@@ -28,6 +28,8 @@ abstract public class PluginBase implements Plugin {
 
     private PluginLoader loader;
 
+    private ClassLoader classLoader;
+
     private Server server;
 
     private boolean isEnabled = false;
@@ -88,7 +90,7 @@ abstract public class PluginBase implements Plugin {
     public final void setEnabled(boolean value) {
         if (isEnabled != value) {
             if (!value && InternalPlugin.INSTANCE == this) {
-                throw new UnsupportedOperationException("The Nukkit-MOT Internal Plugin cannot be disabled");
+                throw new UnsupportedOperationException("The Lumi Internal Plugin cannot be disabled");
             }
             isEnabled = value;
             if (isEnabled) {
@@ -132,10 +134,11 @@ abstract public class PluginBase implements Plugin {
      * @param file        这个插件的文件{@code File}对象。对于jar格式的插件，就是jar文件本身。<br>
      *                    The {@code File} object of this plugin itself. For jar-packed plugins, it is the jar file itself.
      */
-    public final void init(PluginLoader loader, Server server, PluginDescription description, File dataFolder, File file) {
+    public final void init(PluginLoader loader, ClassLoader classLoader, Server server, PluginDescription description, File dataFolder, File file) {
         if (!initialized) {
             initialized = true;
             this.loader = loader;
+            this.classLoader = classLoader;
             this.server = server;
             this.description = description;
             this.dataFolder = dataFolder;
@@ -298,5 +301,10 @@ abstract public class PluginBase implements Plugin {
     @Override
     public PluginLoader getPluginLoader() {
         return this.loader;
+    }
+
+    @Override
+    public ClassLoader getPluginClassLoader() {
+        return classLoader;
     }
 }

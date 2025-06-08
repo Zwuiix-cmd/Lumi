@@ -3,6 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.Server;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.utils.Binary;
 import lombok.ToString;
 
@@ -41,8 +42,10 @@ public class AddPlayerPacket extends DataPacket {
      */
     public int gameType = Server.getInstance().getGamemode();
     public EntityMetadata metadata = new EntityMetadata();
+    public EntityLink[] links = new EntityLink[0];
     public String deviceId = "";
     public int buildPlatform = -1;
+
 
     @Override
     public void decode() {
@@ -99,7 +102,11 @@ public class AddPlayerPacket extends DataPacket {
                     this.putLFloat(1.0f); // getVerticalFlySpeed()
                 }
             }
-            this.putUnsignedVarInt(0);
+            this.putUnsignedVarInt(this.links.length);
+            for (EntityLink link : links) {
+                putEntityLink(protocol, link);
+            }
+
             this.putString(deviceId);
             if (protocol >= 388) {
                 this.putLInt(buildPlatform);

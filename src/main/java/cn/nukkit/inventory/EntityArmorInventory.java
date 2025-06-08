@@ -1,7 +1,7 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.item.EntityArmorStand;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class EntityArmorInventory extends BaseInventory {
 
-    private EntityArmorStand entityLiving;
+    private final Entity entityLiving;
 
     private final Set<Player> viewers = new HashSet<>();
 
@@ -21,9 +21,9 @@ public class EntityArmorInventory extends BaseInventory {
     public static final int SLOT_LEGS = 2;
     public static final int SLOT_FEET = 3;
 
-    public EntityArmorInventory(EntityArmorStand entity) {
+    public EntityArmorInventory(InventoryHolder entity) {
         super(entity, InventoryType.ENTITY_ARMOR);
-        this.entityLiving = entity;
+        this.entityLiving = (Entity) entity;
     }
 
     @Override
@@ -57,20 +57,20 @@ public class EntityArmorInventory extends BaseInventory {
         return this.getItem(SLOT_FEET);
     }
 
-    public void setHelmet(Item item) {
-        this.setItem(SLOT_CHEST, item);
+    public boolean setHelmet(Item item) {
+        return this.setItem(SLOT_CHEST, item);
     }
 
-    public void setChestplate(Item item) {
-        this.setItem(SLOT_CHEST, item);
+    public boolean setChestplate(Item item) {
+        return this.setItem(SLOT_CHEST, item);
     }
 
-    public void setLeggings(Item item) {
-        this.setItem(SLOT_LEGS, item);
+    public boolean setLeggings(Item item) {
+        return this.setItem(SLOT_LEGS, item);
     }
 
-    public void setBoots(Item item) {
-        this.setItem(SLOT_FEET, item);
+    public boolean setBoots(Item item) {
+        return this.setItem(SLOT_FEET, item);
     }
 
     @Override

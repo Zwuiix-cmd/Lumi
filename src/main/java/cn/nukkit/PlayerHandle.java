@@ -1,5 +1,6 @@
 package cn.nukkit;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowDialog;
 import cn.nukkit.inventory.Inventory;
@@ -409,11 +410,15 @@ public final class PlayerHandle {
 
     public void setLastPlayerdLevelUpSoundTime(int lastPlayerdLevelUpSoundTime) {
         player.lastPlayerdLevelUpSoundTime = lastPlayerdLevelUpSoundTime;
-    }
+    }*/
 
     public void setLastAttackEntity(Entity lastAttackEntity) {
         player.lastAttackEntity = lastAttackEntity;
-    }*/
+    }
+
+    public void setLastBeAttackEntity(Entity lastBeAttackEntity) {
+        player.lastBeAttackEntity = lastBeAttackEntity;
+    }
 
     public List<PlayerFogPacket.Fog> getFogStack() {
         return player.fogStack;

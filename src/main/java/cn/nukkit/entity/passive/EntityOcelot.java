@@ -1,21 +1,21 @@
 package cn.nukkit.entity.passive;
 
+
+
+import cn.nukkit.entity.EntityWalkable;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.Utils;
 
-public class EntityOcelot extends EntityTameableAnimal {
+/**
+ * @author BeYkeRYkt (Nukkit Project)
+ */
+public class EntityOcelot extends EntityAnimal implements EntityWalkable {
 
     public static final int NETWORK_ID = 22;
 
     public EntityOcelot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
     }
 
     @Override
@@ -35,27 +35,23 @@ public class EntityOcelot extends EntityTameableAnimal {
     }
 
     @Override
-    public double getSpeed() {
-        return 1.4;
+    public String getOriginalName() {
+        return "Ocelot";
     }
 
     @Override
-    protected void initEntity() {
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public void initEntity() {
         this.setMaxHealth(10);
-
         super.initEntity();
-
-        this.noFallDamage = true;
     }
 
     @Override
-    public boolean isFeedItem(Item item) {
-        int id = item.getId();
-        return id == Item.RAW_FISH || id == Item.RAW_SALMON;
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
+    public boolean isBreedingItem(Item item) {
+        return item.getId() == Item.RAW_FISH;
     }
 }

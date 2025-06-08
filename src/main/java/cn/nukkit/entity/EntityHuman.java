@@ -14,6 +14,7 @@ import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
+import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.utils.*;
 
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_PASSENGER;
 
 /**
  * @author MagicDroidX
@@ -215,6 +218,10 @@ public class EntityHuman extends EntityHumanType {
                 this.setSkin(newSkin);
             }
 
+            if (this.getSkin() == null) {
+                this.setSkin(new Skin());
+            }
+
             this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
                     .getSkinData().data, this.getNameTag().getBytes(StandardCharsets.UTF_8));
         } else {
@@ -326,7 +333,7 @@ public class EntityHuman extends EntityHumanType {
                 this.server.updatePlayerListData(this.uuid, this.getId(), this.getName(), this.skin, new Player[]{player});
             }
 
-            PlayerInventory playerInventory = Objects.requireNonNullElse(this.inventory, BaseEntity.EMPTY_INVENTORY);
+            PlayerInventory playerInventory = Objects.requireNonNullElse(this.inventory, new PlayerInventory(null));
 
             AddPlayerPacket pk = new AddPlayerPacket();
             pk.uuid = this.uuid;
@@ -343,6 +350,11 @@ public class EntityHuman extends EntityHumanType {
             pk.pitch = (float) this.pitch;
             pk.item = playerInventory.getItemInHand();
             pk.metadata = this.dataProperties.clone();
+            pk.links = new EntityLink[this.passengers.size()];
+            for (int i = 0; i < pk.links.length; i++) {
+                pk.links[i] = new EntityLink(this.id, this.passengers.get(i).id, i == 0 ? EntityLink.TYPE_RIDER :
+                        TYPE_PASSENGER, false, false, 0f);
+            }
             player.dataPacket(pk);
 
             if (this.isPlayer) {

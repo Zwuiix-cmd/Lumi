@@ -45,7 +45,7 @@ import static cn.nukkit.utils.Utils.dynamic;
 public abstract class Block extends Position implements Metadatable, Cloneable, AxisAlignedBB, BlockID {
 
     public static final int MAX_BLOCK_ID = dynamic(2048);
-    public static final int DATA_BITS = dynamic(6);
+    public static final int DATA_BITS = dynamic(9);
     public static final int ID_MASK = 0xfff; //max 4095
     public static final int DATA_SIZE = dynamic(1 << DATA_BITS);
     public static final int DATA_MASK = dynamic(DATA_SIZE - 1);
@@ -62,6 +62,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static boolean[] hasMeta = null;
 
     public AxisAlignedBB boundingBox = null;
+    public static final Block[] EMPTY_ARRAY = new Block[0];
     public int layer = 0;
 
     /**
@@ -313,7 +314,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         block.y = y;
         block.z = z;
         block.level = level;
-        block.layer = layer;
+        //block.layer = layer;
         return block;
     }
 
@@ -443,6 +444,17 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public double getFrictionFactor() {
         return 0.6;
+    }
+
+    public static final double DEFAULT_AIR_FLUID_FRICTION = 0.95;
+
+    public double getPassableBlockFrictionFactor() {
+        if (!this.canPassThrough()) return 1;
+        return DEFAULT_AIR_FLUID_FRICTION;
+    }
+
+    public int getWalkThroughExtraCost() {
+        return 0;
     }
 
     public int getLightLevel() {
@@ -872,6 +884,37 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean canBeBrokenWith(Item item) {
         return this.getHardness() != -1;
+    }
+
+    public Block getTickCachedSide(BlockFace face) {
+        return getTickCachedSideAtLayer(layer, face);
+    }
+
+    public Block getTickCachedSide(BlockFace face, int step) {
+        return getTickCachedSideAtLayer(layer, face, step);
+    }
+
+    public Block getTickCachedSideAtLayer(int layer, BlockFace face) {
+        if (this.isValid()) {
+            return this.getLevel().getTickCachedBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
+        }
+        return this.getTickCachedSide(face, 1);
+    }
+
+    public Block getTickCachedSideAtLayer(int layer, BlockFace face, int step) {
+        if (this.isValid()) {
+            if (step == 1) {
+                return this.getLevel().getTickCachedBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
+            } else {
+                return this.getLevel().getTickCachedBlock((int) x + face.getXOffset() * step, (int) y + face.getYOffset() * step, (int) z + face.getZOffset() * step, layer);
+            }
+        }
+        Block block = Block.get(Item.AIR, 0);
+        block.x = (int) x + face.getXOffset() * step;
+        block.y = (int) y + face.getYOffset() * step;
+        block.z = (int) z + face.getZOffset() * step;
+        block.layer = layer;
+        return block;
     }
 
     @Override

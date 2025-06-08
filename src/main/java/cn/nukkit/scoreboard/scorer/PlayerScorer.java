@@ -2,7 +2,7 @@ package cn.nukkit.scoreboard.scorer;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.network.protocol.SetScorePacket;
+import cn.nukkit.network.protocol.types.ScoreEntry;
 import cn.nukkit.network.protocol.types.ScorerType;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
@@ -60,8 +60,8 @@ public class PlayerScorer implements IScorer {
     }
 
     @Override
-    public SetScorePacket.ScoreInfo toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line) {
+    public ScoreEntry toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line) {
         if (uuid == null) return null;
-        return Server.getInstance().getPlayer(uuid).isPresent() ? new SetScorePacket.ScoreInfo(line.getLineId(), scoreboard.getObjectiveName(), line.getScore(), ScorerType.PLAYER, Server.getInstance().getPlayer(uuid).get().getId()) : null;
+        return Server.getInstance().getPlayer(uuid).isPresent() ? new ScoreEntry(line.getLineId(), scoreboard.getObjectiveName(), line.getScore(), ScorerType.PLAYER, Server.getInstance().getPlayer(uuid).get().getId()) : null;
     }
 }

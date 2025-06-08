@@ -221,6 +221,9 @@ public class CustomItemDefinition {
                         .putCompound("item_properties", new CompoundTag()
                                 .putCompound("minecraft:icon", new CompoundTag())));
         private final Item item;
+        protected int id;
+        protected String texture;
+        protected String name;
 
         @Deprecated
         protected SimpleBuilder(CustomItem customItem, ItemCreativeCategory creativeCategory) {
@@ -233,7 +236,7 @@ public class CustomItemDefinition {
 
         protected SimpleBuilder(CustomItem customItem, CreativeItemCategory creativeCategory, String creativeItemGroup) {
             this.item = (Item) customItem;
-            this.identifier = customItem.getNamespaceId();
+            this.identifier = customItem.getSpecification().getId();
             //定义材质
             CompoundTag properties = this.nbt.getCompound("components")
                     .getCompound("item_properties");
@@ -255,6 +258,23 @@ public class CustomItemDefinition {
                     properties.putString("creative_group", creativeItemGroup);
                 }
             }
+        }
+
+        public SimpleBuilder texture(String texture) {
+            if (texture.isBlank()) log.warn("texture name is blank");
+            this.texture = texture;
+            return this;
+        }
+
+        public SimpleBuilder name(String name) {
+            if (name.isBlank()) log.warn("name is blank");
+            this.name = name;
+            return this;
+        }
+
+        public SimpleBuilder id(int id) {
+            this.id = id;
+            return this;
         }
 
         /**
@@ -388,13 +408,31 @@ public class CustomItemDefinition {
         }
 
         protected CustomItemDefinition calculateID() {
+            if (texture.isBlank()) log.warn("You must define the texture through SimpleBuilder#texture method!");
+            this.nbt.getCompound("components")
+                    .getCompound("item_properties")
+                    .getCompound("minecraft:icon")
+                    .putCompound("textures", new CompoundTag()
+                            .putString("default", texture)
+                    );
+            if (name != null) {
+                //定义显示名
+                this.nbt.getCompound("components")
+                        .putCompound("minecraft:display_name", new CompoundTag().putString("value", name));
+            }
             var result = new CustomItemDefinition(identifier, nbt);
-            if (!INTERNAL_ALLOCATION_ID_MAP.containsKey(result.identifier())) {
-                while (RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL).getNamespacedIdByNetworkId(nextRuntimeId.incrementAndGet()) != null)
-                    ;
-                INTERNAL_ALLOCATION_ID_MAP.put(result.identifier(), nextRuntimeId.get());
-                result.nbt.putString("name", result.identifier());
-                result.nbt.putInt("id", nextRuntimeId.get());
+            if(this.id == 0) {
+                if (!INTERNAL_ALLOCATION_ID_MAP.containsKey(result.identifier())) {
+                    while (RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL).getNamespacedIdByNetworkId(nextRuntimeId.incrementAndGet()) != null)
+                        ;
+                    INTERNAL_ALLOCATION_ID_MAP.put(result.identifier(), nextRuntimeId.get());
+                    result.nbt.putString("name", result.identifier());
+                    result.nbt.putInt("id", nextRuntimeId.get());
+                }
+            } else {
+                INTERNAL_ALLOCATION_ID_MAP.put(result.identifier(), this.id);
+                    result.nbt.putString("name", result.identifier());
+                    result.nbt.putInt("id", this.id);
             }
             return result;
         }

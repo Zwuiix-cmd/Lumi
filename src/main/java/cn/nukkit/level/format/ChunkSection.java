@@ -56,6 +56,10 @@ public interface ChunkSection {
 
     boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId, int meta);
 
+    long getBlockChanges();
+
+    void addBlockChange();
+
     int getBlockSkyLight(int x, int y, int z);
 
     void setBlockSkyLight(int x, int y, int z, int level);

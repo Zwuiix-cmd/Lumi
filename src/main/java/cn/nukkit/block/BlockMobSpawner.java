@@ -2,18 +2,30 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntitySpawner;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Pub4Game on 27.12.2015.
  */
-public class BlockMobSpawner extends BlockSolid {
+public class BlockMobSpawner extends BlockSolid implements BlockEntityHolder<BlockEntitySpawner> {
 
     @Override
     public String getName() {
         return "Monster Spawner";
+    }
+
+    @Override
+    public @NotNull Class<? extends BlockEntitySpawner> getBlockEntityClass() {
+        return BlockEntitySpawner.class;
+    }
+
+    @Override
+    public @NotNull String getBlockEntityType() {
+        return BlockEntity.MOB_SPAWNER;
     }
 
     @Override

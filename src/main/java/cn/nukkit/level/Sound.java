@@ -123,6 +123,7 @@ public enum Sound {
     BLOCK_TURTLE_EGG_CRACK("block.turtle_egg.crack"),
     BLOCK_TURTLE_EGG_DROP("block.turtle_egg.drop"),
     BLOOM_SCULK_CATALYST("bloom.sculk_catalyst"),
+    BOTTLE_EMPTY("bottle.empty"),
     BOTTLE_DRAGONBREATH("bottle.dragonbreath"),
     BREAK_AMETHYST_BLOCK("break.amethyst_block"),
     BREAK_AMETHYST_CLUSTER("break.amethyst_cluster"),

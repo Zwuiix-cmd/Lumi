@@ -1,5 +1,6 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ServerException;
 
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import java.util.Objects;
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 public class Attribute implements Cloneable {
+
+    public static final Attribute[] EMPTY_ARRAY = new Attribute[0];
 
     public static final int ABSORPTION = 0;
     public static final int SATURATION = 1;
@@ -103,6 +106,34 @@ public class Attribute implements Cloneable {
         }
         return null;
     }
+
+    public static CompoundTag toNBT(Attribute attribute) {
+        return new CompoundTag().putString("Name", attribute.getName())
+                .putFloat("Base", attribute.getDefaultValue())
+                .putFloat("Current", attribute.getValue())
+                .putFloat("DefaultMax", attribute.getMaxValue())
+                .putFloat("DefaultMin", attribute.getMinValue())
+                .putFloat("Max", attribute.getMaxValue())
+                .putFloat("Min", attribute.getMinValue());
+    }
+
+    public static Attribute fromNBT(CompoundTag NBT) {
+        if (NBT.containsString("Name")
+                && NBT.containsFloat("Base")
+                && NBT.containsFloat("Current")
+                && NBT.containsFloat("DefaultMax")
+                && NBT.containsFloat("DefaultMin")
+                && NBT.containsFloat("Max")
+                && NBT.containsFloat("Min")) {
+            return Attribute.getAttributeByName(NBT.getString("Name"))
+                    .setMinValue(NBT.getFloat("Min"))
+                    .setMaxValue(NBT.getFloat("Max"))
+                    .setValue(NBT.getFloat("Current"))
+                    .setDefaultValue(NBT.getFloat("Base"));
+        }
+        throw new IllegalArgumentException("NBT format error");
+    }
+
 
     public float getMinValue() {
         return this.minValue;

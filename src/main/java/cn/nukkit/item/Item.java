@@ -11,6 +11,8 @@ import cn.nukkit.inventory.ItemTag;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
+import cn.nukkit.item.customitem.CustomItemGenerator;
+import cn.nukkit.item.customitem.ItemCustomSpecification;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -18,6 +20,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.plugin.Plugin;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemData;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemGroup;
@@ -31,6 +34,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import me.sunlan.fastreflection.FastConstructor;
+import me.sunlan.fastreflection.FastMemberLoader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -1022,76 +1027,96 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
         }
 
-        CustomItem customItem;
-        Supplier<Item> supplier;
-
         try {
-            var method = clazz.getDeclaredConstructor();
-            method.setAccessible(true);
-            customItem = method.newInstance();
-            supplier = () -> {
-                try {
-                    return (Item) method.newInstance();
-                } catch (ReflectiveOperationException e) {
-                    throw new UnsupportedOperationException(e);
-                }
-            };
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            return new OK<>(false, e);
-        }
-
-        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
-            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
-        }
-        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
-        CustomItemDefinition customDef = customItem.getDefinition();
-        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customDef);
-        registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
-
-        // 在服务端注册自定义物品的tag
-        if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
-            var tagList = componentTag.getList("item_tags", StringTag.class);
-            if (!tagList.isEmpty()) {
-                ItemTag.registerItemTag(customItem.getNamespaceId(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
+            if (CustomItem.class.isAssignableFrom(clazz)) {
+                FastMemberLoader memberLoader = new FastMemberLoader();
+                FastConstructor<? extends CustomItem> constructor = FastConstructor.create(clazz.getConstructor(), memberLoader, false);
+                return addCustomItemConstructor(constructor, addCreativeItem);
             }
+        } catch (NoSuchMethodException e) {
+            return new OK<>(false, e.getMessage());
         }
+        return new OK<>(false, "Custom item registration failed with unknown error!");
+    }
 
-        registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
-        registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
-        registerCustomItem(customItem, v1_17_10, addCreativeItem, v1_17_10, v1_17_30, v1_17_40);
-        registerCustomItem(customItem, v1_18_0, addCreativeItem, v1_18_0);
-        registerCustomItem(customItem, v1_18_10, addCreativeItem, v1_18_10);
-        registerCustomItem(customItem, v1_18_30, addCreativeItem, v1_18_30);
-        registerCustomItem(customItem, v1_19_0, addCreativeItem, v1_19_0);
-        registerCustomItem(customItem, v1_19_10, addCreativeItem, v1_19_10, v1_19_20);
-        registerCustomItem(customItem, v1_19_50, addCreativeItem, v1_19_50);
-        registerCustomItem(customItem, v1_19_60, addCreativeItem, v1_19_60);
-        registerCustomItem(customItem, v1_19_70, addCreativeItem, v1_19_70);
-        registerCustomItem(customItem, v1_19_80, addCreativeItem, v1_19_80);
-        registerCustomItem(customItem, v1_20_0, addCreativeItem, v1_20_0);
-        registerCustomItem(customItem, v1_20_10, addCreativeItem, v1_20_10);
-        registerCustomItem(customItem, v1_20_30, addCreativeItem, v1_20_30);
-        registerCustomItem(customItem, v1_20_40, addCreativeItem, v1_20_40);
-        registerCustomItem(customItem, v1_20_50, addCreativeItem, v1_20_50);
-        registerCustomItem(customItem, v1_20_60, addCreativeItem, v1_20_60);
-        registerCustomItem(customItem, v1_20_70, addCreativeItem, v1_20_70);
-        registerCustomItem(customItem, v1_20_80, addCreativeItem, v1_20_80);
-        registerCustomItem(customItem, v1_21_0, addCreativeItem, v1_21_0);
-        registerCustomItem(customItem, v1_21_20, addCreativeItem, v1_21_20);
-        registerCustomItem(customItem, v1_21_30, addCreativeItem, v1_21_30);
-        registerCustomItem(customItem, v1_21_40, addCreativeItem, v1_21_40);
-        registerCustomItem(customItem, v1_21_50, addCreativeItem, v1_21_50);
-        registerCustomItem(customItem, v1_21_60, addCreativeItem, v1_21_60);
-        registerCustomItem(customItem, v1_21_70, addCreativeItem, v1_21_70);
-        registerCustomItem(customItem, v1_21_80, addCreativeItem, v1_21_80);
-        //TODO Multiversion 添加新版本支持时修改这里
+    public static <E extends ItemCustomSpecification> OK<?> registerCustomItemBySpecification(@NotNull Plugin plugin, @NotNull Class<? extends CustomItem> value, @NotNull E specification) {
+        value = CustomItemGenerator.generateCustomItem(plugin, value, specification);
+        try {
+            if (CustomItem.class.isAssignableFrom(value)) {
+                FastMemberLoader memberLoader = new FastMemberLoader(CustomItemGenerator.getLoader());
+                FastConstructor<? extends CustomItem> constructor = FastConstructor.create((Constructor<? extends CustomItem>) value.getConstructor(), memberLoader, false);
+                return addCustomItemConstructor(constructor, true);
 
-        if (addCreativeItem) {
-            CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
+            } else {
+                return new OK<>(false, "This class does not implement the CustomItem interface and cannot be registered as a custom item!");
+            }
+        } catch (NoSuchMethodException e) {
+            return new OK<>(false, e.getMessage());
         }
+    }
 
-        return new OK<Void>(true);
+    private static OK<?> addCustomItemConstructor(FastConstructor<? extends CustomItem> constructor, boolean addCreativeItem) {
+        try {
+            CustomItem customItem = (CustomItem) constructor.invoke((Object) null);
+            Supplier<Item> supplier;
+            String key = customItem.getDefinition().identifier();
+
+            if (CUSTOM_ITEMS.containsKey(key)) {
+                return new OK<>(false, "The custom item with the namespace ID \"" + key + "\" is already registered!");
+            }
+            supplier = () -> {
+                return (Item) customItem;
+            };
+            CUSTOM_ITEMS.put(key, supplier);
+            CustomItemDefinition customDef = customItem.getDefinition();
+            CUSTOM_ITEM_DEFINITIONS.put(key, customDef);
+            registerNamespacedIdItem(key, supplier);
+
+            // 在服务端注册自定义物品的tag
+            if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
+                var tagList = componentTag.getList("item_tags", StringTag.class);
+                if (!tagList.isEmpty()) {
+                    ItemTag.registerItemTag(customItem.getDefinition().identifier(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
+                }
+            }
+
+            registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
+            registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
+            registerCustomItem(customItem, v1_17_10, addCreativeItem, v1_17_10, v1_17_30, v1_17_40);
+            registerCustomItem(customItem, v1_18_0, addCreativeItem, v1_18_0);
+            registerCustomItem(customItem, v1_18_10, addCreativeItem, v1_18_10);
+            registerCustomItem(customItem, v1_18_30, addCreativeItem, v1_18_30);
+            registerCustomItem(customItem, v1_19_0, addCreativeItem, v1_19_0);
+            registerCustomItem(customItem, v1_19_10, addCreativeItem, v1_19_10, v1_19_20);
+            registerCustomItem(customItem, v1_19_50, addCreativeItem, v1_19_50);
+            registerCustomItem(customItem, v1_19_60, addCreativeItem, v1_19_60);
+            registerCustomItem(customItem, v1_19_70, addCreativeItem, v1_19_70);
+            registerCustomItem(customItem, v1_19_80, addCreativeItem, v1_19_80);
+            registerCustomItem(customItem, v1_20_0, addCreativeItem, v1_20_0);
+            registerCustomItem(customItem, v1_20_10, addCreativeItem, v1_20_10);
+            registerCustomItem(customItem, v1_20_30, addCreativeItem, v1_20_30);
+            registerCustomItem(customItem, v1_20_40, addCreativeItem, v1_20_40);
+            registerCustomItem(customItem, v1_20_50, addCreativeItem, v1_20_50);
+            registerCustomItem(customItem, v1_20_60, addCreativeItem, v1_20_60);
+            registerCustomItem(customItem, v1_20_70, addCreativeItem, v1_20_70);
+            registerCustomItem(customItem, v1_20_80, addCreativeItem, v1_20_80);
+            registerCustomItem(customItem, v1_21_0, addCreativeItem, v1_21_0);
+            registerCustomItem(customItem, v1_21_20, addCreativeItem, v1_21_20);
+            registerCustomItem(customItem, v1_21_30, addCreativeItem, v1_21_30);
+            registerCustomItem(customItem, v1_21_40, addCreativeItem, v1_21_40);
+            registerCustomItem(customItem, v1_21_50, addCreativeItem, v1_21_50);
+            registerCustomItem(customItem, v1_21_60, addCreativeItem, v1_21_60);
+            registerCustomItem(customItem, v1_21_70, addCreativeItem, v1_21_70);
+            registerCustomItem(customItem, v1_21_80, addCreativeItem, v1_21_80);
+            //TODO Multiversion 添加新版本支持时修改这里
+
+            if (addCreativeItem) {
+                CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
+            }
+            return new OK<Void>(true);
+        } catch (Throwable e) {
+            return new OK<>(false, e.getMessage());
+        }
     }
 
     private static void registerCustomItem(CustomItem item, int protocol,  boolean addCreativeItem, int... creativeProtocols) {
@@ -1285,6 +1310,23 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return get(id, meta.orElse(0));
     }
 
+    private String idConvertToName() {
+        if (this.name != null) {
+            return this.name;
+        } else {
+            var path = this.getNamespaceId().split(":")[1];
+            StringBuilder result = new StringBuilder();
+            String[] parts = path.split("_");
+            for (String part : parts) {
+                if (!part.isEmpty()) {
+                    result.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1)).append(" ");
+                }
+            }
+            this.name = result.toString().trim().intern();
+            return name;
+        }
+    }
+
     public static Item fromJson(Map<String, Object> data) {
         return fromJson(data, false);
     }
@@ -1404,6 +1446,10 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return null;
     }
 
+    public boolean applyEnchantments() {
+        return true;
+    }
+
     public boolean hasEnchantments() {
         if (!this.hasCompoundTag()) {
             return false;
@@ -1413,6 +1459,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
         if (tag.contains("ench")) {
             Tag enchTag = tag.get("ench");
+            return enchTag instanceof ListTag;
+        } else if (tag.contains("custom_ench")) {
+            Tag enchTag = tag.get("custom_ench");
             return enchTag instanceof ListTag;
         }
 
@@ -1428,8 +1477,70 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
      * @return {@code 0} if the item don't have that enchantment or the current level of the given enchantment.
      */
     public int getEnchantmentLevel(int id) {
-        Enchantment enchantment = this.getEnchantment(id);
-        return enchantment == null ? 0 : enchantment.getLevel();
+        if (!this.hasEnchantments()) {
+            return 0;
+        }
+
+        for (CompoundTag entry : this.getNamedTag().getList("ench", CompoundTag.class).getAll()) {
+            if (entry.getShort("id") == id) {
+                return entry.getShort("lvl");
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * 检测该物品是否有该附魔
+     * <p>
+     * Detect if the item has the enchantment
+     *
+     * @param id 要查询的附魔标识符
+     */
+    public boolean hasCustomEnchantment(String id) {
+        return this.getCustomEnchantmentLevel(id) > 0;
+    }
+
+    public int getCustomEnchantmentLevel(String id) {
+        if (!this.hasEnchantments()) {
+            return 0;
+        }
+        for (CompoundTag entry : this.getNamedTag().getList("custom_ench", CompoundTag.class).getAll()) {
+            if (entry.getString("id").equals(id)) {
+                return entry.getShort("lvl");
+            }
+        }
+        return 0;
+    }
+
+    public Enchantment getCustomEnchantment(String id) {
+        if (!this.hasEnchantments()) {
+            return null;
+        }
+
+        for (CompoundTag entry : this.getNamedTag().getList("custom_ench", CompoundTag.class).getAll()) {
+            if (entry.getString("id").equals(id)) {
+                Enchantment e = Enchantment.getEnchantment(entry.getString("id"));
+                if (e != null) {
+                    e.setLevel(entry.getShort("lvl"), false);
+                    return e;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public int getCustomEnchantmentLevel(@NotNull Identifier id) {
+        return getCustomEnchantmentLevel(id.toString());
+    }
+
+    public boolean hasCustomEnchantment(@NotNull Identifier id) {
+        return hasCustomEnchantment(id.toString());
+    }
+
+    public Enchantment getCustomEnchantment(@NotNull Identifier id) {
+        return getCustomEnchantment(id.toString());
     }
 
     public Enchantment getEnchantment(int id) {
@@ -1445,7 +1556,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             if (entry.getShort("id") == id) {
                 Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
                 if (e != null) {
-                    e.setLevel(entry.getShort("lvl"), Server.getInstance().forcedSafetyEnchant);
+                    e.setLevel(entry.getShort("lvl"), false);
                     return e;
                 }
             }
@@ -1464,60 +1575,123 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
         ListTag<CompoundTag> ench;
         if (!tag.contains("ench")) {
-            ench = new ListTag<>("ench");
-            tag.putList(ench);
+            ench = new ListTag<>();
+            tag.putList("ench", ench);
         } else {
             ench = tag.getList("ench", CompoundTag.class);
+        }
+        ListTag<CompoundTag> custom_ench;
+        if (!tag.contains("custom_ench")) {
+            custom_ench = new ListTag<>();
+            tag.putList("custom_ench", custom_ench);
+        } else {
+            custom_ench = tag.getList("custom_ench", CompoundTag.class);
         }
 
         for (Enchantment enchantment : enchantments) {
             boolean found = false;
-
-            for (int k = 0; k < ench.size(); k++) {
-                CompoundTag entry = ench.get(k);
-                if (entry.getShort("id") == enchantment.getId()) {
-                    ench.add(k, new CompoundTag()
+            if (enchantment.getIdentifier() == null) {
+                for (int k = 0; k < ench.size(); k++) {
+                    CompoundTag entry = ench.get(k);
+                    if (entry.getShort("id") == enchantment.getId()) {
+                        ench.add(k, new CompoundTag()
+                                .putShort("id", enchantment.getId())
+                                .putShort("lvl", enchantment.getLevel())
+                        );
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    ench.add(new CompoundTag()
                             .putShort("id", enchantment.getId())
                             .putShort("lvl", enchantment.getLevel())
                     );
-                    found = true;
-                    break;
+                }
+            } else {
+                for (int k = 0; k < custom_ench.size(); k++) {
+                    CompoundTag entry = custom_ench.get(k);
+                    if (entry.getString("id").equals(enchantment.getIdentifier().toString())) {
+                        custom_ench.add(k, new CompoundTag()
+                                .putString("id", enchantment.getIdentifier().toString())
+                                .putShort("lvl", enchantment.getLevel())
+                        );
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    custom_ench.add(new CompoundTag()
+                            .putString("id", enchantment.getIdentifier().toString())
+                            .putShort("lvl", enchantment.getLevel())
+                    );
                 }
             }
-
-            if (!found) {
-                ench.add(new CompoundTag()
-                        .putShort("id", enchantment.getId())
-                        .putShort("lvl", enchantment.getLevel())
+        }
+        if (!custom_ench.isEmpty()) {
+            var customName = getCustomEnchantmentDisplay(custom_ench);
+            if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
+                tag.getCompound("display").putString("Name", customName);
+            } else {
+                tag.putCompound("display", new CompoundTag()
+                        .putString("Name", customName)
                 );
             }
         }
-
         this.setNamedTag(tag);
+    }
+
+    private String getCustomEnchantmentDisplay(ListTag<CompoundTag> customEnchantments) {
+        StringJoiner joiner = new StringJoiner("\n");
+
+        String originalName;
+        if (this.hasSavedCustomName()) {
+            originalName = this.getSavedCustomName();
+        } else {
+            if (this.isTool() && !(this instanceof CustomItem)) {
+                originalName = "%item." + this.getNamespaceId().split(":")[1] + ".name";
+            } else {
+                originalName = this.idConvertToName();
+            }
+        }
+
+        joiner.add(TextFormat.RESET.toString() + TextFormat.AQUA + originalName + TextFormat.RESET);
+
+        for (var enchant : customEnchantments.getAll()) {
+            var enchantment = Enchantment.getEnchantment(enchant.getString("id")).setLevel(enchant.getShort("lvl"));
+            joiner.add(enchantment.getLore());
+        }
+        return joiner.toString();
     }
 
     public Enchantment[] getEnchantments() {
         if (!this.hasEnchantments()) {
             return Enchantment.EMPTY_ARRAY;
         }
-
         List<Enchantment> enchantments = new ArrayList<>();
 
         ListTag<CompoundTag> ench = this.getNamedTag().getList("ench", CompoundTag.class);
         for (CompoundTag entry : ench.getAll()) {
             Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
             if (e != null) {
-                e.setLevel(entry.getShort("lvl"), Server.getInstance().forcedSafetyEnchant);
+                e.setLevel(entry.getShort("lvl"), false);
                 enchantments.add(e);
             }
         }
-
+        //custom ench
+        ListTag<CompoundTag> custom_ench = this.getNamedTag().getList("custom_ench", CompoundTag.class);
+        for (CompoundTag entry : custom_ench.getAll()) {
+            Enchantment e = Enchantment.getEnchantment(entry.getString("id"));
+            if (e != null) {
+                e.setLevel(entry.getShort("lvl"), false);
+                enchantments.add(e);
+            }
+        }
         return enchantments.toArray(Enchantment.EMPTY_ARRAY);
     }
 
     public boolean hasEnchantment(int id) {
-        Enchantment e = this.getEnchantment(id);
-        return e != null && e.getLevel() > 0;
+        return this.getEnchantmentLevel(id) > 0;
     }
 
     public boolean hasEnchantment(short id) {
@@ -1533,6 +1707,22 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         if (tag.contains("display")) {
             Tag tag1 = tag.get("display");
             return tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag;
+        }
+
+        return false;
+    }
+
+    public boolean hasSavedCustomName() {
+        if (!this.hasCompoundTag()) {
+            return false;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+        if (tag.contains("display")) {
+            Tag display = tag.get("display");
+            return display instanceof CompoundTag compound &&
+                    compound.contains("SavedName") &&
+                    compound.get("SavedName") instanceof StringTag;
         }
 
         return false;
@@ -1554,6 +1744,25 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return "";
     }
 
+    public String getSavedCustomName() {
+        if (!this.hasCompoundTag()) {
+            return "";
+        }
+
+        CompoundTag tag = this.getNamedTag();
+        if (tag.contains("display")) {
+            Tag display = tag.get("display");
+            if (display instanceof CompoundTag compound &&
+                    compound.contains("SavedName") &&
+                    compound.get("SavedName") instanceof StringTag) {
+                return compound.getString("SavedName");
+            }
+        }
+
+        return "";
+    }
+
+
     public Item setCustomName(String name) {
         if (name == null || name.isEmpty()) {
             this.clearCustomName();
@@ -1571,10 +1780,13 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             tag = this.getNamedTag();
         }
         if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
-            tag.getCompound("display").putString("Name", name);
+            tag.getCompound("display")
+                    .putString("Name", name)
+                    .putString("SavedName", name);
         } else {
             tag.putCompound("display", new CompoundTag("display")
                     .putString("Name", name)
+                    .putString("SavedName", name)
             );
         }
         this.setNamedTag(tag);
@@ -2144,10 +2356,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         }
 
         public void add(Item item, CreativeItemGroup group) {
-//            if (group == null) {
-//                throw new IllegalArgumentException("group == null");
-//            }
-
             contents.put(item, group);
         }
 

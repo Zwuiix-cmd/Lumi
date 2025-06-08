@@ -26,7 +26,8 @@ public class NPCRequestProcessor extends DataPacketProcessor<NPCRequestPacket> {
         Player player = playerHandle.player;
         //若sceneName字段为空，则为玩家在编辑NPC，我们并不需要记录对话框，直接通过entityRuntimeId获取实体即可
         if (pk.sceneName.isEmpty() && player.level.getEntity(pk.entityRuntimeId) instanceof EntityNPCEntity npcEntity) {
-            FormWindowDialog dialog = npcEntity.getDialog();
+            //TODO: Fix NPC's if someone needs them
+            /*FormWindowDialog dialog = npcEntity.getDialog();
 
             FormResponseDialog response = new FormResponseDialog(pk, dialog);
             for (FormDialogHandler handler : dialog.getHandlers()) {
@@ -35,6 +36,7 @@ public class NPCRequestProcessor extends DataPacketProcessor<NPCRequestPacket> {
 
             PlayerDialogRespondedEvent event = new PlayerDialogRespondedEvent(player, dialog, response);
             player.getServer().getPluginManager().callEvent(event);
+             */
             return;
         }
         if (playerHandle.getDialogWindows().getIfPresent(pk.sceneName) != null) {

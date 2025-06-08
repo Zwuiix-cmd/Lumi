@@ -55,7 +55,7 @@ public class JavaPluginLoader implements PluginLoader {
                     Class<PluginBase> pluginClass = (Class<PluginBase>) javaClass.asSubclass(PluginBase.class);
 
                     plugin = pluginClass.newInstance();
-                    this.initPlugin(plugin, description, dataFolder, file);
+                    this.initPlugin(plugin, classLoader, description, dataFolder, file);
 
                     return plugin;
                 } catch (ClassCastException e) {
@@ -135,8 +135,8 @@ public class JavaPluginLoader implements PluginLoader {
         return new Pattern[]{Pattern.compile("^.+\\.jar$")};
     }
 
-    private void initPlugin(PluginBase plugin, PluginDescription description, File dataFolder, File file) {
-        plugin.init(this, this.server, description, dataFolder, file);
+    private void initPlugin(PluginBase plugin, ClassLoader classLoader, PluginDescription description, File dataFolder, File file) {
+        plugin.init(this, classLoader, this.server, description, dataFolder, file);
         plugin.onLoad();
     }
 

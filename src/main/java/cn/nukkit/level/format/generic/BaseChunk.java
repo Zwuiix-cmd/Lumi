@@ -356,6 +356,10 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
         return this.provider;
     }
 
+    public long getSectionBlockChanges(int sectionY) {
+        return sections[sectionY].getBlockChanges();
+    }
+
     /*private boolean walk(ChunkSection section, Updater updater) {
         int offsetX = getX() << 4;
         int offsetZ = getZ() << 4;

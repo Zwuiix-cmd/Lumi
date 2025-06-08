@@ -1,0 +1,39 @@
+package cn.nukkit.entity.ai.executor;
+
+import cn.nukkit.block.Block;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityIntelligent;
+import cn.nukkit.entity.mob.EntityEnderman;
+import cn.nukkit.item.Item;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+public class EndermanBlockExecutor implements IBehaviorExecutor {
+
+    public boolean execute(EntityIntelligent entity) {
+        if(entity instanceof EntityEnderman enderman) {
+            if(enderman.getItemInHand().isNull()) {
+                Optional<Block> optionalBlock = Arrays.stream(entity.level.getCollisionBlocks(entity.getBoundingBox().grow(3.7f, 0, 3.7f)))/*.filter(block -> block instanceof Natural natural && natural.canBePickedUp())*/.findAny();
+                if(optionalBlock.isPresent()) {
+                    Block block = optionalBlock.get();
+                    enderman.setItemInHand(block.toItem());
+                    //enderman.setDataProperty(Entity.CARRY_BLOCK_STATE, block);
+                    enderman.getLevel().setBlock(block, Block.get(Block.AIR));
+                }
+            } else {
+                if(enderman.getItemInHand().getBlock().getId() != Block.AIR) {
+                    Optional<Block> optionalBlock = Arrays.stream(entity.level.getCollisionBlocks(entity.getBoundingBox().addCoord(0.7f, -1, 0.7f))).filter(block -> block.isSolid() && block.up().canBeReplaced()).findAny();
+                    if(optionalBlock.isPresent()) {
+                        Block block = optionalBlock.get();
+                        block.getLevel().setBlock(block.up(), enderman.getItemInHand().getBlock());
+                        enderman.setItemInHand(Item.AIR_ITEM);
+                        //enderman.setDataProperty(EntityDataTypes.CARRY_BLOCK_STATE, Item.AIR_ITEM.getBlock());
+                    }
+                }   
+            }
+        }
+        return true;
+    }
+
+}

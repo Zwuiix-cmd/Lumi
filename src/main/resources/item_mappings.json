@@ -13,23 +13,6 @@
     "protocol": 729,
     "0": "minecraft:tnt"
   },
-  "minecraft:cobblestone_wall": {
-    "protocol": 729,
-    "0": "minecraft:cobblestone_wall",
-    "1": "minecraft:mossy_cobblestone_wall",
-    "2": "minecraft:granite_wall",
-    "3": "minecraft:diorite_wall",
-    "4": "minecraft:andesite_wall",
-    "5": "minecraft:sandstone_wall",
-    "6": "minecraft:brick_wall",
-    "7": "minecraft:stone_brick_wall",
-    "8": "minecraft:mossy_stone_brick_wall",
-    "9": "minecraft:nether_brick_wall",
-    "10": "minecraft:end_stone_brick_wall",
-    "11": "minecraft:prismarine_wall",
-    "12": "minecraft:red_sandstone_wall",
-    "13": "minecraft:red_nether_brick_wall"
-  },
   "minecraft:sponge": {
     "protocol": 729,
     "0": "minecraft:sponge",
@@ -477,8 +460,7 @@
     "5": "minecraft:dark_oak_boat",
     "6": "minecraft:mangrove_boat",
     "7": "minecraft:bamboo_raft",
-    "8": "minecraft:cherry_boat",
-    "9": "minecraft:pale_oak_boat"
+    "8": "minecraft:cherry_boat"
   },
   "minecraft:bucket": {
     "0": "minecraft:bucket",

@@ -1,11 +1,9 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.AdventureSettings;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockFire;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.block.BlockWater;
+import cn.nukkit.block.*;
 import cn.nukkit.blockentity.BlockEntityPistonArm;
 import cn.nukkit.entity.custom.CustomEntity;
 import cn.nukkit.entity.custom.EntityDefinition;
@@ -14,7 +12,7 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
-import cn.nukkit.entity.mob.EntityWolf;
+import cn.nukkit.entity.passive.EntityWolf;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -106,7 +104,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_SWELL_DIR = 21;
     public static final int DATA_CHARGE_AMOUNT = 22;
     public static final int DATA_ENDERMAN_HELD_RUNTIME_ID = 23; //int (block runtime id)
-    public static final int DATA_ENTITY_AGE = 24; //short
+    public static final int DATA_CLIENT_EVENT = 24; //byte (probably. Because it is like that in PNX)
     public static final int DATA_PLAYER_FLAGS = 26; //byte
     public static final int DATA_PLAYER_INDEX = 27;
     public static final int DATA_PLAYER_BED_POSITION = 28; //block coords
@@ -411,6 +409,8 @@ public abstract class Entity extends Location implements Metadatable {
         initEntityIdentifiers(ProtocolInfo.v1_19_80, AvailableEntityIdentifiersPacket.TAG);
     }
 
+    public final AxisAlignedBB offsetBoundingBox = new SimpleAxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
 
     protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
@@ -527,10 +527,17 @@ public abstract class Entity extends Location implements Metadatable {
         return 0;
     }
 
-    public float getEyeHeight() {
-        return this.getHeight() / 2 + 0.1f;
+    public float getCurrentHeight() {
+        if (isSwimming()) {
+            return getSwimmingHeight();
+        } else {
+            return getHeight();
+        }
     }
 
+    public float getEyeHeight() {
+        return getCurrentHeight() / 2 + 0.1f;
+    }
     public float getEyeY() {
         return (float) y + getEyeHeight();
     }
@@ -811,11 +818,17 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSwimming(boolean value) {
-        if (this.swimming != value) {
-            this.swimming = value;
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SWIMMING, value);
-            this.recalculateBoundingBox(true);
+        if (isSwimming() == value) {
+            return;
         }
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SWIMMING, value);
+        if (Float.compare(getSwimmingHeight(), getHeight()) != 0) {
+            recalculateBoundingBox(true);
+        }
+    }
+
+    public float getSwimmingHeight() {
+        return getHeight();
     }
 
     public boolean isSprinting() {
@@ -1385,6 +1398,10 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public String getOriginalName() {
+        return this.getSaveId();
+    }
+
     public final String getSaveId() {
         if(this instanceof CustomEntity) {
             EntityDefinition entityDefinition = ((CustomEntity) this).getEntityDefinition();
@@ -1525,41 +1542,6 @@ public abstract class Entity extends Location implements Metadatable {
         server.getPluginManager().callEvent(source);
         if (source.isCancelled()) {
             return false;
-        }
-
-        if (source instanceof EntityDamageByEntityEvent) {
-            // Make fire aspect to set the target in fire before dealing any damage so the target is in fire on death even if killed by the first hit
-            Enchantment[] enchantments = ((EntityDamageByEntityEvent) source).getWeaponEnchantments();
-            if (enchantments != null) {
-                for (Enchantment enchantment : enchantments) {
-                    enchantment.doAttack(((EntityDamageByEntityEvent) source).getDamager(), this);
-                }
-            }
-
-            // Wolf targets
-            if (source.getEntity() instanceof Player) {
-                for (Entity entity : source.getEntity().getLevel().getNearbyEntities(source.getEntity().getBoundingBox().grow(17, 17, 17), source.getEntity())) {
-                    if (entity instanceof EntityWolf) {
-                        if (((EntityWolf) entity).hasOwner()) {
-                            ((EntityWolf) entity).isAngryTo = ((EntityDamageByEntityEvent) source).getDamager().getId();
-                            ((EntityWolf) entity).setAngry(true);
-                        }
-                    }
-                }
-            } else if (((EntityDamageByEntityEvent) source).getDamager() instanceof Player) {
-                for (Entity entity : ((EntityDamageByEntityEvent) source).getDamager().getLevel().getNearbyEntities(((EntityDamageByEntityEvent) source).getDamager().getBoundingBox().grow(17, 17, 17), ((EntityDamageByEntityEvent) source).getDamager())) {
-                    if (entity.getId() != source.getEntity().getId()) {
-                        if (entity instanceof EntityWolf) {
-                            if (((EntityWolf) entity).hasOwner()) {
-                                if (((EntityWolf) entity).getOwner().equals(((EntityDamageByEntityEvent) source).getDamager())) {
-                                    ((EntityWolf) entity).isAngryTo = source.getEntity().getId();
-                                    ((EntityWolf) entity).setAngry(true);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         if (this.absorption > 0) { // Damage Absorption
@@ -1857,9 +1839,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.checkBlockCollision();
         int minY = level.getMinBlockY() - 18;
-        if (this.isPlayer && ((Player) this).protocol < ProtocolInfo.v1_18_0) {
-            minY = -18;
-        }
         if (this.y <= minY && this.isAlive()) {
             if (this.isPlayer) {
                 if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
@@ -1896,7 +1875,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        if (this.inPortalTicks == 80 && Server.getInstance().isNetherAllowed() && this instanceof BaseEntity) {
+        if (this.inPortalTicks == 80 && Server.getInstance().isNetherAllowed() && this instanceof EntityIntelligent) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.server.getPluginManager().callEvent(ev);
 
@@ -1916,8 +1895,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void updateMovement() {
+        if (!enableHeadYaw()) {
+            this.headYaw = this.yaw;
+        }
         double diffPosition = (this.x - this.lastX) * (this.x - this.lastX) + (this.y - this.lastY) * (this.y - this.lastY) + (this.z - this.lastZ) * (this.z - this.lastZ);
-        double diffRotation = (this.yaw - this.lastYaw) * (this.yaw - this.lastYaw) + (this.pitch - this.lastPitch) * (this.pitch - this.lastPitch);
+        double diffRotation = (enableHeadYaw() ? (this.headYaw - this.lastHeadYaw) * (this.headYaw - this.lastHeadYaw) : 0) + (this.yaw - this.lastYaw) * (this.yaw - this.lastYaw) + (this.pitch - this.lastPitch) * (this.pitch - this.lastPitch);
 
         double diffMotion = (this.motionX - this.lastMotionX) * (this.motionX - this.lastMotionX) + (this.motionY - this.lastMotionY) * (this.motionY - this.lastMotionY) + (this.motionZ - this.lastMotionZ) * (this.motionZ - this.lastMotionZ);
 
@@ -1946,6 +1928,10 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public boolean enableHeadYaw() {
+        return false;
+    }
+
     public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
         this.level.addEntityMovement(this, x, y, z, yaw, pitch, headYaw);
     }
@@ -1956,9 +1942,8 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        for (Player p : this.hasSpawned.values()) {
-            p.dataPacket(pk); // Server.broadcastPacket would only use batching for >= 1.16.100
-        }
+
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
     }
 
     protected void broadcastMovement() {
@@ -1974,7 +1959,7 @@ public abstract class Entity extends Location implements Metadatable {
         pk.yaw = yaw;
         pk.teleport = false;
         pk.onGround = this.onGround;
-        Server.broadcastPacket(hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_7_0).collect(Collectors.toList()), pk);
+        Server.broadcastPacket(hasSpawned.values(), pk);
     }
 
     @Override
@@ -2019,17 +2004,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.updateMovement();
 
-        /*if (server.vanillaBB && this instanceof EntityBoss && currentTick % 100 == 0) { //TODO: Figure out why doesn't the boss bar length change
-            for (Player p : this.hasSpawned.values()) {
-                BossEventPacket pkBoss = new BossEventPacket();
-                pkBoss.bossEid = this.id;
-                pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
-                pkBoss.title = this.getName();
-                pkBoss.healthPercent = p.protocol >= 361 ? this.health / 100 : this.health;
-                p.dataPacket(pkBoss);
-            }
-        }*/
-
         return hasUpdate;
     }
 
@@ -2051,7 +2025,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         // Entity entering a vehicle
-        EntityVehicleEnterEvent ev = new EntityVehicleEnterEvent(entity, (EntityVehicle) this);
+        EntityVehicleEnterEvent ev = new EntityVehicleEnterEvent(entity, this);
         server.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return false;
@@ -2076,7 +2050,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean dismountEntity(Entity entity, boolean sendLinks) {
         if (this instanceof EntityVehicle) {
             // Run the events
-            EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, (EntityVehicle) this);
+            EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, this);
             server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
                 int seatIndex = this.passengers.indexOf(entity);
@@ -2217,7 +2191,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             if (fallDistance > 0) {
                 // check if we fell into at least 1 block of water
-                if (this instanceof EntityLiving && !(this.getLevelBlock() instanceof BlockWater) && !(this instanceof EntityFlying)) {
+                if (this instanceof EntityLiving && !(this.getLevelBlock() instanceof BlockWater) && !(this instanceof EntityFlyable)) {
                     this.fall(fallDistance);
                 }
                 this.resetFallDistance();
@@ -2416,9 +2390,45 @@ public abstract class Entity extends Location implements Metadatable {
         return block instanceof BlockWater || this.level.getBlock(block, 1) instanceof BlockWater;
     }
 
+    public boolean hasWaterAt(float height) {
+        return hasWaterAt(height, false);
+    }
+
+    protected boolean hasWaterAt(float height, boolean tickCached) {
+        double y = this.y + height;
+        Block block = tickCached ?
+                this.level.getTickCachedBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z))) :
+                this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
+
+        boolean layer1 = false;
+        Block block1 = tickCached ? block.getTickCachedLevelBlockAtLayer(1) : block.getLevelBlockAtLayer(1);
+        if (!(block instanceof BlockBubbleColumn) && (
+                block instanceof BlockWater
+                        || (layer1 = block1 instanceof BlockWater))) {
+            BlockWater water = (BlockWater) (layer1 ? block1 : block);
+            double f = (block.y + 1) - (water.getFluidHeightPercent() - 0.1111111);
+            return y < f;
+        }
+
+        return false;
+    }
+
+
     public boolean isInsideOfWater() {
-        Block block = level.getBlock(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-        return block.isWater() || block.getWaterloggingType() != Block.WaterloggingType.NO_WATERLOGGING && block.getLevelBlockAtLayer(1).isWater();
+        return hasWaterAt(this.getEyeHeight());
+    }
+
+    public boolean isTouchingWater() {
+        return hasWaterAt(0) || hasWaterAt(this.getEyeHeight());
+    }
+
+    public boolean isUnderBlock() {
+        int x = this.getFloorX();
+        int y = this.getFloorY();
+        int z = this.getFloorZ();
+        for (int i = y + 1; i <= this.getLevel().getMaxBlockY(); i++)
+            if (this.getLevel().getBlock(x, i, z).getId() != BlockID.AIR) return true;
+        return false;
     }
 
     public boolean isInsideOfSolid() {
@@ -2446,17 +2456,15 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean fastMove(double dx, double dy, double dz) {
-        if (!this.isPlayer) {
-            this.blocksAround = null;
-        }
-
         if (dx == 0 && dy == 0 && dz == 0) {
             return true;
         }
 
         AxisAlignedBB newBB = this.boundingBox.getOffsetBoundingBox(dx, dy, dz);
 
-        if (server.getAllowFlight() || !this.level.hasCollision(this, newBB, false)) {
+        if (server.getAllowFlight()
+                || isPlayer && ((Player) this).getAdventureSettings().get(AdventureSettings.Type.NO_CLIP)
+                || !this.level.hasCollision(this, newBB, false)) {
             this.boundingBox = newBB;
         }
 
@@ -2470,21 +2478,18 @@ public abstract class Entity extends Location implements Metadatable {
             AxisAlignedBB bb = this.boundingBox.clone();
             bb.setMinY(bb.getMinY() - 0.75);
 
-            this.onGround = this.level.hasCollisionBlocks(this, bb);
+            this.onGround = this.level.getCollisionBlocks(bb).length > 0;
         }
         this.isCollided = this.onGround;
         this.updateFallState(this.onGround);
         return true;
     }
 
+
     public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
-            this.onGround = !this.getPosition().setComponents(this.down()).getLevelBlock().canPassThrough();
-            return false;
-        }
-
-        if (!this.isPlayer) {
-            this.blocksAround = null;
+            this.onGround = !this.getPosition().setComponents(this.down()).getTickCachedLevelBlock().canPassThrough();
+            return true;
         }
 
         if (this.keepMovement) {
@@ -2493,7 +2498,8 @@ public abstract class Entity extends Location implements Metadatable {
             this.onGround = this.isPlayer;
             return true;
         } else {
-            this.ySize *= STEP_CLIP_MULTIPLIER;
+
+            this.ySize *= 0.4;
 
             double movX = dx;
             double movY = dy;
@@ -2501,7 +2507,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             AxisAlignedBB axisalignedbb = this.boundingBox.clone();
 
-            AxisAlignedBB[] list = this.noClip ? AxisAlignedBB.EMPTY_ARRAY : this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+            var list = this.noClip ? AxisAlignedBB.EMPTY_LIST : this.level.fastCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
 
             for (AxisAlignedBB bb : list) {
                 dy = bb.calculateYOffset(this.boundingBox, dy);
@@ -2523,7 +2529,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             this.boundingBox.offset(0, 0, dz);
 
-            if (this.getStepHeight() > 0 && fallingFlag && (movX != dx || movZ != dz)) {
+            if (this.getStepHeight() > 0 && fallingFlag && this.ySize < 0.05 && (movX != dx || movZ != dz)) {
                 double cx = dx;
                 double cy = dy;
                 double cz = dz;
@@ -2535,7 +2541,7 @@ public abstract class Entity extends Location implements Metadatable {
 
                 this.boundingBox.setBB(axisalignedbb);
 
-                list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+                list = this.level.fastCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
 
                 for (AxisAlignedBB bb : list) {
                     dy = bb.calculateYOffset(this.boundingBox, dy);
@@ -2555,12 +2561,7 @@ public abstract class Entity extends Location implements Metadatable {
 
                 this.boundingBox.offset(0, 0, dz);
 
-                double reverseDY = -dy;
-                for (AxisAlignedBB bb : list) {
-                    reverseDY = bb.calculateYOffset(this.boundingBox, reverseDY);
-                }
-                dy += reverseDY;
-                this.boundingBox.offset(0, reverseDY, 0);
+                this.boundingBox.offset(0, 0, dz);
 
                 if ((cx * cx + cz * cz) >= (dx * dx + dz * dz)) {
                     dx = cx;
@@ -2568,8 +2569,9 @@ public abstract class Entity extends Location implements Metadatable {
                     dz = cz;
                     this.boundingBox.setBB(axisalignedbb1);
                 } else {
-                    this.ySize += dy;
+                    this.ySize += 0.5;
                 }
+
             }
 
             this.x = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2;
@@ -2593,6 +2595,7 @@ public abstract class Entity extends Location implements Metadatable {
                 this.motionZ = 0;
             }
 
+            //TODO: vehicle collision events (first we need to spawn them!)
             return true;
         }
     }
@@ -3198,6 +3201,34 @@ public abstract class Entity extends Location implements Metadatable {
 
     public Server getServer() {
         return server;
+    }
+
+    public void setAmbientSoundInterval(float interval) {
+        this.setDataProperty(new FloatEntityData(Entity.DATA_AMBIENT_SOUND_INTERVAL, interval));
+    }
+
+    public void setAmbientSoundIntervalRange(float range) {
+        this.setDataProperty(new FloatEntityData(Entity.DATA_AMBIENT_SOUND_INTERVAL_RANGE, range));
+    }
+
+    public void setAmbientSoundEvent(Sound sound) {
+        this.setAmbientSoundEventName(sound.getSound());
+    }
+
+    public void setAmbientSoundEventName(String eventName) {
+        this.setDataProperty(new StringEntityData(Entity.DATA_AMBIENT_SOUND_EVENT_NAME, eventName));
+    }
+
+    public boolean isUndead() {
+        return false;
+    }
+
+    public boolean isPreventingSleep(Player player) {
+        return false;
+    }
+
+    public boolean isBoss() {
+        return false;
     }
 
     @Override

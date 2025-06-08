@@ -196,12 +196,6 @@ public class BlockChest extends BlockTransparentMeta implements Faceable, BlockE
             }
 
             player.addWindow(chest.getInventory());
-
-            for (Entity e : this.getChunk().getEntities().values()) {
-                if (e instanceof EntityPiglin) {
-                    ((EntityPiglin) e).setAngry(600);
-                }
-            }
         }
 
         return true;
@@ -241,15 +235,6 @@ public class BlockChest extends BlockTransparentMeta implements Faceable, BlockE
     @Override
     public boolean onBreak(Item item, Player player) {
         boolean broken = this.onBreak(item);
-
-        if (broken && player != null) {
-            for (Entity e : this.getChunk().getEntities().values()) {
-                if (e instanceof EntityPiglin) {
-                    ((EntityPiglin) e).setAngry(600);
-                }
-            }
-        }
-
         return broken;
     }
 

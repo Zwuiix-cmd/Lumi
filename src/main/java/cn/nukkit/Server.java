@@ -423,13 +423,6 @@ public class Server {
      */
     public boolean opInGame;
     /**
-     * Handling player names with spaces.
-        [0] "disabled" - Players with names containing spaces are prohibited from entering the server.
-        [1] "ignore" - Ignore names with spaces (default).
-        [2] "replacing" - Replace spaces in player names with "_".
-     */
-    public int spaceMode;
-    /**
      * Sky light updates enabled.
      */
     public boolean lightUpdates;
@@ -465,10 +458,6 @@ public class Server {
      * More vanilla like portal logics enabled.
      */
     public boolean vanillaPortals;
-    /**
-     * Ticks required for the player to trigger the portal.
-     */
-    public int portalTicks;
     /**
      * Persona skins allowed.
      */
@@ -697,7 +686,7 @@ public class Server {
             }
         }
 
-        log.info("\u00A7b-- \u00A7cNukkit \u00A7dMOT \u00A7b--");
+        log.info("\u00A7b-- \u00A7cLumi \u00A7b--");
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -874,26 +863,6 @@ public class Server {
         if (this.getPropertyBoolean("bstats-metrics", true)) {
             new NukkitMetrics(this);
         }
-
-        // Check for updates
-        CompletableFuture.runAsync(() -> {
-            try {
-                URLConnection request = new URL(Nukkit.BRANCH).openConnection();
-                request.connect();
-                InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
-                String latest = "git-" + JsonParser.parseReader(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
-                content.close();
-
-                boolean isMaster = Nukkit.getBranch().equals("master");
-                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && isMaster) {
-                    this.getLogger().info("§c[Nukkit-MOT][Update] §eThere is a new build of §cNukkit§3-§dMOT §eavailable! Current: " + this.getNukkitVersion() + " Latest: " + latest);
-                    this.getLogger().info("§c[Nukkit-MOT][Update] §eYou can download the latest build from https://github.com/MemoriesOfTime/Nukkit-MOT/");
-                } else if (!isMaster) {
-                    this.getLogger().warning("§c[Nukkit-MOT] §eYou are running a dev build! Do not use in production! Branch: " + Nukkit.getBranch());
-                }
-            } catch (Exception ignore) {
-            }
-        });
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::forceShutdown));
 
@@ -1382,6 +1351,9 @@ public class Server {
                 level.doTick(currentTick);
                 int tickMs = (int) (System.currentTimeMillis() - levelTime);
                 level.tickRateTime = tickMs;
+                if ((currentTick & 511) == 0) { // % 511
+                    level.tickRateOptDelay = level.recalcTickOptDelay();
+                }
 
                 if (this.autoTickRate) {
                     if (tickMs < 50 && level.getTickRate() > this.baseTickRate) {
@@ -2894,8 +2866,8 @@ public class Server {
         Entity.registerEntity("Piglin", EntityPiglin.class);
         Entity.registerEntity("Zoglin", EntityZoglin.class);
         Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
+        Entity.registerEntity("Bogged", EntityBogged.class);
         //Entity.registerEntity("Breeze", EntityBreeze.class);
-        //Entity.registerEntity("Bogged", EntityBogged.class);
         Entity.registerEntity("Creaking", EntityCreaking.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
@@ -3093,13 +3065,6 @@ public class Server {
         this.vanillaBossBar = this.getPropertyBoolean("vanilla-bossbars", false);
         this.stopInGame = this.getPropertyBoolean("stop-in-game", false);
         this.opInGame = this.getPropertyBoolean("op-in-game", false);
-
-        switch (this.getPropertyString("space-name-mode")) {
-            case "disabled" -> this.spaceMode = 0;
-            case "replacing" -> this.spaceMode = 2;
-            default -> this.spaceMode = 1;
-        }
-
         this.lightUpdates = this.getPropertyBoolean("light-updates", false);
         this.queryPlugins = this.getPropertyBoolean("query-plugins", false);
         this.flyChecks = this.getPropertyBoolean("allow-flight", false);
@@ -3128,10 +3093,7 @@ public class Server {
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 4);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 56);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
-
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
-        this.portalTicks = this.getPropertyInt("portal-ticks", 80);
-
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
@@ -3199,7 +3161,7 @@ public class Server {
     private static class ServerProperties extends ConfigSection {
         {
             put("motd", "Minecraft Server");
-            put("sub-motd", "Powered by Nukkit-MOT");
+            put("sub-motd", "Powered by Lumi");
             put("server-port", 19132);
             put("server-ip", "0.0.0.0");
             put("view-distance", 8);
@@ -3240,7 +3202,6 @@ public class Server {
             put("explosion-break-blocks", true);
             put("stop-in-game", false);
             put("op-in-game", true);
-            put("space-name-mode", "ignore");
             put("xp-bottles-on-creative", true);
             put("spawn-eggs", true);
             put("forced-safety-enchant", true);
@@ -3285,7 +3246,6 @@ public class Server {
             put("nether", true);
             put("end", true);
             put("vanilla-portals", true);
-            put("portal-ticks", 80);
             put("multi-nether-worlds", "");
             put("anti-xray-worlds", "");
 

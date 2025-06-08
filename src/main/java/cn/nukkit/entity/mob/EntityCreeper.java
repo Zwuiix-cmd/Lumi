@@ -1,35 +1,110 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+
+
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.EntityExplosive;
+import cn.nukkit.entity.EntityInteractable;
+import cn.nukkit.entity.EntityWalkable;
+import cn.nukkit.entity.ai.behavior.Behavior;
+import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
+import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
+import cn.nukkit.entity.ai.controller.FluctuateController;
+import cn.nukkit.entity.ai.controller.LookController;
+import cn.nukkit.entity.ai.controller.WalkController;
+import cn.nukkit.entity.ai.evaluator.EntityCheckEvaluator;
+import cn.nukkit.entity.ai.evaluator.MemoryCheckNotEmptyEvaluator;
+import cn.nukkit.entity.ai.executor.EntityExplosionExecutor;
+import cn.nukkit.entity.ai.executor.FlatRandomRoamExecutor;
+import cn.nukkit.entity.ai.executor.FleeFromTargetExecutor;
+import cn.nukkit.entity.ai.executor.MoveToTargetExecutor;
+import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
+import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
+import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
+import cn.nukkit.entity.ai.sensor.NearestEntitySensor;
+import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
+import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.passive.EntityCat;
+import cn.nukkit.entity.passive.EntityOcelot;
+import cn.nukkit.entity.weather.EntityLightningStrike;
+import cn.nukkit.event.entity.CreeperPowerEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSkull;
-import cn.nukkit.level.Explosion;
-import cn.nukkit.level.GameRule;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
+/**
+ * @author Box.
+ */
+public class EntityCreeper extends EntityMob implements EntityWalkable, EntityInteractable {
 
     public static final int NETWORK_ID = 33;
 
-    private short bombTime = 0;
-    private int explodeTimer;
+    public static final int DATA_SWELL_DIRECTION = 16;
+    public static final int DATA_SWELL = 17;
+    public static final int DATA_SWELL_OLD = 18;
+    public static final int DATA_POWERED = 19;
 
     public EntityCreeper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public IBehaviorGroup requireBehaviorGroup() {
+        return new BehaviorGroup(
+                this.tickSpread,
+                Set.of(),
+                Set.of(
+                        new Behavior(new FleeFromTargetExecutor(CoreMemoryTypes.NEAREST_SHARED_ENTITY, 0.3f, true, 4), new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_SHARED_ENTITY), 5, 1),
+                        new Behavior(
+                                new EntityExplosionExecutor(30, 3, CoreMemoryTypes.SHOULD_EXPLODE),
+                                all(
+                                        entity -> entity.getMemoryStorage().compareDataTo(CoreMemoryTypes.SHOULD_EXPLODE, true),
+                                        any(
+                                                entity -> getMemoryStorage().get(CoreMemoryTypes.NEAREST_PLAYER) != null && getLevel().raycastBlocks(this, getMemoryStorage().get(CoreMemoryTypes.NEAREST_PLAYER)).isEmpty(),
+                                                entity -> getMemoryStorage().get(CoreMemoryTypes.ATTACK_TARGET) != null && getLevel().raycastBlocks(this, getMemoryStorage().get(CoreMemoryTypes.ATTACK_TARGET)).isEmpty()
+                                        )
+                                ), 4, 1
+                        ),
+                        new Behavior(new MoveToTargetExecutor(CoreMemoryTypes.ATTACK_TARGET, 0.3f, true, 16f, 3f, true), all(
+                                new MemoryCheckNotEmptyEvaluator(CoreMemoryTypes.ATTACK_TARGET),
+                                entity -> !entity.getMemoryStorage().notEmpty(CoreMemoryTypes.ATTACK_TARGET) || !(entity.getMemoryStorage().get(CoreMemoryTypes.ATTACK_TARGET) instanceof Player player) || player.isSurvival()
+                        ), 3, 1),
+                        new Behavior(new MoveToTargetExecutor(CoreMemoryTypes.NEAREST_PLAYER, 0.3f, true, 16f, 3f), all(
+                                new MemoryCheckNotEmptyEvaluator(CoreMemoryTypes.NEAREST_PLAYER),
+                                entity -> {
+                                    if (entity.getMemoryStorage().isEmpty(CoreMemoryTypes.NEAREST_PLAYER)) return true;
+                                    Player player = entity.getMemoryStorage().get(CoreMemoryTypes.NEAREST_PLAYER);
+                                    return player.isSurvival();
+                                }
+                        ), 2, 1),
+                        new Behavior(new FlatRandomRoamExecutor(0.3f, 12, 100, false, -1, true, 10), none(), 1, 1)
+                ),
+                Set.of(new NearestPlayerSensor(16, 0, 20),
+                        new NearestEntitySensor(EntityCat.class, CoreMemoryTypes.NEAREST_SHARED_ENTITY, 42, 0),
+                        new NearestEntitySensor(EntityOcelot.class, CoreMemoryTypes.NEAREST_SHARED_ENTITY, 42, 0),
+                        entity -> {
+                            var memoryStorage = entity.getMemoryStorage();
+                            Entity attacker = memoryStorage.get(CoreMemoryTypes.ATTACK_TARGET);
+                            if (attacker == null)
+                                attacker = memoryStorage.get(CoreMemoryTypes.NEAREST_PLAYER);
+                            if (attacker != null && (!(attacker instanceof Player player) || player.isSurvival()) && attacker.distanceSquared(entity) <= 3 * 3 && (memoryStorage.isEmpty(CoreMemoryTypes.SHOULD_EXPLODE) || memoryStorage.compareDataTo(CoreMemoryTypes.SHOULD_EXPLODE, false))) {
+                                memoryStorage.put(CoreMemoryTypes.SHOULD_EXPLODE, true);
+                                return;
+                            }
+                            if ((attacker == null || (attacker instanceof Player player && !player.isSurvival()) || attacker.distanceSquared(entity) >= 7 * 7) && memoryStorage.compareDataTo(CoreMemoryTypes.SHOULD_EXPLODE, true) && memoryStorage.get(CoreMemoryTypes.EXPLODE_CANCELLABLE)) {
+                                memoryStorage.put(CoreMemoryTypes.SHOULD_EXPLODE, false);
+                            }
+                        }),
+                Set.of(new WalkController(), new LookController(true, true), new FluctuateController()),
+                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
+                this
+        );
     }
 
     @Override
@@ -44,179 +119,96 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     @Override
     public float getHeight() {
-        return 1.7f;
+        return 1.8f;
     }
 
+    
     @Override
-    public double getSpeed() {
-        return 0.9;
+    public float getFloatingHeight() {
+        return 0.6f;
     }
 
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(20);
-
-        super.initEntity();
-
-        if (this.namedTag.contains("powered")) {
-            this.setPowered(this.namedTag.getBoolean("powered"));
-        }
+    public boolean isPowered() {
+        return getDataPropertyBoolean(DATA_POWERED);
     }
 
-    @Override
-    public void explode() {
-        if (this.closed) {
-            return;
-        }
-
-        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 6 : 3);
-        this.server.getPluginManager().callEvent(ev);
+    public void setPowered(EntityLightningStrike bolt) {
+        CreeperPowerEvent ev = new CreeperPowerEvent(this, bolt, CreeperPowerEvent.PowerCause.LIGHTNING);
+        this.getServer().getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
-            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
-
-            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
-                explosion.explodeA();
-            }
-
-            explosion.explodeB();
+            this.setDataProperty(new ByteEntityData(DATA_POWERED, 1));
+            this.namedTag.putBoolean("powered", true);
         }
+    }
 
-        this.close();
+    public void setPowered(boolean powered) {
+        CreeperPowerEvent ev = new CreeperPowerEvent(this, powered ? CreeperPowerEvent.PowerCause.SET_ON : CreeperPowerEvent.PowerCause.SET_OFF);
+        this.getServer().getPluginManager().callEvent(ev);
+
+        if (!ev.isCancelled()) {
+            this.setDataProperty(new ByteEntityData(DATA_POWERED, powered ? 1 : 0));
+            this.namedTag.putBoolean("powered", powered);
+        }
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
-        if (this.closed) {
-            return false;
-        }
+    public void onStruckByLightning(Entity entity) {
+        this.setPowered(true);
+    }
 
-        if (this.server.getDifficulty() < 1) {
-            this.close();
-            return false;
-        }
+    @Override
+    protected void initEntity() {
+        this.setMaxHealth(20);
+        super.initEntity();
 
-        if (!this.isAlive()) {
-            if (++this.deadTicks >= 23) {
-                this.close();
-                return false;
-            }
-            return true;
+        if (this.namedTag.getBoolean("powered") || this.namedTag.getBoolean("IsPowered")) {
+            this.dataProperties.putBoolean(DATA_POWERED, true);
         }
+    }
 
-        if (this.explodeTimer > 0) {
-            if (this.explodeTimer == 1) {
-                this.explode();
-                return false;
-            }
-            this.explodeTimer--;
+    @Override
+    public String getOriginalName() {
+        return "Creeper";
+    }
+
+    @Override
+    public Item[] getDrops() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            return new Item[]{Item.get(Item.GUNPOWDER, 0, ThreadLocalRandom.current().nextInt(2) + 1)};
         }
-
-        int tickDiff = currentTick - this.lastUpdate;
-        this.lastUpdate = currentTick;
-        this.entityBaseTick(tickDiff);
-
-        if (!this.isMovement()) {
-            return true;
-        }
-
-        Vector3 target = this.updateMove(tickDiff);
-        if (target != null) {
-            double distance = target.distanceSquared(this);
-            if (distance <= 16) { // 4 blocks
-                if (target instanceof EntityCreature) {
-                    if (this.explodeTimer <= 0) {
-                        if (bombTime == 0) {
-                            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TNT);
-                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
-                        }
-                        this.bombTime += tickDiff;
-                        if (this.bombTime >= 30) {
-                            this.explode();
-                            return false;
-                        }
-                    }
-                    if (distance <= 1) {
-                        this.stayTime = 10;
-                    }
-                }
-            } else {
-                if (this.explodeTimer <= 0) {
-                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
-                    this.bombTime = 0;
-                }
-            }
-        }
+        return Item.EMPTY_ARRAY;
+    }
+    
+    @Override
+    public boolean isPreventingSleep(Player player) {
         return true;
     }
 
     @Override
-    public void attackEntity(Entity player) {}
-
-    @Override
-    public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        drops.add(Item.get(Item.GUNPOWDER, 0, Utils.rand(0, 2)));
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            Entity killer = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
-
-            if (killer instanceof EntitySkeleton || killer instanceof EntityStray) {
-                drops.add(Item.get(Utils.rand(500, 511), 0, 1));
-            }
-
-            if (killer instanceof EntityCreeper) {
-                if (((EntityCreeper) killer).isPowered()) {
-                    drops.add(Item.get(Item.SKULL, ItemSkull.CREEPER_HEAD, 1));
-                }
-            }
-        }
-
-        return drops.toArray(Item.EMPTY_ARRAY);
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 5;
-    }
-
-    @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.FLINT_AND_STEEL && this.explodeTimer <= 0) {
-            level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
-            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TNT);
-            this.stayTime = 31;
-            this.explodeTimer = 31;
+        var memoryStorage = this.getMemoryStorage();
+        if (item.getId() == Item.FLINT_AND_STEEL && (memoryStorage.isEmpty(CoreMemoryTypes.SHOULD_EXPLODE) || memoryStorage.compareDataTo(CoreMemoryTypes.SHOULD_EXPLODE, false))) {
+            memoryStorage.put(CoreMemoryTypes.SHOULD_EXPLODE, true);
+            memoryStorage.put(CoreMemoryTypes.EXPLODE_CANCELLABLE, false);
+            this.level.addSound(this, Sound.FIRE_IGNITE);
             return true;
         }
-
         return super.onInteract(player, item, clickedPos);
     }
 
-    public boolean isPowered() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_POWERED);
-    }
-
-    public void setPowered(boolean charged) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, charged);
+    @Override
+    public String getInteractButtonText() {
+        return getInteractButtonText(null);
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.putBoolean("powered", this.isPowered());
+    public String getInteractButtonText(Player player) {
+        return "action.interact.creeper";
     }
 
     @Override
-    public void onStruckByLightning(Entity lightning) {
-        if (this.attack(new EntityDamageByEntityEvent(lightning, this, EntityDamageEvent.DamageCause.LIGHTNING, 5))) {
-            if (this.fireTicks < 160) {
-                this.setOnFire(8);
-            }
-            this.setPowered(true);
-        }
+    public boolean canDoInteraction() {
+        return true;
     }
 }

@@ -1,26 +1,98 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.IntEntityData;
+
+
+import cn.nukkit.entity.EntityAgeable;
+import cn.nukkit.entity.EntityWalkable;
+import cn.nukkit.entity.ai.behavior.Behavior;
+import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
+import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
+import cn.nukkit.entity.ai.controller.FluctuateController;
+import cn.nukkit.entity.ai.controller.LookController;
+import cn.nukkit.entity.ai.controller.WalkController;
+import cn.nukkit.entity.ai.evaluator.MemoryCheckNotEmptyEvaluator;
+import cn.nukkit.entity.ai.evaluator.PassByTimeEvaluator;
+import cn.nukkit.entity.ai.evaluator.ProbabilityEvaluator;
+import cn.nukkit.entity.ai.executor.*;
+import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
+import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
+import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
+import cn.nukkit.entity.ai.sensor.NearestFeedingPlayerSensor;
+import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Sound;
+import cn.nukkit.level.ParticleEffect;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-public class EntityMooshroom extends EntityWalkingAnimal {
+/**
+ * @author BeYkeRYkt (Nukkit Project)
+ */
+public class EntityMooshroom extends EntityAnimal implements EntityWalkable, EntityAgeable {
 
     public static final int NETWORK_ID = 16;
 
     public EntityMooshroom(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    
+    @Override
+    public IBehaviorGroup requireBehaviorGroup() {
+        return new BehaviorGroup(
+                this.tickSpread,
+                Set.of(
+                        //用于刷新InLove状态的核心行为
+                        new Behavior(
+                                new InLoveExecutor(400),
+                                all(
+                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_FEED_TIME, 0, 400),
+                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_IN_LOVE_TIME, 6000, Integer.MAX_VALUE)
+                                ),
+                                1, 1
+                        )
+                ),
+                Set.of(
+                        new Behavior(new FlatRandomRoamExecutor(0.25f, 12, 40, true, 100, true, 10), new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_ATTACKED_TIME, 0, 100), 4, 1),
+                        new Behavior(new EntityBreedingExecutor<>(EntityMooshroom.class, 16, 100, 0.5f), entity -> entity.getMemoryStorage().get(CoreMemoryTypes.IS_IN_LOVE), 3, 1),
+                        new Behavior(new MoveToTargetExecutor(CoreMemoryTypes.NEAREST_FEEDING_PLAYER, 0.25f, true), new MemoryCheckNotEmptyEvaluator(CoreMemoryTypes.NEAREST_FEEDING_PLAYER), 2, 1),
+                        new Behavior(new LookAtTargetExecutor(CoreMemoryTypes.NEAREST_PLAYER, 100), new ProbabilityEvaluator(4, 10), 1, 1, 100),
+                        new Behavior(new FlatRandomRoamExecutor(0.1f, 12, 100, false, -1, true, 10), (entity -> true), 1, 1)
+                ),
+                Set.of(new NearestFeedingPlayerSensor(8, 0), new NearestPlayerSensor(8, 0, 20)),
+                Set.of(new WalkController(), new LookController(true, true), new FluctuateController()),
+                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
+                this
+        );
+    }
+
+    @Override
+    public float getWidth() {
+        if (isBaby()) {
+            return 0.45f;
+        }
+        return 0.9f;
+    }
+
+    @Override
+    public float getHeight() {
+        if (isBaby()) {
+            return 0.65f;
+        }
+        return 1.3f;
+    }
+
+    @Override
+    public String getOriginalName() {
+        return "Mooshroom";
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.LEATHER), Item.get(Item.RAW_BEEF)};
     }
 
     @Override
@@ -29,108 +101,37 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.45f;
-        }
-        return 0.9f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.7f;
-        }
-        return 1.4f;
-    }
-
-    @Override
-    public void initEntity() {
+    protected void initEntity() {
         this.setMaxHealth(10);
-
         super.initEntity();
-
-        if (this.namedTag.contains("Variant")) {
-            this.setBrown(this.namedTag.getInt("Variant") == 1);
-        }
     }
 
-    @Override
-    public boolean isFeedItem(Item item) {
-        return item.getId() == Item.WHEAT;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (!this.isBaby()) {
-            drops.add(Item.get(Item.LEATHER, 0, Utils.rand(0, 2)));
-            drops.add(Item.get(this.isOnFire() ? Item.STEAK : Item.RAW_BEEF, 0, Utils.rand(1, 3)));
-        }
-
-        return drops.toArray(Item.EMPTY_ARRAY);
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
-    }
-    
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.BOWL) {
-            if (!player.isCreative()) {
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            }
-            player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
-            this.level.addSoundToViewers(this, Sound.MOB_MOOSHROOM_SUSPICIOUS_MILK);
-            return false;
-        } else if (item.getId() == Item.BUCKET) {
-            if (!player.isCreative()) {
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            }
-            Item newBucket = Item.get(Item.BUCKET, 1, 1);
-            if (player.getInventory().getItemFast(player.getInventory().getHeldItemIndex()).count > 0) {
-                if (player.getInventory().canAddItem(newBucket)) {
-                    player.getInventory().addItem(newBucket);
-                } else {
-                    player.dropItem(newBucket);
-                }
-            } else {
-                player.getInventory().setItemInHand(newBucket);
-            }
-            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
-            return false;
-        } else if (item.getId() == Item.WHEAT && !this.isBaby() && !this.isInLoveCooldown()) {
-            if (!player.isCreative()) {
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            }
-            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
-            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
-            this.setInLove();
-            return false;
+        if (super.onInteract(player, item, clickedPos)) {
+            return true;
         }
-        return super.onInteract(player, item, clickedPos);
-    }
 
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putInt("Variant", this.isBrown() ? 1 : 0);
-    }
+        if (item.getId() == Item.SHEARS && item.useOn(this)) {
+            this.close();
+            //TODO 不同颜色的牛掉落不同的蘑菇
+            this.level.dropItem(this, Item.get(40, 0, 5));
+            this.level.addParticleEffect(this.add(0, this.getHeight(), 0), ParticleEffect.LARGE_EXPLOSION_LEVEL);
+            EntityCow cow = new EntityCow(this.getChunk(), this.namedTag);
+            cow.setPosition(this);
+            cow.setRotation(this.yaw, this.pitch);
+            cow.spawnToAll();
+            return true;
+        } else if (item.getId() == Item.BUCKET && item.getDamage() == 0) {
+            item.count--;
+            player.getInventory().addItem(Item.get(Item.BUCKET, 1));
+            return true;
+        } else if (item.getId() == Item.BOWL && item.getDamage() == 0) {
+            item.count--;
+            player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW));
+            return true;
+        }
 
-    @Override
-    public void onStruckByLightning(Entity entity) {
-        this.setBrown(!this.isBrown());
-        super.onStruckByLightning(entity);
-    }
-
-    public boolean isBrown() {
-        return this.getDataPropertyInt(DATA_VARIANT) == 1;
-    }
-
-    public void setBrown(boolean brown) {
-        this.setDataProperty(new IntEntityData(DATA_VARIANT, brown ? 1 : 0));
+        return false;
     }
 }

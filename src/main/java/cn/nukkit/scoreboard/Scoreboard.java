@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.network.protocol.RemoveObjectivePacket;
 import cn.nukkit.network.protocol.SetDisplayObjectivePacket;
 import cn.nukkit.network.protocol.SetScorePacket;
+import cn.nukkit.network.protocol.types.ScoreEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -240,7 +241,7 @@ public class Scoreboard {
             }
             lastAction = update.action;
             pk.action = update.action;
-            pk.infos.add(new SetScorePacket.ScoreInfo(update.currentScoreId, this.objectiveId, update.currentScoreValue, update.scorer));
+            pk.entries.add(new ScoreEntry(update.currentScoreId, this.objectiveId, update.currentScoreValue, update.scorer));
         }
 
         if (pk != null) {
@@ -278,7 +279,7 @@ public class Scoreboard {
 
         SetScorePacket pk = new SetScorePacket();
         pk.action = action;
-        pk.infos.add(new SetScorePacket.ScoreInfo(score.id, this.objectiveId, score.score, scorer));
+        pk.entries.add(new ScoreEntry(score.id, this.objectiveId, score.score, scorer));
         Server.broadcastPacket(this.viewers, pk);
     }
 
@@ -304,7 +305,7 @@ public class Scoreboard {
         for (Map.Entry<String, Score> entry : this.scores.entrySet()) {
             String scorer = entry.getKey();
             Score score = entry.getValue();
-            pk.infos.add(new SetScorePacket.ScoreInfo(score.id, this.objectiveId, score.score, scorer));
+            pk.entries.add(new ScoreEntry(score.id, this.objectiveId, score.score, scorer));
         }
         Server.broadcastPacket(this.viewers, pk);
     }
@@ -327,7 +328,7 @@ public class Scoreboard {
         for (Map.Entry<String, Score> entry : this.scores.entrySet()) {
             String scorer = entry.getKey();
             Score score = entry.getValue();
-            scorePacket.infos.add(new SetScorePacket.ScoreInfo(score.id, this.objectiveId, score.score, scorer));
+            scorePacket.entries.add(new ScoreEntry(score.id, this.objectiveId, score.score, scorer));
         }
         player.dataPacket(scorePacket);
     }

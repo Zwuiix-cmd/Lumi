@@ -83,6 +83,7 @@ public class BlockDirt extends BlockSolidMeta {
             } else {
                 player.getLevel().dropItem(player.add(0, 1.3, 0), emptyBottle, player.getDirectionVector().multiply(0.4));
             }
+            this.getLevel().addSound(this, Sound.BOTTLE_EMPTY);
             this.getLevel().setBlock(this, get(MUD), true);
             return true;
         }

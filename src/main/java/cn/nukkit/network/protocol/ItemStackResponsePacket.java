@@ -31,6 +31,8 @@ public class ItemStackResponsePacket extends DataPacket {
                     putByte((byte) item.getCount());
                     putVarInt(item.getStackNetworkId());
                     putString(item.getCustomName());
+                    if (this.protocol >= ProtocolInfo.v1_21_50)
+                        putString("");
                     putVarInt(item.getDurabilityCorrection());
                 });
             });

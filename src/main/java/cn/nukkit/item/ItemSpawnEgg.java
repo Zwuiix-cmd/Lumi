@@ -6,8 +6,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockMobSpawner;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawner;
-import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityIntelligent;
 import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.entity.passive.EntityChicken;
 import cn.nukkit.entity.passive.EntityCow;
@@ -137,7 +137,7 @@ public class ItemSpawnEgg extends Item {
                     entity instanceof EntitySheep ||
                     entity instanceof EntityZombie)) {
 
-                ((BaseEntity) entity).setBaby(true);
+                ((EntityIntelligent) entity).setBaby(true);
             }
 
             return true;

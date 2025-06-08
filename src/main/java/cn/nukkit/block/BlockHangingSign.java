@@ -1,0 +1,159 @@
+package cn.nukkit.block;
+
+import cn.nukkit.Player;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.CompassRoseDirection;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.Tag;
+
+public abstract class BlockHangingSign extends BlockTransparentMeta {
+    // Corrected bit masks (using 16-bit representation for clarity)
+    private static final int ATTACHED_MASK  = 0b0000_0000_0000_0001; // Bit 0 (1 bit)
+    private static final int FACING_MASK    = 0b0000_0000_0000_1110; // Bits 1-3 (3 bits)
+    private static final int DIRECTION_MASK = 0b0000_0000_1111_0000; // Bits 4-7 (4 bits)
+    private static final int HANGING_MASK   = 0b0000_0001_0000_0000; // Bit 8 (1 bit)
+    private static final int MAX_ATTACHED = 1;
+    private static final int MAX_FACING = 5;
+    private static final int MAX_DIRECTION = 15;
+    private static final int MAX_HANGING = 1;
+
+    public BlockHangingSign() {
+        super(0);
+    }
+
+    public BlockHangingSign(int meta) {
+        super(meta);
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (player != null && !player.isSneaking() && target instanceof BlockHangingSign) {
+            return false;
+        }
+
+        if (face == BlockFace.UP) {
+            BlockFace blockFace = checkGroundBlock();
+            if (blockFace == null) {
+                return false;
+            }
+            face = blockFace;
+        }
+        if (target instanceof BlockHangingSign && face != BlockFace.DOWN) {
+            return false;
+        }
+
+        Block layer0 = level.getBlock(this, 0);
+        Block layer1 = level.getBlock(this, 1);
+
+        CompoundTag nbt = new CompoundTag();
+
+        if (face == BlockFace.DOWN) {
+            this.setPropertyValue(HANGING_MASK, 1);
+            CompassRoseDirection direction = CompassRoseDirection.from(
+                    (int) Math.floor((((player != null ? player.yaw : 0) + 180) * 16 / 360) + 0.5) & 0x0f
+            );
+            player.sendMessage("rose: " + direction + direction.getClosestBlockFace() + ", facing: " + face + ", value: " + ((int) Math.floor(((player.yaw + 180) * 16 / 360) + 0.5) & 0x0f));
+            if ((player != null && player.isSneaking()) || target instanceof BlockThin || target instanceof BlockChain || target instanceof BlockHangingSign) {
+                this.setPropertyValue(ATTACHED_MASK, 1);
+                this.setPropertyValue(DIRECTION_MASK, direction.getIndex());
+                getLevel().setBlock(block, this, true);
+                player.sendMessage(""+ getDamage());
+            } else {
+                this.setPropertyValue(FACING_MASK, direction.getClosestBlockFace().getIndex());
+                getLevel().setBlock(block, this, true);
+                player.sendMessage(""+ getDamage());
+            }
+        } else {
+            this.setPropertyValue(FACING_MASK, face.rotateY().getIndex());
+            getLevel().setBlock(block, this, true);
+            player.sendMessage(""+ getDamage());
+        }
+        if (item.hasCustomBlockData()) {
+            for (Tag aTag : item.getCustomBlockData().getAllTags()) {
+                nbt.put(aTag.getName(), aTag);
+            }
+        }
+
+        try {
+            //createBlockEntity(nbt);
+            if (player != null) {
+                //player.openSignEditor(this, true);
+            }
+            return true;
+        } catch (Exception e) {
+            level.setBlock(layer0, 0, layer0, true);
+            level.setBlock(layer1, 0, layer1, true);
+            return false;
+        }
+    }
+
+    private BlockFace checkGroundBlock() {
+        if (getSide(BlockFace.NORTH, 1).canBePlaced()) return BlockFace.NORTH;
+        if (getSide(BlockFace.SOUTH, 1).canBePlaced()) return BlockFace.SOUTH;
+        if (getSide(BlockFace.WEST, 1).canBePlaced()) return BlockFace.WEST;
+        if (getSide(BlockFace.EAST, 1).canBePlaced()) return BlockFace.EAST;
+        return null;
+    }
+
+    public int getPropertyValue(int mask) {
+        int data = getDamage();
+        if(mask == DIRECTION_MASK) return (data & DIRECTION_MASK) >>> 4;
+        return (data & mask) >> 4;
+    }
+
+    public void setPropertyValue(int mask, int value) {
+        int data = getDamage();
+        int shift = Integer.numberOfTrailingZeros(mask);
+        int maxValue = mask >>> shift;
+        int clampedValue = value & maxValue;
+        setDamage((data & ~mask) | (clampedValue << shift));
+    }
+
+    @Override
+    public double getHardness() {
+        return 1;
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean isSolid(BlockFace side) {
+        return false;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, 0);
+    }
+}

@@ -41,6 +41,7 @@ public class LevelDBChunkSection implements ChunkSection {
     protected byte[] compressedLight;
     protected boolean hasBlockLight;
     protected boolean hasSkyLight;
+    protected long blockChanges = 0;
 
 
     protected boolean dirty;
@@ -287,6 +288,17 @@ public class LevelDBChunkSection implements ChunkSection {
     @Override
     public boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId, int meta) {
         return setBlock(x, y, z, layer, blockId, meta);
+    }
+
+    @Override
+    public long getBlockChanges() {
+        return this.blockChanges;
+    }
+
+
+    @Override
+    public void addBlockChange() {
+        this.blockChanges++;
     }
 
     @Override

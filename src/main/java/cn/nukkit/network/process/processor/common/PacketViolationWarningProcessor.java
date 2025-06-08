@@ -37,6 +37,7 @@ public class PacketViolationWarningProcessor extends DataPacketProcessor<PacketV
                         } else if (field.getType() == byte.class) {
                             return field.getByte(null) == pk.packetId;
                         }
+
                         return false;
                     } catch (IllegalAccessException e) {
                         return false;

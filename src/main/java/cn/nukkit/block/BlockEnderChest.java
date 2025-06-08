@@ -161,12 +161,6 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable, B
 
             player.setViewingEnderChest(this);
             player.addWindow(player.getEnderChestInventory());
-
-            for (Entity e : this.getChunk().getEntities().values()) {
-                if (e instanceof EntityPiglin) {
-                    ((EntityPiglin) e).setAngry(600);
-                }
-            }
         }
 
         return true;

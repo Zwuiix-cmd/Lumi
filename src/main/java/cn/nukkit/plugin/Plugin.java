@@ -265,4 +265,6 @@ public interface Plugin extends CommandExecutor {
      * @see cn.nukkit.plugin.PluginLoader
      */
     PluginLoader getPluginLoader();
+
+    ClassLoader getPluginClassLoader();
 }

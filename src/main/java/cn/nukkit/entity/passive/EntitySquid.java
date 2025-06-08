@@ -1,15 +1,28 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.event.entity.EntityDamageEvent;
+
+
+import cn.nukkit.entity.EntitySwimmable;
+import cn.nukkit.entity.ai.behavior.Behavior;
+import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
+import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
+import cn.nukkit.entity.ai.controller.DiveController;
+import cn.nukkit.entity.ai.controller.LookController;
+import cn.nukkit.entity.ai.controller.SpaceMoveController;
+import cn.nukkit.entity.ai.executor.SpaceRandomRoamExecutor;
+import cn.nukkit.entity.ai.route.finder.impl.SimpleSpaceAStarRouteFinder;
+import cn.nukkit.entity.ai.route.posevaluator.SwimmingPosEvaluator;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.utils.DyeColor;
-import cn.nukkit.utils.Utils;
 
-public class EntitySquid extends EntityWaterAnimal {
+import java.util.Set;
+
+/**
+ * @author PikyCZ
+ */
+public class EntitySquid extends EntityAnimal implements EntitySwimmable {
 
     public static final int NETWORK_ID = 17;
 
@@ -23,49 +36,45 @@ public class EntitySquid extends EntityWaterAnimal {
     }
 
     @Override
+    public IBehaviorGroup requireBehaviorGroup() {
+        return new BehaviorGroup(
+                this.tickSpread,
+                Set.of(),
+                Set.of(
+                        new Behavior(
+                                new SpaceRandomRoamExecutor(0.36f, 12, 1, 80, false, -1, false, 10),
+                                entity -> true, 1)
+                ),
+                Set.of(),
+                Set.of(new SpaceMoveController(), new LookController(true, true), new DiveController()),
+                new SimpleSpaceAStarRouteFinder(new SwimmingPosEvaluator(), this),
+                this
+        );
+    }
+
+    @Override
     public float getWidth() {
-        if (this.isBaby()) {
-            return 0.475f;
-        }
         return 0.95f;
     }
 
     @Override
     public float getHeight() {
-        if (this.isBaby()) {
-            return 0.475f;
-        }
         return 0.95f;
     }
 
     @Override
     public void initEntity() {
         this.setMaxHealth(10);
-
         super.initEntity();
     }
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{new ItemDye(DyeColor.BLACK.getDyeData(), Utils.rand(1, 3))};
+        return new Item[]{Item.get(ItemID.DYE, 0)};
     }
 
     @Override
-    public int getKillExperience() {
-        return Utils.rand(1, 3);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        boolean att =  super.attack(source);
-        if (source.isCancelled()) {
-            return att;
-        }
-
-        EntityEventPacket pk = new EntityEventPacket();
-        pk.eid = this.getId();
-        pk.event = EntityEventPacket.SQUID_INK_CLOUD;
-        this.level.addChunkPacket(this.getChunkX() >> 4, this.getChunkZ() >> 4, pk);
-        return att;
+    public String getOriginalName() {
+        return "Squid";
     }
 }

@@ -302,6 +302,16 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
+    public long getBlockChanges() {
+        return 0;
+    }
+
+    @Override
+    public void addBlockChange() {
+        //do nothing
+    }
+
+    @Override
     public int getBlockSkyLight(int x, int y, int z) {
         if (this.skyLight == null) {
             if (!hasSkyLight) {

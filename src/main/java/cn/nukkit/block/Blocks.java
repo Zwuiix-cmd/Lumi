@@ -149,7 +149,7 @@ public class Blocks {
         list[JUNGLE_WOOD_STAIRS] = BlockStairsJungle.class; //136
         list[COMMAND_BLOCK] = BlockCommandBlock.class; //137
         list[BEACON] = BlockBeacon.class; //138
-        list[STONE_WALL] = BlockWall.class; //139
+        list[COBBLESTONE_WALL] = BlockCobblestoneWall.class; //139
         list[FLOWER_POT_BLOCK] = BlockFlowerPot.class; //140
         list[CARROT_BLOCK] = BlockCarrot.class; //141
         list[POTATO_BLOCK] = BlockPotato.class; //142
@@ -387,7 +387,6 @@ public class Blocks {
         list[SOUL_FIRE] = BlockSoulFire.class; //492
         list[NETHER_SPROUTS_BLOCK] = BlockNetherSprouts.class; //493
         list[TARGET] = BlockTarget.class; //494
-
         list[STRIPPED_CRIMSON_STEM] = BlockStemStrippedCrimson.class; //495
         list[STRIPPED_WARPED_STEM] = BlockStemStrippedWarped.class; //496
         list[CRIMSON_PLANKS] = BlockPlanksCrimson.class; //497
@@ -616,6 +615,15 @@ public class Blocks {
         list[MANGROVE_WOOD] = BlockWoodMangrove.class; //752
         list[STRIPPED_MANGROVE_WOOD] = BlockWoodStrippedMangrove.class; //753
         list[MANGROVE_DOUBLE_SLAB] = BlockDoubleSlabMangrove.class; //754
+        list[OAK_HANGING_SIGN] = BlockOakHangingSign.class; //755
+        list[SPRUCE_HANGING_SIGN] = BlockSpruceHangingSign.class; //756
+        list[BIRCH_HANGING_SIGN] = BlockBirchHangingSign.class; //757
+        list[JUNGLE_HANGING_SIGN] = BlockJungleHangingSign.class; //758
+        list[ACACIA_HANGING_SIGN] = BlockAcaciaHangingSign.class; //759
+        list[DARK_OAK_HANGING_SIGN] = BlockDarkOakHangingSign.class; //760
+        list[CRIMSON_HANGING_SIGN] = BlockCrimsonHangingSign.class; //761
+        list[WARPED_HANGING_SIGN] = BlockWarpedHangingSign.class; //762
+        list[MANGROVE_HANGING_SIGN] = BlockMangroveHangingSign.class; //763
         list[BAMBOO_MOSAIC] = BlockBambooMosaic.class; //764
         list[BAMBOO_PLANKS] = BlockPlanksBamboo.class; //765
         list[BAMBOO_BUTTON] = BlockButtonBamboo.class; //766
@@ -629,7 +637,7 @@ public class Blocks {
         list[BAMBOO_WALL_SIGN] = BlockBambooWallSign.class; //774
         list[BAMBOO_TRAPDOOR] = BlockTrapdoorBamboo.class; //775
         list[BAMBOO_DOUBLE_SLAB] = BlockDoubleSlabBamboo.class; //776
-
+        list[BAMBOO_HANGING_SIGN] = BlockBambooHangingSign.class; //777
         list[BAMBOO_MOSAIC_STAIRS] = BlockStairsBambooMosaic.class; //778
         list[BAMBOO_MOSAIC_SLAB] = BlockSlabBambooMosaic.class; //779
         list[BAMBOO_MOSAIC_DOUBLE_SLAB] = BlockDoubleSlabBambooMosaic.class; //780
@@ -640,7 +648,7 @@ public class Blocks {
         list[CHERRY_BUTTON] = BlockButtonCherry.class; //785
 
         list[CHERRY_FENCE_GATE] = BlockFenceGateCherry.class; //788
-
+        list[CHERRY_HANGING_SIGN] = BlockCherryHangingSign.class; //789
         list[STRIPPED_CHERRY_LOG] = BlockLogStrippedCherry.class; //790
         list[CHERRY_LOG] = BlockCherryLog.class; //791
         list[CHERRY_PLANKS] = BlockPlanksCherry.class; //792
@@ -671,6 +679,20 @@ public class Blocks {
         list[WAXED_EXPOSED_COPPER_BULB] = BlockWaxedExposedCopperBulb.class; //1036
         list[WAXED_WEATHERED_COPPER_BULB] = BlockWaxedWeatheredCopperBulb.class; //1037
         list[WAXED_OXIDIZED_COPPER_BULB] = BlockWaxedOxidizedCopperBulb.class; //1038
+
+        list[MOSSY_COBBLESTONE_WALL] = BlockMossyCobblestoneWall.class; //1226
+        list[GRANITE_WALL] = BlockGraniteWall.class; //1227
+        list[DIORITE_WALL] = BlockDioriteWall.class; //1228
+        list[ANDESITE_WALL] = BlockAndesiteWall.class; //1229
+        list[SANDSTONE_WALL] = BlockSandstoneWall.class; //1230
+        list[BRICK_WALL] = BlockBrickWall.class; //1231
+        list[STONE_BRICK_WALL] = BlockStoneBrickWall.class; //1232
+        list[MOSSY_STONE_BRICK_WALL] = BlockMossyStoneBrickWall.class; //1233
+        list[NETHER_BRICK_WALL] = BlockNetherBrickWall.class; //1234
+        list[ENDSTONE_BRICK_WALL] = BlockEndstoneBrickWall.class; //1235
+        list[PRISMARINE_WALL] = BlockPrismarineWall.class; //1236
+        list[RED_SANDSTONE_WALL] = BlockRedSandstoneBlock.class; //1237
+        list[RED_NETHER_BRICK_WALL] = BlockRedNetherBrickWall.class; //1238
 
         list[BUSH] = BlockBush.class; //1278
         list[WILDFLOWERS] = BlockWildflowers.class; //1279

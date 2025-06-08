@@ -3,8 +3,8 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityIntelligent;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Position;
@@ -14,20 +14,6 @@ import cn.nukkit.nbt.tag.ShortTag;
 import cn.nukkit.utils.Utils;
 
 public class BlockEntitySpawner extends BlockEntitySpawnable {
-
-    private int entityId;
-    private int spawnRange;
-    private int maxNearbyEntities;
-    private int requiredPlayerRange;
-    private int requiredPlayerRange2;
-
-    private int delay = 0;
-
-    private int minSpawnDelay;
-    private int maxSpawnDelay;
-
-    private int minSpawnCount;
-    private int maxSpawnCount;
 
     public static final String TAG_ID = "id";
     public static final String TAG_X = "x";
@@ -41,7 +27,6 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_REQUIRED_PLAYER_RANGE = "RequiredPlayerRange";
     public static final String TAG_MINIMUM_SPAWN_COUNT = "MinimumSpawnerCount";
     public static final String TAG_MAXIMUM_SPAWN_COUNT = "MaximumSpawnerCount";
-
     public static final short SPAWN_RANGE = 4;
     public static final short MIN_SPAWN_DELAY = 200;
     public static final short MAX_SPAWN_DELAY = 5000;
@@ -49,6 +34,16 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final short REQUIRED_PLAYER_RANGE = 16;
     public static final short MINIMUM_SPAWN_COUNT = 1;
     public static final short MAXIMUM_SPAWN_COUNT = 4;
+    private int entityId;
+    private int spawnRange;
+    private int maxNearbyEntities;
+    private int requiredPlayerRange;
+    private int requiredPlayerRange2;
+    private int delay = 0;
+    private int minSpawnDelay;
+    private int maxSpawnDelay;
+    private int minSpawnCount;
+    private int maxSpawnCount;
 
     public BlockEntitySpawner(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -114,7 +109,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                     if (entity.distanceSquared(this) <= this.requiredPlayerRange2) {
                         playerInRange = true;
                     }
-                } else if (entity instanceof BaseEntity) {
+                } else if (entity instanceof EntityIntelligent) {
                     if (entity.distanceSquared(this) <= this.requiredPlayerRange2) {
                         nearbyEntities++;
                     }
@@ -189,18 +184,13 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                 .putInt(TAG_Z, (int) this.z);
     }
 
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt((int) x, (int) y, (int) z) == Block.MONSTER_SPAWNER;
+    public int getSpawnEntityType() {
+        return this.entityId;
     }
 
     public void setSpawnEntityType(int entityId) {
         this.entityId = entityId;
         this.spawnToAll();
-    }
-
-    public int getSpawnEntityType() {
-        return this.entityId;
     }
 
     public void setMinSpawnDelay(int minDelay) {

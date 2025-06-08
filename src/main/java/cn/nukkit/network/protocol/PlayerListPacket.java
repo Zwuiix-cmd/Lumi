@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.entity.data.Skin;
 import lombok.ToString;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.UUID;
 
 /**

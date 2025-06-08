@@ -127,6 +127,11 @@ public class LevelDBProvider implements LevelProvider {
             this.levelData.putString("generatorOptions", "");
         }
 
+        if (!levelData.contains("generatorName")) {
+
+            levelData.putString("generatorName", level.getServer().getPropertyString("level-type", "default"));
+        }
+
         try {
             this.db = openDB(dirPath.resolve("db").toFile());
         } catch (IOException e) {
@@ -727,6 +732,7 @@ public class LevelDBProvider implements LevelProvider {
             this.closed = true;
             this.level = null;
             this.executor.shutdown();
+
             try {
                 this.executor.awaitTermination(1, TimeUnit.DAYS);
             } catch (InterruptedException e) {

@@ -103,6 +103,16 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
+    public long getBlockChanges() {
+        return 0;
+    }
+
+    @Override
+    public void addBlockChange() {
+        //do nothing
+    }
+
+    @Override
     public byte[] getIdArray() {
         return EMPTY_ID_ARRAY;
     }

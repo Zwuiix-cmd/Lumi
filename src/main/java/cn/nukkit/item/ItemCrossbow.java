@@ -66,7 +66,7 @@ public class ItemCrossbow extends ItemBow {
         }
 
         if (ticksUsed < needTickUsed) {
-            return true;
+            return false;
         }
 
         Item chargedItem;

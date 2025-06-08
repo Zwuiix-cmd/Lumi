@@ -17,6 +17,7 @@ import java.util.Map;
 public class EntityDamageEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
+    private boolean canBePrevented = true;
 
     public static HandlerList getHandlers() {
         return handlers;
@@ -104,6 +105,14 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
 
     public int getAttackCooldown() {
         return this.attackCooldown;
+    }
+
+    /**
+     * Many damage events can be cancelled by cooldown (mob can't take more than one damage per 10 ticks). If this method returns false - damage won't be cancelled.
+     * @return boolean
+     */
+    public boolean canBePrevented() {
+        return this.canBePrevented;
     }
 
     public void setAttackCooldown(int attackCooldown) {
@@ -246,6 +255,10 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
          */
         HUNGER,
         /**
+         * Damage caused by Wither
+         */
+        WITHER,
+        /**
          * Damage caused by thorns enchantment
          */
         THORNS,
@@ -254,9 +267,21 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
          */
         HOT_FLOOR,
         /**
+         * Damage caused by fireworks
+         */
+        FIREWORKS,
+        /**
          * Damage caused by temperature
          */
-        FREEZING
+        FREEZING,
+        /**
+         * Damage caused by no reason (eg: /damage command with cause NONE)
+         */
+        NONE,
+        /**
+         * Damage caused by a lot of (>24) entities colliding together
+         */
+        COLLIDE
     }
 
     private static class DamageModifierFloatEnumMap extends EnumMap<DamageModifier, Float> {

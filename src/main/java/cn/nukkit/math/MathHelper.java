@@ -93,6 +93,10 @@ public class MathHelper {
         return check > max ? max : (Math.max(check, min));
     }
 
+    public static float clamp(float num, float min, float max) {
+        return num > max ? max : (Math.max(num, min));
+    }
+
     public static double denormalizeClamp(double lowerBnd, double upperBnd, double slide) {
         return slide < 0.0D ? lowerBnd : (slide > 1.0D ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
     }

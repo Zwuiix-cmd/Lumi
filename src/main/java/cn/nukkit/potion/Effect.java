@@ -295,19 +295,11 @@ public class Effect implements Cloneable {
             }
 
             if (this.id == Effect.SPEED) {
-                /*if (oldEffect != null) {
-                    player.setMovementSpeed(player.getMovementSpeed() / (1 + 0.2f * (oldEffect.amplifier + 1)), false);
-                }
-                player.setMovementSpeed(player.getMovementSpeed() * (1 + 0.2f * (this.amplifier + 1)));*/
-                entityLiving.setMovementSpeed(Player.DEFAULT_SPEED * (1 + 0.2f * (this.amplifier + 1)));
+                entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() * (1 + 0.2f * (this.amplifier + 1)));
             }
 
             if (this.id == Effect.SLOWNESS) {
-                /*if (oldEffect != null) {
-                    player.setMovementSpeed(player.getMovementSpeed() / (1 - 0.15f * (oldEffect.amplifier + 1)), false);
-                }
-                player.setMovementSpeed(player.getMovementSpeed() * (1 - 0.15f * (this.amplifier + 1)));*/
-                entityLiving.setMovementSpeed(Player.DEFAULT_SPEED * (1 - 0.15f * (this.amplifier + 1)));
+                entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() * (1 - 0.15f * (this.amplifier + 1)));
             }
         }
 
@@ -337,23 +329,16 @@ public class Effect implements Cloneable {
                 pk.eventId = MobEffectPacket.EVENT_REMOVE;
 
                 player.dataPacket(pk);
-
-                if (this.id == Effect.SPEED) {
-                    player.setMovementSpeed(player.isSprinting() ? Player.DEFAULT_SPEED * 1.3f : Player.DEFAULT_SPEED, false);
-                    player.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(Player.DEFAULT_SPEED).setDefaultValue(Player.DEFAULT_SPEED));
-                }
-                if (this.id == Effect.SLOWNESS) {
-                    player.setMovementSpeed(player.isSprinting() ? Player.DEFAULT_SPEED * 1.3f : Player.DEFAULT_SPEED, false);
-                    player.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(Player.DEFAULT_SPEED).setDefaultValue(Player.DEFAULT_SPEED));
-                }
-            } else {
-                if (this.id == Effect.SPEED) {
-                    entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() / (1 + 0.2f * (this.amplifier + 1)));
-                }
-                if (this.id == Effect.SLOWNESS) {
-                    entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() / (1 - 0.15f * (this.amplifier + 1)));
-                }
             }
+
+            if (this.id == Effect.SPEED) {
+                entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() / (1 + 0.2f * (this.amplifier + 1)));
+            }
+
+            if (this.id == Effect.SLOWNESS) {
+                entityLiving.setMovementSpeed(entityLiving.getMovementSpeed() / (1 - 0.15f * (this.amplifier + 1)));
+            }
+
             if (this.id == Effect.HEALTH_BOOST) {
                 float max = entity.getMaxHealth();
                 float health = Math.min(entity.getHealth(), max);

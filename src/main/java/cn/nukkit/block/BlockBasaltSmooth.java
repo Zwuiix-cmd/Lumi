@@ -34,18 +34,7 @@ public class BlockBasaltSmooth extends BlockSolid {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
+        return new ItemBlock(this, 0);
     }
 
     @Override

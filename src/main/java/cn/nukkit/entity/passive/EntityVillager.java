@@ -2,6 +2,17 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.EntityAgeable;
+import cn.nukkit.entity.EntityIntelligent;
+import cn.nukkit.entity.ai.behavior.Behavior;
+import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
+import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
+import cn.nukkit.entity.ai.controller.FluctuateController;
+import cn.nukkit.entity.ai.controller.LookController;
+import cn.nukkit.entity.ai.controller.WalkController;
+import cn.nukkit.entity.ai.executor.*;
+import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
+import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.entity.data.profession.Profession;
@@ -15,18 +26,11 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
 import lombok.Getter;
+import java.util.Set;
 
-public class EntityVillager extends EntityWalkingAnimal implements InventoryHolder {
+public class EntityVillager extends EntityIntelligent implements InventoryHolder, EntityNPC, EntityAgeable {
 
-    public static final int PROFESSION_FARMER = 0;
-    public static final int PROFESSION_LIBRARIAN = 1;
-    public static final int PROFESSION_PRIEST = 2;
-    public static final int PROFESSION_BLACKSMITH = 3;
-    public static final int PROFESSION_BUTCHER = 4;
-    public static final int PROFESSION_GENERIC = 5;
-
-    public static final int NETWORK_ID = 15;
-
+    public static final int NETWORK_ID = 115;
     /**
      * 代表交易配方
      */
@@ -91,10 +95,22 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
+    public IBehaviorGroup requireBehaviorGroup() {
+        return new BehaviorGroup(
+                this.tickSpread,
+                Set.of(),
+                Set.of(
+                        new Behavior(new FlatRandomRoamExecutor(0.2f, 12, 100, false, -1, true, 10), (entity -> true), 1, 1)
+                ),
+                Set.of(),
+                Set.of(new WalkController(), new LookController(true, true), new FluctuateController()),
+                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
+                this
+        );
     }
 
+
+    //todo 实现不同群系的村民
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -114,6 +130,11 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
             return 0.95f;
         }
         return 1.9f;
+    }
+
+    @Override
+    public String getOriginalName() {
+        return "VillagerV2";
     }
 
     @Override
@@ -163,9 +184,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
             this.setDataProperty(new IntEntityData(DATA_TRADE_EXPERIENCE, tradeExp));
         }
         Profession profession = Profession.getProfession(this.profession);
-        if (profession != null) {
-            applyProfession(profession);
-        }
+        if (profession != null) applyProfession(profession);
     }
 
     @Override
@@ -180,9 +199,6 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         this.namedTag.putInt("tradeSeed", this.getTradeSeed());
     }
 
-    /**
-     * 获取村民职业id对应的displayName硬编码
-     */
     private String getProfessionName(int profession) {
         return switch (profession) {
             case 1 -> "entity.villager.farmer";
@@ -231,7 +247,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
      * @return 该村民是否可以交易
      */
     public boolean getCanTrade() {
-        return false;
+        return canTrade;
     }
 
     /**
@@ -312,9 +328,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
             var inv = new TradeInventory(this);
             player.addWindow(inv, Player.TRADE_WINDOW_ID);
             return true;
-        } else {
-            return false;
-        }
+        } else return false;
     }
 
     @Override
@@ -346,20 +360,19 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     public boolean onUpdate(int tick) {
         if (tick % 100 == 0) {
             if (profession != 0) {
-                if (recipes.getAll().size() == 0) {
-                    applyProfession(Profession.getProfession(this.profession));
-                }
+                if (recipes.getAll().size() == 0) applyProfession(Profession.getProfession(this.profession));
             }
             if (tradeExp == 0 && !this.namedTag.contains("traded")) {
-                NukkitRandom nukkitRandom = new NukkitRandom();
+                boolean professionFound = false;
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
                         Block block = getLocation().add(x, 0, z).getLevelBlock();
                         int id = block.getId();
                         for (Profession profession : Profession.getProfessions().values()) {
                             if (id == profession.getBlockID()) {
+                                professionFound = true;
                                 if (this.profession != profession.getIndex()) {
-                                    this.setTradeSeed(nukkitRandom.nextBoundedInt(Integer.MAX_VALUE));
+                                    this.setTradeSeed(new NukkitRandom().nextBoundedInt(Integer.MAX_VALUE));
                                     this.setProfession(profession.getIndex());
                                     this.applyProfession(profession);
 
@@ -391,4 +404,5 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         recipes = profession.buildTrades(getTradeSeed());
         this.setCanTrade(true);
     }
+
 }

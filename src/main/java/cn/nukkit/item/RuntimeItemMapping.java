@@ -172,8 +172,8 @@ public class RuntimeItemMapping {
     }
 
     synchronized boolean registerCustomItem(CustomItem customItem) {
-        int runtimeId = CustomItemDefinition.getRuntimeId(customItem.getNamespaceId());
-        String namespaceId = customItem.getNamespaceId();
+        int runtimeId = CustomItemDefinition.getRuntimeId(customItem.getDefinition().identifier());
+        String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().enableExperimentMode) {
             return false;
         }
@@ -181,7 +181,7 @@ public class RuntimeItemMapping {
             this.customItems.add(namespaceId);
 
             RuntimeEntry entry = new RuntimeEntry(
-                    customItem.getNamespaceId(),
+                    customItem.getDefinition().identifier(),
                     runtimeId,
                     false,
                     true
@@ -196,15 +196,15 @@ public class RuntimeItemMapping {
     }
 
     synchronized void deleteCustomItem(CustomItem customItem) {
-        String namespaceId = customItem.getNamespaceId();
+        String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().enableExperimentMode && !this.customItems.contains(namespaceId)) {
             return;
         }
         this.customItems.remove(namespaceId);
 
         this.runtimeId2Name.remove(customItem.getId());
-        this.name2RuntimeId.removeInt(customItem.getNamespaceId());
-        this.itemPaletteEntries.removeIf(next -> next.getIdentifier().equals(customItem.getNamespaceId()));
+        this.name2RuntimeId.removeInt(customItem.getDefinition().identifier());
+        this.itemPaletteEntries.removeIf(next -> next.getIdentifier().equals(customItem.getDefinition().identifier()));
 
         this.generatePalette();
     }

@@ -122,6 +122,14 @@ public class Position extends Vector3 {
         return this.getValidLevel().getBlockAround(this, layer);
     }
 
+    public Block getTickCachedLevelBlock() {
+        return getValidLevel().getTickCachedBlock(this);
+    }
+
+    public Block getTickCachedLevelBlockAtLayer(int layer) {
+        return getValidLevel().getTickCachedBlock(this, layer);
+    }
+
     @NotNull
     public Location getLocation() {
         return new Location(this.x, this.y, this.z, 0, 0, this.getValidLevel());

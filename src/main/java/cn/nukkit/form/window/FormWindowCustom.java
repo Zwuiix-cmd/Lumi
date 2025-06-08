@@ -98,7 +98,7 @@ public class FormWindowCustom extends FormWindow {
                 labelResponses.put(i, ((ElementLabel) e).getText());
                 responses.put(i, ((ElementLabel) e).getText());
                 if (protocol < ProtocolInfo.v1_21_70_24 || protocol >= ProtocolInfo.v1_21_80) {
-                    // to be compatible with the older response before 1.21.70
+                    // to be compatible with response removed in 1.21.70 and returned back in versions higher than 1.21.80. Mojang WTF???
                     responseIndex++;
                 }
             } else if (e instanceof ElementDropdown elementDropdown) {

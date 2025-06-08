@@ -9,6 +9,7 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginDescription;
 import cn.nukkit.utils.TextFormat;
+import cn.nukkit.utils.Utils;
 import com.google.gson.JsonParser;
 
 import java.io.InputStream;
@@ -41,31 +42,15 @@ public class VersionCommand extends VanillaCommand {
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (args.length == 0 || !sender.hasPermission("nukkit.command.version.plugins")) {
             final String branch = Nukkit.getBranch();
+            String minVer = Utils.getVersionByProtocol(ProtocolInfo.SUPPORTED_PROTOCOLS.get(0));
 
-            sender.sendMessage("§e#########################################\n§cNukkit§3-§dMOT\n§6Build: §b" + branch + '/' + Nukkit.VERSION.substring(4) + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§e#########################################");
+            sender.sendMessage("§dLumi§3 v" + Nukkit.API_VERSION + "\n§6Build: §b" + branch + '/' + Nukkit.VERSION.substring(4) + "\n§6Multiversion: §b" + minVer + "-" + ProtocolInfo.MINECRAFT_VERSION_NETWORK);
 
             if (sender.isOp()) {
                 if (!branch.equals("master") || Nukkit.VERSION.equals("git-null")) {
-                    sender.sendMessage("§c[Nukkit-MOT] §aYou are using a development build, consider updating");
+                    sender.sendMessage("§c[Lumi] §aYou are using a development build, consider updating");
                     return true;
                 }
-
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        URLConnection request = new URL(Nukkit.BRANCH).openConnection();
-                        request.connect();
-                        InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
-                        String latest = "git-" + JsonParser.parseReader(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
-                        content.close();
-
-                        if (Nukkit.VERSION.equals(latest)) {
-                            sender.sendMessage("§c[Nukkit-MOT] §aYou are running the latest version.");
-                        } else {
-                            sender.sendMessage("§c[Nukkit-MOT][Update] §eThere is a new build of §cNukkit§3-§dMOT §eavailable! Current: " + Nukkit.VERSION + ", latest: " + latest);
-                        }
-                    } catch (Exception ignore) {
-                    }
-                });
             }
             return true;
         }

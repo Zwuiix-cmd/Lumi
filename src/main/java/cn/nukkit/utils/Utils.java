@@ -17,6 +17,7 @@ import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -39,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Utils {
 
+    public static final Integer[] EMPTY_INTEGERS = new Integer[0];
     /**
      * A SplittableRandom you can use without having to create a new object every time.
      */
@@ -653,6 +655,83 @@ public class Utils {
         }
 
         return blocks.toArray(new Block[0]);
+    }
+
+    public static boolean hasCollisionTickCachedBlocks(Level level, AxisAlignedBB bb) {
+        int minX = NukkitMath.floorDouble(bb.getMinX());
+        int minY = NukkitMath.floorDouble(bb.getMinY());
+        int minZ = NukkitMath.floorDouble(bb.getMinZ());
+        int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+        int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+        int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+
+        for (int z = minZ; z <= maxZ; ++z) {
+            for (int x = minX; x <= maxX; ++x) {
+                for (int y = minY; y <= maxY; ++y) {
+                    Block block = level.getTickCachedBlock(x, y, z, false);
+                    //判断是否和非空气方块有碰撞
+                    if (block != null && block.collidesWithBB(bb) && !block.canPassThrough()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return 0 if no collision, else a byte in the format of 0b 00 xx yy zz <br>
+     * if xx is 01, then the block at the minX side of the bb has collision <br>
+     * if xx is 11, then the block at the maxX side of the bb has collision <br>
+     * if xx is 00, then xx is not used <br>
+     * if yy is 01, then the block at the minY side of the bb has collision <br>
+     * if yy is 11, then the block at the maxY side of the bb has collision <br>
+     * if yy is 00, then yy is not used <br>
+     * if zz is 01, then the block at the minZ side of the bb has collision <br>
+     * if zz is 11, then the block at the maxZ side of the bb has collision <br>
+     * if zz is 00, then zz is not used <br>
+     */
+    public static byte hasCollisionTickCachedBlocksWithInfo(Level level, @NotNull AxisAlignedBB bb) {
+        int minX = NukkitMath.floorDouble(bb.getMinX());
+        int minY = NukkitMath.floorDouble(bb.getMinY());
+        int minZ = NukkitMath.floorDouble(bb.getMinZ());
+        int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+        int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+        int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+        float centerX = (float) (maxX + minX) / 2;
+        float centerY = (float) (maxY + minY) / 2;
+        float centerZ = (float) (maxZ + minZ) / 2;
+        byte returnValue = 0;
+
+        for (int z = minZ; z <= maxZ; ++z) {
+            for (int x = minX; x <= maxX; ++x) {
+                for (int y = minY; y <= maxY; ++y) {
+                    Block block = level.getTickCachedBlock(x, y, z, false);
+                    //判断是否和非空气方块有碰撞
+                    if (block != null && block.collidesWithBB(bb) && !block.canPassThrough()) {
+                        if (x < centerX) {
+                            returnValue |= 0b010000;
+                        } else if (x > centerX) {
+                            returnValue |= 0b110000;
+                        }
+                        if (y < centerY) {
+                            returnValue |= 0b0100;
+                        } else if (y > centerY) {
+                            returnValue |= 0b1100;
+                        }
+                        if (z < centerZ) {
+                            returnValue |= 0b01;
+                        } else if (z > centerZ) {
+                            returnValue |= 0b11;
+                        }
+                        return returnValue;
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     public static JsonElement loadJsonResource(String file) {

@@ -1,33 +1,42 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+
+
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityIntelligent;
+import cn.nukkit.entity.EntityWalkable;
+import cn.nukkit.entity.ai.behavior.Behavior;
+import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
+import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
+import cn.nukkit.entity.ai.controller.LookController;
+import cn.nukkit.entity.ai.controller.WalkController;
+import cn.nukkit.entity.ai.evaluator.EntityCheckEvaluator;
+import cn.nukkit.entity.ai.evaluator.PassByTimeEvaluator;
+import cn.nukkit.entity.ai.evaluator.ProbabilityEvaluator;
+import cn.nukkit.entity.ai.evaluator.RandomSoundEvaluator;
+import cn.nukkit.entity.ai.executor.*;
+import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
+import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
+import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
+import cn.nukkit.entity.ai.sensor.NearestEntitySensor;
+import cn.nukkit.entity.ai.sensor.PlayerStaringSensor;
+import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.player.PlayerTeleportEvent;
-import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Sound;
-import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.NukkitMath;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.Utils;
 
-import java.util.HashMap;
+import java.util.Set;
 
-public class EntityEnderman extends EntityWalkingMob {
+/**
+ * @author PikyCZ
+ */
+public class EntityEnderman extends EntityMob implements EntityWalkable {
 
     public static final int NETWORK_ID = 38;
-
-    private int angry = 0;
-
-    private boolean teleported;
 
     public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -36,6 +45,62 @@ public class EntityEnderman extends EntityWalkingMob {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public IBehaviorGroup requireBehaviorGroup() {
+        return new BehaviorGroup(
+                this.tickSpread,
+                Set.of(
+                        new Behavior(new StaringAttackTargetExecutor(), none(), 1, 1, 1, true)
+                ),
+                Set.of(
+                        new Behavior(new PlaySoundExecutor(Sound.MOB_ENDERMEN_IDLE, 0.8f, 1.2f, 1, 1), all(not(new EntityCheckEvaluator(CoreMemoryTypes.ATTACK_TARGET)), new RandomSoundEvaluator()), 6, 1, 1, true),
+                        new Behavior(new PlaySoundExecutor(Sound.MOB_ENDERMEN_SCREAM, 0.8f, 1.2f, 1, 1), all(new EntityCheckEvaluator(CoreMemoryTypes.ATTACK_TARGET), new RandomSoundEvaluator(10, 7)), 5, 1, 1, true),
+                        new Behavior(new TeleportExecutor(16, 5, 16), any(
+                                all(entity -> getLevel().isRaining(),
+                                        entity -> !isUnderBlock(),
+                                        entity -> getLevel().getCurrentTick()%10 == 0),
+                                entity -> isInsideOfWater(),
+                                all(
+                                        entity -> getMemoryStorage().isEmpty(CoreMemoryTypes.ATTACK_TARGET),
+                                        entity -> getLevel().getCurrentTick()%20==0,
+                                        new ProbabilityEvaluator(2, 25)),
+                                all(
+                                        entity -> !getMemoryStorage().isEmpty(CoreMemoryTypes.ATTACK_TARGET),
+                                        new ProbabilityEvaluator(1, 20),
+                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_ATTACKED_TIME, 0, 10)
+                                )
+                        ), 4, 1),
+                        new Behavior(new MeleeAttackExecutor(CoreMemoryTypes.ATTACK_TARGET, 0.45f, 64, true, 30), all(
+                                new EntityCheckEvaluator(CoreMemoryTypes.ATTACK_TARGET),
+                                any(
+                                        entity -> getMemoryStorage().get(CoreMemoryTypes.ATTACK_TARGET) instanceof Player holder && holder.getInventory() != null && !(holder.getInventory().getHelmet().getId() == Block.CARVED_PUMPKIN),
+                                        entity -> getMemoryStorage().get(CoreMemoryTypes.ATTACK_TARGET) instanceof EntityIntelligent
+                                )
+                        ), 3, 1),
+                        new Behavior(new EndermanBlockExecutor(), all(
+                                entity -> getLevel().getGameRules().getBoolean(GameRule.MOB_GRIEFING),
+                                entity -> getLevel().getCurrentTick()%60 == 0,
+                                new ProbabilityEvaluator(1,20)
+                        ), 2, 1, 1, true),
+                        new Behavior(new FlatRandomRoamExecutor(0.3f, 12, 100, false, -1, true, 10), none(), 1, 1)
+                ),
+                Set.of(
+                        new PlayerStaringSensor(64, 20, false),
+                        new NearestEntitySensor(EntityEndermite.class, CoreMemoryTypes.NEAREST_ENDERMITE, 64, 0)
+                ),
+                Set.of(new WalkController(), new LookController(true, true)),
+                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
+                this
+        );
+    }
+
+    @Override
+    protected void initEntity() {
+        this.setMaxHealth(40);
+        this.diffHandDamage = new float[]{4f, 7f, 10f};
+        super.initEntity();
     }
 
     @Override
@@ -49,181 +114,27 @@ public class EntityEnderman extends EntityWalkingMob {
     }
 
     @Override
-    public double getSpeed() {
-        return this.isAngry() ? 1.6 : 1.21;
+    public String getOriginalName() {
+        return "Enderman";
     }
 
     @Override
-    protected void initEntity() {
-        this.setMaxHealth(40);
-
-        super.initEntity();
-
-        this.setDamage(new int[]{0, 4, 7, 10});
+    public boolean isPreventingSleep(Player player) {
+        return this.getDataPropertyBoolean(DATA_FLAG_ANGRY);
     }
 
     @Override
-    public void attackEntity(Entity player) {
-        if (this.attackDelay > 23 && this.distanceSquared(player) < 1) {
-            this.attackDelay = 0;
-            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
-            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
-
-            if (player instanceof Player) {
-                float points = 0;
-                for (Item i : ((Player) player).getInventory().getArmorContents()) {
-                    points += this.getArmorPoints(i.getId());
-                }
-
-                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
-                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
-            }
-            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
-        }
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent ev) {
-        super.attack(ev);
-
-        if (!ev.isCancelled()) {
-            if (ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (!isAngry()) {
-                    setAngry(2400);
+    public boolean attack(EntityDamageEvent source) {
+        if(source.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+            if(source instanceof EntityDamageByEntityEvent event) {
+                if(event.getDamager() instanceof EntityProjectile projectile){
+                    getMemoryStorage().put(CoreMemoryTypes.ATTACK_TARGET, projectile.shootingEntity);
                 }
             }
-
-            if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                if (!isAngry()) {
-                    setAngry(2400);
-                }
-                ev.setCancelled(true);
-                this.teleport();
-                return false;
-            } else if (!this.teleported && Utils.rand(1, 10) == 1) {
-                this.teleport();
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.ENDER_PEARL, 0, Utils.rand(0, 1))};
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 5;
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (this.closed) {
+            new TeleportExecutor(16, 5, 16).execute(this);
+            source.setCancelled();
             return false;
         }
-
-        if (this.getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        this.teleported = false;
-
-        if (this.angry > 0) {
-            if (this.angry == 1) {
-                this.setAngry(0);
-            } else {
-                this.angry--;
-            }
-        }
-
-        int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
-        CompoundTag biomeDefinitions;
-        if (b == BlockID.WATER || b == BlockID.STILL_WATER
-                || (this.level.isRaining() && Utils.rand() && this.level.canBlockSeeSky(this)
-                && ((biomeDefinitions = Biome.getBiomeDefinitions(this.level.getBiomeId(this.getFloorX(), this.getFloorZ()))) == null
-                || biomeDefinitions.getBoolean("rain")))
-        ) {
-            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 1));
-            this.setAngry(0);
-            this.teleport();
-        } else if (Utils.rand(0, 500) == 20) {
-            this.setAngry(0);
-            this.teleport();
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
-
-    public void teleport() {
-        Location to = this.getSafeTpLocation();
-        if (to != null) {
-            this.level.addSound(this, Sound.MOB_ENDERMEN_PORTAL);
-            if (this.teleport(to, PlayerTeleportEvent.TeleportCause.UNKNOWN)) {
-                this.level.addSound(this, Sound.MOB_ENDERMEN_PORTAL);
-                this.teleported = true;
-            }
-        }
-    }
-
-    private Location getSafeTpLocation() {
-        double dx = this.x + Utils.rand(-16, 16);
-        double dz = this.z + Utils.rand(-16, 16);
-        Vector3 pos = new Vector3(Math.floor(dx), (int) Math.floor(this.y + 0.1) + 16, Math.floor(dz));
-        FullChunk chunk = this.level.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
-        int x = (int) pos.x & 0x0f;
-        int z = (int) pos.z & 0x0f;
-        int previousY1 = -1;
-        int previousY2 = -1;
-        if (chunk != null && chunk.isGenerated()) {
-            for (int y = Math.min(this.level.getMaxBlockY(), (int) pos.y); y >= 0; y--) {
-                if (previousY1 > -1 && previousY2 > -1) {
-                    if (Block.solid[chunk.getBlockId(x, y, z)] && chunk.getBlockId(x, previousY1, z) == 0 && chunk.getBlockId(x, previousY2, z) == 0) {
-                        return new Location(pos.x + 0.5, previousY1 + 0.1, pos.z + 0.5, this.level);
-                    }
-                }
-                previousY2 = previousY1;
-                previousY1 = y;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean canDespawn() {
-        if (this.getLevel().getDimension() == Level.DIMENSION_THE_END) {
-            return false;
-        }
-
-        return super.canDespawn();
-    }
-
-    public boolean isAngry() {
-        return this.angry > 0;
-    }
-
-    public void setAngry(int val) {
-        if (this.angry != val) {
-            this.angry = val;
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, val > 0);
-        }
-    }
-
-    @Override
-    public boolean targetOption(EntityCreature creature, double distance) {
-        if (!isAngry()) {
-            return false;
-        }
-        if (creature instanceof Player player) {
-            return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 1024;
-        }
-        return creature.isAlive() && !creature.closed && distance <= 1024;
-    }
-
-    public void stareToAngry() {
-        if (!isAngry()) {
-            setAngry(2400);
-        }
+        return super.attack(source);
     }
 }

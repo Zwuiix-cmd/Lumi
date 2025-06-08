@@ -5,12 +5,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class EntityCreature extends EntityLiving {
+public abstract class EntityCreature extends EntityLiving implements EntityNameable, EntityAgeable {
 
     public EntityCreature(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -24,13 +25,23 @@ public abstract class EntityCreature extends EntityLiving {
         return false;
     }
 
-    /**
-     * Called when player interacts the entity with a name tag item
-     * @param player player
-     * @param nameTag name tag item
-     * @return true to reduce name tag item count
-     */
+    public final boolean playerApplyNameTag(@NotNull Player player, @NotNull Item item) {
+        return applyNameTag(player, item);
+    }
+
+    // Structured like this so I can override nametags in player and dragon classes
+    // without overriding onInteract.
     protected boolean applyNameTag(Player player, Item item) {
-        return false; // Override in BaseEntity
+        if (item.hasCustomName()) {
+            this.setNameTag(item.getCustomName());
+            this.setNameTagVisible(true);
+
+            if (!player.isCreative()) {
+                player.getInventory().removeItem(item);
+            }
+            // Set entity as persistent.
+            return true;
+        }
+        return false;
     }
 }

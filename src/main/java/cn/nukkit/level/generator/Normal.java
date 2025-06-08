@@ -89,7 +89,6 @@ public class Normal extends Generator {
             new PopulatorIgloo(),
             new PopulatorPillagerOutpost(),
             new PopulatorOceanRuin(),
-            new PopulatorVillage(),
             new PopulatorStronghold(),
             new PopulatorMineshaft(),
             new PopulatorDesertWell(),

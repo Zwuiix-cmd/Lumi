@@ -2,8 +2,8 @@ package cn.nukkit.level.generator.populator.overworld;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityIronGolem;
 import cn.nukkit.entity.mob.EntityPillager;
-import cn.nukkit.entity.passive.EntityIronGolem;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.FullChunk;
@@ -81,6 +81,7 @@ public class PopulatorPillagerOutpost extends Populator {
                         Entity.getDefaultNBT(new Vector3(nbt.getInt("x") + 0.5, nbt.getInt("y"), nbt.getInt("z") + 0.5))
                             .putString("id", String.valueOf(EntityPillager.NETWORK_ID))
                             .putBoolean("PatrolLeader", true)), 2);
+
                     case "cage" -> Server.getInstance().getScheduler().scheduleDelayedTask(InternalPlugin.INSTANCE, new ActorSpawnTask(chunk.getProvider().getLevel(),
                         Entity.getDefaultNBT(new Vector3(nbt.getInt("x") + 0.5, nbt.getInt("y"), nbt.getInt("z") + 0.5))
                             .putString("id", String.valueOf(EntityIronGolem.NETWORK_ID))), 2);

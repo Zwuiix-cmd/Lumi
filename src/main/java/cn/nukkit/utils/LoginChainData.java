@@ -59,6 +59,4 @@ public interface LoginChainData {
     String getWaterdogIP();
 
     JsonObject getRawData();
-
-    String getTitleId();
 }

@@ -32,11 +32,12 @@ public abstract class Event {
     }
 
     /**
-     * 触发事件
-     * call event
+     * Calls an event and returns the result.
+     * @return True if event is cancelled, otherwise false
      */
-    public final void call() {
+    public boolean call() {
         Server.getInstance().getPluginManager().callEvent(this);
+        return this instanceof Cancellable && !this.isCancelled();
     }
 
     public boolean isCancelled() {
