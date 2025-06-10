@@ -398,7 +398,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @param action the action
      * @return 状态值，返回值不为0代表这是一个touch操作而不是一个挖掘方块的操作<br>Status value, if the return value is not 0, it means that this is a touch operation rather than a mining block operation
      */
-    public int onTouch(@Nullable Player player, PlayerInteractEvent.Action action) {
+    public int onTouch(@NotNull Vector3 vector, @NotNull Item item, @NotNull BlockFace face, float fx, float fy, float fz, @Nullable Player player, PlayerInteractEvent.Action action) {
         this.onUpdate(Level.BLOCK_UPDATE_TOUCH);
         return 0;
     }

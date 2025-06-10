@@ -58,6 +58,7 @@ public abstract class BlockEntity extends Position {
     public static final String TARGET = "Target";
     public static final String BRUSHABLE_BLOCK = "BrushableBlock";
     public static final String CONDUIT = "Conduit";
+    public static final String CHISELED_BOOKSHELF = "ChiseledBookshelf";
 
     // Not a vanilla block entity
     public static final String PERSISTENT_CONTAINER = "PersistentContainer";

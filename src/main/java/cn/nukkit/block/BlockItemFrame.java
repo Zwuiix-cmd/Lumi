@@ -12,6 +12,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.ItemFrameItemAddedSound;
 import cn.nukkit.level.sound.ItemFrameItemRotated;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.LevelEventPacket;
@@ -96,7 +97,7 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable, Bl
     }
 
     @Override
-    public int onTouch(@Nullable Player player, PlayerInteractEvent.Action action) {
+    public int onTouch(@NotNull Vector3 vector, @NotNull Item item, @NotNull BlockFace face, float fx, float fy, float fz, @Nullable Player player, PlayerInteractEvent.Action action) {
         this.onUpdate(Level.BLOCK_UPDATE_TOUCH);
         if (player != null && action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             BlockEntity itemFrame = this.level.getBlockEntity(this);

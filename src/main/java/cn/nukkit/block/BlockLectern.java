@@ -10,6 +10,7 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.ContainerOpenPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -157,7 +158,7 @@ public class BlockLectern extends BlockTransparentMeta implements Faceable, Bloc
     }
 
     @Override
-    public int onTouch(@Nullable Player player, PlayerInteractEvent.Action action) {
+    public int onTouch(@NotNull Vector3 vector, @NotNull Item item, @NotNull BlockFace face, float fx, float fy, float fz, @Nullable Player player, PlayerInteractEvent.Action action) {
         if (action == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
             if (blockEntity instanceof BlockEntityLectern lectern && lectern.dropBook(player)) {

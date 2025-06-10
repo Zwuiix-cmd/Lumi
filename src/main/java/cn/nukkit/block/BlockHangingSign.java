@@ -156,4 +156,7 @@ public abstract class BlockHangingSign extends BlockTransparentMeta {
     public Item toItem() {
         return new ItemBlock(this, 0);
     }
+
+    @Override
+    public abstract int getId();
 }

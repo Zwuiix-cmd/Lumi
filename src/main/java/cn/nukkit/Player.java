@@ -4865,7 +4865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (target.onTouch(this, playerInteractEvent.getAction()) != 0) {
+        if (target.onTouch(pos, this.getInventory().getItemInHand(), face, 0, 0, 0, this, playerInteractEvent.getAction()) != 0) {
             return;
         }
 
