@@ -541,6 +541,41 @@ public class PluginManager {
         }
     }
 
+    public <T extends Event> void registerEvent(
+            Class<T> eventClass,
+            NonReflectionEventConsumer<T> consumer,
+            Plugin plugin
+    ) {
+        registerEvent(
+                eventClass, consumer, plugin,
+                EventPriority.NORMAL, false
+        );
+    }
+
+    public <T extends Event> void registerEvent(
+            Class<T> eventClass,
+            NonReflectionEventConsumer<T> consumer,
+            Plugin plugin,
+            EventPriority priority,
+            boolean ignoreCancelled
+    ) {
+        EventExecutor executor = new NonReflectionEventExecutor<>(eventClass, consumer);
+
+        RegisteredListener rl = new RegisteredListener(
+                null,  //null for non reflection registration
+                executor,
+                priority,
+                plugin,
+                ignoreCancelled
+        );
+        try {
+            getEventListeners(eventClass).register(rl);
+        } catch (IllegalAccessException e) {
+            log.error("An error occurred while registering the event listener event:{}, listener:{} for plugin:{} version:{}",
+                    eventClass, null, plugin.getDescription().getName(), plugin.getDescription().getVersion(), e);
+        }
+    }
+
     public void registerEvents(Listener listener, Plugin plugin) {
         if (!plugin.isEnabled()) {
             throw new PluginException("Plugin attempted to register " + listener.getClass().getName() + " while not enabled");
