@@ -106,6 +106,10 @@ public class Position extends Vector3 {
         return this.getValidLevel().getBlockEntity(this);
     }
 
+    public Block getLevelBlock(boolean load) {
+        return this.getValidLevel().getBlock(this, load);
+    }
+
     public Block getLevelBlock() {
         return this.getValidLevel().getBlock(this);
     }

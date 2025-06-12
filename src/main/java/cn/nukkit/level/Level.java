@@ -1112,7 +1112,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (!this.updateEntities.isEmpty()) {
-            CompletableFuture<Void> prepareFuture = CompletableFuture.runAsync(() ->
+            CompletableFuture.runAsync(() ->
                             this.updateEntities.keySet().longParallelStream()
                                     .mapToObj(this.updateEntities::get)
                                     .filter(entity -> entity instanceof EntityAsyncPrepare)
@@ -1136,8 +1136,6 @@ public class Level implements ChunkManager, Metadatable {
                     toRemove.add(id);
                 }
             }
-
-            prepareFuture.join();
 
             if (!toRemove.isEmpty()) {
                 toRemove.forEach(this.updateEntities::remove);

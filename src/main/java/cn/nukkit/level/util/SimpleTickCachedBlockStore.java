@@ -4,21 +4,23 @@ package cn.nukkit.level.util;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.Level;
+import org.jctools.maps.NonBlockingHashMap;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class SimpleTickCachedBlockStore implements TickCachedBlockStore {
-    private volatile ConcurrentHashMap<Integer, Block> tickCachedBlockStore;
+    private volatile NonBlockingHashMap<Integer, Block> tickCachedBlockStore;
     private final DimensionData dimensionData;
 
     public SimpleTickCachedBlockStore(Level level) {
-        this.tickCachedBlockStore = new ConcurrentHashMap<>(32, 0.75f);
+        this.tickCachedBlockStore = new NonBlockingHashMap<>();
         this.dimensionData = level.getDimensionData();
     }
 
     @Override
     public void clearCachedStore() {
         //Replacing map with new instance instead of clearing for better performance
-        tickCachedBlockStore = new ConcurrentHashMap<>(32, 0.75f);
+        tickCachedBlockStore = new NonBlockingHashMap<>();
     }
 
     @Override

@@ -1802,7 +1802,7 @@ public abstract class Entity extends Location implements Metadatable {
      */
     public boolean entityBaseTick(int tickDiff) {
         if (!this.isPlayer) {
-            //this.blocksAround = null; // Use only when entity moves for better performance
+            this.blocksAround = null; // Use only when entity moves for better performance
             this.collisionBlocks = null;
         }
 
@@ -2478,7 +2478,7 @@ public abstract class Entity extends Location implements Metadatable {
             AxisAlignedBB bb = this.boundingBox.clone();
             bb.setMinY(bb.getMinY() - 0.75);
 
-            this.onGround = this.level.getCollisionBlocks(bb).length > 0;
+            this.onGround = level.hasCollisionBlocks(bb);
         }
         this.isCollided = this.onGround;
         this.updateFallState(this.onGround);
@@ -2492,10 +2492,13 @@ public abstract class Entity extends Location implements Metadatable {
             return true;
         }
 
+        if (!this.isPlayer) {
+            this.blocksAround = null;
+        }
+
         if (this.keepMovement) {
             this.boundingBox.offset(dx, dy, dz);
             this.setPosition(this.temporalVector.setComponents((this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2, this.boundingBox.getMinY(), (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2));
-            this.onGround = this.isPlayer;
             return true;
         } else {
 
@@ -2647,6 +2650,29 @@ public abstract class Entity extends Location implements Metadatable {
         return this.blocksAround;
     }
 
+    public List<Block> getTickCachedBlocksAround() {
+        if (this.blocksAround == null) {
+            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
+            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
+            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
+            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
+            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
+
+            this.blocksAround = new ArrayList<>();
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        this.blocksAround.add(this.level.getTickCachedBlock(this.temporalVector.setComponents(x, y, z)));
+                    }
+                }
+            }
+        }
+
+        return this.blocksAround;
+    }
+
     public List<Block> getCollisionBlocks() {
         if (this.collisionBlocks == null) {
             this.collisionBlocks = new ArrayList<>();
@@ -2654,6 +2680,20 @@ public abstract class Entity extends Location implements Metadatable {
             List<Block> bl = this.getBlocksAround();
             for (Block b : bl) {
                 if (b.collidesWithBB(this.boundingBox, true)) {
+                    this.collisionBlocks.add(b);
+                }
+            }
+        }
+
+        return this.collisionBlocks;
+    }
+
+    public List<Block> getTickCachedCollisionBlocks() {
+        if (this.collisionBlocks == null) {
+            this.collisionBlocks = new ArrayList<>();
+
+            for (Block b : getTickCachedBlocksAround()) {
+                if (b.collidesWithBB(this.getBoundingBox(), true)) {
                     this.collisionBlocks.add(b);
                 }
             }
@@ -2676,39 +2716,72 @@ public abstract class Entity extends Location implements Metadatable {
             return;
         }
 
+        boolean needsRecalcCurrent = true;
+        if (this instanceof EntityPhysical entityPhysical) {
+            needsRecalcCurrent = entityPhysical.needsRecalcMovement;
+        }
+
         Vector3 vector = new Vector3(0, 0, 0);
         boolean portal = false;
-        boolean powderSnow = false;
-
-        for (Block block : this.getCollisionBlocks()) {
-            if (block.getId() == Block.NETHER_PORTAL) {
-                portal = true;
-                continue;
-            }
-
-            if (block.getId() == Block.POWDER_SNOW) {
-                portal = true;
-                continue;
+        boolean scaffolding = false;
+        boolean endPortal = false;
+        for (var block : this.getTickCachedCollisionBlocks()) {
+            switch (block.getId()) {
+                case Block.NETHER_PORTAL -> portal = true;
+                case BlockID.SCAFFOLDING -> scaffolding = true;
+                case BlockID.END_PORTAL -> endPortal = true;
             }
 
             block.onEntityCollide(this);
-            block.getLevelBlockAtLayer(1).onEntityCollide(this);
-            block.addVelocityToEntity(this, vector);
+            block.getTickCachedLevelBlockAtLayer(1).onEntityCollide(this);
+            if (needsRecalcCurrent)
+                block.addVelocityToEntity(this, vector);
         }
 
-        if (portal) {
-            inPortalTicks++;
-        } else {
-            this.inPortalTicks = 0;
+        setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_IN_SCAFFOLDING, scaffolding);
+
+        if (Math.abs(this.y % 1) > 0.125) {
+            int minX = NukkitMath.floorDouble(boundingBox.getMinX());
+            int minZ = NukkitMath.floorDouble(boundingBox.getMinZ());
+            int maxX = NukkitMath.ceilDouble(boundingBox.getMaxX());
+            int maxZ = NukkitMath.ceilDouble(boundingBox.getMaxZ());
+            int Y = (int) y;
+
+            outerScaffolding:
+            for (int i = minX; i <= maxX; i++) {
+                for (int j = minZ; j <= maxZ; j++) {
+                    Location location = new Location(i, Y, j,level);
+                    if (location.getLevelBlock(false).getId() == BlockID.SCAFFOLDING) {
+                        setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_OVER_SCAFFOLDING, true);
+                        break outerScaffolding;
+                    }
+                }
+            }
         }
-        
-        if (vector.lengthSquared() > 0) {
-            vector = vector.normalize();
-            double d = 0.014d;
-            this.motionX += vector.x * d;
-            this.motionY += vector.y * d;
-            this.motionZ += vector.z * d;
-        }
+
+        if (needsRecalcCurrent)
+            if (vector.lengthSquared() > 0) {
+                vector = vector.normalize();
+                double d = 0.018d;
+                var dx = vector.x * d;
+                var dy = vector.y * d;
+                var dz = vector.z * d;
+                this.motionX += dx;
+                this.motionY += dy;
+                this.motionZ += dz;
+                if (this instanceof EntityPhysical entityPhysical) {
+                    entityPhysical.previousCurrentMotion.x = dx;
+                    entityPhysical.previousCurrentMotion.y = dy;
+                    entityPhysical.previousCurrentMotion.z = dz;
+                }
+            } else {
+                if (this instanceof EntityPhysical entityPhysical) {
+                    entityPhysical.previousCurrentMotion.x = 0;
+                    entityPhysical.previousCurrentMotion.y = 0;
+                    entityPhysical.previousCurrentMotion.z = 0;
+                }
+            }
+        else ((EntityPhysical) this).addPreviousLiquidMovement();
     }
 
     public boolean setPositionAndRotation(Vector3 pos, double yaw, double pitch) {
