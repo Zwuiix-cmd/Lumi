@@ -12,7 +12,6 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
-import cn.nukkit.entity.passive.EntityWolf;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -49,7 +48,6 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.*;
 import static cn.nukkit.utils.Utils.dynamic;
@@ -2121,9 +2119,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public final void scheduleUpdate() {
-        if (!this.closed && !this.level.isBeingConverted) {
-            this.level.updateEntities.put(this.id, this);
-        }
+        this.level.updateEntities.put(this.id, this);
     }
 
     public boolean isOnFire() {
@@ -2733,6 +2729,10 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             block.onEntityCollide(this);
+            block.getLevelBlockAtLayer(1).onEntityCollide(this);
+
+            if (needsRecalcCurrent)
+                block.addVelocityToEntity(this, vector);
             block.getTickCachedLevelBlockAtLayer(1).onEntityCollide(this);
             if (needsRecalcCurrent)
                 block.addVelocityToEntity(this, vector);
@@ -2758,6 +2758,31 @@ public abstract class Entity extends Location implements Metadatable {
                 }
             }
         }
+
+
+        if (needsRecalcCurrent)
+            if (vector.lengthSquared() > 0) {
+                vector = vector.normalize();
+                double d = 0.018d;
+                var dx = vector.x * d;
+                var dy = vector.y * d;
+                var dz = vector.z * d;
+                this.motionX += dx;
+                this.motionY += dy;
+                this.motionZ += dz;
+                if (this instanceof EntityPhysical entityPhysical) {
+                    entityPhysical.previousCurrentMotion.x = dx;
+                    entityPhysical.previousCurrentMotion.y = dy;
+                    entityPhysical.previousCurrentMotion.z = dz;
+                }
+            } else {
+                if (this instanceof EntityPhysical entityPhysical) {
+                    entityPhysical.previousCurrentMotion.x = 0;
+                    entityPhysical.previousCurrentMotion.y = 0;
+                    entityPhysical.previousCurrentMotion.z = 0;
+                }
+            }
+        else ((EntityPhysical) this).addPreviousLiquidMovement();
 
         if (needsRecalcCurrent)
             if (vector.lengthSquared() > 0) {
@@ -3566,5 +3591,42 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void setPassThroughBarrier(boolean passThroughBarrier) {
         this.passThroughBarrier = passThroughBarrier;
+    }
+
+    public List<Block> getTickCachedBlocksAround() {
+        if (this.blocksAround == null) {
+            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
+            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
+            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
+            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
+            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
+
+            this.blocksAround = new ArrayList<>();
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        this.blocksAround.add(this.level.getTickCachedBlock(this.temporalVector.setComponents(x, y, z)));
+                    }
+                }
+            }
+        }
+
+        return this.blocksAround;
+    }
+
+    public List<Block> getTickCachedCollisionBlocks() {
+        if (this.collisionBlocks == null) {
+            this.collisionBlocks = new ArrayList<>();
+
+            for (Block b : getTickCachedBlocksAround()) {
+                if (b.collidesWithBB(this.getBoundingBox(), true)) {
+                    this.collisionBlocks.add(b);
+                }
+            }
+        }
+
+        return this.collisionBlocks;
     }
 }
