@@ -3592,41 +3592,4 @@ public abstract class Entity extends Location implements Metadatable {
     public void setPassThroughBarrier(boolean passThroughBarrier) {
         this.passThroughBarrier = passThroughBarrier;
     }
-
-    public List<Block> getTickCachedBlocksAround() {
-        if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
-            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
-            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
-
-            this.blocksAround = new ArrayList<>();
-
-            for (int z = minZ; z <= maxZ; ++z) {
-                for (int x = minX; x <= maxX; ++x) {
-                    for (int y = minY; y <= maxY; ++y) {
-                        this.blocksAround.add(this.level.getTickCachedBlock(this.temporalVector.setComponents(x, y, z)));
-                    }
-                }
-            }
-        }
-
-        return this.blocksAround;
-    }
-
-    public List<Block> getTickCachedCollisionBlocks() {
-        if (this.collisionBlocks == null) {
-            this.collisionBlocks = new ArrayList<>();
-
-            for (Block b : getTickCachedBlocksAround()) {
-                if (b.collidesWithBB(this.getBoundingBox(), true)) {
-                    this.collisionBlocks.add(b);
-                }
-            }
-        }
-
-        return this.collisionBlocks;
-    }
 }
