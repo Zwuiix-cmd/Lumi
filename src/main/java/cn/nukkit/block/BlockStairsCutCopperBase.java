@@ -70,9 +70,9 @@ public abstract class BlockStairsCutCopperBase extends BlockStairs implements Ox
 
     @Override
     public Block getStateWithOxidizationLevel(@NotNull OxidizationLevel oxidizationLevel) {
-        BlockStairsCutCopperBase bulb = (BlockStairsCutCopperBase) Block.get((getCopperId(isWaxed(), oxidizationLevel)));
-        bulb.setDamage(getDamage());
-        return bulb;
+        BlockStairsCutCopperBase stairs = (BlockStairsCutCopperBase) Block.get((getCopperId(isWaxed(), oxidizationLevel)));
+        stairs.setDamage(getDamage());
+        return stairs;
     }
 
     @Override
@@ -81,10 +81,10 @@ public abstract class BlockStairsCutCopperBase extends BlockStairs implements Ox
             return true;
         }
 
-        BlockStairsCutCopperBase bulb = (BlockStairsCutCopperBase) Block.get((getCopperId(isWaxed(), oxidizationLevel)));
-        bulb.setDamage(getDamage());
+        BlockStairsCutCopperBase stairs = (BlockStairsCutCopperBase) Block.get((getCopperId(isWaxed(), oxidizationLevel)));
+        stairs.setDamage(getDamage());
 
-        return getValidLevel().setBlock(this, bulb);
+        return getValidLevel().setBlock(this, stairs);
     }
 
     @Override
@@ -93,10 +93,10 @@ public abstract class BlockStairsCutCopperBase extends BlockStairs implements Ox
             return true;
         }
 
-        BlockStairsCutCopperBase bulb = (BlockStairsCutCopperBase) Block.get((getCopperId(waxed, getOxidizationLevel())));
-        bulb.setDamage(getDamage());
+        BlockStairsCutCopperBase stairs = (BlockStairsCutCopperBase) Block.get((getCopperId(waxed, getOxidizationLevel())));
+        stairs.setDamage(getDamage());
 
-        return getValidLevel().setBlock(this, bulb);
+        return getValidLevel().setBlock(this, stairs);
     }
 
     protected int getCopperId(boolean waxed, @Nullable OxidizationLevel oxidizationLevel) {

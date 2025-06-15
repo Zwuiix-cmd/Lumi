@@ -6,8 +6,6 @@ import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.Level;
 import org.jctools.maps.NonBlockingHashMap;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public final class SimpleTickCachedBlockStore implements TickCachedBlockStore {
     private volatile NonBlockingHashMap<Integer, Block> tickCachedBlockStore;
     private final DimensionData dimensionData;
