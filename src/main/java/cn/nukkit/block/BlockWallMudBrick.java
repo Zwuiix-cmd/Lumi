@@ -39,6 +39,17 @@ public class BlockWallMudBrick extends BlockWall {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return Item.EMPTY_ARRAY;
+        }
+    }
+
+    @Override
     public BlockColor getColor() {
         return BlockColor.BROWN_BLOCK_COLOR;
     }

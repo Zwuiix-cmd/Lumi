@@ -18,6 +18,7 @@ import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.block.BlockNaturalBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
@@ -2182,18 +2183,18 @@ public class Level implements ChunkManager, Metadatable {
             Map.Entry<Long, Set<Integer>> entry = iter.next();
             iter.remove();
             long index = entry.getKey();
+            BaseFullChunk chunk = getChunk(getHashX(index), getHashZ(index), false);
             Set<Integer> blocks = entry.getValue();
 
             for (int blockHash : blocks) {
                 Vector3 pos = getBlockXYZ(index, blockHash, this.getDimensionData());
-                BaseFullChunk chunk = getChunk(pos.getChunkX(), pos.getChunkZ(), false);
                 if (chunk != null) {
                     int lcx = pos.getFloorX() & 0xF;
                     int lcz = pos.getFloorZ() & 0xF;
                     int oldLevel = chunk.getBlockLight(lcx, pos.getFloorY(), lcz);
                     int newLevel = Block.getBlockLight(chunk.getBlockId(lcx, pos.getFloorY(), lcz));
                     if (oldLevel != newLevel) {
-                        this.setBlockLightAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), newLevel);
+                        chunk.setBlockLight(((int) pos.x) & 0x0f, ensureY((int) pos.y), ((int) pos.z) & 0x0f, newLevel & 0x0f);
 
                         long hash = Hash.hashBlock(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ());
                         if (newLevel < oldLevel) {
@@ -2716,6 +2717,16 @@ public class Level implements ChunkManager, Metadatable {
         } else {
             drops = target.getDrops(null, item);
         }
+
+        BlockNaturalBreakEvent ev = new BlockNaturalBreakEvent(target, item, drops);
+        ev.call();
+
+        if (ev.isCancelled()) {
+            return null;
+        }
+
+        drops = ev.getDrops();
+        dropExp = ev.getDropExp();
 
         if (createParticles) {
             Map<Integer, Player> players = this.getChunkPlayers((int) target.x >> 4, (int) target.z >> 4);
@@ -5336,7 +5347,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_21_80) {
+        if (protocol >= ProtocolInfo.v1_21_90) {
+            return ProtocolInfo.v1_21_90;
+        } else if (protocol >= ProtocolInfo.v1_21_80) {
             return ProtocolInfo.v1_21_80;
         } else if (protocol >= ProtocolInfo.v1_21_70_24) {
             return ProtocolInfo.v1_21_70;
@@ -5469,7 +5482,8 @@ public class Level implements ChunkManager, Metadatable {
         if (chunk == ProtocolInfo.v1_21_60) if (player == ProtocolInfo.v1_21_60) return true;
         if (chunk == ProtocolInfo.v1_21_70)
             if (player >= ProtocolInfo.v1_21_70_24) if (player < ProtocolInfo.v1_21_80) return true;
-        if (chunk == ProtocolInfo.v1_21_80) if (player >= ProtocolInfo.v1_21_80) return true;
+        if (chunk == ProtocolInfo.v1_21_80) if (player < ProtocolInfo.v1_21_90) return true;
+        if (chunk == ProtocolInfo.v1_21_90) if (player >= ProtocolInfo.v1_21_90) return true;
         return false; //TODO Multiversion  Remember to update when block palette changes
     }
 
