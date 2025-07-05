@@ -2922,6 +2922,7 @@ public class Server {
         Entity.registerEntity("Human", EntityHuman.class, true);
         Entity.registerEntity("Lightning", EntityLightning.class);
         Entity.registerEntity("AreaEffectCloud", EntityAreaEffectCloud.class);
+        Entity.registerEntity("WindCharge", EntityWindCharge.class);
     }
 
     /**

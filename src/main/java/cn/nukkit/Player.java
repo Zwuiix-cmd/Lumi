@@ -114,6 +114,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -170,6 +172,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int MINIMUM_OTHER_WINDOW_ID = Utils.dynamic(8);
 
     public static final int RESOURCE_PACK_CHUNK_SIZE = 8 * 1024; // 8KB
+
+    /**
+     * Regular expression for validating player name. Allows only: Number nicknames, letter nicknames, number and letters nicknames, nicknames with underscores, nicknames with space in the middle
+     */
+    private static final Pattern PLAYER_NAME_PATTERN = Pattern.compile("^(?! )[A-Za-z0-9_](?: ?(?! )?[A-Za-z0-9_]){1,14}$");
 
     protected final SourceInterface interfaz;
     protected final NetworkPlayerSession networkSession;
@@ -3180,25 +3187,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.rawUUID = Binary.writeUUID(this.uuid);
 
                 boolean valid = true;
-                int len = loginPacket.username.length();
-                if (len > 16 || len < 3 || loginPacket.username.trim().isEmpty()) {
+                Matcher usernameMatcher = PLAYER_NAME_PATTERN.matcher(loginPacket.username);
+                if (!usernameMatcher.matches()) {
                     valid = false;
-                }
-
-                if (valid) {
-                    for (int i = 0; i < len; i++) {
-                        char c = loginPacket.username.charAt(i);
-                        if ((c >= 'a' && c <= 'z') ||
-                                (c >= 'A' && c <= 'Z') ||
-                                (c >= '0' && c <= '9') ||
-                                c == '_' || c == ' '
-                        ) {
-                            continue;
-                        }
-
-                        valid = false;
-                        break;
-                    }
                 }
 
                 if (!valid || Objects.equals(this.iusername, "rcon") || Objects.equals(this.iusername, "console")) {
@@ -3893,19 +3884,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 switch (interactPacket.action) {
                     case InteractPacket.ACTION_OPEN_INVENTORY:
-                        if (targetEntity instanceof EntityChestBoat chestBoat) {
-                            if (this.protocol >= ProtocolInfo.v1_19_0) {
-                                this.addWindow(chestBoat.getInventory());
+                        if (!this.inventoryOpen) {
+                            if (this.riding instanceof EntityChestBoat && this.riding == targetEntity) {
+                                if (this.protocol >= ProtocolInfo.v1_19_0) {
+                                    this.addWindow(((InventoryHolder) targetEntity).getInventory());
+                                }
+                            } else if (this.protocol >= 407) {
+                                if (this.inventory.open(this)) {
+                                    this.inventoryOpen = true;
+                                }
                             }
-                            break;
-                        } else if (targetEntity != this) {
-                            break;
-                        }
-                        if (this.protocol >= 407) {
-                            //Optional<Inventory> topWindow = this.getTopWindow();
-                            if (!this.inventoryOpen/* && !(topWindow.isPresent() && topWindow.get().getViewers().contains(this))*/) {
-                                this.inventoryOpen = this.inventory.open(this);
-                            }
+                        } else if (Nukkit.DEBUG > 1) {
+                            server.getLogger().debug(this.username + " tried to open inventory but one is already open");
                         }
                         break;
                     case InteractPacket.ACTION_MOUSEOVER:
@@ -3933,6 +3923,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
                 break;
             case ProtocolInfo.BLOCK_PICK_REQUEST_PACKET:
+                if (!this.spawned || !this.isAlive() || this.inventory == null || this.inventoryOpen) {
+                    return;
+                }
+
                 BlockPickRequestPacket pickRequestPacket = (BlockPickRequestPacket) packet;
                 Block block = this.level.getBlock(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z, false);
                 if (block.distanceSquared(this) > 1000) {
@@ -4090,18 +4084,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 break;
             case ProtocolInfo.CONTAINER_CLOSE_PACKET:
                 ContainerClosePacket containerClosePacket = (ContainerClosePacket) packet;
-                if (!this.spawned || (containerClosePacket.windowId == ContainerIds.INVENTORY && !inventoryOpen && this.protocol >= 407)) {
-                    break;
-                }
-
-                if (this.windowIndex.containsKey(containerClosePacket.windowId)) {
-                    this.server.getPluginManager().callEvent(new InventoryCloseEvent(this.windowIndex.get(containerClosePacket.windowId), this));
-                    if (containerClosePacket.windowId == ContainerIds.INVENTORY) this.inventoryOpen = false;
-                    this.closingWindowId = containerClosePacket.windowId;
-                    this.removeWindow(this.windowIndex.get(containerClosePacket.windowId), true);
-                    this.closingWindowId = Integer.MIN_VALUE;
+                if (!this.spawned) {
+                    return;
                 }
                 if (containerClosePacket.windowId == -1) {
+                    // At least 1.21 does sometimes send windowId -1 when opening and closing containers quickly
+                    if (this.inventoryOpen) {
+                        this.inventoryOpen = false;
+
+                        if (this.craftingType == CRAFTING_SMALL) {
+                            for (Entry<Inventory, Integer> open : new ArrayList<>(this.windows.entrySet())) {
+                                if (open.getKey() instanceof ContainerInventory || open.getKey() instanceof PlayerEnderChestInventory) {
+                                    this.server.getPluginManager().callEvent(new InventoryCloseEvent(open.getKey(), this));
+                                    this.closingWindowId = Integer.MAX_VALUE;
+                                    this.removeWindow(open.getKey(), true);
+                                    this.closingWindowId = Integer.MIN_VALUE;
+                                }
+                            }
+                            return;
+                        }
+                    }
+
                     this.craftingType = CRAFTING_SMALL;
                     this.resetCraftingGridType();
                     this.addWindow(this.craftingGrid, ContainerIds.NONE);
@@ -4116,17 +4119,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (tradeInventory != null) {
                         this.removeWindow(tradeInventory, true);
                     }
-                } else { // Close bugged inventory
+                } else if (this.windowIndex.containsKey(containerClosePacket.windowId)) {
+                    this.inventoryOpen = false;
+                    Inventory inn = this.windowIndex.get(containerClosePacket.windowId);
+                    this.server.getPluginManager().callEvent(new InventoryCloseEvent(inn, this));
+                    this.closingWindowId = containerClosePacket.windowId;
+                    this.removeWindow(inn, true);
+                    this.closingWindowId = Integer.MIN_VALUE;
+                } else {  // Close the bugged inventory client refused with id -1 above
                     ContainerClosePacket pk = new ContainerClosePacket();
                     pk.windowId = containerClosePacket.windowId;
                     pk.wasServerInitiated = false;
                     this.dataPacket(pk);
-
-                    for (Inventory open : new ArrayList<>(this.windows.keySet())) {
-                        if (open instanceof ContainerInventory) {
-                            this.removeWindow(open);
-                        }
-                    }
                 }
                 break;
             case ProtocolInfo.BLOCK_ENTITY_DATA_PACKET:
@@ -4702,6 +4706,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     } else if (!this.server.pvpEnabled) {
                                         break;
                                     }
+                                }
+
+                                this.breakingBlock = null;
+
+                                this.setUsingItem(false);
+
+                                if (this.sleeping != null) {
+                                    this.getServer().getLogger().debug(username + ": USE_ITEM_ON_ENTITY_ACTION_ATTACK while sleeping");
+                                    return;
+                                }
+
+                                if (this.inventoryOpen) {
+                                    this.getServer().getLogger().debug(username + ": USE_ITEM_ON_ENTITY_ACTION_ATTACK while viewing inventory");
+                                    return;
                                 }
 
                                 Enchantment[] enchantments = item.getEnchantments();
@@ -6586,30 +6604,61 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void resetCraftingGridType() {
-        if (this.craftingGrid != null) {
-            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(Item.EMPTY_ARRAY));
+        if (this.playerUIInventory != null) {
+            Item[] drops;
 
-            if (drops.length > 0) {
+            if (this.craftingGrid != null) {
+                drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(Item.EMPTY_ARRAY));
+                this.craftingGrid.clearAll();
+
                 for (Item drop : drops) {
-                    this.dropItem(drop);
+                    PlayerDropItemEvent event = new PlayerDropItemEvent(this, drop);
+                    event.call();
+                    if(!event.isCancelled()) {
+                        this.level.dropItem(this, drop);
+                    }
                 }
             }
 
             drops = this.inventory.addItem(this.getCursorInventory().getItem(0));
-            if (drops.length > 0) {
-                for (Item drop : drops) {
-                    this.dropItem(drop);
+            this.playerUIInventory.getCursorInventory().clear(0);
+
+            for (Item drop : drops) {
+                PlayerDropItemEvent event = new PlayerDropItemEvent(this, drop);
+                event.call();
+                if(!event.isCancelled()) {
+                    this.level.dropItem(this, drop);
                 }
             }
 
+            // Don't trust the client to handle this
+            this.moveBlockUIContents(Player.ANVIL_WINDOW_ID); // LOOM_WINDOW_ID is the same as ANVIL_WINDOW_ID?
+            this.moveBlockUIContents(Player.ENCHANT_WINDOW_ID);
+            this.moveBlockUIContents(Player.BEACON_WINDOW_ID);
+            this.moveBlockUIContents(Player.SMITHING_WINDOW_ID);
+
             this.playerUIInventory.clearAll();
 
-            if (this.craftingGrid instanceof BigCraftingGrid) {
+            if (this.craftingGrid instanceof BigCraftingGrid && this.connected) {
                 this.craftingGrid = this.playerUIInventory.getCraftingGrid();
                 this.addWindow(this.craftingGrid, ContainerIds.NONE);
             }
+        }
+        this.craftingType = CRAFTING_SMALL;
+    }
 
-            this.craftingType = CRAFTING_SMALL;
+    /**
+     * Move all block UI contents back to player inventory or drop them
+     * @param window window id
+     */
+    private void moveBlockUIContents(int window) {
+        Inventory inventory = this.getWindowById(window);
+        if (inventory instanceof FakeBlockUIComponent) {
+            Item[] drops = this.inventory.addItem(inventory.getContents().values().toArray(Item.EMPTY_ARRAY));
+            inventory.clearAll();
+            for (Item drop : drops) {
+                this.level.dropItem(this, drop);
+            }
         }
     }
 
