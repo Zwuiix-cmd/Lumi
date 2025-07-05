@@ -126,6 +126,7 @@ public class RuntimeItems {
         mapping786 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_21_70);
         mapping800 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_21_80);
         mapping818 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_21_90);
+        mapping819 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_21_93);
 
         VALUES = new RuntimeItemMapping[]{
                 mapping361,
