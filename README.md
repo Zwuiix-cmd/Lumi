@@ -6,7 +6,7 @@
 Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTime/Nukkit-MOT/) which was made to introduce many new features and improvements.
 
 ### What's new in Lumi?
-1. Support for 1.20.0 – 1.21.80 version (you can set the minimum protocol in the config)
+1. Support for 1.20.0 – 1.21.93 version (you can set the minimum protocol in the config)
 2. Entity Behaviour port from PNX
 3. Better API, yeaa!!
 
