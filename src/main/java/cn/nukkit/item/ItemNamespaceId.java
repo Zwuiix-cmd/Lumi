@@ -16,6 +16,7 @@ public interface ItemNamespaceId {
     String BAMBOO_DOOR = "minecraft:bamboo_door";
 
     String TORCHFLOWER_SEEDS = "minecraft:torchflower_seeds";
+    String PITCHER_POD = "minecraft:pitcher_pod";
 
     String NETHERITE_UPGRADE_SMITHING_TEMPLATE = "minecraft:netherite_upgrade_smithing_template";
     String SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:sentry_armor_trim_smithing_template";
