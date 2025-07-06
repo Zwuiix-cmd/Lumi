@@ -48,7 +48,7 @@ public class BlockDoubleSlabMangrove extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.MANGROVE_SLAB, 0, 2)
+                new ItemBlock(Block.get(MANGROVE_SLAB), 0, 2)
         };
     }
 

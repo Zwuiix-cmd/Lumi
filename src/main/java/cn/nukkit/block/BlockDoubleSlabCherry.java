@@ -47,7 +47,7 @@ public class BlockDoubleSlabCherry extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.CHERRY_SLAB, 0, 2)
+                new ItemBlock(Block.get(CHERRY_SLAB), 0, 2)
         };
     }
 }

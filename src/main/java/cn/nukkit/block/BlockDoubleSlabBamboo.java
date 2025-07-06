@@ -47,7 +47,7 @@ public class BlockDoubleSlabBamboo extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.BAMBOO_SLAB, 0, 2)
+                new ItemBlock(Block.get(BAMBOO_SLAB), 0, 2)
         };
     }
 }

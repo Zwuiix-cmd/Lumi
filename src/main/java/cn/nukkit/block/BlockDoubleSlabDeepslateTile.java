@@ -52,7 +52,7 @@ public class BlockDoubleSlabDeepslateTile extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.DEEPSLATE_TILE_SLAB, 0, 2)
+                new ItemBlock(Block.get(DEEPSLATE_TILE_SLAB), 0, 2)
         };
     }
 }

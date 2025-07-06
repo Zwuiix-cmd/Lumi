@@ -57,7 +57,7 @@ public class BlockDoubleSlabMudBrick extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.MUD_BRICK_SLAB, 0, 2)
+                new ItemBlock(Block.get(MUD_BRICK_SLAB), 0, 2)
         };
     }
 }

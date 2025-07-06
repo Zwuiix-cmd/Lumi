@@ -52,7 +52,7 @@ public class BlockDoubleSlabDeepslatePolished extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
-                Item.get(Item.POLISHED_DEEPSLATE_DOUBLE_SLAB, 0, 2)
+                new ItemBlock(Block.get(POLISHED_DEEPSLATE_DOUBLE_SLAB), 0, 2)
         };
     }
 }
