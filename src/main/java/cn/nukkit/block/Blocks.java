@@ -656,7 +656,7 @@ public class Blocks {
         list[BAMBOO_PRESSURE_PLATE] = BlockPressurePlateBamboo.class; //769
         list[BAMBOO_FENCE] = BlockFenceBamboo.class; //770
         list[BAMBOO_FENCE_GATE] = BlockFenceGateBamboo.class; //771
-
+        list[BAMBOO_DOOR] = BlockDoorBamboo.class; //772
         list[BAMBOO_STANDING_SIGN] = BlockBambooSignPost.class; //773
         list[BAMBOO_WALL_SIGN] = BlockBambooWallSign.class; //774
         list[BAMBOO_TRAPDOOR] = BlockTrapdoorBamboo.class; //775
@@ -670,7 +670,7 @@ public class Blocks {
         list[STRIPPED_BAMBOO_BLOCK] = BlockStrippedBambooBlock.class; //783
         list[SUSPICIOUS_SAND] = BlockSuspiciousSand.class; //784
         list[CHERRY_BUTTON] = BlockButtonCherry.class; //785
-
+        list[CHERRY_DOOR] = BlockDoorCherry.class; //786
         list[CHERRY_FENCE] = BlockFenceCherry.class; //787
         list[CHERRY_FENCE_GATE] = BlockFenceGateCherry.class; //788
         list[CHERRY_HANGING_SIGN] = BlockCherryHangingSign.class; //789

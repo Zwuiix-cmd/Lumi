@@ -12,6 +12,9 @@ public interface ItemNamespaceId {
 
     String MANGROVE_DOOR = "minecraft:mangrove_door";
 
+    String CHERRY_DOOR = "minecraft:cherry_door";
+    String BAMBOO_DOOR = "minecraft:bamboo_door";
+
     String NETHERITE_UPGRADE_SMITHING_TEMPLATE = "minecraft:netherite_upgrade_smithing_template";
     String SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:sentry_armor_trim_smithing_template";
     String DUNE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:dune_armor_trim_smithing_template";
