@@ -375,7 +375,7 @@ public enum Rotation {
             case BlockID.BED_BLOCK:
                 return meta & ~0x3 | meta + 1 & 0x3;
 
-            case BlockID.SKULL_BLOCK:
+            case BlockID.SKELETON_SKULL_BLOCK:
             case BlockID.PURPLE_GLAZED_TERRACOTTA:
             case BlockID.WHITE_GLAZED_TERRACOTTA:
             case BlockID.ORANGE_GLAZED_TERRACOTTA:
@@ -799,7 +799,7 @@ public enum Rotation {
             case BlockID.BED_BLOCK:
                 return meta & ~0x3 | meta - 1 & 0x3;
 
-            case BlockID.SKULL_BLOCK:
+            case BlockID.SKELETON_SKULL_BLOCK:
             case BlockID.PURPLE_GLAZED_TERRACOTTA:
             case BlockID.WHITE_GLAZED_TERRACOTTA:
             case BlockID.ORANGE_GLAZED_TERRACOTTA:
@@ -1229,7 +1229,7 @@ public enum Rotation {
 			case BlockID.BED_BLOCK:
 				return meta & ~0x3 | meta + 2 & 0x3;
 
-			case BlockID.SKULL_BLOCK:
+			case BlockID.SKELETON_SKULL_BLOCK:
 			case BlockID.PURPLE_GLAZED_TERRACOTTA:
 			case BlockID.WHITE_GLAZED_TERRACOTTA:
 			case BlockID.ORANGE_GLAZED_TERRACOTTA:

@@ -8,14 +8,9 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
-import lombok.Getter;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static cn.nukkit.utils.BlockColor.*;
 
 /**
  * @author MagicDroidX
@@ -67,7 +62,7 @@ public abstract class BlockWall extends BlockTransparentMeta {
 
     private boolean shouldBeTall(Block above, BlockFace face) {
         return switch (above.getId()) {
-            case AIR, SKULL_BLOCK -> false;
+            case AIR, SKELETON_SKULL_BLOCK -> false;
 
             // If the bell is standing and follow the path, make it tall
             default -> {
@@ -246,7 +241,7 @@ public abstract class BlockWall extends BlockTransparentMeta {
 
         switch (above.getId()) {
             // These special blocks forces walls to become a post
-            case FLOWER_POT_BLOCK, SKULL_BLOCK, CONDUIT, STANDING_BANNER, TURTLE_EGG -> {
+            case FLOWER_POT_BLOCK, SKELETON_SKULL_BLOCK, CONDUIT, STANDING_BANNER, TURTLE_EGG -> {
                 return true;
             }
 

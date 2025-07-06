@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Justin
  */
-public class BlockSkull extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntitySkull> {
+public abstract class BlockSkull extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntitySkull> {
 
     public BlockSkull() {
         this(0);
@@ -26,11 +26,6 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable, BlockE
 
     public BlockSkull(int meta) {
         super(meta);
-    }
-
-    @Override
-    public int getId() {
-        return SKULL_BLOCK;
     }
 
     @NotNull
@@ -110,7 +105,7 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable, BlockE
 
         CompoundTag nbt = new CompoundTag()
                 .putString("id", BlockEntity.SKULL)
-                .putByte("SkullType", item.getDamage())
+                .putByte("SkullType", this.getSkullType() == SkullType.SKELETON? item.getDamage(): this.getSkullType().ordinal())
                 .putInt("x", block.getFloorX())
                 .putInt("y", block.getFloorY())
                 .putInt("z", block.getFloorZ())
@@ -128,6 +123,8 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable, BlockE
 
         return true;
     }
+
+    public abstract SkullType getSkullType();
 
     @Override
     public Item[] getDrops(Item item) {
@@ -181,5 +178,15 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable, BlockE
     @Override
     public boolean alwaysDropsOnExplosion() {
         return true;
+    }
+
+    public enum SkullType {
+        SKELETON,
+        WITHER_SKELETON,
+        ZOMBIE,
+        PLAYER,
+        CREEPER,
+        DRAGON,
+        PIGLIN
     }
 }

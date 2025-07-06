@@ -197,7 +197,7 @@ public interface BlockID {
     int CARROT_BLOCK = 141;
     int POTATO_BLOCK = 142;
     int WOODEN_BUTTON = 143;
-    int SKULL_BLOCK = 144;
+    int SKELETON_SKULL_BLOCK = 144;
     int ANVIL = 145;
     int TRAPPED_CHEST = 146;
     int LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
@@ -822,6 +822,12 @@ public interface BlockID {
     int WAXED_WEATHERED_COPPER_TRAPDOOR = 1053;
     int WAXED_OXIDIZED_COPPER_TRAPDOOR = 1054;
 
+    int WITHER_SKELETON_SKULL = 1220;
+    int ZOMBIE_HEAD = 1221;
+    int PLAYER_HEAD = 1222;
+    int CREEPER_HEAD = 1223;
+    int DRAGON_HEAD = 1224;
+    int PIGLIN_HEAD = 1225;
     int MOSSY_COBBLESTONE_WALL = 1226;
     int GRANITE_WALL = 1227;
     int DIORITE_WALL = 1228;
