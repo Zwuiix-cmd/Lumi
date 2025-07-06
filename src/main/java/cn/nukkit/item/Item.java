@@ -419,6 +419,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             registerNamespacedIdItem(ItemDoorMangrove.class);
             registerNamespacedIdItem(ItemDoorCherry.class);
             registerNamespacedIdItem(ItemDoorBamboo.class);
+            registerNamespacedIdItem(ItemTorchflowerSeeds.class);
             //TODO 修改类名格式为ItemSmithingTemplateXXX
             registerNamespacedIdItem(ItemNetheriteUpgradeSmithingTemplate.class);
             registerNamespacedIdItem(ItemSentryArmorTrimSmithingTemplate.class);

@@ -692,6 +692,7 @@ public class Blocks {
 
         list[DECORATED_POT] = BlockDecoratedPot.class; //806
 
+        list[TORCHFLOWER_CROP] = BlockTorchflowerCrop.class; //822
         list[TORCHFLOWER] = BlockTorchflower.class; //823
 
         list[SUSPICIOUS_GRAVEL] = BlockSuspiciousGravel.class; //828
