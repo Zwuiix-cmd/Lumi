@@ -47,8 +47,13 @@ public interface ItemNamespaceId {
 
     String OMINOUS_BOTTLE = "minecraft:ominous_bottle";
 
+    String RESIN_CLUMP = "minecraft:resin_clump";
+    String RESIN_BRICK = "minecraft:resin_brick";
+
     String BLUE_EGG = "minecraft:blue_egg";
     String BROWN_EGG = "minecraft:brown_egg";
+
+    String MUSIC_DISC_TEARS = "minecraft:music_disc_tears";
 
     String MUSIC_DISC_LAVA_CHICKEN = "minecraft:music_disc_lava_chicken";
 
