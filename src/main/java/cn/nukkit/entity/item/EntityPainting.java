@@ -256,6 +256,7 @@ public class EntityPainting extends EntityHanging {
         OWLEMONS("owlemons", 3, 3, true, predicateFor3WidthHeight),
         SUNFLOWERS("sunflowers", 3, 3, true, predicateFor3WidthHeight),
         TIDES("tides", 3, 3, true, predicateFor3WidthHeight),
+        DENNIS("dennis", 3, 3, true, predicateFor3WidthHeight),
         BACKYARD("backyard", 3, 4, true, predicateFor3Width.apply(4)),
         POND("pond", 3, 4, true, predicateFor3Width.apply(4)),
         FIGHTERS("Fighters", 4, 2, predicateFor4Width.apply(2)),
