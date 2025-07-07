@@ -11,7 +11,7 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 3. Better API, yeaa!!
 
 ## How to install?
-1. Install java 17 or higher
+1. Install java 21 or higher
 2. Download the .jar file from the links below
 3. Write a command to run: `java -jar Lumi-SNAPSHOT.jar` (change `Lumi-SNAPSHOT.jar` to the name of the file you downloaded)
 
