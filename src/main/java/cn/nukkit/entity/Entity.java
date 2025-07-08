@@ -2729,10 +2729,6 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             block.onEntityCollide(this);
-            block.getLevelBlockAtLayer(1).onEntityCollide(this);
-
-            if (needsRecalcCurrent)
-                block.addVelocityToEntity(this, vector);
             block.getTickCachedLevelBlockAtLayer(1).onEntityCollide(this);
             if (needsRecalcCurrent)
                 block.addVelocityToEntity(this, vector);
@@ -2759,30 +2755,6 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-
-        if (needsRecalcCurrent)
-            if (vector.lengthSquared() > 0) {
-                vector = vector.normalize();
-                double d = 0.018d;
-                var dx = vector.x * d;
-                var dy = vector.y * d;
-                var dz = vector.z * d;
-                this.motionX += dx;
-                this.motionY += dy;
-                this.motionZ += dz;
-                if (this instanceof EntityPhysical entityPhysical) {
-                    entityPhysical.previousCurrentMotion.x = dx;
-                    entityPhysical.previousCurrentMotion.y = dy;
-                    entityPhysical.previousCurrentMotion.z = dz;
-                }
-            } else {
-                if (this instanceof EntityPhysical entityPhysical) {
-                    entityPhysical.previousCurrentMotion.x = 0;
-                    entityPhysical.previousCurrentMotion.y = 0;
-                    entityPhysical.previousCurrentMotion.z = 0;
-                }
-            }
-        else ((EntityPhysical) this).addPreviousLiquidMovement();
 
         if (needsRecalcCurrent)
             if (vector.lengthSquared() > 0) {
