@@ -24,6 +24,7 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.TickCachedBlockIterator;
 import cn.nukkit.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +34,11 @@ import java.util.Map;
 /**
  * @author MagicDroidX (Nukkit Project)
  */
+@Slf4j
 public abstract class EntityLiving extends Entity implements EntityDamageable {
     public final static float DEFAULT_SPEED = 0.1f;
     protected int attackTime = 0;
+    protected int attackCooldown = 0;
     protected boolean invisible = false;
     protected float movementSpeed = DEFAULT_SPEED;
     protected int turtleTicks = 0;
@@ -110,6 +113,17 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
+        if (source instanceof EntityDamageByEntityEvent event) {
+            if (event.getDamager() instanceof Player damager && damager.attackCooldown > 0) {
+                return false;
+            }
+        }
+
+        if (this.attackCooldown > 0) {
+            return false;
+        }
+
+
         if (isBlocking() && this.blockedByShield(source)) {
             return false;
         }
@@ -149,6 +163,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             Server.broadcastPacket(this.hasSpawned.values(), pk);
 
             this.attackTime = source.getAttackCooldown();
+            if (source instanceof EntityDamageByEntityEvent event) {
+                if (event.getDamager() instanceof Player damager) {
+                    damager.attackCooldown = source.getAttackCooldown();
+                }
+            }
             this.attackTimeByShieldKb = false;
             this.scheduleUpdate();
 
@@ -285,6 +304,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             if (this.attackTime <= 0) {
                 attackTimeByShieldKb = false;
             }
+            hasUpdate = true;
+        }
+
+        if (this.attackCooldown > 0) {
+            this.attackCooldown -= tickDiff;
             hasUpdate = true;
         }
 
