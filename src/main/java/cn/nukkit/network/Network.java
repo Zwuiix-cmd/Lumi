@@ -462,6 +462,7 @@ public class Network {
                 .registerPacket(ProtocolInfo.BLOCK_EVENT_PACKET, BlockEventPacket.class)
                 .registerPacket(ProtocolInfo.BLOCK_PICK_REQUEST_PACKET, BlockPickRequestPacket.class)
                 .registerPacket(ProtocolInfo.BOOK_EDIT_PACKET, BookEditPacket.class)
+                .registerPacket(ProtocolInfo.NPC_REQUEST_PACKET, NPCRequestPacket.class)
                 .registerPacket(ProtocolInfo.BOSS_EVENT_PACKET, BossEventPacket.class)
                 .registerPacket(ProtocolInfo.CHANGE_DIMENSION_PACKET, ChangeDimensionPacket.class)
                 .registerPacket(ProtocolInfo.CHUNK_RADIUS_UPDATED_PACKET, ChunkRadiusUpdatedPacket.class)
