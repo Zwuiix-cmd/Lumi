@@ -73,6 +73,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     protected Block() {}
 
     public static void init() {
+        final BlockUnknown BLOCK_UNKNOWN = new BlockUnknown(Block.MAX_BLOCK_ID, 0);
+
         if (list == null) {
             list = new Class[MAX_BLOCK_ID];
             fullList = new Block[MAX_BLOCK_ID * (1 << DATA_BITS)];
@@ -102,11 +104,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                                 try {
                                     b = (Block) constructor.newInstance(data);
                                     if (b.getDamage() != data) {
-                                        b = new BlockUnknown(id, data);
+                                        b = BLOCK_UNKNOWN;
                                     }
                                 } catch (Exception e) {
                                     Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
-                                    b = new BlockUnknown(id, data);
+                                    b = BLOCK_UNKNOWN;
                                 }
                                 fullList[fullId] = b;
                             }
@@ -120,7 +122,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                     } catch (Exception e) {
                         Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
                         for (int data = 0; data < DATA_SIZE; ++data) {
-                            fullList[(id << DATA_BITS) | data] = new BlockUnknown(id, data);
+                            fullList[(id << DATA_BITS) | data] = BLOCK_UNKNOWN;
                         }
                         return;
                     }
@@ -151,7 +153,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 } else {
                     lightFilter[id] = 1;
                     for (int data = 0; data < DATA_SIZE; ++data) {
-                        fullList[(id << DATA_BITS) | data] = new BlockUnknown(id, data);
+                        fullList[(id << DATA_BITS) | data] = BLOCK_UNKNOWN;
                     }
                 }
             }
