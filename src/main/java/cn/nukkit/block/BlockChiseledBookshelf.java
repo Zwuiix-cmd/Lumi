@@ -65,10 +65,6 @@ public class BlockChiseledBookshelf extends BlockSolidMeta implements BlockEntit
 
     @Override
     public Item[] getDrops(Item item) {
-        BlockEntityChiseledBookshelf blockEntity = this.getBlockEntity();
-        if (blockEntity != null) {
-            return blockEntity.getItems();
-        }
         return Item.EMPTY_ARRAY;
     }
 

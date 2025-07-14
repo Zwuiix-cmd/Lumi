@@ -24,6 +24,13 @@ public class BlockEntityChiseledBookshelf extends BlockEntitySpawnable {
         addBookshelfNbt(namedTag);
     }
 
+    @Override
+    public void onBreak() {
+        for (Item item : items) {
+            level.dropItem(this, item);
+        }
+    }
+
     public Item removeBook(int index) {
         Preconditions.checkArgument(index >= 0 && index <= 5);
         Item remove = this.items[index];
