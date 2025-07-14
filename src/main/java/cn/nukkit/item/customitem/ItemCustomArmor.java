@@ -10,15 +10,9 @@ import javax.annotation.Nullable;
 /**
  * @author lt_name
  */
-public abstract class ItemCustomArmor <T extends ItemCustomSpecification> extends ItemArmor implements CustomItem<T> {
+public abstract class ItemCustomArmor extends ItemArmor implements CustomItem {
     private final String id;
     private final String textureName;
-
-    public ItemCustomArmor(@NotNull String id) {
-        super(ItemID.STRING_IDENTIFIED_ITEM, 0, 1, StringItem.notEmpty(id));
-        this.id = id;
-        this.textureName = name;
-    }
 
     public ItemCustomArmor(@NotNull String id, @Nullable String name) {
         super(ItemID.STRING_IDENTIFIED_ITEM, 0, 1, StringItem.notEmpty(name));

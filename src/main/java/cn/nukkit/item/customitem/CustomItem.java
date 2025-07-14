@@ -1,7 +1,6 @@
 package cn.nukkit.item.customitem;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
 import cn.nukkit.item.StringItem;
 
 /**
@@ -11,7 +10,7 @@ import cn.nukkit.item.StringItem;
  *
  * @author lt_name
  */
-public interface CustomItem <T extends ItemCustomSpecification> extends StringItem {
+public interface CustomItem extends StringItem {
     /**
      * 定义该自定义物品的材质
      * <p>
@@ -27,8 +26,4 @@ public interface CustomItem <T extends ItemCustomSpecification> extends StringIt
      * This method sets the definition of custom item
      */
     CustomItemDefinition getDefinition();
-
-    default T getSpecification() {
-        return (T) CustomItemGenerator.specifications.get(this.getClass());
-    }
 }

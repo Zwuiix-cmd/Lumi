@@ -9,14 +9,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author lt_name
  */
-public abstract class ItemCustomTool <T extends ItemCustomSpecification> extends StringItemToolBase implements ItemDurable, CustomItem<T> {
+public abstract class ItemCustomTool extends StringItemToolBase implements ItemDurable, CustomItem {
 
     private final String textureName;
-
-    public ItemCustomTool(@NotNull String id) {
-        super(id, StringItem.notEmpty(id));
-        this.textureName = id;
-    }
 
     public ItemCustomTool(@NotNull String id, @Nullable String name) {
         super(id, StringItem.notEmpty(name));

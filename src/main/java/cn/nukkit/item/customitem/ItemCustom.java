@@ -14,13 +14,8 @@ import javax.annotation.Nullable;
  *
  * @author lt_name
  */
-public abstract class ItemCustom <T extends ItemCustomSpecification> extends StringItemBase implements CustomItem<T> {
+public abstract class ItemCustom extends StringItemBase implements CustomItem {
     private final String textureName;
-
-    public ItemCustom(@NotNull String id) {
-        super(id, id);
-        this.textureName = name;
-    }
 
     public ItemCustom(@NotNull String id, @Nullable String name) {
         super(id, StringItem.notEmpty(name));

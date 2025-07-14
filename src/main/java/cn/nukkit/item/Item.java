@@ -11,8 +11,6 @@ import cn.nukkit.inventory.ItemTag;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
-import cn.nukkit.item.customitem.CustomItemGenerator;
-import cn.nukkit.item.customitem.ItemCustomSpecification;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -1045,98 +1043,78 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
         }
 
+        CustomItem customItem;
+        Supplier<Item> supplier;
+
         try {
-            if (CustomItem.class.isAssignableFrom(clazz)) {
-                FastMemberLoader memberLoader = new FastMemberLoader();
-                FastConstructor<? extends CustomItem> constructor = FastConstructor.create(clazz.getConstructor(), memberLoader, false);
-                return addCustomItemConstructor(constructor, addCreativeItem);
-            }
-        } catch (NoSuchMethodException e) {
-            return new OK<>(false, e.getMessage());
-        }
-        return new OK<>(false, "Custom item registration failed with unknown error!");
-    }
-
-    public static <E extends ItemCustomSpecification> OK<?> registerCustomItemBySpecification(@NotNull Plugin plugin, @NotNull Class<? extends CustomItem> value, @NotNull E specification) {
-        value = CustomItemGenerator.generateCustomItem(plugin, value, specification);
-        try {
-            if (CustomItem.class.isAssignableFrom(value)) {
-                FastMemberLoader memberLoader = new FastMemberLoader(CustomItemGenerator.getLoader());
-                FastConstructor<? extends CustomItem> constructor = FastConstructor.create((Constructor<? extends CustomItem>) value.getConstructor(), memberLoader, false);
-                return addCustomItemConstructor(constructor, true);
-
-            } else {
-                return new OK<>(false, "This class does not implement the CustomItem interface and cannot be registered as a custom item!");
-            }
-        } catch (NoSuchMethodException e) {
-            return new OK<>(false, e.getMessage());
-        }
-    }
-
-    private static OK<?> addCustomItemConstructor(FastConstructor<? extends CustomItem> constructor, boolean addCreativeItem) {
-        try {
-            CustomItem customItem = (CustomItem) constructor.invoke((Object) null);
-            Supplier<Item> supplier;
-            String key = customItem.getDefinition().identifier();
-
-            if (CUSTOM_ITEMS.containsKey(key)) {
-                return new OK<>(false, "The custom item with the namespace ID \"" + key + "\" is already registered!");
-            }
+            var method = clazz.getDeclaredConstructor();
+            method.setAccessible(true);
+            customItem = method.newInstance();
             supplier = () -> {
-                return (Item) customItem;
-            };
-            CUSTOM_ITEMS.put(key, supplier);
-            CustomItemDefinition customDef = customItem.getDefinition();
-            CUSTOM_ITEM_DEFINITIONS.put(key, customDef);
-            registerNamespacedIdItem(key, supplier);
-
-            // 在服务端注册自定义物品的tag
-            if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
-                var tagList = componentTag.getList("item_tags", StringTag.class);
-                if (!tagList.isEmpty()) {
-                    ItemTag.registerItemTag(customItem.getDefinition().identifier(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
+                try {
+                    return (Item) method.newInstance();
+                } catch (ReflectiveOperationException e) {
+                    throw new UnsupportedOperationException(e);
                 }
-            }
-
-            registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
-            registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
-            registerCustomItem(customItem, v1_17_10, addCreativeItem, v1_17_10, v1_17_30, v1_17_40);
-            registerCustomItem(customItem, v1_18_0, addCreativeItem, v1_18_0);
-            registerCustomItem(customItem, v1_18_10, addCreativeItem, v1_18_10);
-            registerCustomItem(customItem, v1_18_30, addCreativeItem, v1_18_30);
-            registerCustomItem(customItem, v1_19_0, addCreativeItem, v1_19_0);
-            registerCustomItem(customItem, v1_19_10, addCreativeItem, v1_19_10, v1_19_20);
-            registerCustomItem(customItem, v1_19_50, addCreativeItem, v1_19_50);
-            registerCustomItem(customItem, v1_19_60, addCreativeItem, v1_19_60);
-            registerCustomItem(customItem, v1_19_70, addCreativeItem, v1_19_70);
-            registerCustomItem(customItem, v1_19_80, addCreativeItem, v1_19_80);
-            registerCustomItem(customItem, v1_20_0, addCreativeItem, v1_20_0);
-            registerCustomItem(customItem, v1_20_10, addCreativeItem, v1_20_10);
-            registerCustomItem(customItem, v1_20_30, addCreativeItem, v1_20_30);
-            registerCustomItem(customItem, v1_20_40, addCreativeItem, v1_20_40);
-            registerCustomItem(customItem, v1_20_50, addCreativeItem, v1_20_50);
-            registerCustomItem(customItem, v1_20_60, addCreativeItem, v1_20_60);
-            registerCustomItem(customItem, v1_20_70, addCreativeItem, v1_20_70);
-            registerCustomItem(customItem, v1_20_80, addCreativeItem, v1_20_80);
-            registerCustomItem(customItem, v1_21_0, addCreativeItem, v1_21_0);
-            registerCustomItem(customItem, v1_21_20, addCreativeItem, v1_21_20);
-            registerCustomItem(customItem, v1_21_30, addCreativeItem, v1_21_30);
-            registerCustomItem(customItem, v1_21_40, addCreativeItem, v1_21_40);
-            registerCustomItem(customItem, v1_21_50, addCreativeItem, v1_21_50);
-            registerCustomItem(customItem, v1_21_60, addCreativeItem, v1_21_60);
-            registerCustomItem(customItem, v1_21_70, addCreativeItem, v1_21_70);
-            registerCustomItem(customItem, v1_21_80, addCreativeItem, v1_21_80);
-            registerCustomItem(customItem, v1_21_90, addCreativeItem, v1_21_90);
-            registerCustomItem(customItem, v1_21_93, addCreativeItem, v1_21_93);
-            //TODO Multiversion 添加新版本支持时修改这里
-
-            if (addCreativeItem) {
-                CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
-            }
-            return new OK<Void>(true);
-        } catch (Throwable e) {
-            return new OK<>(false, e.getMessage());
+            };
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            return new OK<>(false, e);
         }
+
+        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
+            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
+        }
+        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
+        CustomItemDefinition customDef = customItem.getDefinition();
+        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customDef);
+        registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
+
+        // 在服务端注册自定义物品的tag
+        if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
+            var tagList = componentTag.getList("item_tags", StringTag.class);
+            if (!tagList.isEmpty()) {
+                ItemTag.registerItemTag(customItem.getNamespaceId(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
+            }
+        }
+
+        registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
+        registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
+        registerCustomItem(customItem, v1_17_10, addCreativeItem, v1_17_10, v1_17_30, v1_17_40);
+        registerCustomItem(customItem, v1_18_0, addCreativeItem, v1_18_0);
+        registerCustomItem(customItem, v1_18_10, addCreativeItem, v1_18_10);
+        registerCustomItem(customItem, v1_18_30, addCreativeItem, v1_18_30);
+        registerCustomItem(customItem, v1_19_0, addCreativeItem, v1_19_0);
+        registerCustomItem(customItem, v1_19_10, addCreativeItem, v1_19_10, v1_19_20);
+        registerCustomItem(customItem, v1_19_50, addCreativeItem, v1_19_50);
+        registerCustomItem(customItem, v1_19_60, addCreativeItem, v1_19_60);
+        registerCustomItem(customItem, v1_19_70, addCreativeItem, v1_19_70);
+        registerCustomItem(customItem, v1_19_80, addCreativeItem, v1_19_80);
+        registerCustomItem(customItem, v1_20_0, addCreativeItem, v1_20_0);
+        registerCustomItem(customItem, v1_20_10, addCreativeItem, v1_20_10);
+        registerCustomItem(customItem, v1_20_30, addCreativeItem, v1_20_30);
+        registerCustomItem(customItem, v1_20_40, addCreativeItem, v1_20_40);
+        registerCustomItem(customItem, v1_20_50, addCreativeItem, v1_20_50);
+        registerCustomItem(customItem, v1_20_60, addCreativeItem, v1_20_60);
+        registerCustomItem(customItem, v1_20_70, addCreativeItem, v1_20_70);
+        registerCustomItem(customItem, v1_20_80, addCreativeItem, v1_20_80);
+        registerCustomItem(customItem, v1_21_0, addCreativeItem, v1_21_0);
+        registerCustomItem(customItem, v1_21_20, addCreativeItem, v1_21_20);
+        registerCustomItem(customItem, v1_21_30, addCreativeItem, v1_21_30);
+        registerCustomItem(customItem, v1_21_40, addCreativeItem, v1_21_40);
+        registerCustomItem(customItem, v1_21_50, addCreativeItem, v1_21_50);
+        registerCustomItem(customItem, v1_21_60, addCreativeItem, v1_21_60);
+        registerCustomItem(customItem, v1_21_70, addCreativeItem, v1_21_70);
+        registerCustomItem(customItem, v1_21_80, addCreativeItem, v1_21_80);
+        registerCustomItem(customItem, v1_21_90, addCreativeItem, v1_21_90);
+        registerCustomItem(customItem, v1_21_93, addCreativeItem, v1_21_93);
+        //TODO Multiversion 添加新版本支持时修改这里
+
+        if (addCreativeItem) {
+            CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
+        }
+
+        return new OK<Void>(true);
     }
 
     private static void registerCustomItem(CustomItem item, int protocol,  boolean addCreativeItem, int... creativeProtocols) {
