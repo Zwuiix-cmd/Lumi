@@ -128,7 +128,7 @@ public class BlockDecoratedPot extends BlockTransparentMeta implements Faceable,
     public void onEntityCollide(Entity entity) {
         if (entity instanceof EntityProjectile) {
             entity.close();
-            this.level.useBreakOn(this);
+            this.getLevel().useBreakOn(this, null, null, true);
         }
     }
 

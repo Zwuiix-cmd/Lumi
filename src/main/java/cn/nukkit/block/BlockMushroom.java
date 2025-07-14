@@ -27,7 +27,7 @@ public abstract class BlockMushroom extends BlockFlowable {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!canStay()) {
-                getLevel().useBreakOn(this);
+                getLevel().useBreakOn(this, null, null, true);
 
                 return Level.BLOCK_UPDATE_NORMAL;
             }
