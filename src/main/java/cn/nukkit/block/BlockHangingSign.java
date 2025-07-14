@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityHangingSign;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
@@ -8,8 +10,9 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.CompassRoseDirection;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class BlockHangingSign extends BlockTransparentMeta {
+public abstract class BlockHangingSign extends BlockTransparentMeta implements BlockEntityHolder<BlockEntityHangingSign> {
     // Corrected bit masks (using 16-bit representation for clarity)
     private static final int ATTACHED_MASK  = 0b0000_0000_0000_0001; // Bit 0 (1 bit)
     private static final int FACING_MASK    = 0b0000_0000_0000_1110; // Bits 1-3 (3 bits)
@@ -55,21 +58,17 @@ public abstract class BlockHangingSign extends BlockTransparentMeta {
             CompassRoseDirection direction = CompassRoseDirection.from(
                     (int) Math.floor((((player != null ? player.yaw : 0) + 180) * 16 / 360) + 0.5) & 0x0f
             );
-            player.sendMessage("rose: " + direction + direction.getClosestBlockFace() + ", facing: " + face + ", value: " + ((int) Math.floor(((player.yaw + 180) * 16 / 360) + 0.5) & 0x0f));
             if ((player != null && player.isSneaking()) || target instanceof BlockThin || target instanceof BlockChain || target instanceof BlockHangingSign) {
                 this.setPropertyValue(ATTACHED_MASK, 1);
                 this.setPropertyValue(DIRECTION_MASK, direction.getIndex());
                 getLevel().setBlock(block, this, true);
-                player.sendMessage(""+ getDamage());
             } else {
                 this.setPropertyValue(FACING_MASK, direction.getClosestBlockFace().getIndex());
                 getLevel().setBlock(block, this, true);
-                player.sendMessage(""+ getDamage());
             }
         } else {
             this.setPropertyValue(FACING_MASK, face.rotateY().getIndex());
             getLevel().setBlock(block, this, true);
-            player.sendMessage(""+ getDamage());
         }
         if (item.hasCustomBlockData()) {
             for (Tag aTag : item.getCustomBlockData().getAllTags()) {
@@ -155,6 +154,16 @@ public abstract class BlockHangingSign extends BlockTransparentMeta {
     @Override
     public Item toItem() {
         return new ItemBlock(this, 0);
+    }
+
+    @Override
+    public @NotNull Class<? extends BlockEntityHangingSign> getBlockEntityClass() {
+        return BlockEntityHangingSign.class;
+    }
+
+    @Override
+    public @NotNull String getBlockEntityType() {
+        return BlockEntity.HANGING_SIGN.toString();
     }
 
     @Override
