@@ -373,8 +373,8 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     }
 
     public void playOpenCloseSound() {
-        if (this.isTop() && down() instanceof BlockDoor) {
-            if (((BlockDoor) down()).isOpen()) {
+        if (this.isTop() && down() instanceof BlockDoor door) {
+            if (door.isOpen()) {
                 this.playOpenSound();
             } else {
                 this.playCloseSound();

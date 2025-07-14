@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockTrapdoorWarped extends BlockTrapdoor {
@@ -25,5 +26,15 @@ public class BlockTrapdoorWarped extends BlockTrapdoor {
     @Override
     public BlockColor getColor() {
         return BlockColor.CYAN_BLOCK_COLOR;
+    }
+
+    @Override
+    public void playOpenSound() {
+        level.addSound(this, Sound.OPEN_NETHER_WOOD_TRAPDOOR);
+    }
+
+    @Override
+    public void playCloseSound() {
+        level.addSound(this, Sound.CLOSE_NETHER_WOOD_TRAPDOOR);
     }
 }
