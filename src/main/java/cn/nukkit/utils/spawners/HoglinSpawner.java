@@ -1,7 +1,7 @@
 package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.EntityIntelligent;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.mob.EntityHoglin;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -21,7 +21,7 @@ public class HoglinSpawner extends AbstractEntitySpawner {
             int biome = level.getBiomeId((int) pos.x, (int) pos.z);
             if (biome == 179) {
                 for (int i = 0; i < 4; i++) {
-                    EntityIntelligent entity = (EntityIntelligent) this.spawnTask.createEntity("Hoglin", pos.add(0.5, 1, 0.5));
+                    BaseEntity entity = this.spawnTask.createEntity("Hoglin", pos.add(0.5, 1, 0.5));
                     if (entity == null) {
                         return;
                     }

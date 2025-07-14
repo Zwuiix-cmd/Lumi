@@ -3,8 +3,8 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityIntelligent;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Position;
@@ -109,7 +109,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                     if (entity.distanceSquared(this) <= this.requiredPlayerRange2) {
                         playerInRange = true;
                     }
-                } else if (entity instanceof EntityIntelligent) {
+                } else if (entity instanceof BaseEntity) {
                     if (entity.distanceSquared(this) <= this.requiredPlayerRange2) {
                         nearbyEntities++;
                     }

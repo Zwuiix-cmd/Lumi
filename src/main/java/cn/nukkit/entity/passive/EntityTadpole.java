@@ -1,14 +1,24 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.EntitySwimmable;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public class EntityTadpole extends EntityAnimal implements EntitySwimmable {
+public class EntityTadpole extends EntityFish {
+
     public static final int NETWORK_ID = 133;
 
     public EntityTadpole(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
+    protected int getBucketMeta() {
+        return 13;
     }
 
     @Override
@@ -29,11 +39,12 @@ public class EntityTadpole extends EntityAnimal implements EntitySwimmable {
     @Override
     protected void initEntity() {
         this.setMaxHealth(6);
+
         super.initEntity();
     }
 
     @Override
-    public String getOriginalName() {
+    public String getName() {
         return "Tadpole";
     }
 }

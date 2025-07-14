@@ -1,42 +1,25 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-
-
-
-import cn.nukkit.entity.EntityFlyable;
-import cn.nukkit.entity.ai.behavior.Behavior;
-import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
-import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
-import cn.nukkit.entity.ai.controller.LiftController;
-import cn.nukkit.entity.ai.controller.LookController;
-import cn.nukkit.entity.ai.controller.SpaceMoveController;
-import cn.nukkit.entity.ai.evaluator.DistanceEvaluator;
-import cn.nukkit.entity.ai.evaluator.EntityCheckEvaluator;
-import cn.nukkit.entity.ai.evaluator.RandomSoundEvaluator;
-import cn.nukkit.entity.ai.executor.BlazeShootExecutor;
-import cn.nukkit.entity.ai.executor.MeleeAttackExecutor;
-import cn.nukkit.entity.ai.executor.PlaySoundExecutor;
-import cn.nukkit.entity.ai.executor.SpaceRandomRoamExecutor;
-import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
-import cn.nukkit.entity.ai.route.finder.impl.SimpleSpaceAStarRouteFinder;
-import cn.nukkit.entity.ai.route.posevaluator.FlyingPosEvaluator;
-import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.block.Block;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.projectile.EntitySmallFireBall;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Sound;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
-import java.util.Set;
-
-/**
- * @author PikyCZ
- */
-public class EntityBlaze extends EntityMob implements EntityFlyable {
+public class EntityBlaze extends EntityFlyingMob {
 
     public static final int NETWORK_ID = 43;
+
+    private int fireball;
 
     public EntityBlaze(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -48,48 +31,8 @@ public class EntityBlaze extends EntityMob implements EntityFlyable {
     }
 
     @Override
-    public IBehaviorGroup requireBehaviorGroup() {
-        return new BehaviorGroup(
-                this.tickSpread,
-                Set.of(),
-                Set.of(
-                        new Behavior(new PlaySoundExecutor(Sound.MOB_BLAZE_BREATHE), new RandomSoundEvaluator(), 5, 1),
-                        new Behavior(new MeleeAttackExecutor(CoreMemoryTypes.NEAREST_PLAYER, 0.3f, 1, false, 30), all(
-                                new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_PLAYER),
-                                new DistanceEvaluator(CoreMemoryTypes.NEAREST_PLAYER, 1)
-                        ), 4, 1),
-                        new Behavior(new BlazeShootExecutor(CoreMemoryTypes.ATTACK_TARGET, 0.3f, 15, true, 100, 40), new EntityCheckEvaluator(CoreMemoryTypes.ATTACK_TARGET), 3, 1),
-                        new Behavior(new BlazeShootExecutor(CoreMemoryTypes.NEAREST_PLAYER, 0.3f, 15, true, 100, 40), new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_PLAYER), 2, 1),
-                        new Behavior(new SpaceRandomRoamExecutor(0.15f, 12, 100, 20, false, -1, true, 10), none(), 1, 1)
-                ),
-                Set.of(new NearestPlayerSensor(40, 0, 20)),
-                Set.of(new SpaceMoveController(), new LookController(true, true), new LiftController()),
-                new SimpleSpaceAStarRouteFinder(new FlyingPosEvaluator(), this),
-                this
-        );
-    }
-
-    @Override
-    protected void initEntity() {
-        this.setMaxHealth(20);
-        this.diffHandDamage = new float[]{4f, 6f, 9f};
-        super.initEntity();
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        EntityDamageEvent.DamageCause cause = source.getCause();
-        if (cause == EntityDamageEvent.DamageCause.LAVA
-                || cause == EntityDamageEvent.DamageCause.HOT_FLOOR
-                || cause == EntityDamageEvent.DamageCause.FIRE
-                || cause == EntityDamageEvent.DamageCause.FIRE_TICK)
-            return false;
-        return super.attack(source);
-    }
-
-    @Override
     public float getWidth() {
-        return 0.5f;
+        return 0.6f;
     }
 
     @Override
@@ -98,8 +41,61 @@ public class EntityBlaze extends EntityMob implements EntityFlyable {
     }
 
     @Override
-    public String getOriginalName() {
-        return "Blaze";
+    public void initEntity() {
+        this.setMaxHealth(20);
+
+        super.initEntity();
+
+        this.fireProof = true;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 2304; // 48 blocks
+        }
+        return false;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        if (this.attackDelay == 60 && this.fireball == 0) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, true);
+        }
+        if (((this.fireball > 0 && this.fireball < 3 && this.attackDelay > 5) || (this.attackDelay > 120 && Utils.rand(1, 32) < 4)) && this.distanceSquared(player) <= 256) { // 16 blocks
+            this.attackDelay = 0;
+            this.fireball++;
+
+            if (this.fireball == 3) {
+                this.fireball = 0;
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
+            }
+
+            double f = 1.1;
+            double yaw = this.yaw + Utils.rand(-4.0, 4.0);
+            double pitch = this.pitch + Utils.rand(-4.0, 4.0);
+            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+
+            if (this.getLevel().getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()) != Block.AIR) {
+                return;
+            }
+
+            EntitySmallFireBall fireball = (EntitySmallFireBall) Entity.createEntity("SmallFireBall", pos, this);
+
+            fireball.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                    Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
+
+            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(fireball);
+            this.server.getPluginManager().callEvent(launch);
+            if (launch.isCancelled()) {
+                fireball.close();
+            } else {
+                fireball.spawnToAll();
+                this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_BLAZE_SHOOT);
+            }
+        }
     }
 
     @Override
@@ -108,12 +104,12 @@ public class EntityBlaze extends EntityMob implements EntityFlyable {
     }
 
     @Override
-    public boolean isPreventingSleep(Player player) {
-        return true;
+    public int getKillExperience() {
+        return 10;
     }
-    
+
     @Override
-    public int getFrostbiteInjury() {
-        return 5;
+    public int nearbyDistanceMultiplier() {
+        return 1000; // don't follow
     }
 }

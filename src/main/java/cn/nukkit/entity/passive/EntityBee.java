@@ -1,25 +1,35 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-
-
 import cn.nukkit.blockentity.BlockEntityBeehive;
-import cn.nukkit.entity.EntityAgeable;
-import cn.nukkit.entity.EntityFlyable;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityArthropod;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.mob.EntityFlyingMob;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.Utils;
 
-/**
- * @author joserobjr
- */
-public class EntityBee extends EntityAnimal implements EntityFlyable, EntityAgeable {
+import java.util.HashMap;
+
+public class EntityBee extends EntityFlyingMob implements EntityArthropod { // A mob because it needs to have an attack behavior
 
     public static final int NETWORK_ID = 122;
 
-    private final int beehiveTimer = 600;
+    private boolean angry;
 
     public EntityBee(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return Utils.rand(1, 3);
     }
 
     @Override
@@ -43,75 +53,83 @@ public class EntityBee extends EntityAnimal implements EntityFlyable, EntityAgea
         return 0.5f;
     }
 
-    public boolean getHasNectar() {
-        return false;
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(10);
+
+        super.initEntity();
+        this.setDamage(new int[]{0, 2, 2, 3});
     }
 
-    public void setHasNectar(boolean hasNectar) {
+    @Override
+    public double getSpeed() {
+        return 1.2;
+    }
 
+    @Override
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1.3) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(
+                                damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
+                if (this.getServer().getDifficulty() == 2) {
+                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(200), EntityPotionEffectEvent.Cause.ATTACK);
+                } else if (this.getServer().getDifficulty() == 3) {
+                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(360), EntityPotionEffectEvent.Cause.ATTACK);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return this.isAngry() && super.targetOption(creature, distance);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (super.attack(ev)) {
+            if (ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(true);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public boolean isAngry() {
-        return false;
+        return this.angry;
     }
 
     public void setAngry(boolean angry) {
-
+        this.angry = angry;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, angry);
     }
 
-    public void setAngry(Player player) {
-
+    public boolean getHasNectar() {
+        return false; //TODO
     }
 
-    @Override
-    public boolean onUpdate(int currentTick) {
-        return super.onUpdate(currentTick);
-        //todo: 属于实体AI范畴，应迁移到实体AI部分实现，此方法开销巨大
-//        if (--beehiveTimer <= 0) {
-//            BlockEntityBeehive closestBeehive = null;
-//            double closestDistance = Double.MAX_VALUE;
-//            Optional<Block> flower = Arrays.stream(level.getCollisionBlocks(getBoundingBox().grow(4, 4, 4), false, true))
-//                    .filter(block -> block instanceof BlockFlower)
-//                    .findFirst();
-//
-//            for (Block collisionBlock : level.getCollisionBlocks(getBoundingBox().grow(1.5, 1.5, 1.5))) {
-//                if (collisionBlock instanceof BlockBeehive) {
-//                    BlockEntityBeehive beehive = ((BlockBeehive) collisionBlock).getOrCreateBlockEntity();
-//                    double distance;
-//                    if (beehive.getOccupantsCount() < 4 && (distance = beehive.distanceSquared(this)) < closestDistance) {
-//                        closestBeehive = beehive;
-//                        closestDistance = distance;
-//                    }
-//                }
-//            }
-//
-//            if (closestBeehive != null) {
-//                BlockEntityBeehive.Occupant occupant = closestBeehive.addOccupant(this);
-//                if (flower.isPresent()) {
-//                    occupant.setTicksLeftToStay(2400);
-//                    occupant.setHasNectar(true);
-//                }
-//            }
-//        }
-//        return true;
-    }
-
-    @Override
-    protected void initEntity() {
-        this.setMaxHealth(10);
-        super.initEntity();
+    public void setHasNectar(boolean hasNectar) {
+        //TODO
     }
 
     public void nectarDelivered(BlockEntityBeehive blockEntityBeehive) {
-
+        //TODO
     }
 
     public void leftBeehive(BlockEntityBeehive blockEntityBeehive) {
-
-    }
-
-    @Override
-    public String getOriginalName() {
-        return "Bee";
+        //TODO
     }
 }

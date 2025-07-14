@@ -2,7 +2,7 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.EntityIntelligent;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityCow;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -25,7 +25,7 @@ public class CowSpawner extends AbstractEntitySpawner {
             int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
             if (blockId == Block.GRASS || blockId == Block.SNOW_LAYER) {
                 for (int i = 0; i < Utils.rand(2, 3); i++) {
-                    EntityIntelligent entity = (EntityIntelligent) this.spawnTask.createEntity("Cow", pos.add(0.5, 1, 0.5));
+                    BaseEntity entity = this.spawnTask.createEntity("Cow", pos.add(0.5, 1, 0.5));
                     if (entity == null) return;
                     if (Utils.rand(1, 20) == 1) {
                         entity.setBaby(true);

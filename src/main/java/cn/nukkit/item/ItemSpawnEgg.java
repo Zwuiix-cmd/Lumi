@@ -6,8 +6,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockMobSpawner;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawner;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityIntelligent;
 import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.entity.passive.EntityChicken;
 import cn.nukkit.entity.passive.EntityCow;
@@ -132,12 +132,12 @@ public class ItemSpawnEgg extends Item {
 
             if (Utils.rand(1, 20) == 1 &&
                     (entity instanceof EntityCow ||
-                    entity instanceof EntityChicken ||
-                    entity instanceof EntityPig ||
-                    entity instanceof EntitySheep ||
-                    entity instanceof EntityZombie)) {
+                            entity instanceof EntityChicken ||
+                            entity instanceof EntityPig ||
+                            entity instanceof EntitySheep ||
+                            entity instanceof EntityZombie)) {
 
-                ((EntityIntelligent) entity).setBaby(true);
+                ((BaseEntity) entity).setBaby(true);
             }
 
             return true;

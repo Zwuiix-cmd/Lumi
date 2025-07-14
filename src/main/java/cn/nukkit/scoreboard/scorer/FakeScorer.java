@@ -1,6 +1,6 @@
 package cn.nukkit.scoreboard.scorer;
 
-import cn.nukkit.network.protocol.types.ScoreEntry;
+import cn.nukkit.network.protocol.SetScorePacket;
 import cn.nukkit.network.protocol.types.ScorerType;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
@@ -39,7 +39,7 @@ public class FakeScorer implements IScorer {
     }
 
     @Override
-    public ScoreEntry toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line) {
-        return new ScoreEntry(line.getLineId(), scoreboard.getObjectiveName(), line.getScore(), this.getFakeName());
+    public SetScorePacket.ScoreInfo toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line) {
+        return new SetScorePacket.ScoreInfo(line.getLineId(), scoreboard.getObjectiveName(), line.getScore(), this.getFakeName());
     }
 }

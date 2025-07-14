@@ -1,40 +1,43 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.EntitySwimmable;
-import cn.nukkit.entity.ai.behavior.Behavior;
-import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
-import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
-import cn.nukkit.entity.ai.controller.DiveController;
-import cn.nukkit.entity.ai.controller.LookController;
-import cn.nukkit.entity.ai.controller.SpaceMoveController;
-import cn.nukkit.entity.ai.executor.SpaceRandomRoamExecutor;
-import cn.nukkit.entity.ai.route.finder.impl.SimpleSpaceAStarRouteFinder;
-import cn.nukkit.entity.ai.route.posevaluator.SwimmingPosEvaluator;
+import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
-import java.util.Set;
-
-public abstract class EntityFish extends EntityAnimal implements EntitySwimmable {
+/**
+ * Created by PetteriM1
+ */
+public abstract class EntityFish extends EntityWaterAnimal {
 
     public EntityFish(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     @Override
-    public IBehaviorGroup requireBehaviorGroup() {
-        return new BehaviorGroup(
-                this.tickSpread,
-                Set.of(),
-                Set.of(
-                        new Behavior(
-                                new SpaceRandomRoamExecutor(0.36f, 12, 1, 80, false, -1, false, 10),
-                                entity -> true, 1)
-                ),
-                Set.of(),
-                Set.of(new SpaceMoveController(), new LookController(true, true), new DiveController()),
-                new SimpleSpaceAStarRouteFinder(new SwimmingPosEvaluator(), this),
-                this
-        );
+    public int getKillExperience() {
+        return Utils.rand(1, 3);
     }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (item.getId() == Item.BUCKET && (item.getDamage() == 0 || item.getDamage() == 8) && this.isInsideOfWater()) {
+            this.close();
+            if (item.getCount() <= 1) {
+                player.getInventory().setItemInHand(Item.get(Item.BUCKET, this.getBucketMeta(), 1));
+                return false;
+            } else {
+                if (!player.isCreative()) {
+                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                }
+                player.getInventory().addItem(Item.get(Item.BUCKET, this.getBucketMeta(), 1));
+                return true;
+            }
+        }
+        return super.onInteract(player, item, clickedPos);
+    }
+
+    protected abstract int getBucketMeta();
 }

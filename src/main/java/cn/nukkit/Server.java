@@ -423,6 +423,13 @@ public class Server {
      */
     public boolean opInGame;
     /**
+     * Handling player names with spaces.
+     [0] "disabled" - Players with names containing spaces are prohibited from entering the server.
+     [1] "ignore" - Ignore names with spaces (default).
+     [2] "replacing" - Replace spaces in player names with "_".
+     */
+    public int spaceMode;
+    /**
      * Sky light updates enabled.
      */
     public boolean lightUpdates;
@@ -458,6 +465,10 @@ public class Server {
      * More vanilla like portal logics enabled.
      */
     public boolean vanillaPortals;
+    /**
+     * Ticks required for the player to trigger the portal.
+     */
+    public int portalTicks;
     /**
      * Persona skins allowed.
      */
@@ -686,7 +697,7 @@ public class Server {
             }
         }
 
-        log.info("\u00A7b-- \u00A7cLumi \u00A7b--");
+        log.info("\u00A7b-- \u00A7cNukkit \u00A7dMOT \u00A7b--");
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -711,8 +722,8 @@ public class Server {
         // Convert legacy data before plugins get the chance to mess with it
         try {
             nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
-                            .createIfMissing(true)
-                            .compressionType(CompressionType.ZLIB_RAW));
+                    .createIfMissing(true)
+                    .compressionType(CompressionType.ZLIB_RAW));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1224,7 +1235,7 @@ public class Server {
 
     public void onPlayerCompleteLoginSequence(Player player) {
         this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
+        this.updatePlayerListData(player.getLoginUuid(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
     }
 
     public void addPlayer(InetSocketAddress socketAddress, Player player) {
@@ -1233,7 +1244,7 @@ public class Server {
 
     public void addOnlinePlayer(Player player) {
         this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
+        this.updatePlayerListData(player.getLoginUuid(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -1245,7 +1256,7 @@ public class Server {
 
             PlayerListPacket pk = new PlayerListPacket();
             pk.type = PlayerListPacket.TYPE_REMOVE;
-            pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(player.getUniqueId())};
+            pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(player.getLoginUuid())};
 
             Server.broadcastPacket(this.playerList.values(), pk);
         }
@@ -1301,7 +1312,7 @@ public class Server {
     public void sendFullPlayerListData(Player player) {
         PlayerListPacket.Entry[] array = this.playerList.values().stream()
                 .map(p -> new PlayerListPacket.Entry(
-                        p.getUniqueId(),
+                        p.getLoginUuid(),
                         p.getId(),
                         p.getDisplayName(),
                         p.getSkin(),
@@ -1351,9 +1362,6 @@ public class Server {
                 level.doTick(currentTick);
                 int tickMs = (int) (System.currentTimeMillis() - levelTime);
                 level.tickRateTime = tickMs;
-                if ((currentTick & 511) == 0) { // % 511
-                    level.tickRateOptDelay = level.recalcTickOptDelay();
-                }
 
                 if (this.autoTickRate) {
                     if (tickMs < 50 && level.getTickRate() > this.baseTickRate) {
@@ -2866,8 +2874,8 @@ public class Server {
         Entity.registerEntity("Piglin", EntityPiglin.class);
         Entity.registerEntity("Zoglin", EntityZoglin.class);
         Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
-        Entity.registerEntity("Bogged", EntityBogged.class);
         //Entity.registerEntity("Breeze", EntityBreeze.class);
+        //Entity.registerEntity("Bogged", EntityBogged.class);
         Entity.registerEntity("Creaking", EntityCreaking.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
@@ -3067,6 +3075,13 @@ public class Server {
         this.vanillaBossBar = this.getPropertyBoolean("vanilla-bossbars", false);
         this.stopInGame = this.getPropertyBoolean("stop-in-game", false);
         this.opInGame = this.getPropertyBoolean("op-in-game", false);
+
+        switch (this.getPropertyString("space-name-mode")) {
+            case "disabled" -> this.spaceMode = 0;
+            case "replacing" -> this.spaceMode = 2;
+            default -> this.spaceMode = 1;
+        }
+
         this.lightUpdates = this.getPropertyBoolean("light-updates", false);
         this.queryPlugins = this.getPropertyBoolean("query-plugins", false);
         this.flyChecks = this.getPropertyBoolean("allow-flight", false);
@@ -3095,7 +3110,10 @@ public class Server {
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 4);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 56);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
+
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
+        this.portalTicks = this.getPropertyInt("portal-ticks", 80);
+
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
@@ -3163,7 +3181,7 @@ public class Server {
     private static class ServerProperties extends ConfigSection {
         {
             put("motd", "Minecraft Server");
-            put("sub-motd", "Powered by Lumi");
+            put("sub-motd", "Powered by Nukkit-MOT");
             put("server-port", 19132);
             put("server-ip", "0.0.0.0");
             put("view-distance", 8);
@@ -3204,6 +3222,7 @@ public class Server {
             put("explosion-break-blocks", true);
             put("stop-in-game", false);
             put("op-in-game", true);
+            put("space-name-mode", "ignore");
             put("xp-bottles-on-creative", true);
             put("spawn-eggs", true);
             put("forced-safety-enchant", true);
@@ -3248,6 +3267,7 @@ public class Server {
             put("nether", true);
             put("end", true);
             put("vanilla-portals", true);
+            put("portal-ticks", 80);
             put("multi-nether-worlds", "");
             put("anti-xray-worlds", "");
 
@@ -3315,8 +3335,8 @@ public class Server {
 
         @SuppressWarnings("removal")
         private static final AccessControlContext ACC = contextWithPermissions(
-            new RuntimePermission("getClassLoader"),
-            new RuntimePermission("setContextClassLoader")
+                new RuntimePermission("getClassLoader"),
+                new RuntimePermission("setContextClassLoader")
         );
 
         @SuppressWarnings("removal")

@@ -1,16 +1,11 @@
 package cn.nukkit.entity.mob;
 
-import cn.nukkit.Player;
-
-
-import cn.nukkit.entity.EntitySmite;
-import cn.nukkit.entity.EntityWalkable;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public class EntityZombieVillager extends EntityMob implements EntityWalkable, EntitySmite {
+public class EntityZombieVillager extends EntityZombie {
 
-    public static final int NETWORK_ID = 116;
+    public static final int NETWORK_ID = 44;
 
     public EntityZombieVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -22,43 +17,7 @@ public class EntityZombieVillager extends EntityMob implements EntityWalkable, E
     }
 
     @Override
-    protected void initEntity() {
-        this.setMaxHealth(20);
-        super.initEntity();
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.6f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 1.9f;
-    }
-
-    
-    
-    @Override
-    public String getOriginalName() {
-        return "Zombie VillagerV2";
-    }
-
-    
-    @Override
-    public boolean isUndead() {
-        return true;
-    }
-
-    
-    @Override
-    public boolean isPreventingSleep(Player player) {
-        return true;
-    }
-
-    @Override
-    public boolean onUpdate(int currentTick) {
-        burn(this);
-        return super.onUpdate(currentTick);
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Zombie Villager";
     }
 }

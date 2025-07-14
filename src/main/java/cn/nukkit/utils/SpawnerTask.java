@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.EntityCod;
@@ -212,8 +213,8 @@ public class SpawnerTask implements Runnable {
      * @param pos position
      * @return spawned entity or null
      */
-    public Entity createEntity(Object type, Position pos) {
-        Entity entity = Entity.createEntity((String) type, pos);
+    public BaseEntity createEntity(Object type, Position pos) {
+        BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null) {
             if (!entity.isInsideOfSolid()) {
                 CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), pos, entity.namedTag, CreatureSpawnEvent.SpawnReason.NATURAL, null);

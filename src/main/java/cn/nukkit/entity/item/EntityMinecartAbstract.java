@@ -188,17 +188,17 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
 
         // Collisions
         if (this instanceof InventoryHolder) {
-            for (cn.nukkit.entity.Entity entity : level.getNearbyEntities(boundingBox.grow(0.2D, 0, 0.2D), this)) {
+            for (Entity entity : level.getNearbyEntities(boundingBox.grow(0.2D, 0, 0.2D), this)) {
                 if (!passengers.contains(entity) && entity instanceof EntityMinecartAbstract) {
                     entity.applyEntityCollision(this);
                 }
             }
         }
 
-        Iterator<cn.nukkit.entity.Entity> linkedIterator = this.passengers.iterator();
+        Iterator<Entity> linkedIterator = this.passengers.iterator();
 
         while (linkedIterator.hasNext()) {
-            cn.nukkit.entity.Entity linked = linkedIterator.next();
+            Entity linked = linkedIterator.next();
 
             if (!linked.isAlive()) {
                 if (linked.riding == this) {
@@ -290,7 +290,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     }
 
     @Override
-    public void applyEntityCollision(cn.nukkit.entity.Entity entity) {
+    public void applyEntityCollision(Entity entity) {
         if (entity != riding && !(entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
             double motiveX = entity.x - x;
             double motiveZ = entity.z - z;
@@ -442,7 +442,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         motionZ = NukkitMath.clamp(motionZ, -maxSpeed, maxSpeed);
 
         if (!hasUpdated) {
-            for (cn.nukkit.entity.Entity linked : passengers) {
+            for (Entity linked : passengers) {
                 linked.setSeatPosition(getMountedOffset(linked).add(0, 0.35f));
                 updatePassengerPosition(linked);
             }
@@ -520,7 +520,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         double playerYawPos; // PlayerYawPositive
         double motion;
 
-        cn.nukkit.entity.Entity linked = getPassenger();
+        Entity linked = getPassenger();
 
         if (linked instanceof EntityLiving) {
             expectedSpeed = currentSpeed;

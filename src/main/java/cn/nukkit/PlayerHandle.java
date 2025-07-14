@@ -412,14 +412,6 @@ public final class PlayerHandle {
         player.lastPlayerdLevelUpSoundTime = lastPlayerdLevelUpSoundTime;
     }*/
 
-    public void setLastAttackEntity(Entity lastAttackEntity) {
-        player.lastAttackEntity = lastAttackEntity;
-    }
-
-    public void setLastBeAttackEntity(Entity lastBeAttackEntity) {
-        player.lastBeAttackEntity = lastBeAttackEntity;
-    }
-
     public List<PlayerFogPacket.Fog> getFogStack() {
         return player.fogStack;
     }

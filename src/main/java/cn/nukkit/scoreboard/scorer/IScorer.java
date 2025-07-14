@@ -1,6 +1,6 @@
 package cn.nukkit.scoreboard.scorer;
 
-import cn.nukkit.network.protocol.types.ScoreEntry;
+import cn.nukkit.network.protocol.SetScorePacket;
 import cn.nukkit.network.protocol.types.ScorerType;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
@@ -29,5 +29,5 @@ public interface IScorer {
      * @param line       the line to which it belongs
      * @return network information
      */
-    ScoreEntry toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line);
+    SetScorePacket.ScoreInfo toNetworkInfo(IScoreboard scoreboard, IScoreboardLine line);
 }

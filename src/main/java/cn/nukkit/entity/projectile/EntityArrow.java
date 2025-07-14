@@ -30,7 +30,6 @@ public class EntityArrow extends EntitySlenderProjectile {
     public static final int DATA_SOURCE_ID = 17;
 
     protected int pickupMode;
-    protected boolean critical;
     protected boolean isFullEffect;
 
     protected Int2ObjectMap<Effect> mobEffects;
@@ -83,6 +82,7 @@ public class EntityArrow extends EntitySlenderProjectile {
     protected void initEntity() {
         super.initEntity();
 
+        this.setCritical(this.namedTag.getBoolean("crit"));
         this.pickupMode = this.namedTag.contains("pickup") ? this.namedTag.getByte("pickup") : PICKUP_ANY;
         this.isFullEffect = this.namedTag.getBoolean("isFullEffect");
 
@@ -105,13 +105,11 @@ public class EntityArrow extends EntitySlenderProjectile {
     }
 
     public void setCritical(boolean value) {
-        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
-        this.critical = value;
+        this.setDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_CRITICAL, value, true);
     }
 
     public boolean isCritical() {
-        //return this.getDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL);
-        return this.critical;
+        return this.getDataFlag(Entity.DATA_FLAGS, Entity.DATA_FLAG_CRITICAL);
     }
 
     @Override
@@ -156,6 +154,7 @@ public class EntityArrow extends EntitySlenderProjectile {
     public void saveNBT() {
         super.saveNBT();
 
+        this.namedTag.putBoolean("crit", this.isCritical());
         this.namedTag.putByte("pickup", this.pickupMode);
         this.namedTag.putBoolean("isFullEffect", this.isFullEffect);
 

@@ -1,40 +1,22 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-
-
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
-import cn.nukkit.entity.EntityWalkable;
-import cn.nukkit.entity.ai.behavior.Behavior;
-import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
-import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
-import cn.nukkit.entity.ai.controller.LookController;
-import cn.nukkit.entity.ai.controller.WalkController;
-import cn.nukkit.entity.ai.evaluator.EntityCheckEvaluator;
-import cn.nukkit.entity.ai.evaluator.RandomSoundEvaluator;
-import cn.nukkit.entity.ai.executor.FlatRandomRoamExecutor;
-import cn.nukkit.entity.ai.executor.FleeFromTargetExecutor;
-import cn.nukkit.entity.ai.executor.MeleeAttackExecutor;
-import cn.nukkit.entity.ai.executor.PlaySoundExecutor;
-import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
-import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
-import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
-import cn.nukkit.entity.ai.sensor.NearestEntitySensor;
-import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
-import cn.nukkit.entity.ai.sensor.NearestTargetEntitySensor;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityPotionEffectEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-/**
- * @author PikyCZ
- */
-public class EntityCaveSpider extends EntityMob implements EntityWalkable, EntityArthropod {
+public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropod {
 
     public static final int NETWORK_ID = 40;
 
@@ -48,38 +30,6 @@ public class EntityCaveSpider extends EntityMob implements EntityWalkable, Entit
     }
 
     @Override
-    public IBehaviorGroup requireBehaviorGroup() {
-        return new BehaviorGroup(
-                this.tickSpread,
-                Set.of(),
-                Set.of(
-                        new Behavior(new PlaySoundExecutor(Sound.MOB_SPIDER_SAY), new RandomSoundEvaluator(), 5, 1),
-                        new Behavior(new FleeFromTargetExecutor(CoreMemoryTypes.NEAREST_SHARED_ENTITY, 0.3f, true, 9), new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_SHARED_ENTITY), 5, 1),
-                        new Behavior(new MeleeAttackExecutor(CoreMemoryTypes.ATTACK_TARGET, 0.3f, 40, true, 30), new EntityCheckEvaluator(CoreMemoryTypes.ATTACK_TARGET), 4, 1),
-                        new Behavior(new MeleeAttackExecutor(CoreMemoryTypes.NEAREST_SUITABLE_ATTACK_TARGET, 0.3f, 40, true, 30), new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_SUITABLE_ATTACK_TARGET), 3, 1),
-                        new Behavior(new MeleeAttackExecutor(CoreMemoryTypes.NEAREST_PLAYER, 0.3f, 40, false, 30), new EntityCheckEvaluator(CoreMemoryTypes.NEAREST_PLAYER), 2, 1),
-                        new Behavior(new FlatRandomRoamExecutor(0.3f, 12, 100, false, -1, true, 10), none(), 1, 1)
-                ),
-                Set.of(
-                        new NearestPlayerSensor(40, 0, 20),
-                        new NearestTargetEntitySensor<>(0, 16, 20,
-                                List.of(CoreMemoryTypes.NEAREST_SUITABLE_ATTACK_TARGET), this::attackTarget)
-                        //new NearestEntitySensor(EntityArmadillo.class, CoreMemoryTypes.NEAREST_SHARED_ENTITY, 42, 0)
-                ),
-                Set.of(new WalkController(), new LookController(true, true)),
-                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
-                this
-        );
-    }
-
-    @Override
-    protected void initEntity() {
-        this.setMaxHealth(12);
-        this.diffHandDamage = new float[]{2.5f, 3f, 4.5f};
-        super.initEntity();
-    }
-
-    @Override
     public float getWidth() {
         return 0.7f;
     }
@@ -88,19 +38,71 @@ public class EntityCaveSpider extends EntityMob implements EntityWalkable, Entit
     public float getHeight() {
         return 0.5f;
     }
-    
+
     @Override
-    public String getOriginalName() {
-        return "Cave Spider";
+    public double getSpeed() {
+        return 1.3;
     }
 
     @Override
-    public boolean isPreventingSleep(Player player) {
-        return true;
+    public void initEntity() {
+        this.setMaxHealth(12);
+
+        super.initEntity();
+
+        this.setDamage(new int[] { 0, 2, 3, 3 });
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1.32) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+
+                EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
+
+                if (player.attack(ev) && !ev.isCancelled() && this.server.getDifficulty() > 0) {
+                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(this.server.getDifficulty() > 1 ? 300 : 140), EntityPotionEffectEvent.Cause.ATTACK);
+                }
+            }
+        }
     }
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.STRING, 0, Utils.rand(0, 2))};
+        List<Item> drops = new ArrayList<>();
+
+        drops.add(Item.get(Item.STRING, 0, Utils.rand(0, 2)));
+        drops.add(Item.get(Item.SPIDER_EYE, 0, (Utils.rand(0, 2) == 0 ? 1 : 0)));
+
+        return drops.toArray(Item.EMPTY_ARRAY);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 5;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Cave Spider";
+    }
+
+    @Override
+    public boolean canBeAffected(int effectId) {
+        if (effectId == Effect.POISON) {
+            return false;
+        }
+        return super.canBeAffected(effectId);
     }
 }

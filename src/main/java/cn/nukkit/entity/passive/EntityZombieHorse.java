@@ -1,17 +1,15 @@
 package cn.nukkit.entity.passive;
 
-
-
 import cn.nukkit.entity.EntitySmite;
-import cn.nukkit.entity.EntityWalkable;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
-/**
- * @author PikyCZ
- */
-public class EntityZombieHorse extends EntityAnimal implements EntityWalkable, EntitySmite {
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
 
     public static final int NETWORK_ID = 27;
 
@@ -26,39 +24,50 @@ public class EntityZombieHorse extends EntityAnimal implements EntityWalkable, E
 
     @Override
     public float getWidth() {
-        return 1.4f;
+        if (this.isBaby()) {
+            return 0.6982f;
+        }
+        return 1.3965f;
     }
 
     @Override
     public float getHeight() {
+        if (this.isBaby()) {
+            return 0.8f;
+        }
         return 1.6f;
     }
 
     @Override
     public void initEntity() {
         this.setMaxHealth(15);
+
         super.initEntity();
     }
 
     @Override
+    public boolean isFeedItem(Item item) {
+        return false;
+    }
+
+    @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.ROTTEN_FLESH, 1, 1)};
+        List<Item> drops = new ArrayList<>();
+
+        if (!this.isBaby()) {
+            drops.add(Item.get(Item.LEATHER, 0, Utils.rand(0, 2)));
+            drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2)));
+        }
+
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
+        }
+
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
-    
     @Override
-    public boolean isUndead() {
-        return true;
-    }
-
-    @Override
-    public String getOriginalName() {
+    public String getName() {
         return "Zombie Horse";
-    }
-
-    @Override
-    public boolean onUpdate(int currentTick) {
-        burn(this);
-        return super.onUpdate(currentTick);
     }
 }

@@ -1,6 +1,6 @@
 package cn.nukkit.scoreboard.scoreboard;
 
-import cn.nukkit.network.protocol.types.ScoreEntry;
+import cn.nukkit.network.protocol.SetScorePacket;
 import cn.nukkit.scoreboard.scorer.IScorer;
 
 public interface IScoreboardLine {
@@ -47,7 +47,7 @@ public interface IScoreboardLine {
      *
      * @return network information
      */
-    default ScoreEntry toNetworkInfo() {
+    default SetScorePacket.ScoreInfo toNetworkInfo() {
         return this.getScorer().toNetworkInfo(this.getScoreboard(), this);
     }
 

@@ -2,8 +2,10 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
-public class EntityCamel extends EntityAnimal {
+public class EntityCamel extends EntityWalkingAnimal {
+
     public static final int NETWORK_ID = 138;
 
     public EntityCamel(FullChunk chunk, CompoundTag nbt) {
@@ -18,6 +20,7 @@ public class EntityCamel extends EntityAnimal {
     @Override
     protected void initEntity() {
         this.setMaxHealth(32);
+
         super.initEntity();
     }
 
@@ -38,10 +41,7 @@ public class EntityCamel extends EntityAnimal {
     }
 
     @Override
-    public float getFootHeight() {
-        if (!isBaby()) {
-            return 1.5f;
-        }
-        return super.getFootHeight();
+    public int getKillExperience() {
+        return Utils.rand(1, 3);
     }
 }

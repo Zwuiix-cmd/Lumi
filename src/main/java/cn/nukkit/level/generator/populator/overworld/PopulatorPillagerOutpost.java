@@ -2,8 +2,8 @@ package cn.nukkit.level.generator.populator.overworld;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityIronGolem;
 import cn.nukkit.entity.mob.EntityPillager;
+import cn.nukkit.entity.passive.EntityIronGolem;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.FullChunk;

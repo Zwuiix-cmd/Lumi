@@ -14,7 +14,6 @@ import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
-import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.utils.*;
 
 import java.nio.charset.StandardCharsets;
@@ -22,8 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_PASSENGER;
 
 /**
  * @author MagicDroidX
@@ -37,6 +34,7 @@ public class EntityHuman extends EntityHumanType {
     public static final int DATA_PLAYER_FLAGS = 26;
     public static final int DATA_PLAYER_BUTTON_TEXT = 40;
 
+    protected UUID loginUuid;
     protected UUID uuid;
     protected byte[] rawUUID;
 
@@ -99,6 +97,10 @@ public class EntityHuman extends EntityHumanType {
 
     public Skin getSkin() {
         return skin;
+    }
+
+    public UUID getLoginUuid() {
+        return loginUuid;
     }
 
     @Override
@@ -218,10 +220,6 @@ public class EntityHuman extends EntityHumanType {
                 this.setSkin(newSkin);
             }
 
-            if (this.getSkin() == null) {
-                this.setSkin(new Skin());
-            }
-
             this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
                     .getSkinData().data, this.getNameTag().getBytes(StandardCharsets.UTF_8));
         } else {
@@ -328,15 +326,15 @@ public class EntityHuman extends EntityHumanType {
             }
 
             if (this.isPlayer) {
-                this.server.updatePlayerListData(this.uuid, this.getId(), ((Player) this).getDisplayName(), this.skin, ((Player) this).getLoginChainData().getXUID(), new Player[]{player});
+                this.server.updatePlayerListData(this.loginUuid, this.getId(), ((Player) this).getDisplayName(), this.skin, ((Player) this).getLoginChainData().getXUID(), new Player[]{player});
             } else {
                 this.server.updatePlayerListData(this.uuid, this.getId(), this.getName(), this.skin, new Player[]{player});
             }
 
-            PlayerInventory playerInventory = Objects.requireNonNullElse(this.inventory, new PlayerInventory(null));
+            PlayerInventory playerInventory = Objects.requireNonNullElse(this.inventory, BaseEntity.EMPTY_INVENTORY);
 
             AddPlayerPacket pk = new AddPlayerPacket();
-            pk.uuid = this.uuid;
+            pk.uuid = this.isPlayer ? this.loginUuid : this.uuid;
             pk.username = this.getName();
             pk.entityUniqueId = this.getId();
             pk.entityRuntimeId = this.getId();
@@ -350,11 +348,6 @@ public class EntityHuman extends EntityHumanType {
             pk.pitch = (float) this.pitch;
             pk.item = playerInventory.getItemInHand();
             pk.metadata = this.dataProperties.clone();
-            pk.links = new EntityLink[this.passengers.size()];
-            for (int i = 0; i < pk.links.length; i++) {
-                pk.links[i] = new EntityLink(this.id, this.passengers.get(i).id, i == 0 ? EntityLink.TYPE_RIDER :
-                        TYPE_PASSENGER, false, false, 0f);
-            }
             player.dataPacket(pk);
 
             if (this.isPlayer) {

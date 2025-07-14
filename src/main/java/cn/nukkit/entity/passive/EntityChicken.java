@@ -1,126 +1,29 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.EntityClimateVariant;
-import cn.nukkit.entity.EntityWalkable;
-import cn.nukkit.entity.ai.behavior.Behavior;
-import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
-import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
-import cn.nukkit.entity.ai.controller.FluctuateController;
-import cn.nukkit.entity.ai.controller.LookController;
-import cn.nukkit.entity.ai.controller.WalkController;
-import cn.nukkit.entity.ai.evaluator.MemoryCheckNotEmptyEvaluator;
-import cn.nukkit.entity.ai.evaluator.PassByTimeEvaluator;
-import cn.nukkit.entity.ai.evaluator.ProbabilityEvaluator;
-import cn.nukkit.entity.ai.executor.*;
-import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
-import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
-import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
-import cn.nukkit.entity.ai.sensor.NearestFeedingPlayerSensor;
-import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author BeYkeRYkt (Nukkit Project)
- */
-public class EntityChicken extends EntityAnimal implements EntityWalkable, EntityClimateVariant {
+public class EntityChicken extends EntityWalkingAnimal implements EntityClimateVariant {
 
     public static final int NETWORK_ID = 10;
 
+    private int eggLayTime = getRandomEggLayTime();
+    //private boolean isChickenJockey = false;
+
     public EntityChicken(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public void updateMovement() {
-        //补充鸡的缓慢无伤落地特性
-        if (!this.onGround && this.motionY < -0.08f) {
-            this.motionY = -0.08f;
-            this.highestPosition = this.y;
-        }
-        super.updateMovement();
-    }
-
-    @Override
-    public IBehaviorGroup requireBehaviorGroup() {
-        return new BehaviorGroup(
-                this.tickSpread,
-                Set.of(
-                        //用于刷新InLove状态的核心行为
-                        new Behavior(
-                                new InLoveExecutor(400),
-                                all(
-                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_FEED_TIME, 0, 400),
-                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_IN_LOVE_TIME, 6000, Integer.MAX_VALUE)
-                                ),
-                                1, 1, 1, false
-                        ),
-                        //生长
-                        new Behavior(
-                                new AnimalGrowExecutor(),
-                                //todo：Growth rate
-                                all(
-                                        new PassByTimeEvaluator(CoreMemoryTypes.ENTITY_SPAWN_TIME, 20 * 60 * 20, Integer.MAX_VALUE),
-                                        entity -> entity instanceof EntityAnimal animal && animal.isBaby()
-                                )
-                                , 1, 1, 1200
-                        )
-                ),
-                Set.of(
-                        new Behavior(new FlatRandomRoamExecutor(0.22f, 12, 40, true, 100, true, 10), new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_ATTACKED_TIME, 0, 100), 6, 1),
-                        new Behavior(new EntityBreedingExecutor<>(EntityChicken.class, 16, 100, 0.3f), entity -> entity.getMemoryStorage().get(CoreMemoryTypes.IS_IN_LOVE), 5, 1),
-                        new Behavior(new MoveToTargetExecutor(CoreMemoryTypes.NEAREST_FEEDING_PLAYER, 0.22f, true), new MemoryCheckNotEmptyEvaluator(CoreMemoryTypes.NEAREST_FEEDING_PLAYER), 4, 1),
-                        new Behavior(new LookAtTargetExecutor(CoreMemoryTypes.NEAREST_PLAYER, 100), new ProbabilityEvaluator(4, 10), 1, 1, 100),
-                        new Behavior(new FlatRandomRoamExecutor(0.22f, 12, 100, false, -1, true, 10), (entity -> true), 1, 1),
-                        new Behavior(entity -> {
-                            entity.getMemoryStorage().put(CoreMemoryTypes.LAST_EGG_SPAWN_TIME, (int) getLevel().getCurrentTick());
-                            entity.getLevel().dropItem(entity, getEgg());
-                            entity.getLevel().addSound(entity, Sound.MOB_CHICKEN_PLOP);
-                            return false;
-                        }, any(
-                                all(
-                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_EGG_SPAWN_TIME, 6000, 12000),
-                                        new ProbabilityEvaluator(20, 100)
-                                ),
-                                new PassByTimeEvaluator(CoreMemoryTypes.LAST_EGG_SPAWN_TIME, 12000, Integer.MAX_VALUE)
-                        ), 1, 1, 20)
-                ),
-                Set.of(new NearestFeedingPlayerSensor(8, 0), new NearestPlayerSensor(8, 0, 20)),
-                Set.of(new WalkController(), new LookController(true, true), new FluctuateController()),
-                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
-                this
-        );
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.3f;
-        }
-        return 0.6f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.4f;
-        }
-        return 0.8f;
-    }
-
-    @Override
-    public String getOriginalName() {
-        return "Chicken";
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(((this.isOnFire()) ? Item.COOKED_CHICKEN : Item.RAW_CHICKEN)), Item.get(Item.FEATHER)};
     }
 
     @Override
@@ -129,7 +32,34 @@ public class EntityChicken extends EntityAnimal implements EntityWalkable, Entit
     }
 
     @Override
-    protected void initEntity() {
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.2f;
+        }
+        return 0.4f;
+    }
+
+    @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.35f;
+        }
+        return 0.7f;
+    }
+
+    @Override
+    public float getDrag() {
+        return 0.2f;
+    }
+
+    @Override
+    public float getGravity() {
+        //Should be lower but that breaks jumping
+        return 0.08f;
+    }
+
+    @Override
+    public void initEntity() {
         this.setMaxHealth(4);
         super.initEntity();
 
@@ -138,21 +68,106 @@ public class EntityChicken extends EntityAnimal implements EntityWalkable, Entit
         } else {
             setVariant(getBiomeVariant(getLevel().getBiomeId(getFloorX(), getFloorZ())));
         }
+
+        if (this.namedTag.contains("EggLayTime")) {
+            this.eggLayTime = this.namedTag.getInt("EggLayTime");
+        } else {
+            this.eggLayTime = getRandomEggLayTime();
+        }
+        //if (this.namedTag.contains("IsChickenJockey")) {
+        //    this.isChickenJockey = this.namedTag.getBoolean("IsChickenJockey");
+        //} else {
+        //    this.isChickenJockey = false;
+        //}
+
+        this.noFallDamage = true;
     }
 
     @Override
-    public boolean isBreedingItem(Item item) {
-        int id = item.getId();
+    public boolean entityBaseTick(int tickDiff) {
+        boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        return id == Item.WHEAT_SEEDS || id == Item.MELON_SEEDS || id == Item.PUMPKIN_SEEDS || id == Item.BEETROOT_SEEDS;
+        if (this.getServer().mobsFromBlocks && !this.isBaby()) {
+            if (this.eggLayTime > 0) {
+                eggLayTime -= tickDiff;
+            } else {
+                this.level.dropItem(this, getEgg());
+                this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PLOP);
+                this.eggLayTime = getRandomEggLayTime();
+            }
+        }
+
+        return hasUpdate;
     }
 
     private Item getEgg() {
         if (Server.getInstance().enableNewChickenEggsLaying) {
-            if(getVariant() == EntityClimateVariant.Variant.COLD) return Item.fromString(Item.BLUE_EGG);
-            if(getVariant() == EntityClimateVariant.Variant.WARM) return Item.fromString(Item.BROWN_EGG);
+            if(getVariant() == Variant.COLD) return Item.fromString(Item.BLUE_EGG);
+            if(getVariant() == Variant.WARM) return Item.fromString(Item.BROWN_EGG);
         }
 
         return Item.get(Item.EGG, 0, 1);
+    }
+
+    @Override
+    public boolean isFeedItem(Item item) {
+        int id = item.getId();
+        return id == Item.SEEDS
+                || id == Item.BEETROOT_SEEDS
+                || id == Item.MELON_SEEDS
+                || id == Item.PUMPKIN_SEEDS;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (item.getId() == Item.SEEDS || item.getId() == Item.BEETROOT_SEEDS ||
+                item.getId() == Item.MELON_SEEDS || item.getId() == Item.PUMPKIN_SEEDS) {
+            if (!this.isBaby() && !this.isInLoveCooldown()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                this.level.addParticle(new ItemBreakParticle(
+                        this.add(Utils.rand(-0.5, 0.5), this.getMountedYOffset(), Utils.rand(-0.5, 0.5)),
+                        item));
+                this.setInLove();
+            }
+        }
+        return super.onInteract(player, item, clickedPos);
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putInt("EggLayTime", this.eggLayTime);
+        //this.namedTag.putBoolean("IsChickenJockey", this.isChickenJockey);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
+
+        if (!this.isBaby()) {
+            drops.add(Item.get(Item.FEATHER, 0, Utils.rand(0, 2)));
+            drops.add(Item.get(this.isOnFire() ? Item.COOKED_CHICKEN : Item.RAW_CHICKEN, 0, 1));
+        }
+
+        return drops.toArray(Item.EMPTY_ARRAY);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (ev.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return super.attack(ev);
+        }
+
+        return false;
+    }
+
+    private static  int getRandomEggLayTime() {
+        return Utils.rand(6000, 12000);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

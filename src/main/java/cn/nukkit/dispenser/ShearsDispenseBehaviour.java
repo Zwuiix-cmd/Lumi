@@ -25,7 +25,7 @@ public class ShearsDispenseBehaviour extends DefaultDispenseBehavior {
         ))) {
             if (entity instanceof EntitySheep) {
                 if (!((EntitySheep) entity).isSheared()) {
-                    ((EntitySheep) entity).shear();
+                    ((EntitySheep) entity).shear(true);
                     item.useOn(entity);
                     return item.getDamage() >= item.getMaxDurability() ? null : item;
                 }

@@ -1,33 +1,20 @@
 package cn.nukkit.entity.passive;
 
-
-
-import cn.nukkit.entity.EntityWalkable;
-import cn.nukkit.entity.ai.behavior.Behavior;
-import cn.nukkit.entity.ai.behaviorgroup.BehaviorGroup;
-import cn.nukkit.entity.ai.behaviorgroup.IBehaviorGroup;
-import cn.nukkit.entity.ai.controller.FluctuateController;
-import cn.nukkit.entity.ai.controller.HoppingController;
-import cn.nukkit.entity.ai.controller.LookController;
-import cn.nukkit.entity.ai.evaluator.MemoryCheckNotEmptyEvaluator;
-import cn.nukkit.entity.ai.evaluator.PassByTimeEvaluator;
-import cn.nukkit.entity.ai.evaluator.ProbabilityEvaluator;
-import cn.nukkit.entity.ai.executor.*;
-import cn.nukkit.entity.ai.memory.CoreMemoryTypes;
-import cn.nukkit.entity.ai.route.finder.impl.SimpleFlatAStarRouteFinder;
-import cn.nukkit.entity.ai.route.posevaluator.WalkingPosEvaluator;
-import cn.nukkit.entity.ai.sensor.NearestFeedingPlayerSensor;
-import cn.nukkit.entity.ai.sensor.NearestPlayerSensor;
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-/**
- * @author BeYkeRYkt (Nukkit Project)
- */
-public class EntityRabbit extends EntityAnimal implements EntityWalkable {
+public class EntityRabbit extends EntityJumpingAnimal {
 
     public static final int NETWORK_ID = 18;
 
@@ -36,69 +23,76 @@ public class EntityRabbit extends EntityAnimal implements EntityWalkable {
     }
 
     @Override
-    public IBehaviorGroup requireBehaviorGroup() {
-        return new BehaviorGroup(
-                this.tickSpread,
-                Set.of(
-                        //用于刷新InLove状态的核心行为
-                        new Behavior(
-                                new InLoveExecutor(400),
-                                all(
-                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_FEED_TIME, 0, 400),
-                                        new PassByTimeEvaluator(CoreMemoryTypes.LAST_IN_LOVE_TIME, 6000, Integer.MAX_VALUE)
-                                ),
-                                1, 1, 1, false
-                        )
-                ),
-                Set.of(
-                        new Behavior(new FlatRandomRoamExecutor(0.4f, 12, 40, true, 100, true, 10), new PassByTimeEvaluator(CoreMemoryTypes.LAST_BE_ATTACKED_TIME, 0, 100), 4, 1),
-                        new Behavior(new EntityBreedingExecutor<>(EntityRabbit.class, 16, 100, 0.5f), entity -> entity.getMemoryStorage().get(CoreMemoryTypes.IS_IN_LOVE), 3, 1),
-                        new Behavior(new MoveToTargetExecutor(CoreMemoryTypes.NEAREST_FEEDING_PLAYER, 0.4f, true), new MemoryCheckNotEmptyEvaluator(CoreMemoryTypes.NEAREST_FEEDING_PLAYER), 2, 1),
-                        new Behavior(new LookAtTargetExecutor(CoreMemoryTypes.NEAREST_PLAYER, 100), new ProbabilityEvaluator(4, 10), 1, 1, 100),
-                        new Behavior(new FlatRandomRoamExecutor(0.2f, 12, 100, false, -1, true, 10), (entity -> true), 1, 1)
-                ),
-                Set.of(new NearestFeedingPlayerSensor(8, 0), new NearestPlayerSensor(8, 0, 20)),
-                Set.of(new HoppingController(5), new LookController(true, true), new FluctuateController()),
-                new SimpleFlatAStarRouteFinder(new WalkingPosEvaluator(), this),
-                this
-        );
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.268f;
-        }
-        return 0.402f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.268f;
-        }
-        return 0.402f;
-    }
-
-    @Override
-    public String getOriginalName() {
-        return "Rabbit";
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(((this.isOnFire()) ? Item.COOKED_RABBIT : Item.RAW_RABBIT)), Item.get(Item.RABBIT_HIDE), Item.get(Item.RABBIT_FOOT)};
-    }
-
-    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
     @Override
-    protected void initEntity() {
+    public float getWidth() {
+        return this.isBaby() ? 0.268f : 0.402f;
+    }
+
+    @Override
+    public float getLength() {
+        return this.isBaby() ? 0.268f : 0.402f;
+    }
+
+    @Override
+    public float getHeight() {
+        return this.isBaby() ? 0.268f : 0.402f;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.2;
+    }
+
+    @Override
+    public void initEntity() {
         this.setMaxHealth(3);
         super.initEntity();
         this.setScale(0.65f);
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player player) {
+            if (player.closed) {
+                return false;
+            }
+            int id = Objects.requireNonNullElse(player.getInventory(), EMPTY_INVENTORY).getItemInHandFast().getId();
+            return player.spawned && player.isAlive() && (id == Item.DANDELION || id == Item.CARROT || id == Item.GOLDEN_CARROT) && distance <= 49;
+        }
+        return super.targetOption(creature, distance);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
+
+        if (!this.isBaby()) {
+            drops.add(Item.get(Item.RABBIT_HIDE, 0, Utils.rand(0, 1)));
+            drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, Utils.rand(0, 1)));
+            drops.add(Item.get(Item.RABBIT_FOOT, 0, Utils.rand(0, 101) <= 9 ? 1 : 0));
+        }
+
+        return drops.toArray(Item.EMPTY_ARRAY);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (item.getId() == Item.DANDELION || item.getId() == Item.CARROT || item.getId() == Item.GOLDEN_CARROT) {
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0), item));
+            this.setInLove();
+            return true;
+        }
+        return super.onInteract(player, item, clickedPos);
     }
 }

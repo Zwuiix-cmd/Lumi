@@ -1,17 +1,17 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-
-
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
-import cn.nukkit.entity.EntityWalkable;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-/**
- * @author Box.
- */
-public class EntityEndermite extends EntityMob implements EntityWalkable, EntityArthropod {
+import java.util.HashMap;
+
+public class EntityEndermite extends EntityWalkingMob implements EntityArthropod {
 
     public static final int NETWORK_ID = 55;
 
@@ -25,12 +25,6 @@ public class EntityEndermite extends EntityMob implements EntityWalkable, Entity
     }
 
     @Override
-    protected void initEntity() {
-        this.setMaxHealth(8);
-        super.initEntity();
-    }
-
-    @Override
     public float getWidth() {
         return 0.4f;
     }
@@ -40,16 +34,42 @@ public class EntityEndermite extends EntityMob implements EntityWalkable, Entity
         return 0.3f;
     }
 
-    
-    
     @Override
-    public String getOriginalName() {
-        return "Endermite";
+    public double getSpeed() {
+        return 1.1;
     }
 
-    
     @Override
-    public boolean isPreventingSleep(Player player) {
-        return true;
+    public void initEntity() {
+        this.setMaxHealth(8);
+
+        super.initEntity();
+
+        this.setDamage(new int[] { 0, 2, 2, 3 });
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+        }
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 3;
     }
 }

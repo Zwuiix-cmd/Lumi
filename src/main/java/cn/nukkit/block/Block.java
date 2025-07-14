@@ -388,18 +388,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     }
 
-
-    /**
-     * 当玩家使用与左键或者右键方块时会触发，常被用于处理例如物品展示框左键掉落物品这种逻辑<br>
-     * 触发点在{@link Player}的onBlockBreakStart中
-     * <p>
-     * It will be triggered when the player uses the left or right click on the block, which is often used to deal with logic such as left button dropping items in the item frame<br>
-     * The trigger point is in the onBlockBreakStart of {@link Player}
-     *
-     * @param player the player
-     * @param action the action
-     * @return 状态值，返回值不为0代表这是一个touch操作而不是一个挖掘方块的操作<br>Status value, if the return value is not 0, it means that this is a touch operation rather than a mining block operation
-     */
     public int onTouch(@NotNull Vector3 vector, @NotNull Item item, @NotNull BlockFace face, float fx, float fy, float fz, @Nullable Player player, PlayerInteractEvent.Action action) {
         this.onUpdate(Level.BLOCK_UPDATE_TOUCH);
         return 0;
@@ -446,17 +434,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public double getFrictionFactor() {
         return 0.6;
-    }
-
-    public static final double DEFAULT_AIR_FLUID_FRICTION = 0.95;
-
-    public double getPassableBlockFrictionFactor() {
-        if (!this.canPassThrough()) return 1;
-        return DEFAULT_AIR_FLUID_FRICTION;
-    }
-
-    public int getWalkThroughExtraCost() {
-        return 0;
     }
 
     public int getLightLevel() {
@@ -886,37 +863,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean canBeBrokenWith(Item item) {
         return this.getHardness() != -1;
-    }
-
-    public Block getTickCachedSide(BlockFace face) {
-        return getTickCachedSideAtLayer(layer, face);
-    }
-
-    public Block getTickCachedSide(BlockFace face, int step) {
-        return getTickCachedSideAtLayer(layer, face, step);
-    }
-
-    public Block getTickCachedSideAtLayer(int layer, BlockFace face) {
-        if (this.isValid()) {
-            return this.getLevel().getTickCachedBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
-        }
-        return this.getTickCachedSide(face, 1);
-    }
-
-    public Block getTickCachedSideAtLayer(int layer, BlockFace face, int step) {
-        if (this.isValid()) {
-            if (step == 1) {
-                return this.getLevel().getTickCachedBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
-            } else {
-                return this.getLevel().getTickCachedBlock((int) x + face.getXOffset() * step, (int) y + face.getYOffset() * step, (int) z + face.getZOffset() * step, layer);
-            }
-        }
-        Block block = Block.get(Item.AIR, 0);
-        block.x = (int) x + face.getXOffset() * step;
-        block.y = (int) y + face.getYOffset() * step;
-        block.z = (int) z + face.getZOffset() * step;
-        block.layer = layer;
-        return block;
     }
 
     @Override
