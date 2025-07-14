@@ -180,20 +180,33 @@ public class Level implements ChunkManager, Metadatable {
         xrayableBlocks[Block.DEEPSLATE_EMERALD_ORE] = true;
         xrayableBlocks[Block.DEEPSLATE_COPPER_ORE] = true;
 
-        randomTickBlocks[BlockID.CAVE_VINES] = true;
-        randomTickBlocks[BlockID.CAVE_VINES_BODY_WITH_BERRIES] = true;
-        randomTickBlocks[BlockID.CAVE_VINES_HEAD_WITH_BERRIES] = true;
-        randomTickBlocks[BlockID.AZALEA_LEAVES] = true;
-        randomTickBlocks[BlockID.AZALEA_LEAVES_FLOWERED] = true;
+        randomTickBlocks[Block.CAVE_VINES] = true;
+        randomTickBlocks[Block.CAVE_VINES_BODY_WITH_BERRIES] = true;
+        randomTickBlocks[Block.CAVE_VINES_HEAD_WITH_BERRIES] = true;
+        randomTickBlocks[Block.AZALEA_LEAVES] = true;
+        randomTickBlocks[Block.AZALEA_LEAVES_FLOWERED] = true;
         randomTickBlocks[Block.COPPER_BLOCK] = true;
-        randomTickBlocks[Block.CUT_COPPER] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
-        randomTickBlocks[Block.EXPOSED_CUT_COPPER] = true;
         randomTickBlocks[Block.WEATHERED_COPPER] = true;
-        randomTickBlocks[Block.WEATHERED_CUT_COPPER] = true;
         randomTickBlocks[Block.OXIDIZED_COPPER] = true;
+        randomTickBlocks[Block.CUT_COPPER] = true;
+        randomTickBlocks[Block.EXPOSED_CUT_COPPER] = true;
+        randomTickBlocks[Block.WEATHERED_CUT_COPPER] = true;
         randomTickBlocks[Block.OXIDIZED_CUT_COPPER] = true;
-        randomTickBlocks[BlockID.BUDDING_AMETHYST] = true;
+        randomTickBlocks[Block.CUT_COPPER_STAIRS] = true;
+        randomTickBlocks[Block.EXPOSED_CUT_COPPER_STAIRS] = true;
+        randomTickBlocks[Block.WEATHERED_CUT_COPPER_STAIRS] = true;
+        randomTickBlocks[Block.OXIDIZED_CUT_COPPER_STAIRS] = true;
+        randomTickBlocks[Block.CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.EXPOSED_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.WEATHERED_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.OXIDIZED_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.DOUBLE_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.EXPOSED_DOUBLE_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.WEATHERED_DOUBLE_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.OXIDIZED_DOUBLE_CUT_COPPER_SLAB] = true;
+        
+        randomTickBlocks[Block.BUDDING_AMETHYST] = true;
     }
 
     @NonComputationAtomic
