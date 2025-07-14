@@ -2,10 +2,6 @@ package cn.nukkit.item;
 
 import cn.nukkit.network.protocol.ProtocolInfo;
 
-/**
- * @author MagicDroidX
- * Nukkit Project
- */
 public class ItemWindCharge extends StringItemProjectileBase {
 
     public ItemWindCharge() {
@@ -15,11 +11,6 @@ public class ItemWindCharge extends StringItemProjectileBase {
     @Override
     public boolean isSupportedOn(int protocolId) {
         return protocolId >= ProtocolInfo.v1_21_0;
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return 16;
     }
 
     @Override

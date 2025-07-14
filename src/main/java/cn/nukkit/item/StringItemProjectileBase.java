@@ -29,16 +29,6 @@ public abstract class StringItemProjectileBase extends ProjectileItem implements
     }
 
     @Override
-    public final int getId() {
-        return StringItem.super.getId();
-    }
-
-    @Override
-    public StringItemProjectileBase clone() {
-        return (StringItemProjectileBase) super.clone();
-    }
-
-    @Override
     public boolean isSupportedOn(int protocolId) {
         return protocolId >= ProtocolInfo.v1_16_100;
     }
