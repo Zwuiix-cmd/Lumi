@@ -5,7 +5,7 @@ import cn.nukkit.event.block.DoorToggleEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.sound.DoorSound;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
@@ -74,7 +74,7 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
         if (i == 2 || i == 0) {
             return new SimpleAxisAlignedBB(x, y, z + 0.375, x + 1, y + 1.5, z + 0.625);
         } else {
-            return new SimpleAxisAlignedBB( x + 0.375, y, z, x + 0.625, y + 1.5, z + 1);
+            return new SimpleAxisAlignedBB(x + 0.375, y, z, x + 0.625, y + 1.5, z + 1);
         }
     }
 
@@ -97,8 +97,7 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
         }
 
         this.getLevel().setBlock(this, this, true);
-        this.getLevel().addSound(new DoorSound(this));
-
+        this.playOpenCloseSound();
         return true;
     }
 
@@ -153,9 +152,25 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
         }
 
         this.setDamage(direction | ((~this.getDamage()) & OPEN_BIT));
-        this.level.addSound(new DoorSound(this));
         this.level.setBlock(this, this, false, false);
+        this.playOpenCloseSound();
         return true;
+    }
+
+    public void playOpenCloseSound() {
+        if (this.isOpen()) {
+            this.playOpenSound();
+        } else {
+            this.playCloseSound();
+        }
+    }
+
+    public void playOpenSound() {
+        level.addSound(this, Sound.RANDOM_DOOR_OPEN);
+    }
+
+    public void playCloseSound() {
+        level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
     }
 
     public boolean isOpen() {
@@ -165,7 +180,8 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            if ((!isOpen() && this.level.isBlockPowered(this.getLocation())) || (isOpen() && !this.level.isBlockPowered(this.getLocation()))) {
+            boolean powered = this.level.isBlockPowered(this.getLocation());
+            if ((!isOpen() && powered) || (isOpen() && !powered)) {
                 this.toggle(null);
                 return type;
             }
@@ -173,7 +189,7 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
 
         return 0;
     }
-    
+
     @Override
     public Item toItem() {
         return Item.get(Item.FENCE_GATE, 0, 1);

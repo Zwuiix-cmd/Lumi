@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockTrapdoorCherry extends BlockTrapdoor {
@@ -24,5 +25,15 @@ public class BlockTrapdoorCherry extends BlockTrapdoor {
     @Override
     public BlockColor getColor() {
         return BlockColor.CHERRY_BLOCK_COLOR;
+    }
+
+    @Override
+    public void playOpenSound() {
+        level.addSound(this, Sound.OPEN_CHERRY_WOOD_TRAPDOOR);
+    }
+
+    @Override
+    public void playCloseSound() {
+        level.addSound(this, Sound.CLOSE_CHERRY_WOOD_TRAPDOOR);
     }
 }

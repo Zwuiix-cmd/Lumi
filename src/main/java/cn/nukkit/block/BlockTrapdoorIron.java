@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockTrapdoorIron extends BlockTrapdoor {
@@ -57,5 +58,15 @@ public class BlockTrapdoorIron extends BlockTrapdoor {
     @Override
     public BlockColor getColor() {
         return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public void playOpenSound() {
+        level.addSound(this, Sound.OPEN_IRON_TRAPDOOR);
+    }
+
+    @Override
+    public void playCloseSound() {
+        level.addSound(this, Sound.CLOSE_IRON_TRAPDOOR);
     }
 }

@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
@@ -56,16 +57,15 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_REDSTONE && (
-                !this.isOpen() && level.isBlockPowered(this) || this.isOpen() && !level.isBlockPowered(this)
-        )) {
-            level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, this.isOpen() ? 15 : 0, this.isOpen() ? 0 : 15));
-            this.setDamage(this.getDamage() ^ TRAPDOOR_OPEN_BIT);
-            level.setBlock(this, this, true);
-            level.addLevelEvent(this.add(0.5, 0.5, 0.5), LevelEventPacket.EVENT_SOUND_DOOR);
-            return type;
-        }
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            boolean powered = level.isBlockPowered(this);
+            if (!this.isOpen() && powered || this.isOpen() && !powered) {
+                this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, this.isOpen() ? 15 : 0, this.isOpen() ? 0 : 15));
 
+                this.toggle(null);
+                return type;
+            }
+        }
         return 0;
     }
 
@@ -166,11 +166,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (this.toggle(player)) {
-            level.addLevelEvent(this.add(0.5, 0.5, 0.5), LevelEventPacket.EVENT_SOUND_DOOR);
-            return true;
-        }
-        return false;
+        return this.toggle(player);
     }
 
     public boolean toggle(Player player) {
@@ -181,7 +177,24 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         }
         this.setDamage(this.getDamage() ^ TRAPDOOR_OPEN_BIT);
         this.getLevel().setBlock(this, this, true);
+        this.playOpenCloseSound();
         return true;
+    }
+
+    public void playOpenCloseSound() {
+        if (this.isOpen()) {
+            this.playOpenSound();
+        } else {
+            this.playCloseSound();
+        }
+    }
+
+    public void playOpenSound() {
+        this.level.addSound(this, Sound.RANDOM_DOOR_OPEN);
+    }
+
+    public void playCloseSound() {
+        this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
     }
 
     public boolean isOpen() {
