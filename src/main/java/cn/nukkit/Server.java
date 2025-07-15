@@ -697,7 +697,7 @@ public class Server {
             }
         }
 
-        log.info("\u00A7b-- \u00A7cNukkit \u00A7dMOT \u00A7b--");
+        log.info("\u00A7b-- \u00A7dLumi \u00A7b--");
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -1698,8 +1698,8 @@ public class Server {
     }
 
     public String getSubMotd() {
-        String sub = this.getPropertyString("sub-motd", "Powered by Nukkit");
-        if (sub.isEmpty()) sub = "Powered by Nukkit";
+        String sub = this.getPropertyString("sub-motd", "Powered by Lumi");
+        if (sub.isEmpty()) sub = "Powered by Lumi";
         return sub;
     }
 
@@ -3182,7 +3182,7 @@ public class Server {
     private static class ServerProperties extends ConfigSection {
         {
             put("motd", "Minecraft Server");
-            put("sub-motd", "Powered by Nukkit-MOT");
+            put("sub-motd", "Powered by Lumi");
             put("server-port", 19132);
             put("server-ip", "0.0.0.0");
             put("view-distance", 8);
