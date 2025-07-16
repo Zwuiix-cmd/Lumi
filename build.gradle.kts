@@ -147,7 +147,10 @@ publishing {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
-            from(components["java"])
+
+            artifact(tasks.named("shadowJar").get()) {
+                classifier = null
+            }
         }
     }
     repositories {
