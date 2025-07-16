@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     java
     application
+    `maven-publish`
     id("com.gradleup.shadow") version "8.3.6"
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
 }
@@ -137,6 +138,27 @@ tasks {
     jar {
         enabled = false
         dependsOn(shadowJar)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            name = "luminiadev"
+            url = uri("https://repo.luminiadev.com/snapshots")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
     }
 }
 
