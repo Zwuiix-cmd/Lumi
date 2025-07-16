@@ -96,6 +96,11 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isDayBurning() {
+        return true;
+    }
+
+    @Override
     public void attackEntity(Entity target) {
         if (this.attackDelay > 23 && target.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
@@ -125,17 +130,7 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
             return true;
         }
 
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (!this.closed && level.shouldMobBurn(this)) {
-            if (this.armor[0] == null) {
-                this.setOnFire(100);
-            } else if (this.armor[0].getId() == 0) {
-                this.setOnFire(100);
-            }
-        }
-
-        return hasUpdate;
+        return super.entityBaseTick(tickDiff);
     }
 
     @Override

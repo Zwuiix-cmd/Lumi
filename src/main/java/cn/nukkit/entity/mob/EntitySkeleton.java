@@ -133,6 +133,11 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isDayBurning() {
+        return true;
+    }
+
+    @Override
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate;
 
@@ -141,13 +146,7 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
             return true;
         }
 
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (!this.closed && level.shouldMobBurn(this)) {
-            this.setOnFire(100);
-        }
-
-        return hasUpdate;
+        return super.entityBaseTick(tickDiff);
     }
 
     @Override

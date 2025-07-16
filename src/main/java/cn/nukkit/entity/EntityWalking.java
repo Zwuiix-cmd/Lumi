@@ -65,19 +65,60 @@ public abstract class EntityWalking extends BaseEntity {
             }
             x = Utils.rand(10, 30);
             z = Utils.rand(10, 30);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20.0, 20.0) / 10, Utils.rand() ? z : -z);
+
+            final int fX = Utils.rand() ? x : -x;
+            final double fY = Utils.rand(-20.0, 20.0) / 10;
+            final int fZ = Utils.rand() ? z : -z;
+
+            if(trySetTarget(fX, fZ)) {
+                this.target = this.add(fX, fY, fZ);
+            }
         } else if (Utils.rand(1, 100) == 1) {
             x = Utils.rand(10, 30);
             z = Utils.rand(10, 30);
-            this.stayTime = Utils.rand(100, 200);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20.0, 20.0) / 10, Utils.rand() ? z : -z);
+
+            final int fX = Utils.rand() ? x : -x;
+            final double fY = Utils.rand(-20.0, 20.0) / 10;
+            final int fZ = Utils.rand() ? z : -z;
+
+            if(trySetTarget(fX, fZ)) {
+                this.stayTime = Utils.rand(100, 200);
+                this.target = this.add(fX, fY, fZ);
+            }
         } else if (this.moveTime <= 0 || this.target == null) {
             x = Utils.rand(20, 100);
             z = Utils.rand(20, 100);
-            this.stayTime = 0;
-            this.moveTime = Utils.rand(100, 200);
-            this.target = this.add(Utils.rand() ? x : -x, 0, Utils.rand() ? z : -z);
+
+            final int fX = Utils.rand() ? x : -x;
+            final int fZ = Utils.rand() ? z : -z;
+
+            if(trySetTarget(fX, fZ)) {
+                this.stayTime = 0;
+                this.moveTime = Utils.rand(100, 200);
+                this.target = this.add(fX, 0, fZ);
+            }
         }
+    }
+
+    protected boolean trySetTarget(int x, int z) {
+        for(int i = (int) this.y - 10;i <= this.y;i++) {
+            Block block = level.getBlock(x, i, z);
+
+            if(block.isSolid()) {
+                return true;
+            }
+
+            if(this.isDayBurning()) {
+                if(block.isLiquid()) {
+                    return level.isDaytime();
+                }
+
+            } else if(block.isLiquid()) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     protected boolean checkJump(double dx, double dz) {
