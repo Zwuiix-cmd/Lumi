@@ -185,6 +185,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.CAVE_VINES_HEAD_WITH_BERRIES] = true;
         randomTickBlocks[Block.AZALEA_LEAVES] = true;
         randomTickBlocks[Block.AZALEA_LEAVES_FLOWERED] = true;
+
         randomTickBlocks[Block.COPPER_BLOCK] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
         randomTickBlocks[Block.WEATHERED_COPPER] = true;
@@ -205,6 +206,10 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.EXPOSED_DOUBLE_CUT_COPPER_SLAB] = true;
         randomTickBlocks[Block.WEATHERED_DOUBLE_CUT_COPPER_SLAB] = true;
         randomTickBlocks[Block.OXIDIZED_DOUBLE_CUT_COPPER_SLAB] = true;
+        randomTickBlocks[Block.COPPER_BULB] = true;
+        randomTickBlocks[Block.EXPOSED_COPPER_BULB] = true;
+        randomTickBlocks[Block.WEATHERED_COPPER_BULB] = true;
+        randomTickBlocks[Block.OXIDIZED_COPPER_BULB] = true;
         
         randomTickBlocks[Block.BUDDING_AMETHYST] = true;
     }
