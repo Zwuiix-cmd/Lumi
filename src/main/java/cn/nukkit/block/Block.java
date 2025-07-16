@@ -393,6 +393,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return 0;
     }
 
+    public void onPlayerRightClick(@NotNull Player player, Item item, BlockFace face, Vector3 clickPoint) {
+    }
+
     public boolean onActivate(Item item) {
         return this.onActivate(item, null);
     }

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Nukkit Project Team
  */
-public class BlockSignPost extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntitySign> {
+public class BlockSignPost extends BlockSignBase implements Faceable, BlockEntityHolder<BlockEntitySign> {
 
     public BlockSignPost() {
         this(0);
@@ -118,15 +118,7 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable, Blo
             }
 
             BlockEntity blockEntity = BlockEntity.createBlockEntity(BlockEntity.SIGN, this.level.getChunk(block.getChunkX(), block.getChunkZ()), nbt);
-            if (player != null && blockEntity instanceof BlockEntitySign blockEntitySign) {
-                blockEntitySign.setEditorEntityRuntimeId(player.getId());
-                if (player.protocol >= ProtocolInfo.v1_19_80) {
-                    OpenSignPacket openSignPacket = new OpenSignPacket();
-                    openSignPacket.setPosition(this.asBlockVector3());
-                    openSignPacket.setFrontSide(true);
-                    player.dataPacket(openSignPacket);
-                }
-            }
+            player.openSignEditor(blockEntity, true);
             return true;
         }
 
@@ -164,81 +156,5 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable, Blo
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromIndex(this.getDamage() & 0x07);
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE) {
-            BlockEntity blockEntity = this.level.getBlockEntity(this);
-            if (!(blockEntity instanceof BlockEntitySign)) {
-                return false;
-            }
-            BlockEntitySign sign = (BlockEntitySign) blockEntity;
-
-            int meta = item.getDamage();
-            if (meta == ItemDye.INK_SAC || meta == ItemDye.GLOW_INK_SAC) {
-                boolean glow = meta == ItemDye.GLOW_INK_SAC;
-                if (sign.isGlowing() == glow) {
-                    if (player != null) {
-                        sign.spawnTo(player);
-                    }
-                    return false;
-                }
-
-                SignGlowEvent event = new SignGlowEvent(this, player, glow);
-                this.level.getServer().getPluginManager().callEvent(event);
-                if (event.isCancelled()) {
-                    if (player != null) {
-                        sign.spawnTo(player);
-                    }
-                    return false;
-                }
-
-                sign.setGlowing(glow);
-                sign.spawnToAll();
-
-                this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_INK_SACE_USED);
-
-                if (player != null && (player.getGamemode() & 0x01) == 0) {
-                    item.count--;
-                }
-
-                return true;
-            }
-
-            BlockColor color = DyeColor.getByDyeData(meta).getSignColor();
-            if (color.equals(sign.getColor())) {
-                if (player != null) {
-                    sign.spawnTo(player);
-                }
-                return false;
-            }
-
-            SignColorChangeEvent event = new SignColorChangeEvent(this, player, color);
-            this.level.getServer().getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                if (player != null) {
-                    sign.spawnTo(player);
-                }
-                return false;
-            }
-
-            sign.setColor(color);
-            sign.spawnToAll();
-
-            this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_DYE_USED);
-
-            if (player != null && (player.getGamemode() & 0x01) == 0) {
-                item.count--;
-            }
-
-            return true;
-        }
-        return false;
     }
 }

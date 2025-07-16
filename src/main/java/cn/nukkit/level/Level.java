@@ -2653,7 +2653,9 @@ public class Level implements ChunkManager, Metadatable {
 
             if (!ev.isCancelled()) {
                 target.onTouch(vector, item, face, fx, fy, fz, player, ev.getAction());
-
+                if (ev.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    target.onPlayerRightClick(player, item, face, new Vector3(fx, fy, fz));
+                }
                 if ((!player.isSneaking() || player.getInventory().getItemInHand().isNull()) && target.canBeActivated() && target.onActivate(item, player)) {
                     if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
                         this.addSoundToViewers(target, cn.nukkit.level.Sound.RANDOM_BREAK);
