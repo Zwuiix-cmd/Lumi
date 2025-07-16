@@ -8,7 +8,7 @@ plugins {
     id("com.gorylenko.gradle-git-properties") version "2.4.2"
 }
 
-group = "ru.koshakmine"
+group = "com.koshakmine"
 version = "1.0.0"
 application.mainClass.set("cn.nukkit.Nukkit")
 
