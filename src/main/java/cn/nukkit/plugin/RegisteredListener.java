@@ -13,6 +13,7 @@ import cn.nukkit.utils.EventException;
 public class RegisteredListener {
 
     private final Listener listener;
+    private final NonReflectionEventConsumer<?> consumer;
 
     private final EventPriority priority;
 
@@ -22,8 +23,9 @@ public class RegisteredListener {
 
     private final boolean ignoreCancelled;
 
-    public RegisteredListener(Listener listener, EventExecutor executor, EventPriority priority, Plugin plugin, boolean ignoreCancelled) {
+    public RegisteredListener(Listener listener, NonReflectionEventConsumer<?> consumer, EventExecutor executor, EventPriority priority, Plugin plugin, boolean ignoreCancelled) {
         this.listener = listener;
+        this.consumer = consumer;
         this.priority = priority;
         this.plugin = plugin;
         this.executor = executor;
@@ -32,6 +34,10 @@ public class RegisteredListener {
 
     public Listener getListener() {
         return listener;
+    }
+
+    public NonReflectionEventConsumer<?> getConsumer() {
+        return consumer;
     }
 
     public Plugin getPlugin() {

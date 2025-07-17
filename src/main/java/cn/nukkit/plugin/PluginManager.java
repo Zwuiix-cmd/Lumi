@@ -533,7 +533,12 @@ public class PluginManager {
                 try {
                     registration.callEvent(event);
                 } catch (Exception e) {
-                    log.error(this.server.getLanguage().translateString("nukkit.plugin.eventError", event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()), e);
+                    log.error(this.server.getLanguage().translateString("nukkit.plugin.eventError", event.getEventName(),
+                            registration.getPlugin().getDescription().getFullName(),
+                            e.getMessage(),
+                            registration.getListener() != null ?
+                                    registration.getListener().getClass().getName() :
+                                    registration.getConsumer().getClass().getName()), e);
                 }
             }
         } catch (IllegalAccessException e) {
@@ -563,6 +568,7 @@ public class PluginManager {
 
         RegisteredListener rl = new RegisteredListener(
                 null,  //null for non reflection registration
+                consumer,
                 executor,
                 priority,
                 plugin,
@@ -571,8 +577,8 @@ public class PluginManager {
         try {
             getEventListeners(eventClass).register(rl);
         } catch (IllegalAccessException e) {
-            log.error("An error occurred while registering the event listener event:{}, listener:{} for plugin:{} version:{}",
-                    eventClass, null, plugin.getDescription().getName(), plugin.getDescription().getVersion(), e);
+            log.error("An error occurred while registering the event listener event: {}, consumer: {} for plugin: {} version: {}",
+                    eventClass, consumer, plugin.getDescription().getName(), plugin.getDescription().getVersion(), e);
         }
     }
 
@@ -631,7 +637,7 @@ public class PluginManager {
         }
 
         try {
-            this.getEventListeners(event).register(new RegisteredListener(listener, executor, priority, plugin, ignoreCancelled));
+            this.getEventListeners(event).register(new RegisteredListener(listener, null, executor, priority, plugin, ignoreCancelled));
         } catch (IllegalAccessException e) {
             log.error("An error occurred while registering the event listener event:{}, listener:{} for plugin:{} version:{}",
                     event, listener, plugin.getDescription().getName(), plugin.getDescription().getVersion(), e);
