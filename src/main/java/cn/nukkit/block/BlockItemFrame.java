@@ -27,12 +27,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockItemFrame extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntityItemFrame> {
 
-    protected final static int[] FACING = new int[]{4, 5, 3, 2, 1, 0}; // TODO when 1.13 support arrives, add UP/DOWN facings
-
-    //TODO fix runtime_block_states
-    private final static int FACING_BITMASK = 0x3; //11
-    private final static int HAS_MAP_BIT = 0x4; //100
-    //private final static int HAS_PHOTO_BIT = 0x10; //10000
+    private static final int FACING_MASK = 0b0000_0000_0000_0111;
+    private static final int MAP_BIT_MASK = 0b0000_0000_0000_1000;
+    private static final int PHOTO_BIT_MASK = 0b0000_0000_0001_0000;
 
     public BlockItemFrame() {
         this(0);
@@ -67,7 +64,7 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable, Bl
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!this.getSide(getFacing()).isSolid()) {
+            if (!this.getSide(getFacing().getOpposite()).isSolid()) {
                 this.level.useBreakOn(this, null, null, true);
                 return type;
             }
@@ -148,7 +145,7 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable, Bl
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (face.getIndex() > 1 && target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
+        if (target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
             this.setBlockFace(face);
             this.getLevel().setBlock(block, this, true, true);
             CompoundTag nbt = new CompoundTag()
@@ -219,28 +216,34 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable, Bl
     }
 
     public BlockFace getFacing() {
-        return switch (this.getDamage() & FACING_BITMASK) {
-            case 0 -> BlockFace.WEST;
-            case 1 -> BlockFace.EAST;
-            case 2 -> BlockFace.NORTH;
-            case 3 -> BlockFace.SOUTH;
-            default -> null;
-        };
+        return BlockFace.fromIndex(getProperty(FACING_MASK));
     }
 
     @Override
     public void setBlockFace(@NotNull BlockFace face) {
-        if (face.getIndex() > 1) {
-            this.setDamage(FACING[face.getIndex()]);
-        }
+        this.setProperty(FACING_MASK, face.getIndex());
     }
 
     public boolean isStoringMap() {
-        return (this.getDamage() & HAS_MAP_BIT) != 0;
+        return (getProperty(MAP_BIT_MASK)) != 0;
     }
 
     public void setStoringMap(boolean map) {
-        this.setDamage((this.getDamage() & FACING_BITMASK) | (map ? HAS_MAP_BIT : 0x0));
+        setProperty(MAP_BIT_MASK, map ? 0 : 1);
+    }
+
+    public void setProperty(int mask, int value) {
+        int data = getDamage();
+        int shift = Integer.numberOfTrailingZeros(mask);
+        int maxValue = (mask >>> shift);
+        int clampedValue = value & maxValue;
+        setDamage((data & ~mask) | (clampedValue << shift));
+    }
+
+    public int getProperty(int mask) {
+        int data = getDamage();
+        int shift = Integer.numberOfTrailingZeros(mask);
+        return (data & mask) >>> shift;
     }
 
     @Override

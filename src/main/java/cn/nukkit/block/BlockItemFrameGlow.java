@@ -51,7 +51,7 @@ public class BlockItemFrameGlow extends BlockItemFrame {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
-            this.setDamage(FACING[face.getIndex()]);
+            this.setBlockFace(face);
 
             this.getLevel().setBlock(this, this, true, true);
 
