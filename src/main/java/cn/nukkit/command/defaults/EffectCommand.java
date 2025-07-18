@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Snake1999 and Pub4Game
  * @since 2016/1/23
  */
-public class EffectCommand extends Command {
+public class EffectCommand extends VanillaCommand {
     public EffectCommand(String name) {
         super(name, "commands.effect.description", "nukkit.command.effect.usage");
         this.setPermission("nukkit.command.effect");
