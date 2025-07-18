@@ -2,10 +2,7 @@ package cn.nukkit;
 
 import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityCampfire;
-import cn.nukkit.blockentity.BlockEntityItemFrame;
-import cn.nukkit.blockentity.BlockEntitySpawnable;
+import cn.nukkit.blockentity.*;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
@@ -387,6 +384,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * 用于修复1.20.0连续执行despawnFromAll和spawnToAll导致玩家移动不显示问题
      */
     private boolean needSpawnToAll;
+
+    private Boolean openSignFront = null;
 
     /**
      * Packets that can be received before the player has logged verified
@@ -7668,5 +7667,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public boolean isLockMovementInput() {
         return this.lockMovementInput;
+    }
+
+    public Boolean isOpenSignFront() {
+        return openSignFront;
+    }
+
+    public void setOpenSignFront(Boolean frontSide) {
+        openSignFront = frontSide;
+    }
+
+    public void openSignEditor(Vector3 position, boolean frontSide) {
+        if (openSignFront == null) {
+            BlockEntity blockEntity = this.getLevel().getBlockEntity(position);
+            if (blockEntity instanceof BlockEntitySign blockEntitySign) {
+                //if (blockEntitySign.getEditorEntityRuntimeId() == -1) {
+                    blockEntitySign.setEditorEntityRuntimeId(this.getId());
+                    OpenSignPacket openSignPacket = new OpenSignPacket();
+                    openSignPacket.setPosition(position.asBlockVector3());
+                    openSignPacket.setFrontSide(frontSide);
+                    this.dataPacket(openSignPacket);
+                    setOpenSignFront(frontSide);
+                //}
+            } else {
+                throw new IllegalArgumentException("Block at this position is not a sign");
+            }
+        }
     }
 }

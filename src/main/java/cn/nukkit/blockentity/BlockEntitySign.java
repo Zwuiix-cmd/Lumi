@@ -7,9 +7,11 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.StringUtils;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author MagicDroidX
@@ -37,9 +39,9 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     private static void sanitizeText(String[] lines) {
         for (int i = 0; i < lines.length; i++) {
-            // Don't allow excessive text per line
+            // Don't allow excessive text per line.
             if (lines[i] != null) {
-                lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
+                lines[i] = lines[i].substring(0, Math.min(255, lines[i].length()));
             }
         }
     }
@@ -112,7 +114,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
                 else
                     frontText[i] = "";
             }
-            this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, String.join("\n", frontText));
+            this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, StringUtils.joinNotNull("\n", frontText));
             this.namedTag.remove(TAG_TEXT_BLOB);
         } else {
             int count = 0;
@@ -126,7 +128,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
                 }
             }
             if (count == 4) {
-                this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, String.join("\n", frontText));
+                this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, StringUtils.joinNotNull("\n", frontText));
             }
         }
         if (this.namedTag.contains(TAG_GLOWING_TEXT)) {
@@ -137,6 +139,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
             this.setColor(true, new BlockColor(this.namedTag.getInt(TAG_TEXT_COLOR), true));
             this.namedTag.remove(TAG_TEXT_COLOR);
         }
+        this.namedTag.remove("Creator");
     }
 
     @Override
@@ -163,26 +166,67 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         this.namedTag.putLong(TAG_LOCKED_FOR_EDITING_BY, editorEntityRuntimeId == null ? -1L : editorEntityRuntimeId);
     }
 
-    public boolean setText(String... lines) {
-        for (int i = 0; i < 4; i++) {
-            if (i < lines.length)
-                frontText[i] = lines[i];
-            else
-                frontText[i] = "";
+    public boolean isEmpty() {
+        return isEmpty(true);
+    }
+
+    public boolean isEmpty(boolean front) {
+        if (front) {
+            return (frontText[0] == null || frontText[0].isEmpty()) && frontText[1] == null && frontText[2] == null && frontText[3] == null;
+        } else {
+            return (backText[0] == null || backText[0].isEmpty()) && backText[1] == null && backText[2] == null && backText[3] == null;
         }
+    }
 
-        this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, String.join("\n", frontText));
+    public boolean isWaxed() {
+        return this.namedTag.getByte(TAG_WAXED) == 1;
+    }
+
+    /**
+     * @param waxed If the sign is waxed, once a sign is waxed it cannot be modified
+     */
+    public void setWaxed(boolean waxed) {
+        this.namedTag.putByte(TAG_WAXED, waxed ? (byte) 1 : (byte) 0);
+    }
+
+    /**
+     * 设置lines文本数组到Sign对象，同时更新NBT
+     *
+     * @param front the front
+     * @param lines the lines
+     * @return the text
+     */
+    public boolean setText(boolean front, String... lines) {
+        if (front) {
+            for (int i = 0; i < 4; i++) {
+                if (i < lines.length)
+                    frontText[i] = lines[i];
+                else
+                    frontText[i] = "";
+            }
+            this.namedTag.getCompound(TAG_FRONT_TEXT).putString(TAG_TEXT_BLOB, StringUtils.joinNotNull("\n", lines));
+        } else {
+            for (int i = 0; i < 4; i++) {
+                if (i < lines.length)
+                    backText[i] = lines[i];
+                else
+                    backText[i] = "";
+            }
+            this.namedTag.getCompound(TAG_BACK_TEXT).putString(TAG_TEXT_BLOB, StringUtils.joinNotNull("\n", lines));
+        }
         this.spawnToAll();
-
         if (this.chunk != null) {
             setDirty();
         }
-
         return true;
     }
 
     public String[] getText() {
-        return frontText;
+        return getText(true);
+    }
+
+    public String[] getText(boolean front) {
+        return front ? frontText : backText;
     }
 
     public BlockColor getColor() {
@@ -235,24 +279,20 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {
-        if (!nbt.getString("id").equals(BlockEntity.SIGN)) {
+        if (!nbt.getString("id").equals(BlockEntity.SIGN) && !nbt.getString("id").equals(BlockEntity.HANGING_SIGN)) {
             return false;
         }
+        if (player.isOpenSignFront() == null) return false;
         String[] lines = new String[4];
-        Arrays.fill(lines, "");
-        String[] splitLines;
-        if (player.protocol >= ProtocolInfo.v1_19_80) { //1.19.80 =+ 开始支持双面文本，这里读取正面文本
-            splitLines = nbt.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB).split("\n", 4);
-        } else {
-            splitLines = nbt.getString(TAG_TEXT_BLOB).split("\n", 4);
-        }
+        String[] splitLines = player.isOpenSignFront() ? nbt.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB).split("\n", 4)
+                : nbt.getCompound(TAG_BACK_TEXT).getString(TAG_TEXT_BLOB).split("\n", 4);
         System.arraycopy(splitLines, 0, lines, 0, splitLines.length);
 
         sanitizeText(lines);
 
         SignChangeEvent signChangeEvent = new SignChangeEvent(this.getBlock(), player, lines);
 
-        if (this.getEditorEntityRuntimeId() != player.getId()) {
+        if (!this.namedTag.contains(TAG_LOCKED_FOR_EDITING_BY) || !Objects.equals(player.getId(), this.getEditorEntityRuntimeId())) {
             signChangeEvent.setCancelled();
         }
 
@@ -264,14 +304,34 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
         this.server.getPluginManager().callEvent(signChangeEvent);
 
-        if (!signChangeEvent.isCancelled()) {
-            this.setText(signChangeEvent.getLines());
-            //低版本任何改动都会触发updateCompoundTag，暂时不用把他设置为null
-            //this.setEditorEntityRuntimeId(null);
+        if (!signChangeEvent.isCancelled() && player.isOpenSignFront() != null) {
+            this.setText(player.isOpenSignFront(), signChangeEvent.getLines());
+            this.setEditorEntityRuntimeId(null);
+            player.setOpenSignFront(null);
             return true;
         }
-
+        player.setOpenSignFront(null);
         return false;
+    }
+
+    private void getLines(boolean front) {
+        if (front) {
+            String[] lines = this.namedTag.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB).split("\n", 4);
+            for (int i = 0; i < frontText.length; i++) {
+                if (i < lines.length)
+                    frontText[i] = lines[i];
+                else
+                    frontText[i] = "";
+            }
+        } else {
+            String[] lines = this.namedTag.getCompound(TAG_BACK_TEXT).getString(TAG_TEXT_BLOB).split("\n", 4);
+            for (int i = 0; i < backText.length; i++) {
+                if (i < lines.length)
+                    backText[i] = lines[i];
+                else
+                    backText[i] = "";
+            }
+        }
     }
 
     @Override
@@ -288,25 +348,18 @@ public class BlockEntitySign extends BlockEntitySpawnable {
                 .putByte(TAG_WAXED, 0)
                 .putLong(TAG_LOCKED_FOR_EDITING_BY, getEditorEntityRuntimeId());
 
-        if (protocol >= ProtocolInfo.v1_19_80) {
-            tag.putCompound(new CompoundTag(TAG_FRONT_TEXT)
-                    .putString(TAG_TEXT_BLOB, this.namedTag.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB))
-                    .putInt(TAG_TEXT_COLOR, this.getColor(true).getARGB())
-                    .putBoolean(TAG_GLOWING_TEXT, this.isGlowing(true))
-                    .putBoolean(TAG_PERSIST_FORMATTING, true)
-            ).putCompound(new CompoundTag(TAG_BACK_TEXT)
-                    .putString(TAG_TEXT_BLOB, this.namedTag.getCompound(TAG_BACK_TEXT).getString(TAG_TEXT_BLOB))
-                    .putInt(TAG_TEXT_COLOR, this.getColor(false).getARGB())
-                    .putBoolean(TAG_GLOWING_TEXT, this.isGlowing(false))
-                    .putBoolean(TAG_PERSIST_FORMATTING, true)
-            );
-        } else {
-            tag.putString(TAG_TEXT_BLOB, this.namedTag.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB))
-                    .putInt(TAG_TEXT_COLOR, this.getColor().getARGB())
-                    .putBoolean(TAG_GLOWING_TEXT, this.isGlowing())
-                    .putBoolean(TAG_LEGACY_BUG_RESOLVE, true);
-        }
 
+        tag.putCompound(new CompoundTag(TAG_FRONT_TEXT)
+                .putString(TAG_TEXT_BLOB, this.namedTag.getCompound(TAG_FRONT_TEXT).getString(TAG_TEXT_BLOB))
+                .putInt(TAG_TEXT_COLOR, this.getColor(true).getARGB())
+                .putBoolean(TAG_GLOWING_TEXT, this.isGlowing(true))
+                .putBoolean(TAG_PERSIST_FORMATTING, true)
+        ).putCompound(new CompoundTag(TAG_BACK_TEXT)
+                .putString(TAG_TEXT_BLOB, this.namedTag.getCompound(TAG_BACK_TEXT).getString(TAG_TEXT_BLOB))
+                .putInt(TAG_TEXT_COLOR, this.getColor(false).getARGB())
+                .putBoolean(TAG_GLOWING_TEXT, this.isGlowing(false))
+                .putBoolean(TAG_PERSIST_FORMATTING, true)
+        );
         return tag;
     }
 }

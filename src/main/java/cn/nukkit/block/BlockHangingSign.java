@@ -12,7 +12,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BlockHangingSign extends BlockTransparentMeta implements BlockEntityHolder<BlockEntityHangingSign> {
+public abstract class BlockHangingSign extends BlockSignBase implements BlockEntityHolder<BlockEntityHangingSign> {
     // Corrected bit masks (using 16-bit representation for clarity)
     private static final int ATTACHED_MASK  = 0b0000_0000_0000_0001; // Bit 0 (1 bit)
     private static final int FACING_MASK    = 0b0000_0000_0000_1110; // Bits 1-3 (3 bits)
@@ -51,7 +51,11 @@ public abstract class BlockHangingSign extends BlockTransparentMeta implements B
         Block layer0 = level.getBlock(this, 0);
         Block layer1 = level.getBlock(this, 1);
 
-        CompoundTag nbt = new CompoundTag();
+        CompoundTag nbt = new CompoundTag()
+                .putString("id", BlockEntity.HANGING_SIGN)
+                .putInt("x", (int) block.x)
+                .putInt("y", (int) block.y)
+                .putInt("z", (int) block.z);
 
         if (face == BlockFace.DOWN) {
             this.setPropertyValue(HANGING_MASK, 1);
@@ -77,9 +81,9 @@ public abstract class BlockHangingSign extends BlockTransparentMeta implements B
         }
 
         try {
-            //createBlockEntity(nbt);
+            BlockEntity blockEntity = BlockEntity.createBlockEntity(BlockEntity.HANGING_SIGN, this.level.getChunk(block.getChunkX(), block.getChunkZ()), nbt);
             if (player != null) {
-                //player.openSignEditor(this, true);
+                player.openSignEditor(blockEntity, true);
             }
             return true;
         } catch (Exception e) {
@@ -95,6 +99,28 @@ public abstract class BlockHangingSign extends BlockTransparentMeta implements B
         if (getSide(BlockFace.WEST, 1).canBePlaced()) return BlockFace.WEST;
         if (getSide(BlockFace.EAST, 1).canBePlaced()) return BlockFace.EAST;
         return null;
+    }
+
+    public CompassRoseDirection getSignDirection() {
+        if (isHanging() && isAttached()) {
+            System.out.println("hanging and attached" + CompassRoseDirection.from(getDamage()));
+            return CompassRoseDirection.from(getDamage());
+        } else {
+            System.out.println("a hui tam " + CompassRoseDirection.from(getFacing()));
+            return CompassRoseDirection.from(getFacing());
+        }
+    }
+
+    public int getFacing() {
+        return getPropertyValue(FACING_MASK);
+    }
+
+    public boolean isHanging() {
+        return getPropertyValue(HANGING_MASK) != 0;
+    }
+
+    public boolean isAttached() {
+        return getPropertyValue(ATTACHED_MASK) != 0;
     }
 
     public int getPropertyValue(int mask) {
@@ -163,7 +189,7 @@ public abstract class BlockHangingSign extends BlockTransparentMeta implements B
 
     @Override
     public @NotNull String getBlockEntityType() {
-        return BlockEntity.HANGING_SIGN.toString();
+        return BlockEntity.HANGING_SIGN;
     }
 
     @Override
