@@ -14,7 +14,7 @@ public class EffectSaturation extends InstantEffect {
     @Override
     public void onApply(Entity entity, double tickCount) {
         if (entity instanceof Player player) {
-            player.getFoodData().addFoodLevel(this.getLevel(), 2 * this.getLevel());
+            player.getFoodData().addFood(this.getLevel(), 2 * this.getLevel());
         }
     }
 }

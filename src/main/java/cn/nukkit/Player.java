@@ -350,7 +350,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public EntityFishingHook fishing = null;
     public boolean formOpen;
     public boolean locallyInitialized;
-    private boolean foodEnabled = true;
     private int failedTransactions;
     protected int failedMobEquipmentPacket;
     private int timeSinceRest;
@@ -1180,7 +1179,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             this.setHealth(this.getMaxHealth());
-            this.foodData.setLevel(20, 20);
+            this.foodData.setFood(20, 20);
             this.sendData(this);
         } else {
             this.setPosition(respawnEvent.getRespawnPosition());
@@ -2146,7 +2145,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.riding == null && this.inventory != null) {
-            if (this.isFoodEnabled() && this.getServer().getDifficulty() > 0 && distanceSquared >= 0.05) {
+            if (this.getFoodData().isEnabled() && this.getServer().getDifficulty() > 0 && distanceSquared >= 0.05) {
                 double jump = 0;
                 double swimming = this.isInsideOfWater() ? 0.015 * distanceSquared : 0;
                 double distance2 = distanceSquared;
@@ -2157,15 +2156,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.inAirTicks == 3 && swimming == 0) {
                         jump = 0.2;
                     }
-                    this.getFoodData().updateFoodExpLevel(0.1 * distance2 + jump + swimming);
+                    this.getFoodData().exhaust(0.1 * distance2 + jump + swimming);
                 } else if (this.isSneaking() && this.inAirTicks == 3) {
                     jump = 0.05;
-                    this.getFoodData().updateFoodExpLevel(jump);
+                    this.getFoodData().exhaust(jump);
                 } else {
                     if (this.inAirTicks == 3 && swimming == 0) {
                         jump = 0.05;
                     }
-                    this.getFoodData().updateFoodExpLevel(jump + swimming);
+                    this.getFoodData().exhaust(jump + swimming);
                 }
             }
 
@@ -2291,7 +2290,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.entityId = this.getId();
         pk.entries = new Attribute[]{
                 Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getLevel()).setDefaultValue(this.foodData.getMaxLevel()),
+                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getFood()).setDefaultValue(this.foodData.getMaxFood()),
                 Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()).setDefaultValue(this.getMovementSpeed()),
                 Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.expLevel),
                 Attribute.getAttribute(Attribute.EXPERIENCE).setValue(((float) this.exp) / calculateRequireExperience(this.expLevel))
@@ -2385,10 +2384,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (this.getHealth() < this.getMaxHealth() && this.age % 20 == 0) {
                     this.heal(1);
                 }
-
-                if (this.foodData.getLevel() < 20 && this.age % 10 == 0) {
-                    this.foodData.addFoodLevel(1, 0);
-                }
             }
 
             if (this.isOnFire() && this.lastUpdate % 10 == 0) {
@@ -2444,8 +2439,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
 
-                if (this.foodData != null) {
-                    this.foodData.update(tickDiff);
+                if (this.getFoodData() != null) {
+                    this.getFoodData().tick(tickDiff);
                 }
 
                 //鞘翅检查和耐久计算
@@ -3383,7 +3378,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 if (authPacket.getInputData().contains(AuthInputAction.START_SPRINTING)) {
                     PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
-                    if ((this.foodData.getLevel() <= 6 && !this.getAdventureSettings().get(Type.FLYING)) ||
+                    if ((this.foodData.getFood() <= 6 && !this.getAdventureSettings().get(Type.FLYING)) ||
                             this.riding != null || this.sleeping != null || this.hasEffect(EffectType.BLINDNESS) ||
                             (this.isSneaking() && !authPacket.getInputData().contains(AuthInputAction.STOP_SNEAKING))) {
                         playerToggleSprintEvent.setCancelled(true);
@@ -4603,7 +4598,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                 if (this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7) && (i = this.level.useBreakOn(blockVector.asVector3(), face, i, this, true)) != null) {
                                     if (this.isSurvival() || this.isAdventure()) {
-                                        this.foodData.updateFoodExpLevel(0.005);
+                                        this.foodData.exhaust(0.005);
                                         if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
                                             if (oldItem.getId() == i.getId() || i.getId() == 0) {
                                                 inventory.setItemInHand(i);
@@ -4973,7 +4968,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     ((BlockEntitySpawnable) blockEntity).spawnTo(this);
                 }
             } else if (this.isSurvival()) {
-                this.getFoodData().updateFoodExpLevel(0.005);
+                this.getFoodData().exhaust(0.005);
                 if (handItem.equals(clone) && handItem.getCount() == clone.getCount()) {
                     return;
                 }
@@ -5531,8 +5526,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("EXP", this.exp);
             this.namedTag.putInt("expLevel", this.expLevel);
 
-            this.namedTag.putInt("foodLevel", this.foodData.getLevel());
-            this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
+            this.namedTag.putInt("foodLevel", this.foodData.getFood());
+            this.namedTag.putFloat("foodSaturationLevel", this.foodData.getSaturation());
 
             this.namedTag.putInt("TimeSinceRest", this.timeSinceRest);
 
@@ -5852,7 +5847,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.removeAllEffects(EntityEffectUpdateEvent.Cause.DEATH);
         this.setHealth(this.getMaxHealth());
-        this.foodData.setLevel(20, 20);
+        this.foodData.setFood(20, 20);
 
         this.sendData(this);
 
@@ -6022,8 +6017,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.getLastDamageCause() == source && this.spawned) {
                 if (source instanceof EntityDamageByEntityEvent) {
                     Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-                    if (damager instanceof Player) {
-                        ((Player) damager).foodData.updateFoodExpLevel(0.1);
+                    if (damager instanceof Player player) {
+                        player.foodData.exhaust(0.1);
                     }
                 }
                 EntityEventPacket pk = new EntityEventPacket();
@@ -6791,24 +6786,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     /**
-     * Check whether food is enabled or not
-     *
-     * @return food enabled
-     */
-    public boolean isFoodEnabled() {
-        return !(this.isCreative() || this.isSpectator()) && this.foodEnabled;
-    }
-
-    /**
-     * Enable or disable food
-     *
-     * @param foodEnabled food enabled
-     */
-    public void setFoodEnabled(boolean foodEnabled) {
-        this.foodEnabled = foodEnabled;
-    }
-
-    /**
      * Get player's food data
      *
      * @return food data
@@ -7549,7 +7526,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         if (this.needSendFoodLevel) {
             this.needSendFoodLevel = false;
-            this.foodData.sendFoodLevel();
+            this.foodData.sendFood();
         }
         if (this.needSendInventory && this.spawned) {
             this.needSendInventory = false;
@@ -7573,7 +7550,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return can eat
      */
     public boolean canEat(boolean update) {
-        if (this.foodData.getLevel() < this.foodData.getMaxLevel() || this.isCreative() || this.server.getDifficulty() == 0) {
+        if (this.foodData.isHungry() || this.isCreative() || this.server.getDifficulty() == 0) {
             return true;
         }
         if (update) {

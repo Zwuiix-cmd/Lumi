@@ -169,7 +169,7 @@ public abstract class Food {
     }
 
     protected boolean onEatenBy(Player player) {
-        player.getFoodData().addFoodLevel(this);
+        player.getFoodData().addFood(this);
         return true;
     }
 
