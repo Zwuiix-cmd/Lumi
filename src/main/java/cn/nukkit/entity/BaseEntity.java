@@ -246,7 +246,19 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.inLoveCooldown -= tickDiff;
         }
 
+        if (isDayBurning() && !this.closed && level.shouldMobBurn(this)) {
+            if (this.armor[0] == null) {
+                this.setOnFire(100);
+            } else if (this.armor[0].getId() == 0) {
+                this.setOnFire(100);
+            }
+        }
+
         return hasUpdate;
+    }
+
+    public boolean isDayBurning() {
+        return false;
     }
 
     protected boolean checkSpawnBaby(Entity entity) {

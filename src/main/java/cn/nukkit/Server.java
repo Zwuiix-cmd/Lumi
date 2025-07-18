@@ -3186,8 +3186,8 @@ public class Server {
             put("server-port", 19132);
             put("server-ip", "0.0.0.0");
             put("view-distance", 8);
-            put("achievements", true);
-            put("announce-player-achievements", true);
+            put("achievements", false);
+            put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
             put("drop-spawners", true); //TODO 考虑弃用
