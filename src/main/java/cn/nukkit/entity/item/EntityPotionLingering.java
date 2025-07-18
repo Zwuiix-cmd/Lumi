@@ -11,7 +11,7 @@ import cn.nukkit.nbt.tag.ListTag;
 
 import java.util.List;
 
-public class EntityPotionLingering extends EntityPotion {
+public class EntityPotionLingering extends EntityPotionSplash {
 
     public static final int NETWORK_ID = 101;
 

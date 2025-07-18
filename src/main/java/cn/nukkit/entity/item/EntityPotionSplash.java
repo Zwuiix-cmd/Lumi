@@ -1,7 +1,6 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.entity.mob.EntityBlaze;
@@ -21,17 +20,17 @@ import java.awt.*;
 /**
  * @author xtypr
  */
-public class EntityPotion extends EntityProjectile {
+public class EntityPotionSplash extends EntityProjectile {
 
     public static final int NETWORK_ID = 86;
 
     public int potionId;
 
-    public EntityPotion(FullChunk chunk, CompoundTag nbt) {
+    public EntityPotionSplash(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
-    public EntityPotion(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+    public EntityPotionSplash(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         super(chunk, nbt, shootingEntity);
     }
 

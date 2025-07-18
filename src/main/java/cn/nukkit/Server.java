@@ -2827,7 +2827,7 @@ public class Server {
         Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
         Entity.registerEntity("EnderEye", EntityEnderEye.class);
         Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
-        Entity.registerEntity("ThrownPotion", EntityPotion.class);
+        Entity.registerEntity("ThrownPotion", EntityPotionSplash.class);
         Entity.registerEntity("Egg", EntityEgg.class);
         Entity.registerEntity("SmallFireBall", EntitySmallFireBall.class);
         // 和原版名称不一样，已弃用

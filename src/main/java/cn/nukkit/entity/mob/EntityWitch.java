@@ -6,7 +6,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.effect.PotionType;
-import cn.nukkit.entity.item.EntityPotion;
+import cn.nukkit.entity.item.EntityPotionSplash;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -80,7 +80,7 @@ public class EntityWitch extends EntityWalkingMob {
                     return;
                 }
 
-                EntityPotion thrownPotion = (EntityPotion) Entity.createEntity("ThrownPotion", pos, this);
+                EntityPotionSplash thrownPotion = (EntityPotionSplash) Entity.createEntity("ThrownPotion", pos, this);
 
                 double distance = this.distanceSquared(player);
 

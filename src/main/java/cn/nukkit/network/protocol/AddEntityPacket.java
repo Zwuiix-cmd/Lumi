@@ -106,7 +106,7 @@ public class AddEntityPacket extends DataPacket {
         mapping.put(EntityPainting.NETWORK_ID, "minecraft:painting");
         mapping.put(EntityThrownTrident.NETWORK_ID, "minecraft:thrown_trident");
         mapping.put(EntityGhastFireBall.NETWORK_ID, "minecraft:fireball");
-        mapping.put(EntityPotion.NETWORK_ID, "minecraft:splash_potion");
+        mapping.put(EntityPotionSplash.NETWORK_ID, "minecraft:splash_potion");
         mapping.put(EntityEnderPearl.NETWORK_ID, "minecraft:ender_pearl");
         mapping.put(88, "minecraft:leash_knot");
         mapping.put(EntityWitherSkull.NETWORK_ID, "minecraft:wither_skull");

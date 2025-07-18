@@ -1,10 +1,9 @@
 package cn.nukkit.block;
 
-import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.effect.PotionType;
-import cn.nukkit.entity.item.EntityPotion;
+import cn.nukkit.entity.item.EntityPotionSplash;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.BlockBurnEvent;
 import cn.nukkit.event.block.BlockFadeEvent;
@@ -69,7 +68,7 @@ public class BlockFire extends BlockFlowable {
 
     @Override
     public void onEntityCollide(Entity entity) {
-        if (entity instanceof EntityPotion potion) {
+        if (entity instanceof EntityPotionSplash potion) {
             if (potion.potionId == PotionType.WATER.id()) {
                 BlockFadeEvent event = new BlockFadeEvent(this, Block.get(AIR));
                 this.level.getServer().getPluginManager().callEvent(event);
