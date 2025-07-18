@@ -11,6 +11,7 @@ import cn.nukkit.command.utils.RawText;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.EntityProperty;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.mob.EntityWolf;
@@ -70,8 +71,6 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
@@ -84,7 +83,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.gson.JsonParser;
 import io.netty.util.internal.PlatformDependent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -102,15 +100,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -2415,7 +2408,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 } else {
                     this.lastInAirTick = server.getTick();
 
-                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && this.inAirTicks > 20 && !this.getAllowFlight() && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(Effect.LEVITATION) && !this.hasEffect(Effect.SLOW_FALLING)) {
+                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && this.inAirTicks > 20 && !this.getAllowFlight() && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(EffectType.LEVITATION) && !this.hasEffect(EffectType.SLOW_FALLING)) {
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * FastMath.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
@@ -3391,7 +3384,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (authPacket.getInputData().contains(AuthInputAction.START_SPRINTING)) {
                     PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
                     if ((this.foodData.getLevel() <= 6 && !this.getAdventureSettings().get(Type.FLYING)) ||
-                            this.riding != null || this.sleeping != null || this.hasEffect(Effect.BLINDNESS) ||
+                            this.riding != null || this.sleeping != null || this.hasEffect(EffectType.BLINDNESS) ||
                             (this.isSneaking() && !authPacket.getInputData().contains(AuthInputAction.STOP_SNEAKING))) {
                         playerToggleSprintEvent.setCancelled(true);
                     }
@@ -4856,41 +4849,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         this.inventory.sendContents(this);
                                     }
                                     return;
-                                case InventoryTransactionPacket.RELEASE_ITEM_ACTION_CONSUME:
-                                    if (this.protocol >= 388)
-                                        break; // Usage of potions on 1.13 and later is handled at ItemPotion#onUse
-                                    Item itemInHand = this.inventory.getItemInHand();
-                                    PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
-
-                                    if (itemInHand.getId() == Item.POTION) {
-                                        this.server.getPluginManager().callEvent(consumeEvent);
-                                        if (consumeEvent.isCancelled()) {
-                                            this.inventory.sendContents(this);
-                                            break;
-                                        }
-                                        Potion potion = Potion.getPotion(itemInHand.getDamage());
-
-                                        if (this.gamemode == SURVIVAL || this.gamemode == ADVENTURE) {
-                                            this.getInventory().decreaseCount(this.getInventory().getHeldItemIndex());
-                                            this.inventory.addItem(new ItemGlassBottle());
-                                        }
-
-                                        if (potion != null) {
-                                            potion.applyPotion(this);
-                                        }
-                                    } else { // Food
-                                        this.server.getPluginManager().callEvent(consumeEvent);
-                                        if (consumeEvent.isCancelled()) {
-                                            this.inventory.sendContents(this);
-                                            break;
-                                        }
-
-                                        Food food = Food.getByRelative(itemInHand);
-                                        if (food != null && food.eatenBy(this)) {
-                                            this.getInventory().decreaseCount(this.getInventory().getHeldItemIndex());
-                                        }
-                                    }
-                                    return;
                                 default:
                                     this.getServer().getLogger().debug(username + ": unknown release item action type: " + releaseItemData.actionType);
                                     break;
@@ -5751,7 +5709,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             this.extinguish();
-            this.removeAllEffects(EntityPotionEffectEvent.Cause.DEATH);
+            this.removeAllEffects(EntityEffectUpdateEvent.Cause.DEATH);
             this.health = 0;
             this.scheduleUpdate();
             this.timeSinceRest = 0;
@@ -5892,7 +5850,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.deadTicks = 0;
         this.noDamageTicks = 60;
 
-        this.removeAllEffects(EntityPotionEffectEvent.Cause.DEATH);
+        this.removeAllEffects(EntityEffectUpdateEvent.Cause.DEATH);
         this.setHealth(this.getMaxHealth());
         this.foodData.setLevel(20, 20);
 

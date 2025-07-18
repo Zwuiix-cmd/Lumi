@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.entity.item.EntityPotion;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.BlockBurnEvent;
@@ -18,8 +20,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
@@ -69,8 +69,8 @@ public class BlockFire extends BlockFlowable {
 
     @Override
     public void onEntityCollide(Entity entity) {
-        if (entity instanceof EntityPotion) {
-            if (((EntityPotion) entity).potionId == Potion.WATER) {
+        if (entity instanceof EntityPotion potion) {
+            if (potion.potionId == PotionType.WATER.id()) {
                 BlockFadeEvent event = new BlockFadeEvent(this, Block.get(AIR));
                 this.level.getServer().getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
@@ -80,17 +80,17 @@ public class BlockFire extends BlockFlowable {
             return;
         }
 
-        if (!entity.hasEffect(Effect.FIRE_RESISTANCE) && this.level.getGameRules().getBoolean(GameRule.FIRE_DAMAGE)) {
+        if (!entity.hasEffect(EffectType.FIRE_RESISTANCE) && this.level.getGameRules().getBoolean(GameRule.FIRE_DAMAGE)) {
             entity.attack(new EntityDamageByBlockEvent(this, entity, DamageCause.FIRE, 1));
         }
 
-        EntityCombustByBlockEvent ev = new EntityCombustByBlockEvent(this, entity, 8);
+        EntityCombustByBlockEvent event = new EntityCombustByBlockEvent(this, entity, 8);
         if (entity instanceof EntityArrow) {
-            ev.setCancelled();
+            event.setCancelled();
         }
-        Server.getInstance().getPluginManager().callEvent(ev);
-        if (!ev.isCancelled() && entity.isAlive() && entity.noDamageTicks == 0) {
-            entity.setOnFire(ev.getDuration());
+
+        if (event.call() && entity.isAlive() && entity.noDamageTicks == 0) {
+            entity.setOnFire(event.getDuration());
         }
     }
 

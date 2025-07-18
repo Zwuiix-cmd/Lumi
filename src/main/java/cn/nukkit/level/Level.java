@@ -9,6 +9,7 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.custom.EntityDefinition;
 import cn.nukkit.entity.custom.EntityManager;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.mob.EntitySnowGolem;
@@ -60,7 +61,6 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.collection.nb.Long2ObjectNonBlockingMap;
@@ -2492,12 +2492,12 @@ public class Level implements ChunkManager, Metadatable {
                 breakTime = 0.15;
             }
 
-            if (player.hasEffect(Effect.HASTE)) {
-                breakTime *= 1 - (0.2 * (player.getEffect(Effect.HASTE).getAmplifier() + 1));
+            if (player.hasEffect(EffectType.HASTE)) {
+                breakTime *= 1 - (0.2 * (player.getEffect(EffectType.HASTE).getAmplifier() + 1));
             }
 
-            if (player.hasEffect(Effect.MINING_FATIGUE)) {
-                breakTime *= 1 - (0.3 * (player.getEffect(Effect.MINING_FATIGUE).getAmplifier() + 1));
+            if (player.hasEffect(EffectType.MINING_FATIGUE)) {
+                breakTime *= 1 - (0.3 * (player.getEffect(EffectType.MINING_FATIGUE).getAmplifier() + 1));
             }
 
             Enchantment eff = item.getEnchantment(Enchantment.ID_EFFICIENCY);

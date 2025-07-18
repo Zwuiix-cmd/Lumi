@@ -3,18 +3,19 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntitySmite;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSwordStone;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
             }
             if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
                 this.playAttack();
-                player.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200), EntityPotionEffectEvent.Cause.ATTACK);
+                player.addEffect(Effect.get(EffectType.WITHER).setDuration(200), EntityEffectUpdateEvent.Cause.ATTACK);
             }
         }
     }
@@ -117,11 +118,11 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
     }
 
     @Override
-    public boolean canBeAffected(int effectId) {
-        if (effectId == Effect.WITHER) {
+    public boolean canBeAffected(EffectType type) {
+        if (type == EffectType.WITHER) {
             return false;
         }
-        return super.canBeAffected(effectId);
+        return super.canBeAffected(type);
     }
 
     @Override

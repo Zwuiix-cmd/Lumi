@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.block.BlockFormEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -10,7 +11,6 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
-import cn.nukkit.potion.Effect;
 
 public class BlockMagma extends BlockSolid {
 
@@ -61,7 +61,7 @@ public class BlockMagma extends BlockSolid {
 
     @Override
     public void onEntityCollide(Entity entity) {
-        if (entity.hasEffect(Effect.FIRE_RESISTANCE)) {
+        if (entity.hasEffect(EffectType.FIRE_RESISTANCE)) {
             return;
         }
 

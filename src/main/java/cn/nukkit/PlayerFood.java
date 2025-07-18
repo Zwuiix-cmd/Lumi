@@ -1,13 +1,13 @@
 package cn.nukkit;
 
 import cn.nukkit.entity.Attribute;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityRegainHealthEvent;
 import cn.nukkit.event.player.PlayerFoodLevelChangeEvent;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.level.GameRule;
-import cn.nukkit.potion.Effect;
 
 /**
  * This class handles player's food.
@@ -171,8 +171,8 @@ public class PlayerFood {
                 this.foodTickTimer = 0;
             }
 
-            if (this.player.hasEffect(Effect.HUNGER)) {
-                this.updateFoodExpLevel(0.1 * (this.getPlayer().getEffect(Effect.HUNGER).getAmplifier() + 1));
+            if (this.player.hasEffect(EffectType.HUNGER)) {
+                this.updateFoodExpLevel(0.1 * (this.getPlayer().getEffect(EffectType.HUNGER).getAmplifier() + 1));
             }
         }
     }
@@ -180,7 +180,7 @@ public class PlayerFood {
     public void updateFoodExpLevel(double use) {
         if (!this.player.isFoodEnabled()) return;
         if (Server.getInstance().getDifficulty() == 0) return;
-        if (this.player.hasEffect(Effect.SATURATION)) return;
+        if (this.player.hasEffect(EffectType.SATURATION)) return;
         this.foodExpLevel += use;
         if (this.foodExpLevel > 4) {
             this.useHunger(1);

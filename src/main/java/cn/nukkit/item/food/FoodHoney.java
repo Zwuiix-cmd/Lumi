@@ -1,9 +1,9 @@
 package cn.nukkit.item.food;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.ItemGlassBottle;
-import cn.nukkit.potion.Effect;
 
 public class FoodHoney extends Food {
 
@@ -16,7 +16,7 @@ public class FoodHoney extends Food {
     protected boolean onEatenBy(Player player) {
         super.onEatenBy(player);
         player.getInventory().addItem(new ItemGlassBottle());
-        player.removeEffect(Effect.POISON, EntityPotionEffectEvent.Cause.FOOD);
+        player.removeEffect(EffectType.POISON, EntityEffectUpdateEvent.Cause.FOOD);
         return true;
     }
 }

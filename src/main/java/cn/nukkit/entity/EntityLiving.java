@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockCactus;
 import cn.nukkit.block.BlockMagma;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
@@ -28,7 +29,6 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,8 +111,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     @Override
-    public boolean canBeAffected(int effectId) {
-        return !(this instanceof EntitySmite) || effectId != Effect.REGENERATION && effectId != Effect.POISON;
+    public boolean canBeAffected(EffectType type) {
+        return !(this instanceof EntitySmite) || type != EffectType.REGENERATION && type != EffectType.POISON;
     }
 
     @Override
@@ -335,11 +335,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
             }
 
-            if (this.isOnLadder() || this.hasEffect(Effect.LEVITATION) || this.hasEffect(Effect.SLOW_FALLING)) {
+            if (this.isOnLadder() || this.hasEffect(EffectType.LEVITATION) || this.hasEffect(EffectType.SLOW_FALLING)) {
                 this.resetFallDistance();
             }
 
-            if (inWater && !this.hasEffect(Effect.WATER_BREATHING)) {
+            if (inWater && !this.hasEffect(EffectType.WATER_BREATHING)) {
                 if (this instanceof EntitySwimming || this.isDrowned || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {

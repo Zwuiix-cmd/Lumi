@@ -1,11 +1,12 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 public class EntityWitherSkull extends EntityProjectile {
@@ -82,6 +83,6 @@ public class EntityWitherSkull extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         super.onCollideWithEntity(entity);
-        entity.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200), EntityPotionEffectEvent.Cause.ATTACK);
+        entity.addEffect(Effect.get(EffectType.WITHER).setDuration(200), EntityEffectUpdateEvent.Cause.ATTACK);
     }
 }

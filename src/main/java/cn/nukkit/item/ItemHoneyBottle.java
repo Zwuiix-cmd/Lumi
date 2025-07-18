@@ -1,10 +1,10 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.potion.Effect;
 
 public class ItemHoneyBottle extends ItemEdible {
     
@@ -35,8 +35,8 @@ public class ItemHoneyBottle extends ItemEdible {
         if (ticksUsed < 10) return false;
         super.onUse(player, ticksUsed);
 
-        if (player.hasEffect(Effect.POISON)) {
-            player.removeEffect(Effect.POISON, EntityPotionEffectEvent.Cause.FOOD);
+        if (player.hasEffect(EffectType.POISON)) {
+            player.removeEffect(EffectType.POISON, EntityEffectUpdateEvent.Cause.FOOD);
         }
 
         if (!player.isCreative()) {

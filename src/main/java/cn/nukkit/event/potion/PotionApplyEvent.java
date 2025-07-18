@@ -3,12 +3,14 @@ package cn.nukkit.event.potion;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.PotionType;
+
+import java.util.List;
 
 /**
- * Created by Snake1999 on 2016/1/12.
- * Package cn.nukkit.event.potion in project nukkit
+ * @author Snake1999
+ * @since 2016/1/12
  */
 public class PotionApplyEvent extends PotionEvent implements Cancellable {
 
@@ -18,13 +20,12 @@ public class PotionApplyEvent extends PotionEvent implements Cancellable {
         return handlers;
     }
 
-    private Effect applyEffect;
-
     private final Entity entity;
+    private List<Effect> applyEffects;
 
-    public PotionApplyEvent(Potion potion, Effect applyEffect, Entity entity) {
+    public PotionApplyEvent(PotionType potion, List<Effect> applyEffects, Entity entity) {
         super(potion);
-        this.applyEffect = applyEffect;
+        this.applyEffects = applyEffects;
         this.entity = entity;
     }
 
@@ -32,11 +33,11 @@ public class PotionApplyEvent extends PotionEvent implements Cancellable {
         return entity;
     }
 
-    public Effect getApplyEffect() {
-        return applyEffect;
+    public List<Effect> getApplyEffects() {
+        return applyEffects;
     }
 
-    public void setApplyEffect(Effect applyEffect) {
-        this.applyEffect = applyEffect;
+    public void setApplyEffect(List<Effect> applyEffects) {
+        this.applyEffects = applyEffects;
     }
 }

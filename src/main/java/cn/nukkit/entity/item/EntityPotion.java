@@ -2,16 +2,21 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.PotionType;
+import cn.nukkit.entity.mob.EntityBlaze;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.potion.PotionCollideEvent;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.particle.SpellParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
+import cn.nukkit.utils.BlockColor;
+
+import java.awt.*;
 
 /**
  * @author xtypr
@@ -33,24 +38,8 @@ public class EntityPotion extends EntityProjectile {
     @Override
     protected void initEntity() {
         super.initEntity();
-
-        potionId = this.namedTag.getShort("PotionId");
-
+        this.potionId = this.namedTag.getShort("PotionId");
         this.dataProperties.putShort(DATA_POTION_AUX_VALUE, this.potionId);
-
-        Effect effect = Potion.getEffect(potionId, true);
-
-        if (effect != null) {
-            int count = 0;
-            int[] c = effect.getColor();
-            count += effect.getAmplifier() + 1;
-
-            int r = ((c[0] * (effect.getAmplifier() + 1)) / count) & 0xff;
-            int g = ((c[1] * (effect.getAmplifier() + 1)) / count) & 0xff;
-            int b = ((c[2] * (effect.getAmplifier() + 1)) / count) & 0xff;
-
-            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, (r << 16) + (g << 8) + b));
-        }
     }
 
     @Override
@@ -83,8 +72,13 @@ public class EntityPotion extends EntityProjectile {
         return 0.01f;
     }
 
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        this.splash(entity);
+    }
+
     protected void splash(Entity collidedWith) {
-        Potion potion = Potion.getPotion(this.potionId);
+        PotionType potion = PotionType.get(this.potionId);
         PotionCollideEvent event = new PotionCollideEvent(potion, this);
         this.server.getPluginManager().callEvent(event);
 
@@ -99,59 +93,47 @@ public class EntityPotion extends EntityProjectile {
             return;
         }
 
-        potion.setSplash(true);
-
-        Particle particle;
-        int r;
-        int g;
-        int b;
-
-        Effect effect = Potion.getEffect(potion.getId(), true);
-
-        if (effect == null) {
-            r = 40;
-            g = 40;
-            b = 255;
-        } else {
-            int[] colors = effect.getColor();
-            r = colors[0];
-            g = colors[1];
-            b = colors[2];
+        if (potion.equals(PotionType.WATER)) {
+            if (collidedWith instanceof EntityBlaze blaze) {
+                blaze.attack(new EntityDamageByEntityEvent(this, blaze, EntityDamageEvent.DamageCause.MAGIC, 1));
+            }
         }
 
-        particle = new SpellParticle(this, r, g, b);
+        int[] color = new int[3];
+        int count = 0;
+
+        if (!potion.getEffects(true).isEmpty()) {
+            for (Effect effect : potion.getEffects(true)) {
+                Color effectColor = effect.getColor();
+                color[0] += effectColor.getRed() * effect.getLevel();
+                color[1] += effectColor.getGreen() * effect.getLevel();
+                color[2] += effectColor.getBlue() * effect.getLevel();
+                count += effect.getLevel();
+            }
+        } else {
+            BlockColor water = BlockColor.WATER_BLOCK_COLOR;
+            color[0] = water.getRed();
+            color[1] = water.getGreen();
+            color[2] = water.getBlue();
+            count = 1;
+        }
+
+        int r = (color[0] / count) & 0xff;
+        int g = (color[1] / count) & 0xff;
+        int b = (color[2] / count) & 0xff;
+        Particle particle = new SpellParticle(this, r, g, b);
 
         this.getLevel().addParticle(particle);
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_GLASS);
-
-        if (this.isLinger()) {
-            CompoundTag nbt = Entity.getDefaultNBT(this);
-            nbt.putShort("PotionId", this.potionId);
-            if (effect != null) {
-                nbt.putList("mobEffects", new ListTag<>().add(effect.save()));
-            }
-            Entity entity = Entity.createEntity("AreaEffectCloud", this.chunk, nbt);
-            if (entity instanceof EntityAreaEffectCloud entityAreaEffectCloud) {
-                entityAreaEffectCloud.setOwner(this.shootingEntity);
-            }
-            entity.spawnToAll();
-            return;
-        }
+        this.getLevel().addSound(this, Sound.RANDOM_GLASS);
 
         Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(4.125, 2.125, 4.125));
         for (Entity anEntity : entities) {
             double distance = anEntity.distanceSquared(this);
             if (distance < 16) {
-                double d = anEntity.equals(collidedWith) ? 1 : 1 - Math.sqrt(distance) / 4;
-                potion.applyPotion(anEntity, d);
+                double splashDistance = anEntity.equals(collidedWith) ? 1 : 1 - Math.sqrt(distance) / 4;
+                potion.applyEffects(anEntity, true, splashDistance);
             }
         }
-    }
-
-    @Override
-    public void onCollideWithEntity(Entity entity) {
-        this.splash(entity);
-        this.close();
     }
 
     @Override
@@ -160,19 +142,15 @@ public class EntityPotion extends EntityProjectile {
             return false;
         }
 
-        if (this.isCollided) {
+        boolean hasUpdate = super.onUpdate(currentTick);
+
+        if (this.age > 1200) {
+            this.kill();
+            hasUpdate = true;
+        } else if (this.isCollided) {
             this.splash(null);
+            hasUpdate = true;
         }
-
-        if (this.age > 1200 || this.isCollided) {
-            this.close();
-            return false;
-        }
-
-        return super.onUpdate(currentTick);
-    }
-
-    public boolean isLinger() {
-        return false;
+        return hasUpdate;
     }
 }

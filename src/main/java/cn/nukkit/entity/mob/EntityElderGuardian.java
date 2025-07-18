@@ -4,12 +4,13 @@ import cn.nukkit.Player;
 import cn.nukkit.block.BlockSponge;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -86,15 +87,15 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     public boolean entityBaseTick(int tickDiff) {
         boolean result = super.entityBaseTick(tickDiff);
         if (!this.closed && this.ticksLived % 1200 == 0 && this.isAlive()) {
-            for (Player p : this.level.getPlayers().values()) {
-                if (p.getGamemode() % 2 == 0 && p.distanceSquared(this) < 2500 && !p.hasEffect(Effect.MINING_FATIGUE)) {
-                    p.addEffect(Effect.getEffect(Effect.MINING_FATIGUE).setAmplifier(2).setDuration(6000));
-                    LevelEventPacket pk = new LevelEventPacket();
-                    pk.evid = LevelEventPacket.EVENT_GUARDIAN_CURSE;
-                    pk.x = (float) this.x;
-                    pk.y = (float) this.y;
-                    pk.z = (float) this.z;
-                    p.dataPacket(pk);
+            for (Player player : this.level.getPlayers().values()) {
+                if (player.getGamemode() % 2 == 0 && player.distanceSquared(this) < 2500 && !player.hasEffect(EffectType.MINING_FATIGUE)) {
+                    player.addEffect(Effect.get(EffectType.MINING_FATIGUE).setAmplifier(2).setDuration(6000));
+                    LevelEventPacket packet = new LevelEventPacket();
+                    packet.evid = LevelEventPacket.EVENT_GUARDIAN_CURSE;
+                    packet.x = (float) this.x;
+                    packet.y = (float) this.y;
+                    packet.z = (float) this.z;
+                    player.dataPacket(packet);
                 }
             }
         }

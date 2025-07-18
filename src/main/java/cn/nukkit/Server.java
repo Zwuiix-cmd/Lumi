@@ -12,6 +12,8 @@ import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.data.profession.Profession;
 import cn.nukkit.entity.data.property.EntityProperty;
+import cn.nukkit.entity.effect.EffectRegistry;
+import cn.nukkit.entity.effect.PotionRegistry;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
@@ -71,8 +73,6 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.*;
 import cn.nukkit.plugin.service.NKServiceManager;
 import cn.nukkit.plugin.service.ServiceManager;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
 import cn.nukkit.resourcepacks.loader.ZippedResourcePackLoader;
@@ -85,7 +85,6 @@ import cn.nukkit.utils.*;
 import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.sentry.Sentry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -100,14 +99,18 @@ import org.iq80.leveldb.Options;
 import org.iq80.leveldb.impl.Iq80DBFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
@@ -424,9 +427,9 @@ public class Server {
     public boolean opInGame;
     /**
      * Handling player names with spaces.
-     [0] "disabled" - Players with names containing spaces are prohibited from entering the server.
-     [1] "ignore" - Ignore names with spaces (default).
-     [2] "replacing" - Replace spaces in player names with "_".
+     * [0] "disabled" - Players with names containing spaces are prohibited from entering the server.
+     * [1] "ignore" - Ignore names with spaces (default).
+     * [2] "replacing" - Replace spaces in player names with "_".
      */
     public int spaceMode;
     /**
@@ -691,13 +694,16 @@ public class Server {
 
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
-            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100  && level.intLevel() > currentLevel.intLevel()) {
+            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100 && level.intLevel() > currentLevel.intLevel()) {
                 Nukkit.setLogLevel(level);
                 break;
             }
         }
 
         log.info("\u00A7b-- \u00A7dLumi \u00A7b--");
+
+        EffectRegistry.init();
+        PotionRegistry.init();
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -712,8 +718,6 @@ public class Server {
         RuntimeItems.init();
         Item.init();
         EnumBiome.values();
-        Effect.init();
-        Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
         CustomBlockManager.init(this);
@@ -1048,7 +1052,8 @@ public class Server {
         for (BanEntry entry : this.banByIP.getEntires().values()) {
             try {
                 this.network.blockAddress(InetAddress.getByName(entry.getName()), -1);
-            } catch (UnknownHostException ignore) {}
+            } catch (UnknownHostException ignore) {
+            }
         }
 
         this.pluginManager.registerInterface(JavaPluginLoader.class);
@@ -1148,7 +1153,8 @@ public class Server {
         for (BanEntry entry : this.banByIP.getEntires().values()) {
             try {
                 this.network.blockAddress(InetAddress.getByName(entry.getName()), -1);
-            } catch (UnknownHostException ignore) {}
+            } catch (UnknownHostException ignore) {
+            }
         }
 
         this.tickCounter = 0;
@@ -1163,6 +1169,7 @@ public class Server {
 
     /**
      * Internal: Handle query
+     *
      * @param address sender address
      * @param payload payload
      */
@@ -1993,9 +2000,9 @@ public class Server {
      * Internal: Save offline player data
      *
      * @param serializer serializer
-     * @param tag compound tag
-     * @param name player name
-     * @param uuid player uuid
+     * @param tag        compound tag
+     * @param name       player name
+     * @param uuid       player uuid
      */
     private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
         try (OutputStream dataStream = serializer.write(name, uuid)) {
@@ -2206,7 +2213,7 @@ public class Server {
 
     /**
      * Unload a level
-     *
+     * <p>
      * Notice: the default level cannot be unloaded without forceUnload=true
      *
      * @param level Level
@@ -2218,10 +2225,10 @@ public class Server {
 
     /**
      * Unload a level
-     *
+     * <p>
      * Notice: the default level cannot be unloaded without forceUnload=true
      *
-     * @param level Level
+     * @param level       Level
      * @param forceUnload force unload (ignore cancelled events and default level)
      * @return unloaded
      */
@@ -2308,8 +2315,8 @@ public class Server {
     /**
      * Generate a new level
      *
-     * @param name level name
-     * @param seed level seed
+     * @param name      level name
+     * @param seed      level seed
      * @param generator level generator
      * @return generated
      */
@@ -2320,10 +2327,10 @@ public class Server {
     /**
      * Generate a new level
      *
-     * @param name level name
-     * @param seed level seed
+     * @param name      level name
+     * @param seed      level seed
      * @param generator level generator
-     * @param options level generator options
+     * @param options   level generator options
      * @return generated
      */
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {
@@ -2333,11 +2340,11 @@ public class Server {
     /**
      * Generate a new level
      *
-     * @param name level name
-     * @param seed level seed
+     * @param name      level name
+     * @param seed      level seed
      * @param generator level generator
-     * @param options level generator options
-     * @param provider level provider
+     * @param options   level generator options
+     * @param provider  level provider
      * @return generated
      */
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options, Class<? extends LevelProvider> provider) {
@@ -2460,7 +2467,7 @@ public class Server {
     /**
      * Get a value from server.properties
      *
-     * @param variable key
+     * @param variable     key
      * @param defaultValue default value
      * @return value
      */
@@ -2472,7 +2479,7 @@ public class Server {
      * Set a string value in server.properties
      *
      * @param variable key
-     * @param value value
+     * @param value    value
      */
     public void setPropertyString(String variable, String value) {
         this.properties.set(variable, value);
@@ -2492,7 +2499,7 @@ public class Server {
     /**
      * Get a string value from server.properties
      *
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return value
      */
@@ -2513,7 +2520,7 @@ public class Server {
     /**
      * Get an int value from server.properties
      *
-     * @param variable key
+     * @param variable     key
      * @param defaultValue default value
      * @return value
      */
@@ -2536,7 +2543,7 @@ public class Server {
      * Set an int value in server.properties
      *
      * @param variable key
-     * @param value value
+     * @param value    value
      */
     public void setPropertyInt(String variable, int value) {
         this.properties.set(variable, value);
@@ -2556,7 +2563,7 @@ public class Server {
     /**
      * Get a boolean value from server.properties
      *
-     * @param variable key
+     * @param variable     key
      * @param defaultValue default value
      * @return value
      */
@@ -2575,7 +2582,7 @@ public class Server {
      * Set a boolean value in server.properties
      *
      * @param variable key
-     * @param value value
+     * @param value    value
      */
     public void setPropertyBoolean(String variable, boolean value) {
         this.properties.set(variable, value);

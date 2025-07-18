@@ -5,6 +5,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.entity.projectile.EntityEnderCharge;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -157,7 +158,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     }
 
     @Override
-    public boolean canBeAffected(int effectId) {
+    public boolean canBeAffected(EffectType type) {
         return false;
     }
 

@@ -1,8 +1,8 @@
 package cn.nukkit.event.entity;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.potion.Effect;
 
 import java.util.Map;
 
@@ -46,12 +46,12 @@ public class EntityDamageByEntityEvent extends EntityDamageEvent {
     }
 
     protected void addAttackerModifiers(Entity damager) {
-        if (damager.hasEffect(Effect.STRENGTH)) {
-            this.setDamage((float) (this.getDamage(DamageModifier.BASE) * 0.3 * (damager.getEffect(Effect.STRENGTH).getAmplifier() + 1)), DamageModifier.STRENGTH);
+        if (damager.hasEffect(EffectType.STRENGTH)) {
+            this.setDamage((float) (this.getDamage(DamageModifier.BASE) * 0.3 * (damager.getEffect(EffectType.STRENGTH).getAmplifier() + 1)), DamageModifier.STRENGTH);
         }
 
-        if (damager.hasEffect(Effect.WEAKNESS)) {
-            this.setDamage(-(float) (this.getDamage(DamageModifier.BASE) * 0.2 * (damager.getEffect(Effect.WEAKNESS).getAmplifier() + 1)), DamageModifier.WEAKNESS);
+        if (damager.hasEffect(EffectType.WEAKNESS)) {
+            this.setDamage(-(float) (this.getDamage(DamageModifier.BASE) * 0.2 * (damager.getEffect(EffectType.WEAKNESS).getAmplifier() + 1)), DamageModifier.WEAKNESS);
         }
     }
 
