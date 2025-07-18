@@ -52,6 +52,11 @@ public class EntityZoglin extends EntityWalkingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isUndead() {
+        return true;
+    }
+
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 30 && player.distanceSquared(this) <= 1.5) {
             this.attackDelay = 0;

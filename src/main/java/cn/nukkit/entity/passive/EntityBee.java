@@ -5,14 +5,15 @@ import cn.nukkit.blockentity.BlockEntityBeehive;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
@@ -83,9 +84,9 @@ public class EntityBee extends EntityFlyingMob implements EntityArthropod { // A
             }
             if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
                 if (this.getServer().getDifficulty() == 2) {
-                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(200), EntityPotionEffectEvent.Cause.ATTACK);
+                    player.addEffect(Effect.get(EffectType.POISON).setDuration(200), EntityEffectUpdateEvent.Cause.ATTACK);
                 } else if (this.getServer().getDifficulty() == 3) {
-                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(360), EntityPotionEffectEvent.Cause.ATTACK);
+                    player.addEffect(Effect.get(EffectType.POISON).setDuration(360), EntityEffectUpdateEvent.Cause.ATTACK);
                 }
             }
         }

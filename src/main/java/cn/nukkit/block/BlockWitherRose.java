@@ -3,9 +3,10 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.potion.Effect;
 
 public class BlockWitherRose extends BlockFlower {
 
@@ -29,11 +30,11 @@ public class BlockWitherRose extends BlockFlower {
     @Override
     public void onEntityCollide(Entity entity) {
         if (level.getServer().getDifficulty() != 0 && entity instanceof EntityLiving living) {
-            if (!living.invulnerable && !living.hasEffect(Effect.WITHER)
+            if (!living.invulnerable && !living.hasEffect(EffectType.WITHER)
                     && (!(living instanceof Player) || !((Player) living).isCreative() && !((Player) living).isSpectator())) {
-                Effect effect = Effect.getEffect(Effect.WITHER);
+                Effect effect = Effect.get(EffectType.WITHER);
                 effect.setDuration(50); // No damage is given if less due to how the effect is ticked
-                living.addEffect(effect, EntityPotionEffectEvent.Cause.WITHER_ROSE);
+                living.addEffect(effect, EntityEffectUpdateEvent.Cause.WITHER_ROSE);
             }
         }
     }

@@ -3,13 +3,14 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntitySmite;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
@@ -40,6 +41,11 @@ public class EntityHusk extends EntityWalkingMob implements EntitySmite {
     @Override
     public double getSpeed() {
         return this.isBaby() ? 1.6 : 1.1;
+    }
+
+    @Override
+    public boolean isUndead() {
+        return true;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class EntityHusk extends EntityWalkingMob implements EntitySmite {
                         (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
             }
             if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
-                player.addEffect(Effect.getEffect(Effect.HUNGER).setDuration(140), EntityPotionEffectEvent.Cause.ATTACK);
+                player.addEffect(Effect.get(EffectType.HUNGER).setDuration(140), EntityEffectUpdateEvent.Cause.ATTACK);
             }
             this.playAttack();
         }

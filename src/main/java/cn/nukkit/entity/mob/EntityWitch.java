@@ -4,7 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.item.EntityPotion;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.entity.effect.PotionType;
+import cn.nukkit.entity.item.EntityPotionSplash;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -12,8 +14,6 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
 import cn.nukkit.utils.Utils;
 import org.apache.commons.math3.util.FastMath;
 
@@ -80,18 +80,18 @@ public class EntityWitch extends EntityWalkingMob {
                     return;
                 }
 
-                EntityPotion thrownPotion = (EntityPotion) Entity.createEntity("ThrownPotion", pos, this);
+                EntityPotionSplash thrownPotion = (EntityPotionSplash) Entity.createEntity("ThrownPotion", pos, this);
 
                 double distance = this.distanceSquared(player);
 
-                if (!player.hasEffect(Effect.SLOWNESS) && distance <= 64) {
-                    thrownPotion.potionId = Potion.SLOWNESS;
+                if (!player.hasEffect(EffectType.SLOWNESS) && distance <= 64) {
+                    thrownPotion.potionId = PotionType.SLOWNESS.id();
                 } else if (player.getHealth() >= 8) {
-                    thrownPotion.potionId = Potion.POISON;
-                } else if (!player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0 && distance <= 9) {
-                    thrownPotion.potionId = Potion.WEAKNESS;
+                    thrownPotion.potionId = PotionType.POISON.id();
+                } else if (!player.hasEffect(EffectType.WEAKNESS) && Utils.rand(0, 4) == 0 && distance <= 9) {
+                    thrownPotion.potionId = PotionType.WEAKNESS.id();
                 } else {
-                    thrownPotion.potionId = Potion.HARMING;
+                    thrownPotion.potionId = PotionType.HARMING.id();
                 }
 
                 thrownPotion.setMotion(new Vector3(-Math.sin(yawR) * Math.cos(pitchR) * f * f, -Math.sin(pitchR) * f * f,

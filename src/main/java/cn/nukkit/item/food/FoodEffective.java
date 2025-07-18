@@ -1,8 +1,8 @@
 package cn.nukkit.item.food;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
-import cn.nukkit.potion.Effect;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class FoodEffective extends Food {
         super.onEatenBy(player);
         effects.forEach((effect, chance) -> {
             if (chance >= Math.random()) {
-                player.addEffect(effect.clone(), EntityPotionEffectEvent.Cause.FOOD);
+                player.addEffect(effect.clone(), EntityEffectUpdateEvent.Cause.FOOD);
             }
         });
         return true;

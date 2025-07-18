@@ -42,6 +42,11 @@ public class EntityPhantom extends EntityFlyingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isUndead() {
+        return true;
+    }
+
+    @Override
     public void initEntity() {
         this.setMaxHealth(20);
 

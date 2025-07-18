@@ -52,6 +52,11 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isUndead() {
+        return true;
+    }
+
+    @Override
     protected void initEntity() {
         this.setMaxHealth(20);
         

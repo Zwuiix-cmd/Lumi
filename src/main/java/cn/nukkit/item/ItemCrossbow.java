@@ -3,6 +3,8 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityShootBowEvent;
@@ -18,9 +20,9 @@ import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.potion.Potion;
 import cn.nukkit.utils.Utils;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemCrossbow extends ItemBow {
@@ -178,11 +180,16 @@ public class ItemCrossbow extends ItemBow {
                     EntityArrow arrow = new EntityArrow(player.chunk, nbt, player, false);
                     arrow.piercing = penetrationLevel;
                     if (chargedItem.getDamage() != ItemArrow.NORMAL_ARROW) {
-                        Potion potion = Potion.getPotion(chargedItem.getDamage() - ItemArrow.TIPPED_ARROW);
-                        if (potion != null && potion.getEffect() != null) {
-                            ListTag<CompoundTag> mobEffects = new ListTag<>("mobEffects");
-                            mobEffects.add(potion.getEffect().save());
-                            nbt.putList(mobEffects);
+                        PotionType potion = PotionType.get(chargedItem.getDamage() - ItemArrow.TIPPED_ARROW);
+                        if (potion != null) {
+                            List<Effect> effects = potion.getEffects(false);
+                            if (effects != null) {
+                                ListTag<CompoundTag> mobEffects = new ListTag<>("mobEffects");
+                                for (Effect effect : effects) {
+                                    mobEffects.add(effect.saveNBT());
+                                }
+                                nbt.putList(mobEffects);
+                            }
                         }
                     }
 

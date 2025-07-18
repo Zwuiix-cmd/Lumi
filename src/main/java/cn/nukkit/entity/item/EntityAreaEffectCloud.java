@@ -1,46 +1,38 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
-import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
-import cn.nukkit.event.entity.EntityRegainHealthEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.Particle;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.potion.Effect;
-import cn.nukkit.potion.Potion;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2LongMap;
-import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntityAreaEffectCloud extends Entity {
 
     public static final int NETWORK_ID = 95;
 
-    protected Int2ObjectMap<Effect> mobEffects;
+    protected List<Effect> cloudEffects;
     protected int reapplicationDelay;
     protected int durationOnUse;
     protected float initialRadius;
     protected float radiusOnUse;
+    protected int nextApply;
+    private int lastAge;
     protected long ownerId;
 
-    protected boolean affectOwner = true;
     @Nullable
     protected Entity owner;
-    protected final Long2LongMap victims = new Long2LongOpenHashMap();
 
     @Override
     public int getNetworkId() {
@@ -49,6 +41,10 @@ public class EntityAreaEffectCloud extends Entity {
 
     public EntityAreaEffectCloud(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    public List<Effect> getCloudEffects() {
+        return cloudEffects;
     }
 
     public int getWaitTime() {
@@ -80,11 +76,34 @@ public class EntityAreaEffectCloud extends Entity {
     }
 
     public void recalculatePotionColor(boolean send) {
+        int[] color = new int[4];
+        int count = 0;
+
         if (namedTag.contains("ParticleColor")) {
-            this.setPotionColor(namedTag.getInt("ParticleColor"), send);
+            int effectColor = namedTag.getInt("ParticleColor");
+            color[0] = (effectColor & 0xFF000000) >> 24;
+            color[1] = (effectColor & 0x00FF0000) >> 16;
+            color[2] = (effectColor & 0x0000FF00) >> 8;
+            color[3] = effectColor & 0x000000FF;
         } else {
-            this.setPotionColor(Effect.calculateColor(this.mobEffects.values().toArray(new Effect[0])), send);
+            color[0] = 255;
+
+            PotionType potion = PotionType.get(getPotionId());
+            for (Effect effect : potion.getEffects(true)) {
+                Color effectColor = effect.getColor();
+                color[1] += effectColor.getRed() * effect.getLevel();
+                color[2] += effectColor.getGreen() * effect.getLevel();
+                color[3] += effectColor.getBlue() * effect.getLevel();
+                count += effect.getLevel();
+            }
         }
+
+        int a = (color[0] / count) & 0xff;
+        int r = (color[1] / count) & 0xff;
+        int g = (color[2] / count) & 0xff;
+        int b = (color[3] / count) & 0xff;
+
+        setPotionColor(a, r, g, b, send);
     }
 
     public int getPotionColor() {
@@ -211,10 +230,6 @@ public class EntityAreaEffectCloud extends Entity {
         }
     }
 
-    public void setAffectOwner(boolean shouldAffect) {
-        this.affectOwner = shouldAffect;
-    }
-
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -282,11 +297,15 @@ public class EntityAreaEffectCloud extends Entity {
         this.setPotionId(this.namedTag.getShort("PotionId"), false);
 
         ListTag<CompoundTag> mobEffects = this.namedTag.getList("mobEffects", CompoundTag.class);
-        this.mobEffects = new Int2ObjectOpenHashMap<>(mobEffects.size());
+        this.cloudEffects = new ArrayList<>();
         for (CompoundTag effectTag : mobEffects.getAll()) {
-            Effect effect = Effect.load(effectTag);
+            Effect effect = Effect.get(effectTag.getByte("Id"))
+                    .setAmbient(effectTag.getBoolean("Ambient"))
+                    .setAmplifier(effectTag.getByte("Amplifier"))
+                    .setVisible(effectTag.getBoolean("DisplayOnScreenTextureAnimation"))
+                    .setDuration(effectTag.getInt("Duration"));
             if (effect != null) {
-                this.mobEffects.put(effect.getId(), effect);
+                this.cloudEffects.add(effect);
             }
         }
 
@@ -331,7 +350,7 @@ public class EntityAreaEffectCloud extends Entity {
         this.namedTag.putFloat("Radius", this.getRadius());
 
         ListTag<CompoundTag> list = new ListTag<>("mobEffects");
-        for (Effect effect : this.mobEffects.values()) {
+        for (Effect effect : this.cloudEffects) {
             list.add(new CompoundTag().putByte("Id", effect.getId())
                     .putBoolean("Ambient", effect.isAmbient())
                     .putByte("Amplifier", effect.getAmplifier())
@@ -350,144 +369,56 @@ public class EntityAreaEffectCloud extends Entity {
 
     @Override
     public boolean onUpdate(int currentTick) {
-        if (isClosed()) {
+        if (this.closed) {
             return false;
         }
 
-        int tickDiff = currentTick - lastUpdate;
-        if (tickDiff <= 0 && !justCreated) {
-            return true;
-        }
-        lastUpdate = currentTick;
+        super.onUpdate(currentTick);
 
-        if (this.getSpawnTick() == 0) {
-            this.setSpawnTick(level.getCurrentTick());
-            return true;
-        }
+        boolean sendRadius = age % 10 == 0;
 
-        long tickCount = this.getTicksAlive();
-        if (tickCount >= this.getDuration()) {
-            this.close();
-            return false;
-        }
+        int age = this.age;
+        float radius = getRadius();
+        int waitTime = getWaitTime();
+        if (age < waitTime) {
+            radius = initialRadius;
+        } else if (age > waitTime + getDuration()) {
+            kill();
+        } else {
+            int tickDiff = age - lastAge;
+            radius += getRadiusPerTick() * tickDiff;
+            if ((nextApply -= tickDiff) <= 0) {
+                nextApply = reapplicationDelay + 10;
 
-        float newRadius = this.getRadius() + this.getRadiusPerTick() * tickDiff;
-        if (newRadius < 0.5f) {
-            this.close();
-            return false;
-        }
-        this.setRadius(newRadius, false);
+                Entity[] collidingEntities = level.getCollidingEntities(getBoundingBox());
+                if (collidingEntities.length > 0) {
+                    radius += radiusOnUse;
+                    radiusOnUse /= 2;
 
-        if (tickCount % 5 != 0 || this.getSpawnTick() + this.getWaitTime() > level.getCurrentTick()) {
-            return true;
-        }
+                    setDuration(getDuration() + durationOnUse);
 
-        if (mobEffects.isEmpty()) {
-            victims.clear();
-            return true;
-        }
+                    for (Entity collidingEntity : collidingEntities) {
+                        if (collidingEntity == this || !(collidingEntity instanceof EntityLiving)) continue;
 
-        victims.long2LongEntrySet().removeIf(entry -> tickCount >= entry.getLongValue());
-
-        long nextTick = tickCount + reapplicationDelay;
-        float radiusSquare = newRadius * newRadius;
-
-        Entity[] entities = level.getNearbyEntities(getBoundingBox().grow(newRadius, newRadius * 0.5, newRadius), this);
-        for (Entity entity : entities) {
-            if (!(entity instanceof EntityLiving)) {
-                continue;
-            }
-
-            if (!entity.isAlive()) {
-                continue;
-            }
-
-            if (entity instanceof Player && ((Player) entity).isSpectator()) {
-                continue;
-            }
-
-            long id = entity.getId();
-            if (!affectOwner && (id == ownerId || entity == owner)) {
-                continue;
-            }
-
-            if (radiusSquare >= distanceSquared(entity)) {
-                continue;
-            }
-
-            if (victims.putIfAbsent(id, nextTick) != 0) {
-                continue;
-            }
-
-            for (Effect effect : mobEffects.values()) {
-                switch (effect.getId()) {
-                    case Effect.NO_EFFECT:
-                        if (this.getPotionId() == Potion.WATER && entity.isOnFire()) {
-                            level.addLevelSoundEvent(entity.getSideVec(BlockFace.UP), LevelSoundEventPacket.SOUND_FIZZ);
-                            level.addLevelEvent(entity, LevelEventPacket.EVENT_PARTICLE_FIZZ_EFFECT, 513);
-                            entity.extinguish();
+                        for (Effect effect : cloudEffects) {
+                            collidingEntity.addEffect(effect);
                         }
-                        break;
-                    case Effect.INSTANT_HEALTH:
-                        if (!entity.canBeAffected(effect.getId())) {
-                            break;
-                        }
-                        if (entity instanceof EntitySmite) {
-                            if (owner != null) {
-                                entity.attack(new EntityDamageByEntityEvent(owner, entity, EntityDamageEvent.DamageCause.MAGIC, 0.5f * (6 << effect.getAmplifier())));
-                            } else {
-                                entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.DamageCause.MAGIC, 0.5f * (6 << effect.getAmplifier())));
-                            }
-                        } else {
-                            entity.heal(new EntityRegainHealthEvent(entity, 0.5f * (4 << effect.getAmplifier()), EntityRegainHealthEvent.CAUSE_MAGIC));
-                        }
-                        break;
-                    case Effect.INSTANT_DAMAGE:
-                        if (!entity.canBeAffected(effect.getId())) {
-                            break;
-                        }
-                        if (entity instanceof EntitySmite) {
-                            entity.heal(new EntityRegainHealthEvent(entity, 0.5f * (4 << effect.getAmplifier()), EntityRegainHealthEvent.CAUSE_MAGIC));
-                        } else if (owner != null) {
-                            entity.attack(new EntityDamageByEntityEvent(owner, entity, EntityDamageEvent.DamageCause.MAGIC, 0.5f * (6 << effect.getAmplifier())));
-                        } else {
-                            entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.DamageCause.MAGIC, 0.5f * (6 << effect.getAmplifier())));
-                        }
-                        break;
-                    case Effect.SATURATION:
-                        if (entity instanceof Player player) {
-                            int level = 1 + effect.getAmplifier();
-                            player.getFoodData().addFoodLevel(level, level * 2);
-                        }
-                        break;
-                    default:
-                        entity.addEffect(effect.clone().setDuration(effect.getDuration() / 4), EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD);
-                        break;
+                    }
                 }
             }
-
-            if (radiusOnUse != 0) {
-                newRadius += radiusOnUse;
-
-                if (newRadius < 0.5f) {
-                    close();
-                    return false;
-                }
-
-                this.setRadius(newRadius, false);
-            }
-
-            if (durationOnUse != 0) {
-                int newDuration = durationOnUse + this.getDuration();
-
-                if (newDuration <= 0) {
-                    close();
-                    return false;
-                }
-
-                this.setDuration(newDuration, false);
-            }
         }
+
+        this.lastAge = age;
+
+        if (radius <= 1.5 && age >= waitTime) {
+            setRadius(radius, false);
+            kill();
+        } else {
+            setRadius(radius, sendRadius);
+        }
+
+        float height = getHeight();
+        boundingBox.setBounds(x - radius, y - height, z - radius, x + radius, y + height, z + radius);
 
         return true;
     }

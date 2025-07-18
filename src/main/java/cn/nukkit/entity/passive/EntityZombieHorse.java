@@ -39,6 +39,11 @@ public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
     }
 
     @Override
+    public boolean isUndead() {
+        return true;
+    }
+
+    @Override
     public void initEntity() {
         this.setMaxHealth(15);
 

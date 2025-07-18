@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.*;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
@@ -15,7 +15,6 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 
@@ -296,7 +295,7 @@ public class ItemBucket extends Item {
             player.getInventory().setItemInHand(Item.get(Item.BUCKET));
         }
 
-        player.removeAllEffects(EntityPotionEffectEvent.Cause.MILK);
+        player.removeAllEffects(EntityEffectUpdateEvent.Cause.MILK);
         return true;
     }
 
