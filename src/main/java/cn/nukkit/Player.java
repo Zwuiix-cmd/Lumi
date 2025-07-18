@@ -1515,27 +1515,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        Achievement achievement = Achievement.achievements.get(achievementId);
+        if(server.achievementsEnabled) {
+            Achievement achievement = Achievement.achievements.get(achievementId);
 
-        if (achievement == null || hasAchievement(achievementId)) {
-            return false;
-        }
-
-        for (String id : achievement.requires) {
-            if (!this.hasAchievement(id)) {
+            if (achievement == null || hasAchievement(achievementId)) {
                 return false;
             }
-        }
-        PlayerAchievementAwardedEvent event = new PlayerAchievementAwardedEvent(this, achievementId);
-        this.server.getPluginManager().callEvent(event);
 
-        if (event.isCancelled()) {
-            return false;
+            for (String id : achievement.requires) {
+                if (!this.hasAchievement(id)) {
+                    return false;
+                }
+            }
+            PlayerAchievementAwardedEvent event = new PlayerAchievementAwardedEvent(this, achievementId);
+            this.server.getPluginManager().callEvent(event);
+
+            if (event.isCancelled()) {
+                return false;
+            }
+
+            this.achievements.add(achievementId);
+            achievement.broadcast(this);
+            return true;
         }
 
-        this.achievements.add(achievementId);
-        achievement.broadcast(this);
-        return true;
+        return false;
     }
 
     /**
@@ -7137,11 +7141,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             return false;
                         }
 
-                        if (server.achievementsEnabled) {
-                            switch (item.getId()) {
-                                case Item.WOOD, Item.WOOD2 -> this.awardAchievement("mineWood");
-                                case Item.DIAMOND -> this.awardAchievement("diamond");
-                            }
+                        switch (item.getId()) {
+                            case Item.WOOD, Item.WOOD2 -> this.awardAchievement("mineWood");
+                            case Item.DIAMOND -> this.awardAchievement("diamond");
                         }
 
                         TakeItemEntityPacket pk = new TakeItemEntityPacket();
