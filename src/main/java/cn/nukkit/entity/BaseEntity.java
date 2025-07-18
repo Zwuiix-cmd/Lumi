@@ -247,9 +247,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         }
 
         if (isDayBurning() && !this.closed && level.shouldMobBurn(this)) {
-            if (this.armor[0] == null) {
-                this.setOnFire(100);
-            } else if (this.armor[0].getId() == 0) {
+            if (this.armor == null || this.armor[0] == null || this.armor[0].getId() == 0) {
                 this.setOnFire(100);
             }
         }
