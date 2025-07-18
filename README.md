@@ -13,9 +13,41 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 ## How to install?
 1. Install java 21 or higher
 2. Download the .jar file from the links below
-3. Write a command to run: `java -jar Lumi-SNAPSHOT.jar` (change `Lumi-SNAPSHOT.jar` to the name of the file you downloaded)
+3. Write a command to run: `java -jar Lumi-1.0.0.jar`
 
-### Currently there is no ability to add Lumi as dependency to your plugin using repos
+## Maven
+Adding repo:
+```xml
+<repositories>
+    <repository>
+        <id>luminiadev-repository-snapshots</id>
+        <url>https://repo.luminiadev.com/snapshots</url>
+    </repository>
+</repositories>
+```
+
+Adding dependency:
+```xml
+<dependency>
+    <groupId>com.koshakmine</groupId>
+    <artifactId>Lumi</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+## Gradle
+Adding repo:
+```kts
+maven {
+    name = "luminiadevRepositorySnapshots"
+    url = uri("https://repo.luminiadev.com/snapshots")
+}
+```
+
+Adding dependency:
+```kts
+compileOnly("com.koshakmine:Lumi:1.0.0")
+```
 
 ## Credits
 [<img src="https://raw.githubusercontent.com/CloudburstMC/Nukkit/master/.github/images/logo.png" width="18"/>]() [Nukkit](https://github.com/CloudburstMC/Nukkit)  

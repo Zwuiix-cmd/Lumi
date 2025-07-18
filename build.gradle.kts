@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
     java
@@ -144,9 +146,10 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            val dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
             groupId = project.group.toString()
             artifactId = project.name
-            version = project.version.toString()
+            version = "${project.version}-$dateTime"
 
             artifact(tasks.named("shadowJar").get()) {
                 classifier = null
