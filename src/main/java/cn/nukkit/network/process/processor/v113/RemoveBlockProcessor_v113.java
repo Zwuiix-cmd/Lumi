@@ -47,7 +47,7 @@ public class RemoveBlockProcessor_v113 extends DataPacketProcessor<RemoveBlockPa
 
         if (player.canInteract(blockVector.add(0.5, 0.5, 0.5), player.isCreative() ? 13 : 7) && (i = player.level.useBreakOn(blockVector.asVector3(), player.getHorizontalFacing(), i, player, true)) != null) {
             if (player.isSurvival() || player.isAdventure()) {
-                player.getFoodData().updateFoodExpLevel(0.005);
+                player.getFoodData().exhaust(0.005);
                 if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
                     if (oldItem.getId() == i.getId() || i.getId() == 0) {
                         inventory.setItemInHand(i);
