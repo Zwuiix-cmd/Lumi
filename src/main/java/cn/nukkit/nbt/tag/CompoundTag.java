@@ -267,7 +267,7 @@ public class CompoundTag extends Tag implements Cloneable {
 
     public int getShort(String name) {
         if (!tags.containsKey(name)) return 0;
-        return ((NumberTag) tags.get(name)).getData().shortValue();
+        return ((NumberTag) tags.get(name)).getData().intValue();
     }
 
     public int getInt(String name) {
