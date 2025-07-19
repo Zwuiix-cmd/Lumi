@@ -123,7 +123,6 @@ public class Level implements ChunkManager, Metadatable {
 
     // The blocks that can randomly tick
     private static final boolean[] randomTickBlocks = new boolean[Block.MAX_BLOCK_ID];
-    public static final boolean[] xrayableBlocks = new boolean[Block.MAX_BLOCK_ID];
 
     static {
         randomTickBlocks[Block.GRASS] = true;
@@ -159,26 +158,6 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.CORAL_FAN_DEAD] = true;
         randomTickBlocks[Block.BLOCK_KELP] = true;
         randomTickBlocks[Block.SWEET_BERRY_BUSH] = true;
-
-        xrayableBlocks[Block.GOLD_ORE] = true;
-        xrayableBlocks[Block.IRON_ORE] = true;
-        xrayableBlocks[Block.COAL_ORE] = true;
-        xrayableBlocks[Block.LAPIS_ORE] = true;
-        xrayableBlocks[Block.DIAMOND_ORE] = true;
-        xrayableBlocks[Block.REDSTONE_ORE] = true;
-        xrayableBlocks[Block.GLOWING_REDSTONE_ORE] = true;
-        xrayableBlocks[Block.EMERALD_ORE] = true;
-        xrayableBlocks[Block.ANCIENT_DEBRIS] = true;
-        xrayableBlocks[Block.COPPER_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_LAPIS_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_IRON_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_GOLD_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_REDSTONE_ORE] = true;
-        xrayableBlocks[Block.LIT_DEEPSLATE_REDSTONE_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_DIAMOND_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_COAL_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_EMERALD_ORE] = true;
-        xrayableBlocks[Block.DEEPSLATE_COPPER_ORE] = true;
 
         randomTickBlocks[Block.CAVE_VINES] = true;
         randomTickBlocks[Block.CAVE_VINES_BODY_WITH_BERRIES] = true;
@@ -260,7 +239,7 @@ public class Level implements ChunkManager, Metadatable {
     private final String folderName;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private final Long2ObjectOpenHashMap<SoftReference<Map<Integer, Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<SoftReference<Int2ObjectOpenHashMap<Object>>> changedBlocks= new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
@@ -353,7 +332,9 @@ public class Level implements ChunkManager, Metadatable {
 
     private Iterator<LongObjectEntry<Long>> lastUsingUnloadingIter;
 
-    private final boolean antiXray;
+    @Getter
+    @Setter
+    private AntiXraySystem antiXraySystem;
 
     // 用于实现世界监听的回调
     private static final AtomicInteger callbackIdCounter = new AtomicInteger();
@@ -422,7 +403,16 @@ public class Level implements ChunkManager, Metadatable {
 
         this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
 
-        this.antiXray = Server.antiXrayWorlds.contains(name);
+        if (Server.antiXrayWorlds.contains(name)) {
+            this.antiXraySystem = new AntiXraySystem(this);
+            this.antiXraySystem.setFakeOreDenominator(switch (Server.antiXrayMode) {
+                case HIGH -> 4;
+                case MEDIUM -> 8;
+                default -> 16;
+            });
+            this.antiXraySystem.setPreDeObfuscate(Server.antiXrayPreDeobfuscate);
+            this.antiXraySystem.reinitAntiXray();
+        }
 
         if (this.server.asyncChunkSending) {
             this.asyncChuckExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AsyncChunkThread for " + name).build());
@@ -451,6 +441,10 @@ public class Level implements ChunkManager, Metadatable {
         return (hi & 0xFF) << 16 | lo;
     }
 
+    public static int localBlockHash(double x, double y, double z, Level level) {
+        return localBlockHash(x, y, z, level.getDimensionData());
+    }
+
     public static Vector3 getBlockXYZ(long chunkHash, int blockHash, DimensionData dimensionData) {
         int hi = (byte) (blockHash >>> 16);
         int lo = (short) blockHash;
@@ -458,6 +452,10 @@ public class Level implements ChunkManager, Metadatable {
         int x = (hi & 0xF) + (getHashX(chunkHash) << 4);
         int z = ((hi >> 4) & 0xF) + (getHashZ(chunkHash) << 4);
         return new Vector3(x, y, z);
+    }
+
+    public static Vector3 getBlockXYZ(long chunkHash, int blockHash, Level level) {
+        return getBlockXYZ(chunkHash, blockHash, level.getDimensionData());
     }
 
     public static BlockVector3 blockHash(double x, double y, double z) {
@@ -1106,11 +1104,11 @@ public class Level implements ChunkManager, Metadatable {
         synchronized (changedBlocks) {
             if (!this.changedBlocks.isEmpty()) {
                 if (!this.players.isEmpty()) {
-                    ObjectIterator<Long2ObjectMap.Entry<SoftReference<Map<Integer, Object>>>> iter = changedBlocks.long2ObjectEntrySet().fastIterator();
+                    ObjectIterator<Long2ObjectMap.Entry<SoftReference<Int2ObjectOpenHashMap<Object>>>> iter = changedBlocks.long2ObjectEntrySet().fastIterator();
                     while (iter.hasNext()) {
-                        Long2ObjectMap.Entry<SoftReference<Map<Integer, Object>>> entry = iter.next();
+                        Long2ObjectMap.Entry<SoftReference<Int2ObjectOpenHashMap<Object>>> entry = iter.next();
                         long index = entry.getLongKey();
-                        Map<Integer, Object> blocks = entry.getValue().get();
+                        Int2ObjectOpenHashMap<Object> blocks = entry.getValue().get();
                         int chunkX = Level.getHashX(index);
                         int chunkZ = Level.getHashZ(index);
                         if (blocks == null || blocks.size() > MAX_BLOCK_CACHE) {
@@ -1120,13 +1118,18 @@ public class Level implements ChunkManager, Metadatable {
                             }
                         } else {
                             Player[] playerArray = this.getChunkPlayers(chunkX, chunkZ).values().toArray(Player.EMPTY_ARRAY);
-                            Vector3[] blocksArray = new Vector3[blocks.size()];
-                            int i = 0;
-                            for (int blockHash : blocks.keySet()) {
-                                Vector3 hash = getBlockXYZ(index, blockHash, this.getDimensionData());
-                                blocksArray[i++] = hash;
+
+                            if (isAntiXrayEnabled()) {
+                                antiXraySystem.obfuscateSendBlocks(index, playerArray, blocks);
+                            } else {
+                                var blocksArray = new Vector3[blocks.size()];
+                                int i = 0;
+                                for (int blockHash : blocks.keySet()) {
+                                    Vector3 hash = getBlockXYZ(index, blockHash, this);
+                                    blocksArray[i++] = hash;
+                                }
+                                this.sendBlocks(playerArray, blocksArray, UpdateBlockPacket.FLAG_ALL);
                             }
-                            this.sendBlocks(playerArray, blocksArray, UpdateBlockPacket.FLAG_ALL);
                         }
                     }
                 }
@@ -2125,6 +2128,10 @@ public class Level implements ChunkManager, Metadatable {
         this.setBlock(x, y, z, layer, Block.fullList[fullId], false, false);
     }
 
+    public boolean isAntiXrayEnabled() {
+        return antiXraySystem != null;
+    }
+
     public boolean setBlock(Vector3 pos, Block block) {
         return this.setBlock(pos, 0, block);
     }
@@ -2181,6 +2188,9 @@ public class Level implements ChunkManager, Metadatable {
         int cz = z >> 4;
 
         if (direct) {
+            if (isAntiXrayEnabled() && block.isTransparent()) {
+                this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(Player.EMPTY_ARRAY), new Vector3[]{block.add(-1), block.add(1), block.add(0, -1), block.add(0, 1), block.add(0, 0, 1), block.add(0, 0, -1)}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+            }
             this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(Player.EMPTY_ARRAY), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY, block.layer);
         } else {
             this.addBlockChange(Level.chunkHash(cx, cz), x, y, z);
@@ -2202,9 +2212,6 @@ public class Level implements ChunkManager, Metadatable {
                 block = ev.getBlock();
                 block.onUpdate(BLOCK_UPDATE_NORMAL);
                 block.getLevelBlockAtLayer(layer == 0 ? 1 : 0).onUpdate(BLOCK_UPDATE_NORMAL);
-                if (block.isTransparent()) {
-                    this.antiXrayOnBlockChange(null, block, 1);
-                }
                 this.updateAround(new Vector3(x, y, z));
             }
         }
@@ -2218,7 +2225,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void addBlockChange(long index, int x, int y, int z) {
         synchronized (changedBlocks) {
-            SoftReference<Map<Integer, Object>> current = changedBlocks.computeIfAbsent(index, k -> new SoftReference<>(new HashMap<>()));
+            SoftReference<Int2ObjectOpenHashMap<Object>> current = changedBlocks.computeIfAbsent(index, k -> new SoftReference<>(new Int2ObjectOpenHashMap<>()));
             Map<Integer, Object> currentMap = current.get();
             if (currentMap != changeBlocksFullMap && currentMap != null) {
                 if (currentMap.size() > MAX_BLOCK_CACHE) {
@@ -2226,113 +2233,6 @@ public class Level implements ChunkManager, Metadatable {
                 } else {
                     currentMap.put(Level.localBlockHash(x, y, z, this.getDimensionData()), changeBlocksPresent);
                 }
-            }
-        }
-    }
-
-    public void antiXrayOnBlockChange(@Nullable Player player, @NotNull Vector3 vector3, int type) {
-        if (!this.antiXrayEnabled()) {
-            return;
-        }
-
-        //获取要发送的方块位置
-        Vector3[] vector3Array;
-        switch (type) {
-            case 0 -> { //explode
-                vector3 = vector3.floor();
-                vector3Array = new Vector3[] {
-                        vector3.add(1, 0, 0),
-                        vector3.add(-1, 0, 0),
-                        vector3.add(0, 1, 0),
-                        vector3.add(0, -1, 0),
-                        vector3.add(0, 0, 1),
-                        vector3.add(0, 0, -1)
-                };
-            }
-            case 1 -> { //block change
-                vector3Array = new Vector3[26];
-                int index = 0;
-                for (int x = -1; x < 2; x++) {
-                    for (int z = -1; z < 2; z++) {
-                        for (int y = -1; y < 2; y++) {
-                            if (x != 0 && y != 0 && z != 0) {
-                                vector3Array[index] = vector3.add(x, y, z);
-                                index++;
-                            }
-                        }
-                    }
-                }
-            }
-            case 2 -> { //player move
-                vector3Array = new Vector3[100];
-                int index = 0;
-                for (int x = -2; x < 3; x++) {
-                    for (int z = -2; z < 3; z++) {
-                        for (int y = -1; y < 3; y++) {
-                            vector3Array[index] = vector3.add(x, y, z);
-                            index++;
-                        }
-                    }
-                }
-            }
-            default -> {
-                return;
-            }
-        }
-
-        //发送给玩家
-        for (Vector3 v : vector3Array) {
-            if (v == null) {
-                continue;
-            }
-            int x = (int) v.x;
-            int y = (int) v.y;
-            int z = (int) v.z;
-            FullChunk fullChunk = player == null ? null : player.chunk;
-
-            int fullId = this.getFullBlock(fullChunk, x, y, z, 0);
-            int id = fullId >> Block.DATA_BITS;
-            if (id >= Block.MAX_BLOCK_ID || !Level.xrayableBlocks[id]) {
-                continue;
-            }
-
-            if (player == null) {
-                Int2ObjectMap<ObjectList<Player>> players = Server.sortPlayers(this.getChunkPlayers(v.getChunkX(), v.getChunkZ()).values().toArray(Player.EMPTY_ARRAY));
-                for (Int2ObjectMap.Entry<ObjectList<Player>> entry : players.int2ObjectEntrySet()) {
-                    int protocol = entry.getIntKey();
-
-                    UpdateBlockPacket pk = new UpdateBlockPacket();
-                    pk.x = x;
-                    pk.y = y;
-                    pk.z = z;
-                    pk.flags = UpdateBlockPacket.FLAG_ALL;
-
-                    if (protocol > ProtocolInfo.v1_2_10) {
-                        pk.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, fullId & 0xf);
-                    } else {
-                        pk.blockId = id;
-                        pk.blockData = fullId & 0xf;
-                    }
-
-                    for (Player p : entry.getValue()) {
-                        p.dataPacket(pk);
-                    }
-                }
-            } else {
-                UpdateBlockPacket pk = new UpdateBlockPacket();
-                pk.x = x;
-                pk.y = y;
-                pk.z = z;
-                pk.flags = UpdateBlockPacket.FLAG_ALL;
-
-                if (player.protocol > ProtocolInfo.v1_2_10) {
-                    pk.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, id, fullId & 0xf);
-                } else {
-                    pk.blockId = id;
-                    pk.blockData = fullId & 0xf;
-                }
-
-                player.dataPacket(pk);
             }
         }
     }
@@ -4727,10 +4627,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean isMobSpawningAllowed() {
         return !Server.disabledSpawnWorlds.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
-    }
-
-    public boolean antiXrayEnabled() {
-        return this.antiXray;
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {

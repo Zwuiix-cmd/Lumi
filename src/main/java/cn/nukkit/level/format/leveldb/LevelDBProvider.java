@@ -335,7 +335,7 @@ public class LevelDBProvider implements LevelProvider {
                             networkChunkSerializerCallback.getSubchunks(),
                             networkChunkSerializerCallback.getStream().getBuffer()
                     );
-                }, level.antiXrayEnabled(), getLevel().getDimensionData());
+                }, level.isAntiXrayEnabled(), getLevel().getDimensionData());
             });
         }else {
             NetworkChunkSerializer.serialize(protocols, chunk, networkChunkSerializerCallback -> {
@@ -346,7 +346,7 @@ public class LevelDBProvider implements LevelProvider {
                         networkChunkSerializerCallback.getSubchunks(),
                         networkChunkSerializerCallback.getStream().getBuffer()
                 );
-            }, level.antiXrayEnabled(), this.level.getDimensionData());
+            }, level.isAntiXrayEnabled(), this.level.getDimensionData());
         }
     }
 
@@ -657,7 +657,7 @@ public class LevelDBProvider implements LevelProvider {
 
     @Override
     public LevelDBChunk getEmptyChunk(int chunkX, int chunkZ) {
-        return LevelDBChunk.getEmptyChunk(chunkX, chunkZ, this);
+        return LevelDBChunk.getEmptyChunk(level, chunkX, chunkZ, this);
     }
 
     public DB getDatabase() {
@@ -676,11 +676,6 @@ public class LevelDBProvider implements LevelProvider {
             this.unloadChunk(chunkX, chunkZ, false);
         }
         this.chunks.put(index, (LevelDBChunk) chunk);
-    }
-
-    @SuppressWarnings("unused")
-    public static LevelDBChunkSection createChunkSection(int chunkY) {
-        return new LevelDBChunkSection(chunkY);
     }
 
     private boolean chunkExists(int chunkX, int chunkZ) {

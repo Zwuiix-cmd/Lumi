@@ -2171,11 +2171,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.forceMovement = null;
-        if (distanceSquared != 0) {
-            if (this.nextChunkOrderRun > 20) {
-                this.nextChunkOrderRun = 20;
-            }
-            this.level.antiXrayOnBlockChange(this, this, 2);
+        if (distanceSquared != 0 && this.nextChunkOrderRun > 20) {
+            this.nextChunkOrderRun = 20;
         }
         this.needSendRotation = false; // Sent with movement
 
@@ -4906,26 +4903,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.z = (float) pos.z;
                 pk.data = (int) (65535 / breakTime);
                 this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
-
-                // 优化反矿透时玩家的挖掘体验
-                if (this.getLevel().antiXrayEnabled()) {
-                    Vector3[] vector3s = new Vector3[5];
-                    int index = 0;
-                    for (BlockFace each : BlockFace.values()) {
-                        if (each == face) {
-                            continue;
-                        }
-                        int tmpX = target.getFloorX() + each.getXOffset();
-                        int tmpY = target.getFloorY() + each.getYOffset();
-                        int tmpZ = target.getFloorZ() + each.getZOffset();
-                        if (Level.xrayableBlocks[this.getLevel().getBlockIdAt(tmpX, tmpY, tmpZ)]) {
-                            vector3s[index] = new Vector3(tmpX, tmpY, tmpZ);
-                            index++;
-                        }
-                    }
-                    this.getLevel().sendBlocks(new Player[]{this}, vector3s, UpdateBlockPacket.FLAG_ALL);
-                }
             }
+        }
+
+        if (this.getLevel().isAntiXrayEnabled() && this.getLevel().getAntiXraySystem().isPreDeObfuscate()) {
+            this.getLevel().getAntiXraySystem().deObfuscateBlock(this, face, target);
         }
 
         this.breakingBlock = target;
