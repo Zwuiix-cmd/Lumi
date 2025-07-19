@@ -33,10 +33,7 @@ import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
-import cn.nukkit.level.EnumLevel;
-import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
@@ -217,6 +214,8 @@ public class Server {
      */
     public static final List<String> multiNetherWorlds = new ArrayList<>();
     public static final List<String> antiXrayWorlds = new ArrayList<>();
+    public static AntiXraySystem.AntiXrayMode antiXrayMode;
+    public static boolean antiXrayPreDeobfuscate;
     /**
      * Worlds where random block ticking is disabled.
      */
@@ -3067,6 +3066,8 @@ public class Server {
                 antiXrayWorlds.add(tokenizer.nextToken());
             }
         }
+        antiXrayMode = AntiXraySystem.AntiXrayMode.valueOf(this.getPropertyString("anti-xray-mode"));
+        antiXrayPreDeobfuscate = this.getPropertyBoolean("anti-xray-pre-deobfuscate");
 
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
@@ -3278,6 +3279,8 @@ public class Server {
             put("portal-ticks", 80);
             put("multi-nether-worlds", "");
             put("anti-xray-worlds", "");
+            put("anti-xray-mode", AntiXraySystem.AntiXrayMode.LOW);
+            put("anti-xray-pre-deobfuscate", true);
 
             put("do-not-tick-worlds", "");
             put("worlds-entity-spawning-disabled", "");

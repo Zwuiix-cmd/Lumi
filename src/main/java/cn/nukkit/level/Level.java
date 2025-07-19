@@ -403,12 +403,15 @@ public class Level implements ChunkManager, Metadatable {
 
         this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
 
-        if(Server.antiXrayWorlds.contains(name)) {
+        if (Server.antiXrayWorlds.contains(name)) {
             this.antiXraySystem = new AntiXraySystem(this);
-
-            antiXraySystem.reinitAntiXray();
-            antiXraySystem.setFakeOreDenominator(16);
-            antiXraySystem.setPreDeObfuscate(true);
+            this.antiXraySystem.setFakeOreDenominator(switch (Server.antiXrayMode) {
+                case HIGH -> 4;
+                case MEDIUM -> 8;
+                default -> 16;
+            });
+            this.antiXraySystem.setPreDeObfuscate(Server.antiXrayPreDeobfuscate);
+            this.antiXraySystem.reinitAntiXray();
         }
 
         if (this.server.asyncChunkSending) {

@@ -1,16 +1,12 @@
 package cn.nukkit.level;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +37,7 @@ public final class AntiXraySystem {
             this.fakeOreToPutBlockIds.put(originBlock, list = new IntArrayList(8));
         }
 
-        for(int id : fakeBlocks) {
+        for (int id : fakeBlocks) {
             this.realOreToReplacedBlockIds.put(id, originBlock);
             list.add(id);
         }
@@ -74,7 +70,8 @@ public final class AntiXraySystem {
                     if (!Block.transparent[tmpV3Rid.getBlockIdLayer0()]) {
                         continue;
                     }
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             x++;
             blockHash = localBlockHash(x, y, z, level);
@@ -82,7 +79,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             x -= 2;
             blockHash = localBlockHash(x, y, z, level);
@@ -90,7 +88,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             x++;
             y++;
@@ -99,7 +98,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             y -= 2;
             blockHash = localBlockHash(x, y, z, level);
@@ -107,7 +107,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             y++;
             z++;
@@ -116,7 +117,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
             z -= 2;
             blockHash = localBlockHash(x, y, z, level);
@@ -124,7 +126,8 @@ public final class AntiXraySystem {
                 vectorSet.add(blockHash);
                 try {
                     vRidList.add(new Vector3WithBlockId(x, y, z, level.getBlockIdAt(x, y, z, 0), level.getBlockIdAt(x, y, z, 1)));
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
             }
         }
         level.sendBlocks(playerArray, vRidList.toArray(Vector3[]::new), UpdateBlockPacket.FLAG_ALL);
@@ -150,10 +153,10 @@ public final class AntiXraySystem {
     }
 
     public void reinitAntiXray() {
-        getFakeOreToPutBlockIds().clear();
-        getRealOreToReplacedBlockIds().clear();
+        this.fakeOreToPutBlockIds.clear();
+        this.realOreToReplacedBlockIds.clear();
 
-        addAntiXrayFakeBlock(BlockID.STONE, List.of(
+        this.addAntiXrayFakeBlock(BlockID.STONE, List.of(
                 BlockID.COAL_ORE,
                 BlockID.DIAMOND_ORE,
                 BlockID.EMERALD_ORE,
@@ -163,12 +166,12 @@ public final class AntiXraySystem {
                 BlockID.REDSTONE_ORE,
                 BlockID.COPPER_ORE
         ));
-        addAntiXrayFakeBlock(BlockID.NETHERRACK, List.of(
+        this.addAntiXrayFakeBlock(BlockID.NETHERRACK, List.of(
                 BlockID.QUARTZ_ORE,
                 BlockID.NETHER_GOLD_ORE,
                 BlockID.ANCIENT_DEBRIS
         ));
-        addAntiXrayFakeBlock(BlockID.DEEPSLATE, List.of(
+        this.addAntiXrayFakeBlock(BlockID.DEEPSLATE, List.of(
                 BlockID.DEEPSLATE_COAL_ORE,
                 BlockID.DEEPSLATE_DIAMOND_ORE,
                 BlockID.DEEPSLATE_EMERALD_ORE,
@@ -178,5 +181,11 @@ public final class AntiXraySystem {
                 BlockID.DEEPSLATE_REDSTONE_ORE,
                 BlockID.DEEPSLATE_COPPER_ORE
         ));
+    }
+
+    public enum AntiXrayMode {
+        LOW,
+        MEDIUM,
+        HIGH
     }
 }
