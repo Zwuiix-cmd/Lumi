@@ -38,6 +38,16 @@ public abstract class BlockCopperGrateBase extends BlockSolid implements Oxidiza
     }
 
     @Override
+    public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
     public boolean onActivate(@NotNull Item item, Player player) {
         return Waxable.super.onActivate(item, player)
                 || Oxidizable.super.onActivate(item, player);

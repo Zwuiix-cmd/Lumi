@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockWaxedOxidizedCopperGrate extends BlockChiseledCopperBase {
+public class BlockWaxedOxidizedCopperGrate extends BlockCopperGrateBase {
     @Override
     public String getName() {
         return "Waxed Oxidized Copper Grate";
