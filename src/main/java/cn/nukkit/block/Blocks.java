@@ -710,8 +710,8 @@ public class Blocks {
         list[OXIDIZED_CHISELED_COPPER] = BlockOxidizedChiseledCopper.class; //1018
         list[WAXED_CHISELED_COPPER] = BlockWaxedChiseledCopper.class; //1019
         list[WAXED_EXPOSED_CHISELED_COPPER] = BlockWaxedExposedChiseledCopper.class; //1020
-        list[WAXED_WEATHERED_CHISELED_COPPER] = BlockWaxedWeatheredChiseledCopper.class; //1022
-        list[WAXED_OXIDIZED_CHISELED_COPPER] = BlockWaxedOxidizedChiseledCopper.class; //1021
+        list[WAXED_WEATHERED_CHISELED_COPPER] = BlockWaxedWeatheredChiseledCopper.class; //1021
+        list[WAXED_OXIDIZED_CHISELED_COPPER] = BlockWaxedOxidizedChiseledCopper.class; //1022
 
         list[COPPER_BULB] = BlockCopperBulb.class; //1031
         list[EXPOSED_COPPER_BULB] = BlockExposedCopperBulb.class; //1032
