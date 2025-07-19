@@ -4,7 +4,7 @@ package cn.nukkit.item;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class ItemBeefRaw extends ItemEdible {
+public class ItemBeefRaw extends ItemFood {
 
     public ItemBeefRaw() {
         this(0, 1);
@@ -16,5 +16,15 @@ public class ItemBeefRaw extends ItemEdible {
 
     public ItemBeefRaw(Integer meta, int count) {
         super(RAW_BEEF, meta, count, "Raw Beef");
+    }
+
+    @Override
+    public int getFoodRestore() {
+        return 3;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 1.8F;
     }
 }

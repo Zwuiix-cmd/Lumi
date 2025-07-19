@@ -9,6 +9,7 @@ import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.ExplodeParticle;
 import cn.nukkit.level.sound.FizzSound;
 import cn.nukkit.math.BlockFace;
@@ -279,23 +280,26 @@ public class ItemBucket extends Item {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
-        if (player.isSpectator() || this.getDamage() != MILK_BUCKET) {
+        if (ticksUsed < 31) {
             return false;
         }
 
-        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(player, this);
+        PlayerItemConsumeEvent event = new PlayerItemConsumeEvent(player, this);
+        Server.getInstance().getPluginManager().callEvent(event);
 
-        player.getServer().getPluginManager().callEvent(consumeEvent);
-        if (consumeEvent.isCancelled()) {
-            player.setNeedSendInventory(true);
+        if (event.isCancelled()) {
+            player.getInventory().sendContents(player);
             return false;
         }
 
-        if (!player.isCreative()) {
-            player.getInventory().setItemInHand(Item.get(Item.BUCKET));
-        }
+        player.removeAllEffects();
 
-        player.removeAllEffects(EntityEffectUpdateEvent.Cause.MILK);
+        if (player.isAdventure() || player.isSurvival()) {
+            --this.count;
+            player.getInventory().addItem(Item.get(ItemID.BUCKET, 0, 1));
+            player.getInventory().setItemInHand(this);
+            player.getLevel().addSound(player, Sound.RANDOM_BURP);
+        }
         return true;
     }
 

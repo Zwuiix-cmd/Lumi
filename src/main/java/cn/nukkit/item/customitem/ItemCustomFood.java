@@ -1,31 +1,27 @@
 package cn.nukkit.item.customitem;
 
 import cn.nukkit.Player;
-import cn.nukkit.item.ItemEdible;
+import cn.nukkit.item.ItemFood;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.item.StringItem;
-import cn.nukkit.item.food.Food;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author lt_name
  */
-public abstract class ItemCustomEdible extends ItemEdible implements CustomItem {
+public abstract class ItemCustomFood extends ItemFood implements CustomItem {
     private final String id;
     private final String textureName;
 
-    public ItemCustomEdible(@NotNull String id, @Nullable String name) {
+    public ItemCustomFood(@NotNull String id, @Nullable String name) {
         super(ItemID.STRING_IDENTIFIED_ITEM, 0, 1, StringItem.notEmpty(name));
         this.id = id;
         this.textureName = name;
     }
 
-    public ItemCustomEdible(@NotNull String id, @Nullable String name, @NotNull String textureName) {
+    public ItemCustomFood(@NotNull String id, @Nullable String name, @NotNull String textureName) {
         super(ItemID.STRING_IDENTIFIED_ITEM, 0, 1, StringItem.notEmpty(name));
         this.id = id;
         this.textureName = textureName;
@@ -33,7 +29,7 @@ public abstract class ItemCustomEdible extends ItemEdible implements CustomItem 
 
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
-        if (player.getFoodData().isHungry() || player.isCreative() || canAlwaysEat()) {
+        if (player.getFoodData().isHungry() || player.isCreative() || isRequiresHunger()) {
             return true;
         }
         player.getFoodData().sendFood();
@@ -60,13 +56,7 @@ public abstract class ItemCustomEdible extends ItemEdible implements CustomItem 
         return CustomItem.super.getId();
     }
 
-    public abstract Map.Entry<Plugin, Food> getFood();
-
     public boolean isDrink() {
-        return false;
-    }
-
-    public boolean canAlwaysEat() {
         return false;
     }
 }

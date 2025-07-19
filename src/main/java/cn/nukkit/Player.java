@@ -43,7 +43,6 @@ import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.item.*;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.food.Food;
 import cn.nukkit.item.trim.TrimFactory;
 import cn.nukkit.lang.CommandOutputContainer;
 import cn.nukkit.lang.LangCode;
