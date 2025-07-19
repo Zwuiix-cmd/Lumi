@@ -3,11 +3,12 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, Waxable {
-    public BlockCopperBase() {
+public abstract class BlockCopperGrateBase extends BlockSolid implements Oxidizable, Waxable {
+    public BlockCopperGrateBase() {
         // Does nothing
     }
 
@@ -22,8 +23,28 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     }
 
     @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
+    }
+
+    @Override
     public int onUpdate(int type) {
         return Oxidizable.super.onUpdate(type);
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
@@ -41,6 +62,7 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     public Block getStateWithOxidizationLevel(@NotNull OxidizationLevel oxidizationLevel) {
         return Block.get((getCopperId(isWaxed(), oxidizationLevel)));
     }
+
 
     @Override
     public boolean setOxidizationLevel(@NotNull OxidizationLevel oxidizationLevel) {
@@ -68,10 +90,10 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
             return getId();
         }
         return switch (oxidizationLevel) {
-            case UNAFFECTED -> waxed ? WAXED_COPPER : COPPER_BLOCK;
-            case EXPOSED -> waxed ? WAXED_EXPOSED_COPPER : EXPOSED_COPPER;
-            case WEATHERED -> waxed ? WAXED_WEATHERED_COPPER : WEATHERED_COPPER;
-            case OXIDIZED -> waxed ? WAXED_OXIDIZED_COPPER : OXIDIZED_COPPER;
+            case UNAFFECTED -> waxed ? WAXED_COPPER_GRATE : COPPER_GRATE;
+            case EXPOSED -> waxed ? WAXED_EXPOSED_COPPER_GRATE : EXPOSED_COPPER_GRATE;
+            case WEATHERED -> waxed ? WAXED_WEATHERED_COPPER_GRATE : WEATHERED_COPPER_GRATE;
+            case OXIDIZED -> waxed ? WAXED_OXIDIZED_COPPER_GRATE: OXIDIZED_COPPER_GRATE;
         };
     }
 }

@@ -3,11 +3,12 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, Waxable {
-    public BlockCopperBase() {
+public abstract class BlockChiseledCopperBase extends BlockSolid implements Oxidizable, Waxable {
+    public BlockChiseledCopperBase() {
         // Does nothing
     }
 
@@ -19,6 +20,16 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     @Override
     public double getResistance() {
         return 6;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
     }
 
     @Override
@@ -41,6 +52,7 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     public Block getStateWithOxidizationLevel(@NotNull OxidizationLevel oxidizationLevel) {
         return Block.get((getCopperId(isWaxed(), oxidizationLevel)));
     }
+
 
     @Override
     public boolean setOxidizationLevel(@NotNull OxidizationLevel oxidizationLevel) {
@@ -68,10 +80,10 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
             return getId();
         }
         return switch (oxidizationLevel) {
-            case UNAFFECTED -> waxed ? WAXED_COPPER : COPPER_BLOCK;
-            case EXPOSED -> waxed ? WAXED_EXPOSED_COPPER : EXPOSED_COPPER;
-            case WEATHERED -> waxed ? WAXED_WEATHERED_COPPER : WEATHERED_COPPER;
-            case OXIDIZED -> waxed ? WAXED_OXIDIZED_COPPER : OXIDIZED_COPPER;
+            case UNAFFECTED -> waxed ? WAXED_CHISELED_COPPER : CHISELED_COPPER;
+            case EXPOSED -> waxed ? WAXED_EXPOSED_CHISELED_COPPER : EXPOSED_CHISELED_COPPER;
+            case WEATHERED -> waxed ? WAXED_WEATHERED_CHISELED_COPPER : WEATHERED_CHISELED_COPPER;
+            case OXIDIZED -> waxed ? WAXED_OXIDIZED_CHISELED_COPPER : OXIDIZED_CHISELED_COPPER;
         };
     }
 }

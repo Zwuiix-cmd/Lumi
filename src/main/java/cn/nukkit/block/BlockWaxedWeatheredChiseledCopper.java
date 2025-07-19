@@ -3,28 +3,20 @@ package cn.nukkit.block;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author LoboMetalurgico
- * @since 11/06/2021
- */
-public class BlockCopperOxidizedWaxed extends BlockCopperBase {
-    public BlockCopperOxidizedWaxed() {
-        // Does nothing
-    }
-
+public class BlockWaxedWeatheredChiseledCopper extends BlockChiseledCopperBase {
     @Override
     public String getName() {
-        return "Waxed Oxidized Copper";
+        return "Waxed Weathered Chiseled Copper";
     }
 
     @Override
     public int getId() {
-        return WAXED_OXIDIZED_COPPER;
+        return WAXED_WEATHERED_CHISELED_COPPER;
     }
 
     @Override
     public @NotNull OxidizationLevel getOxidizationLevel() {
-        return OxidizationLevel.OXIDIZED;
+        return OxidizationLevel.WEATHERED;
     }
 
     @Override

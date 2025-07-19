@@ -704,6 +704,22 @@ public class Blocks {
 
         list[PITCHER_PLANT] = BlockPitcherPlant.class; //867
 
+        list[CHISELED_COPPER] = BlockChiseledCopper.class; //1015
+        list[EXPOSED_CHISELED_COPPER] = BlockExposedChiseledCopper.class; //1016
+        list[WEATHERED_CHISELED_COPPER] = BlockWeatheredChiseledCopper.class; //1017
+        list[OXIDIZED_CHISELED_COPPER] = BlockOxidizedChiseledCopper.class; //1018
+        list[WAXED_CHISELED_COPPER] = BlockWaxedChiseledCopper.class; //1019
+        list[WAXED_EXPOSED_CHISELED_COPPER] = BlockWaxedExposedChiseledCopper.class; //1020
+        list[WAXED_WEATHERED_CHISELED_COPPER] = BlockWaxedWeatheredChiseledCopper.class; //1021
+        list[WAXED_OXIDIZED_CHISELED_COPPER] = BlockWaxedOxidizedChiseledCopper.class; //1022
+        list[COPPER_GRATE] = BlockCopperGrate.class; //1023
+        list[EXPOSED_COPPER_GRATE] = BlockExposedCopperGrate.class; //1024
+        list[WEATHERED_COPPER_GRATE] = BlockWeatheredCopperGrate.class; //1025
+        list[OXIDIZED_COPPER_GRATE] = BlockOxidizedCopperGrate.class; //1026
+        list[WAXED_COPPER_GRATE] = BlockWaxedCopperGrate.class; //1027
+        list[WAXED_EXPOSED_COPPER_GRATE] = BlockWaxedExposedCopperGrate.class; //1028
+        list[WAXED_WEATHERED_COPPER_GRATE] = BlockWaxedWeatheredCopperGrate.class; //1029
+        list[WAXED_OXIDIZED_COPPER_GRATE] = BlockWaxedOxidizedCopperGrate.class; //1030
         list[COPPER_BULB] = BlockCopperBulb.class; //1031
         list[EXPOSED_COPPER_BULB] = BlockExposedCopperBulb.class; //1032
         list[WEATHERED_COPPER_BULB] = BlockWeatheredCopperBulb.class; //1033
