@@ -9,9 +9,14 @@ import cn.nukkit.nbt.tag.*;
  * @author rcsuperman
  * Nukkit Project
  */
-public abstract class BlockFallable extends BlockSolid {
+public abstract class BlockFallable extends BlockSolidMeta {
 
-    protected BlockFallable() {
+    public BlockFallable() {
+        super(0);
+    }
+
+    public BlockFallable(int meta) {
+        super(meta);
     }
 
     @Override
@@ -29,11 +34,16 @@ public abstract class BlockFallable extends BlockSolid {
                 return type;
             }
 
-            this.level.setBlock(this, Block.get(Block.AIR), true, true);
-            EntityFallingBlock fall = this.createFallingEntity(new CompoundTag());
-            fall.spawnToAll();
+           drop(new CompoundTag());
         }
         return type;
+    }
+
+    public void drop(CompoundTag customNbt) {
+        this.level.setBlock(this, Block.get(Block.AIR), true, true);
+        EntityFallingBlock fall = createFallingEntity(customNbt);
+
+        fall.spawnToAll();
     }
 
     protected EntityFallingBlock createFallingEntity(CompoundTag customNbt) {

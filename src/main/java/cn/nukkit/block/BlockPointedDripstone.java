@@ -25,13 +25,12 @@ import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-public class BlockPointedDripstone extends BlockSolidMeta implements BlockPropertiesHelper, Faceable {
-
-    private static final float GROWTH_PROBABILITY = 0.011377778F;
-    private static final int MAX_HEIGHT = 7;
+public class BlockPointedDripstone extends BlockFallable implements BlockPropertiesHelper, Faceable {
 
     private static final EnumBlockProperty<DripstoneThickness> THICKNESS = new EnumBlockProperty<>("dripstone_thickness", false, DripstoneThickness.class);
     private static final BooleanBlockProperty HANGING = new BooleanBlockProperty("hanging", false);
@@ -66,183 +65,298 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target)) {
-            return false;
-        }
-
-        Block up = this.up();
-        Block down = this.down();
-
-        boolean hanging = false;
-        if (face == BlockFace.UP || face == BlockFace.DOWN) {
-            if ((face == BlockFace.UP && !down.isSolid()) || (face == BlockFace.DOWN && !up.isSolid())) {
-                return false;
-            }
-            hanging = face == BlockFace.DOWN;
-        } else if (up.isSolid()) {
-            hanging = true;
-        } else if (!down.isSolid()) {
-            return false;
-        }
-
-
-        Block tip = null;
-        if (up instanceof BlockPointedDripstone && hanging) {
-            tip = up;
-        } else if (down instanceof BlockPointedDripstone) {
-            tip = down;
-        }
-
-        if (tip != null) {
-            IntObjectPair<Block> pair = this.getDripstoneHeightFromTip(tip, hanging);
-            int height = pair.keyInt();
-            if (height == 0 || height == MAX_HEIGHT) {
-                return false;
-            }
-            Location location = pair.right().getLocation();
-            this.growPointedDripstone(location, hanging, height);
-        } else {
-            this.setHanging(hanging);
-            this.setThickness(DripstoneThickness.TIP);
-            this.getLevel().setBlock(this, this, true, true);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onBreak(Item item, Player player) {
-        boolean hanging = this.isHanging();
-
-        Block newTip = hanging ? this.up() : this.down();
-        if (newTip instanceof BlockPointedDripstone) {
-            ((BlockPointedDripstone) newTip).setThickness(DripstoneThickness.TIP);
-            this.getLevel().setBlock(newTip, newTip);
-        }
-
-        DripstoneThickness thickness = this.getThickness();
-        if (thickness == DripstoneThickness.TIP || thickness == DripstoneThickness.MERGE) {
-            return super.onBreak(item, player);
-        }
-
-        Block block = this;
-        while (block instanceof BlockPointedDripstone) {
-            BlockPointedDripstone dripstone = (BlockPointedDripstone) block;
-            if (this != dripstone) {
-                this.getLevel().addParticle(new DestroyBlockParticle(block.add(0.5), block));
-                if (hanging) {
-                    this.spawnFallingBlock(dripstone);
-                } else {
-                    this.getLevel().dropItem(block.add(0.5, 0.5, 0.5), block.toItem());
-                }
-            }
-            this.getLevel().setBlock(block, Block.get(BlockID.AIR), false, true);
-            block = hanging ? block.down() : block.up();
-        }
-        return true;
-    }
-
-    @Override
     public int onUpdate(int type) {
-        if (type != Level.BLOCK_UPDATE_RANDOM) {
-            return 0;
-        }
-
-        if (ThreadLocalRandom.current().nextFloat() >= GROWTH_PROBABILITY || !this.isHanging() || this.up().getId() == POINTED_DRIPSTONE) {
-            return 0;
-        }
-
-        int height;
-        if (this.canGrow() && (height = this.getDripstoneHeightFromBase(this, true)) < MAX_HEIGHT) {
-            BlockGrowEvent event = new BlockGrowEvent(this, Block.get(BlockID.POINTED_DRIPSTONE));
-            this.getLevel().getServer().getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                return 0;
+        if (type == Level.BLOCK_UPDATE_RANDOM && this.getThickness() == DripstoneThickness.TIP) {
+            Random rand = new Random();
+            double nextDouble = rand.nextDouble();
+            if (nextDouble <= 0.011377778) {
+                this.grow();
             }
-            this.growPointedDripstone(this.getLocation(), true, height);
-        }
 
-        // TODO: grow from ground too
+            drippingLiquid();
+        }
+        boolean hanging = getPropertyValue(HANGING);
+        if (!hanging) {
+            Block down = down();
+            if (!down.isSolid()) {
+                this.getLevel().useBreakOn(this);
+            }
+        }
+        tryDrop(hanging);
         return 0;
     }
 
-    private void growPointedDripstone(Position position, boolean hanging, int height) {
-        this.buildBaseToTipColumn(height + 1, false, thickness -> {
-            BlockPointedDripstone dripstone = (BlockPointedDripstone) Block.get(POINTED_DRIPSTONE);
-            dripstone.setHanging(hanging);
-            dripstone.setThickness(thickness);
-            this.getLevel().setBlock(position, dripstone);
-            position.setY(hanging ? position.getY() - 1 : position.getY() + 1);
-        });
-    }
-
-    private IntObjectPair<Block> getDripstoneHeightFromTip(Block block, boolean hanging) {
-        int height = 0;
-        BlockPointedDripstone dripstone = null;
-        while (block instanceof BlockPointedDripstone) {
-            height++;
-            dripstone = (BlockPointedDripstone) block;
-            block = hanging ? block.up() : block.down();
+    public void tryDrop(boolean hanging) {
+        if (!hanging) return;
+        boolean AirUp = false;
+        Block blockUp = this.clone();
+        while (blockUp.getSide(BlockFace.UP).getId() == POINTED_DRIPSTONE) {
+            blockUp = blockUp.getSide(BlockFace.UP);
         }
-        return IntObjectPair.of(height, dripstone);
-    }
-
-    private int getDripstoneHeightFromBase(Block block, boolean hanging) {
-        int height = 0;
-        while (block instanceof BlockPointedDripstone) {
-            height++;
-            block = hanging ? block.down() : block.up();
+        if (!blockUp.getSide(BlockFace.UP).isSolid())
+            AirUp = true;
+        if (AirUp) {
+            BlockFallEvent event = new BlockFallEvent(this);
+            event.call();
+            if (event.isCancelled()) {
+                return;
+            }
+            BlockPointedDripstone block = (BlockPointedDripstone) blockUp;
+            block.drop(new CompoundTag().putBoolean("BreakOnGround", true));
+            while (block.getSide(BlockFace.DOWN).getId()== POINTED_DRIPSTONE) {
+                block = (BlockPointedDripstone) block.getSide(BlockFace.DOWN);
+                block.drop(new CompoundTag().putBoolean("BreakOnGround", true));
+            }
         }
-        return height;
     }
 
-    private void buildBaseToTipColumn(int height, boolean merge, Consumer<DripstoneThickness> callback) {
-        if (height >= 3) {
-            callback.accept(DripstoneThickness.BASE);
-            for(int i = 0; i < height - 3; ++i) {
-                callback.accept(DripstoneThickness.MIDDLE);
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        int placeX = block.getFloorX();
+        int placeY = block.getFloorY();
+        int placeZ = block.getFloorZ();
+        int upBlockID = level.getBlockIdAt(placeX, placeY + 1, placeZ);
+        int downBlockID = level.getBlockIdAt(placeX, placeY - 1, placeZ);
+        if (Objects.equals(upBlockID, AIR) && Objects.equals(downBlockID, AIR)) return false;
+        /*    "up" define is exist drip stone in block above,"down" is Similarly.
+              up   down
+          1   yes   yes
+          2   yes   no
+          3   no    no
+          4   no    yes
+        */
+        int state = (Objects.equals(upBlockID, POINTED_DRIPSTONE)) ?
+                (Objects.equals(downBlockID, POINTED_DRIPSTONE) ? 1 : 2) :
+                (!Objects.equals(downBlockID, POINTED_DRIPSTONE) ? 3 : 4
+                );
+        boolean hanging = false;
+        switch (state) {
+            case 1 -> {
+                setMergeBlock(placeX, placeY, placeZ, false);
+                setBlockThicknessStateAt(placeX, placeY + 1, placeZ, true, DripstoneThickness.MERGE);
+            }
+            case 2 -> {
+                if (!Objects.equals(level.getBlockIdAt(placeX, placeY - 1, placeZ), AIR)) {
+                    if (face.equals(BlockFace.UP)) {
+                        setBlockThicknessStateAt(placeX, placeY + 1, placeZ, true, DripstoneThickness.MERGE);
+                        setMergeBlock(placeX, placeY, placeZ, false);
+                    } else {
+                        setTipBlock(placeX, placeY, placeZ, true);
+                        setAddChange(placeX, placeY, placeZ, true);
+                    }
+                    return true;
+                }
+                hanging = true;
+            }
+            case 3 -> {
+                setTipBlock(placeX, placeY, placeZ, !face.equals(BlockFace.UP));
+                return true;
+            }
+            case 4 -> {
+                if (!Objects.equals(level.getBlockIdAt(placeX, placeY + 1, placeZ), AIR)) {
+                    if (face.equals(BlockFace.DOWN)) {
+                        setMergeBlock(placeX, placeY, placeZ, true);
+                        setBlockThicknessStateAt(placeX, placeY - 1, placeZ, false, DripstoneThickness.MERGE);
+                    } else {
+                        setTipBlock(placeX, placeY, placeZ, false);
+                        setAddChange(placeX, placeY, placeZ, false);
+                    }
+                    return true;
+                }
+            }
+        }
+        setAddChange(placeX, placeY, placeZ, hanging);
+
+        if (state == 1) return true;
+        setTipBlock(placeX, placeY, placeZ, hanging);
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        int x = this.getFloorX();
+        int y = this.getFloorY();
+        int z = this.getFloorZ();
+        level.setBlock(x, y, z, Block.get(AIR), true, true);
+        boolean hanging = getPropertyValue(HANGING);
+        DripstoneThickness thickness = getThickness();
+        if (thickness == DripstoneThickness.MERGE) {
+            if (!hanging) {
+                setBlockThicknessStateAt(x, y + 1, z, true, DripstoneThickness.TIP);
+            } else setBlockThicknessStateAt(x, y - 1, z, false, DripstoneThickness.TIP);
+        }
+        if (!hanging) {
+            int length = getPointedDripStoneLength(x, y, z, false);
+            if (length > 0) {
+                Block downBlock = down();
+                for (int i = 0; i <= length - 1; ++i) {
+                    level.setBlock(downBlock.down(i), Block.get(AIR), false, false);
+                }
+                for (int i = length - 1; i >= 0; --i) {
+                    place(null, downBlock.down(i), null, BlockFace.DOWN, 0, 0, 0, null);
+                }
+            }
+        }
+        if (hanging) {
+            int length = getPointedDripStoneLength(x, y, z, true);
+            if (length > 0) {
+                Block upBlock = up();
+                for (int i = 0; i <= length - 1; ++i) {
+                    level.setBlock(upBlock.up(i), Block.get(AIR), false, false);
+                }
+                for (int i = length - 1; i >= 0; --i) {
+                    place(null, upBlock.up(i), null, BlockFace.DOWN, 0, 0, 0, null);
+                }
             }
         }
 
-        if (height >= 2) {
-            callback.accept(DripstoneThickness.FRUSTUM);
-        }
+        return true;
+    }
 
-        if (height >= 1) {
-            callback.accept(merge ? DripstoneThickness.MERGE : DripstoneThickness.TIP);
+    /*@Override
+    public void onEntityFallOn(Entity entity, float fallDistance) {
+        if (this.level.gameRules.getBoolean(GameRule.FALL_DAMAGE) && this.getPropertyValue(DRIPSTONE_THICKNESS) == DripstoneThickness.TIP && !this.getPropertyValue(HANGING)) {
+            int jumpBoost = entity.hasEffect(EffectType.JUMP_BOOST) ? Effect.get(EffectType.JUMP_BOOST).getLevel() : 0;
+            float damage = (fallDistance - jumpBoost) * 2 - 2;
+            if (damage > 0)
+                entity.attack(new EntityDamageEvent(entity, EntityDamageEvent.DamageCause.FALL, damage));
         }
     }
 
-    private boolean canGrow() {
-        Block up2;
-        // TODO: grow from ground too
-        return this.down().getId() == AIR && this.up().getId() == DRIPSTONE_BLOCK && ((up2 = this.up(2)).getId() == WATER || up2.getId() == STILL_WATER);
+    @Override
+    public boolean useDefaultFallDamage() {
+        return false;
+    }*/
+
+    protected void setTipBlock(int x, int y, int z, boolean hanging) {
+        setThickness(DripstoneThickness.TIP);
+        this.setPropertyValue(HANGING, hanging);
+        this.getLevel().setBlock(x, y, z, this, true, true);
     }
 
-    private void spawnFallingBlock(BlockPointedDripstone block) {
-        BlockFallEvent event = new BlockFallEvent(block);
-        this.level.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+    protected void setMergeBlock(int x, int y, int z, boolean hanging) {
+        this.setThickness(DripstoneThickness.MERGE);
+        this.setPropertyValue(HANGING, hanging);
+        this.getLevel().setBlock(x, y, z, this, true, true);
+    }
+
+    protected void setBlockThicknessStateAt(int x, int y, int z, boolean hanging, DripstoneThickness thickness) {
+        BlockPointedDripstone blockState;
+        this.setThickness(thickness);
+        this.setPropertyValue(HANGING, hanging);
+        blockState = this;
+        level.setBlock(x, y, z, blockState, true,false);
+    }
+
+    protected int getPointedDripStoneLength(int x, int y, int z, boolean hanging) {
+        if (hanging) {
+            for (int j = y + 1; j < getLevel().getDimensionData().getMaxHeight(); ++j) {
+                int blockId = level.getBlockIdAt(x, j, z);
+                if (!Objects.equals(blockId, POINTED_DRIPSTONE)) {
+                    return j - y - 1;
+                }
+            }
+        } else {
+            for (int j = y - 1; j > getLevel().getDimensionData().getMinHeight(); --j) {
+                int blockId = level.getBlockIdAt(x, j, z);
+                if (!Objects.equals(blockId, POINTED_DRIPSTONE)) {
+                    return y - j - 1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    protected void setAddChange(int x, int y, int z, boolean hanging) {
+        int length = getPointedDripStoneLength(x, y, z, hanging);
+        int k2 = !hanging ? -2 : 2;
+        int k1 = !hanging ? -1 : 1;
+        if (length == 1) {
+            setBlockThicknessStateAt(x, y + k1, z, hanging, DripstoneThickness.FRUSTUM);
+        }
+        if (length == 2) {
+            setBlockThicknessStateAt(x, y + k2, z, hanging, DripstoneThickness.BASE);
+            setBlockThicknessStateAt(x, y + k1, z, hanging, DripstoneThickness.FRUSTUM);
+        }
+        if (length >= 3) {
+            setBlockThicknessStateAt(x, y + k2, z, hanging, DripstoneThickness.MIDDLE);
+            setBlockThicknessStateAt(x, y + k1, z, hanging, DripstoneThickness.FRUSTUM);
+        }
+    }
+
+    public void grow() {
+        BlockFace face = this.isHanging() ? BlockFace.DOWN : BlockFace.UP;
+        Block target = this.getSide(face);
+        if (target.isAir()) {
+            this.place(null, target, null, face, 0, 0, 0, null);
+        }
+    }
+
+    public void drippingLiquid() {//features according to https://zh.minecraft.wiki/w/%E6%BB%B4%E6%B0%B4%E7%9F%B3%E9%94%A5
+        if (this.getLevelBlockAtLayer(1) instanceof BlockLiquid || this.getThickness() != DripstoneThickness.TIP || !this.isHanging()) {
+            return;
+        }
+        Block highestPDS = this;
+        int height = 1;
+        while (highestPDS.getSide(BlockFace.UP) instanceof BlockPointedDripstone) {
+            highestPDS = highestPDS.getSide(BlockFace.UP);
+            height++;
+        }
+
+        boolean isWaterloggingBlock = false;
+        if (height >= 11 ||
+                !(highestPDS.getSide(BlockFace.UP, 2) instanceof BlockLiquid ||
+                        highestPDS.getSide(BlockFace.UP, 2).getLevelBlockAtLayer(1) instanceof BlockWater)
+        ) {
             return;
         }
 
-        CompoundTag nbt = new CompoundTag()
-                .putList(new ListTag<DoubleTag>("Pos")
-                        .add(new DoubleTag("", this.x + 0.5))
-                        .add(new DoubleTag("", this.y))
-                        .add(new DoubleTag("", this.z + 0.5)))
-                .putList(new ListTag<DoubleTag>("Motion")
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0)))
+        if (highestPDS.getSide(BlockFace.UP, 2).getLevelBlockAtLayer(1) instanceof BlockWater) {
+            isWaterloggingBlock = true;
+        }
 
-                .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", 0))
-                        .add(new FloatTag("", 0)))
-                .putInt("TileID", this.getId())
-                .putByte("Data", this.getDamage());
+        Block tmp = this;
+        BlockCauldron cauldron;
+        while (tmp.getSide(BlockFace.DOWN) instanceof BlockAir) {
+            tmp = tmp.getSide(BlockFace.DOWN);
+        }
+        if (tmp.getSide(BlockFace.DOWN) instanceof BlockCauldron) {
+            cauldron = (BlockCauldron) tmp.getSide(BlockFace.DOWN);
+        } else {
+            return;
+        }
 
-        Entity.createEntity(EntityFallingBlock.NETWORK_ID, this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt).spawnToAll();
+        Random rand = new Random();
+        double nextDouble;
+        Block filledWith = isWaterloggingBlock ? highestPDS.getSideAtLayer(1, BlockFace.UP, 2) : highestPDS.getSide(BlockFace.UP, 2);
+        /*switch (filledWith.getId()) {
+            case FLOWING_LAVA -> {
+                nextDouble = rand.nextDouble();
+                if ((cauldron.getCauldronLiquid() == CauldronLiquid.LAVA || cauldron.isEmpty()) && cauldron.getFillLevel() < 6 && nextDouble <= 15.0 / 256.0) {
+                    CauldronFilledByDrippingLiquidEvent event = new CauldronFilledByDrippingLiquidEvent(cauldron, CauldronLiquid.LAVA, 1);
+                    Server.getInstance().getPluginManager().callEvent(event);
+                    if (event.isCancelled())
+                        return;
+                    cauldron.setCauldronLiquid(event.getLiquid());
+                    cauldron.setFillLevel(cauldron.getFillLevel() + event.getLiquidLevelIncrement());
+                    cauldron.level.setBlock(cauldron, cauldron, true, true);
+                    this.getLevel().addSound(this.add(0.5, 1, 0.5), Sound.CAULDRON_DRIP_LAVA_POINTED_DRIPSTONE);
+                }
+            }
+            case FLOWING_WATER -> {
+                nextDouble = rand.nextDouble();
+                if ((cauldron.getCauldronLiquid() == CauldronLiquid.WATER || cauldron.isEmpty()) && cauldron.getFillLevel() < 6 && nextDouble <= 45.0 / 256.0) {
+                    CauldronFilledByDrippingLiquidEvent event = new CauldronFilledByDrippingLiquidEvent(cauldron, CauldronLiquid.WATER, 1);
+                    Server.getInstance().getPluginManager().callEvent(event);
+                    if (event.isCancelled())
+                        return;
+                    cauldron.setCauldronLiquid(event.getLiquid());
+                    cauldron.setFillLevel(cauldron.getFillLevel() + event.getLiquidLevelIncrement());
+                    cauldron.level.setBlock(cauldron, cauldron, true, true);
+                    this.getLevel().addSound(this.add(0.5, 1, 0.5), Sound.CAULDRON_DRIP_WATER_POINTED_DRIPSTONE);
+                }
+            }
+        }*/
     }
 
     @Override
