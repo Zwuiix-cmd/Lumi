@@ -11,7 +11,6 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    int v1_1_0 = 113;
     int v1_2_0 = 137;
     int v1_2_5_11 = 140;
     int v1_2_5 = 141;

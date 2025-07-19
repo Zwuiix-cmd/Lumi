@@ -505,7 +505,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
     }
 
-    private static final CreativeItems creative113 = new CreativeItems();
     private static final CreativeItems creative137 = new CreativeItems();
     private static final CreativeItems creative274 = new CreativeItems();
     private static final CreativeItems creative291 = new CreativeItems();
@@ -553,7 +552,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
 
         // Creative inventory for oldest versions
-        registerCreativeItems(v1_1_0);
         registerCreativeItems(v1_2_0);
         registerCreativeItems(v1_5_0);
         registerCreativeItems(v1_7_0);
@@ -682,7 +680,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static void clearCreativeItems() {
-        Item.creative113.clear();
         Item.creative137.clear();
         Item.creative274.clear();
         Item.creative291.clear();
@@ -743,8 +740,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static CreativeItems getCreativeItemsAndGroups(int protocol) {
         switch (protocol) {
-            case v1_1_0:
-                return Item.creative113;
             case v1_2_0:
             case v1_2_5_11:
             case v1_2_5:
@@ -887,7 +882,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static void addCreativeItem(int protocol, Item item, CreativeItemCategory category, String group) {
         switch (protocol) { // NOTE: Not all versions are supposed to be here
-            case v1_1_0 -> Item.creative113.add(item.clone(), category, group);
             case v1_2_0 -> Item.creative137.add(item.clone(), category, group);
             case v1_5_0 -> Item.creative274.add(item.clone(), category, group);
             case v1_7_0 -> Item.creative291.add(item.clone(), category, group);

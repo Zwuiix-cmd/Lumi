@@ -80,9 +80,4 @@ public class NPCRequestProcessor extends DataPacketProcessor<NPCRequestPacket> {
     public Class<? extends DataPacket> getPacketClass() {
         return NPCRequestPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

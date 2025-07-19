@@ -42,9 +42,4 @@ public class LevelSoundEventProcessor<T extends LevelSoundEventPacket> extends D
     public Class<? extends DataPacket> getPacketClass() {
         return LevelSoundEventPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

@@ -85,9 +85,4 @@ public class MapInfoRequestProcessor extends DataPacketProcessor<MapInfoRequestP
     public Class<? extends DataPacket> getPacketClass() {
         return MapInfoRequestPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

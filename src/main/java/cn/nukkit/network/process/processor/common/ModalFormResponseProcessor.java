@@ -68,9 +68,4 @@ public class ModalFormResponseProcessor extends DataPacketProcessor<ModalFormRes
     public Class<? extends DataPacket> getPacketClass() {
         return ModalFormResponsePacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

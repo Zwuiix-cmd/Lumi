@@ -37,9 +37,4 @@ public class RequestChunkRadiusProcessor extends DataPacketProcessor<RequestChun
     public Class<? extends DataPacket> getPacketClass() {
         return RequestChunkRadiusPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

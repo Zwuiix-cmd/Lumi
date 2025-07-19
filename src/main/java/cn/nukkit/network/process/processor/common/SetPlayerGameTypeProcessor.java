@@ -49,9 +49,4 @@ public class SetPlayerGameTypeProcessor extends DataPacketProcessor<SetPlayerGam
     public Class<? extends DataPacket> getPacketClass() {
         return SetPlayerGameTypePacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

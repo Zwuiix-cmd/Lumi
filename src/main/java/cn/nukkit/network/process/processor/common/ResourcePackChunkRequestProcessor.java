@@ -48,9 +48,4 @@ public class ResourcePackChunkRequestProcessor extends DataPacketProcessor<Resou
     public Class<? extends DataPacket> getPacketClass() {
         return ResourcePackChunkRequestPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }
