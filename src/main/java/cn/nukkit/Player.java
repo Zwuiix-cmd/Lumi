@@ -4903,11 +4903,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.z = (float) pos.z;
                 pk.data = (int) (65535 / breakTime);
                 this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
-
-                if (this.getLevel().isAntiXrayEnabled() && this.getLevel().getAntiXraySystem().isPreDeObfuscate()) {
-                    this.getLevel().getAntiXraySystem().deObfuscateBlock(this, face, target);
-                }
             }
+        }
+
+        if (this.getLevel().isAntiXrayEnabled() && this.getLevel().getAntiXraySystem().isPreDeObfuscate()) {
+            this.getLevel().getAntiXraySystem().deObfuscateBlock(this, face, target);
         }
 
         this.breakingBlock = target;
