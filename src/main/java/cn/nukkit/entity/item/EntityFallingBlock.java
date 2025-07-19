@@ -70,6 +70,7 @@ public class EntityFallingBlock extends Entity {
     protected int blockId;
     protected int damage;
     protected boolean breakOnLava;
+    protected boolean breakOnGround;
 
     public EntityFallingBlock(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -92,6 +93,7 @@ public class EntityFallingBlock extends Entity {
             }
 
             this.breakOnLava = this.namedTag.getBoolean("BreakOnLava");
+            this.breakOnGround = namedTag.getBoolean("BreakOnGround");
         }
 
         if (this.blockId == 0) {
@@ -213,8 +215,16 @@ public class EntityFallingBlock extends Entity {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(blockId, damage));
                     this.server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        this.level.setBlock(pos, event.getTo(), true, true);
-                        this.level.scheduleUpdate(this.level.getBlock(pos), 1);
+
+                        if (breakOnGround) {
+                            if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                                this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
+                            }
+                            level.addParticle(new DestroyBlockParticle(pos, block));
+                        } else {
+                            this.level.setBlock(pos, event.getTo(), true, true);
+                            this.level.scheduleUpdate(this.level.getBlock(pos), 1);
+                        }
 
                         //== 临时修复掉落方块问题
                         // 可能原因：onGround更新不及时 或者两个EntityFallingBlock离得太近，导致核心误判为同一位置
@@ -233,13 +243,13 @@ public class EntityFallingBlock extends Entity {
                             if (blockId == Item.ANVIL) {
                                 this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ANVIL_FALL);
                             } else {
-                                this.getLevel().dropItem(this, Block.get(blockId, event.getTo().getDamage()).toItem());
+                                getLevel().addLevelEvent(block, LevelEventPacket.EVENT_SOUND_POINTED_DRIPSTONE_LAND);
                             }
-
+                            System.out.println(fallDistance + " " + y);
                             Entity[] e = level.getCollidingEntities(this.getBoundingBox(), this);
                             for (Entity entity : e) {
-                                if (entity instanceof EntityLiving && highestPosition > y) {
-                                    entity.attack(new EntityDamageByBlockEvent(event.getTo(), entity, DamageCause.CONTACT, (float) Math.min(40, Math.max(0, (highestPosition - y) * 2))));
+                                if (entity instanceof EntityLiving && fallDistance > 0) {
+                                    entity.attack(new EntityDamageByBlockEvent(event.getTo(), entity, DamageCause.CONTACT, (float) Math.min(40, Math.max(0, (fallDistance) * 2))));
                                 }
                             }
                         }
