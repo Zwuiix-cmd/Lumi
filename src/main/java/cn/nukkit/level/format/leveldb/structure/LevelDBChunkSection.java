@@ -3,6 +3,7 @@ package cn.nukkit.level.format.leveldb.structure;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.custom.container.BlockStorageContainer;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
@@ -33,6 +34,7 @@ public class LevelDBChunkSection implements ChunkSection {
     private WeakReference<LevelDBChunk> parent;
 
     protected final int y;
+    protected final Level level;
     protected StateBlockStorage[] storages;
 
 
@@ -51,23 +53,25 @@ public class LevelDBChunkSection implements ChunkSection {
     protected Lock writeLock = lock.writeLock();
     private final ReentrantLock skyLightLock = new ReentrantLock();
 
-    public LevelDBChunkSection(int y) {
-        this(null, y);
+    public LevelDBChunkSection(Level level, int y) {
+        this(level, null, y);
     }
 
-    public LevelDBChunkSection(LevelDBChunk parent, int y) {
+    public LevelDBChunkSection(Level level, LevelDBChunk parent, int y) {
         this.parent = new WeakReference<>(parent);
         this.y = y;
         this.storages = new StateBlockStorage[]{ new StateBlockStorage(), new StateBlockStorage() };
+        this.level = level;
     }
 
-    public LevelDBChunkSection(int y, @Nullable StateBlockStorage[] storages) {
-        this(null, y, storages, null, null, null, false, false);
+    public LevelDBChunkSection(Level level, int y, @Nullable StateBlockStorage[] storages) {
+        this(level, null, y, storages, null, null, null, false, false);
     }
 
-    public LevelDBChunkSection(LevelDBChunk parent, int y, @Nullable StateBlockStorage[] storages, byte[] blockLight, byte[] skyLight, byte[] compressedLight, boolean hasBlockLight, boolean hasSkyLight) {
+    public LevelDBChunkSection(Level level, LevelDBChunk parent, int y, @Nullable StateBlockStorage[] storages, byte[] blockLight, byte[] skyLight, byte[] compressedLight, boolean hasBlockLight, boolean hasSkyLight) {
         this.parent = new WeakReference<>(parent);
         this.y = y;
+        this.level = level;
 
         if (storages == null || storages.length == 0) {
             this.storages = new StateBlockStorage[]{ new StateBlockStorage(), new StateBlockStorage() };
@@ -708,7 +712,7 @@ public class LevelDBChunkSection implements ChunkSection {
             stream.putByte((byte) layers);
 
             for (int i = 0; i < layers; i++) {
-                this.storages[i].writeTo(protocol, stream, antiXray);
+                this.storages[i].writeTo(level, protocol, stream, antiXray);
             }
         } finally {
             this.readLock.unlock();
@@ -803,7 +807,7 @@ public class LevelDBChunkSection implements ChunkSection {
                 }
                 storages[i] = storage.copy();
             }
-            return new LevelDBChunkSection(null, this.y, storages, this.blockLight, this.skyLight, this.compressedLight, this.hasBlockLight, this.hasSkyLight);
+            return new LevelDBChunkSection(level, null, this.y, storages, this.blockLight, this.skyLight, this.compressedLight, this.hasBlockLight, this.hasSkyLight);
         } finally {
             this.readLock.unlock();
         }
