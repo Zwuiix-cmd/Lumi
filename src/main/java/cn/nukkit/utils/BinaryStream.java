@@ -327,82 +327,68 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        if (protocol < ProtocolInfo.v1_13_0) {
-            if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
-                this.putByteArray(steveSkinDecoded != null ? steveSkinDecoded : (steveSkinDecoded = Base64.getDecoder().decode(Skin.STEVE_SKIN)));
-                this.putByteArray(skin.getCapeData().data);
-                this.putString("geometry.humanoid.custom");
-                this.putString(Skin.STEVE_GEOMETRY);
-            } else {
-                this.putByteArray(skin.getSkinData().data);
-                this.putByteArray(skin.getCapeData().data);
-                this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
-                this.putString(skin.getGeometryData());
-            }
-        } else {
-            if (protocol >= ProtocolInfo.v1_16_210) {
-                this.putString(skin.getPlayFabId());
-            }
-            this.putString(skin.getSkinResourcePatch());
-            this.putImage(skin.getSkinData());
+        if (protocol >= ProtocolInfo.v1_16_210) {
+            this.putString(skin.getPlayFabId());
+        }
+        this.putString(skin.getSkinResourcePatch());
+        this.putImage(skin.getSkinData());
 
-            List<SkinAnimation> animations = skin.getAnimations();
-            this.putLInt(animations.size());
-            for (SkinAnimation animation : animations) {
-                this.putImage(animation.image);
-                this.putLInt(animation.type);
-                this.putLFloat(animation.frames);
-                if (protocol >= ProtocolInfo.v1_16_100) {
-                    this.putLInt(animation.expression);
+        List<SkinAnimation> animations = skin.getAnimations();
+        this.putLInt(animations.size());
+        for (SkinAnimation animation : animations) {
+            this.putImage(animation.image);
+            this.putLInt(animation.type);
+            this.putLFloat(animation.frames);
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.putLInt(animation.expression);
+            }
+        }
+
+        this.putImage(skin.getCapeData());
+        this.putString(skin.getGeometryData());
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putString(skin.getGeometryDataEngineVersion());
+        }
+        this.putString(skin.getAnimationData());
+        if (protocol < ProtocolInfo.v1_17_30) {
+            this.putBoolean(skin.isPremium());
+            this.putBoolean(skin.isPersona());
+            this.putBoolean(skin.isCapeOnClassic());
+        }
+        this.putString(skin.getCapeId());
+        this.putString(skin.getFullSkinId());
+        if (protocol >= ProtocolInfo.v1_14_60) {
+            this.putString(skin.getArmSize());
+            this.putString(skin.getSkinColor());
+
+            List<PersonaPiece> pieces = skin.getPersonaPieces();
+            this.putLInt(pieces.size());
+            for (PersonaPiece piece : pieces) {
+                this.putString(piece.id);
+                this.putString(piece.type);
+                this.putString(piece.packId);
+                this.putBoolean(piece.isDefault);
+                this.putString(piece.productId);
+            }
+
+            List<PersonaPieceTint> tints = skin.getTintColors();
+            this.putLInt(tints.size());
+            for (PersonaPieceTint tint : tints) {
+                this.putString(tint.pieceType);
+                List<String> colors = tint.colors;
+                this.putLInt(colors.size());
+                for (String color : colors) {
+                    this.putString(color);
                 }
             }
 
-            this.putImage(skin.getCapeData());
-            this.putString(skin.getGeometryData());
             if (protocol >= ProtocolInfo.v1_17_30) {
-                this.putString(skin.getGeometryDataEngineVersion());
-            }
-            this.putString(skin.getAnimationData());
-            if (protocol < ProtocolInfo.v1_17_30) {
                 this.putBoolean(skin.isPremium());
                 this.putBoolean(skin.isPersona());
                 this.putBoolean(skin.isCapeOnClassic());
-            }
-            this.putString(skin.getCapeId());
-            this.putString(skin.getFullSkinId());
-            if (protocol >= ProtocolInfo.v1_14_60) {
-                this.putString(skin.getArmSize());
-                this.putString(skin.getSkinColor());
-
-                List<PersonaPiece> pieces = skin.getPersonaPieces();
-                this.putLInt(pieces.size());
-                for (PersonaPiece piece : pieces) {
-                    this.putString(piece.id);
-                    this.putString(piece.type);
-                    this.putString(piece.packId);
-                    this.putBoolean(piece.isDefault);
-                    this.putString(piece.productId);
-                }
-
-                List<PersonaPieceTint> tints = skin.getTintColors();
-                this.putLInt(tints.size());
-                for (PersonaPieceTint tint : tints) {
-                    this.putString(tint.pieceType);
-                    List<String> colors = tint.colors;
-                    this.putLInt(colors.size());
-                    for (String color : colors) {
-                        this.putString(color);
-                    }
-                }
-
-                if (protocol >= ProtocolInfo.v1_17_30) {
-                    this.putBoolean(skin.isPremium());
-                    this.putBoolean(skin.isPersona());
-                    this.putBoolean(skin.isCapeOnClassic());
-                    this.putBoolean(skin.isPrimaryUser());
-                    if (protocol >= ProtocolInfo.v1_19_63) {
-                        this.putBoolean(skin.isOverridingPlayerAppearance());
-                    }
+                this.putBoolean(skin.isPrimaryUser());
+                if (protocol >= ProtocolInfo.v1_19_63) {
+                    this.putBoolean(skin.isOverridingPlayerAppearance());
                 }
             }
         }
@@ -940,11 +926,6 @@ public class BinaryStream {
                         if (runtimeId == Item.HONEYCOMB || runtimeId == Item.HONEY_BOTTLE) {
                             saveOriginalID = true;
                             runtimeId = Item.INFO_UPDATE;
-                        } else if (protocolId < ProtocolInfo.v1_13_0) {
-                            if (runtimeId == Item.SUSPICIOUS_STEW) {
-                                saveOriginalID = true;
-                                runtimeId = Item.INFO_UPDATE;
-                            }
                         }
                     }
                 }

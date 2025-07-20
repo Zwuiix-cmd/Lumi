@@ -276,16 +276,14 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(this.isWorldTemplateOptionLocked);
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
-                    if (protocol >= ProtocolInfo.v1_13_0) {
-                        if (protocol >= ProtocolInfo.v1_19_20) {
-                            this.putBoolean(this.isDisablingPersonas);
-                            this.putBoolean(this.isDisablingCustomSkins);
-                            if (protocol >= ProtocolInfo.v1_19_60) {
-                                this.putBoolean(this.emoteChatMuted);
-                            }
+                    if (protocol >= ProtocolInfo.v1_19_20) {
+                        this.putBoolean(this.isDisablingPersonas);
+                        this.putBoolean(this.isDisablingCustomSkins);
+                        if (protocol >= ProtocolInfo.v1_19_60) {
+                            this.putBoolean(this.emoteChatMuted);
                         }
-                        this.putString(this.vanillaVersion);
                     }
+                    this.putString(this.vanillaVersion);
                 }
             }
             if (protocol >= ProtocolInfo.v1_16_0) {
@@ -317,20 +315,18 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
-        if (protocol >= ProtocolInfo.v1_13_0) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                if (protocol >= ProtocolInfo.v1_16_210) {
-                    if (protocol < ProtocolInfo.v1_21_90) {
-                        this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
-                    }
-                    this.putVarInt(0); // RewindHistorySize
-                    this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
-                } else {
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            if (protocol >= ProtocolInfo.v1_16_210) {
+                if (protocol < ProtocolInfo.v1_21_90) {
                     this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
                 }
+                this.putVarInt(0); // RewindHistorySize
+                this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
             } else {
-                this.putBoolean(this.isMovementServerAuthoritative);
+                this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
             }
+        } else {
+            this.putBoolean(this.isMovementServerAuthoritative);
         }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);

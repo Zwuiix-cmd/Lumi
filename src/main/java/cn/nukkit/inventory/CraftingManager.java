@@ -721,22 +721,18 @@ public class CraftingManager {
         for (SmithingRecipe recipe : this.getSmithingRecipes(protocol).values()) {
             pk.addShapelessRecipe(recipe);
         }
-        if (protocol > ProtocolInfo.v1_13_0) {
-            for (FurnaceRecipe recipe : this.getFurnaceRecipes(protocol).values()) {
-                pk.addFurnaceRecipe(recipe);
-            }
+        for (FurnaceRecipe recipe : this.getFurnaceRecipes(protocol).values()) {
+            pk.addFurnaceRecipe(recipe);
         }
-        if (protocol >= ProtocolInfo.v1_13_0) {
-            for (BrewingRecipe recipe : this.getBrewingRecipes(protocol).values()) {
-                pk.addBrewingRecipe(recipe);
-            }
-            for (ContainerRecipe recipe : this.getContainerRecipes(protocol).values()) {
-                pk.addContainerRecipe(recipe);
-            }
-            if (protocol >= ProtocolInfo.v1_16_0) {
-                for (MultiRecipe recipe : this.getMultiRecipes(protocol).values()) {
-                    pk.addMultiRecipe(recipe);
-                }
+        for (BrewingRecipe recipe : this.getBrewingRecipes(protocol).values()) {
+            pk.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : this.getContainerRecipes(protocol).values()) {
+            pk.addContainerRecipe(recipe);
+        }
+        if (protocol >= ProtocolInfo.v1_16_0) {
+            for (MultiRecipe recipe : this.getMultiRecipes(protocol).values()) {
+                pk.addMultiRecipe(recipe);
             }
         }
         pk.tryEncode();
@@ -960,11 +956,6 @@ public class CraftingManager {
                 packet407 = packetFor(ProtocolInfo.v1_16_0);
             }
             return packet407;
-        } else if (protocol >= ProtocolInfo.v1_13_0) {
-            if (packet388 == null) {
-                packet388 = packetFor(ProtocolInfo.v1_13_0);
-            }
-            return packet388;
         }
         return null;
     }

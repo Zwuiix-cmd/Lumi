@@ -130,20 +130,10 @@ public class AddEntityPacket extends DataPacket {
         mapping.put(EntityRavager.NETWORK_ID, "minecraft:ravager");
         mapping.put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2");
         mapping.put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2");
+        mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
+        mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
 
         // Correct new entities for older protocols
-        if (protocolId < ProtocolInfo.v1_13_0) {
-            mapping.put(EntityFox.NETWORK_ID, mapping.get(EntityWolf.NETWORK_ID));
-        } else {
-            mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
-        }
-
-        if (protocolId < ProtocolInfo.v1_14_0) {
-            mapping.put(EntityBee.NETWORK_ID, mapping.get(EntityBat.NETWORK_ID));
-        } else {
-            mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
-        }
-
         if (protocolId < ProtocolInfo.v1_16_0) {
             mapping.put(EntityPiglin.NETWORK_ID, mapping.get(EntityZombiePigman.NETWORK_ID));
             mapping.put(EntityHoglin.NETWORK_ID, mapping.get(EntityPig.NETWORK_ID));
@@ -320,9 +310,6 @@ public class AddEntityPacket extends DataPacket {
 
                         if (this.protocol < ProtocolInfo.v1_14_0 && this.type == EntityBee.NETWORK_ID) {
                             return "minecraft:bat";
-                        }
-                        if (this.protocol < ProtocolInfo.v1_13_0 && this.type == EntityFox.NETWORK_ID) {
-                            return "minecraft:wolf";
                         }
                     }
                 }

@@ -36,21 +36,16 @@ public class PlayerListPacket extends DataPacket {
                     this.putUUID(entry.uuid);
                     this.putVarLong(entry.entityId);
                     this.putString(entry.name);
-                    if (protocol < ProtocolInfo.v1_13_0) {
-                        this.putSkin(protocol, entry.skin);
-                    }
                     this.putString(entry.xboxUserId);
                     this.putString(entry.platformChatId);
-                    if (protocol >= 388) {
-                        this.putLInt(entry.buildPlatform);
-                        this.putSkin(protocol, entry.skin);
-                        this.putBoolean(entry.isTeacher);
-                        this.putBoolean(entry.isHost);
-                        if (protocol >= ProtocolInfo.v1_20_60) {
-                            this.putBoolean(entry.isSubClient);
-                            if (protocol >= ProtocolInfo.v1_21_80) {
-                                this.putLInt(entry.color);
-                            }
+                    this.putLInt(entry.buildPlatform);
+                    this.putSkin(protocol, entry.skin);
+                    this.putBoolean(entry.isTeacher);
+                    this.putBoolean(entry.isHost);
+                    if (protocol >= ProtocolInfo.v1_20_60) {
+                        this.putBoolean(entry.isSubClient);
+                        if (protocol >= ProtocolInfo.v1_21_80) {
+                            this.putLInt(entry.color);
                         }
                     }
                 }

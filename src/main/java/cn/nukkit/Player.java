@@ -1160,14 +1160,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.teleport(respawnEvent.getRespawnPosition(), null);
 
-            if (this.protocol < ProtocolInfo.v1_13_0) {
-                RespawnPacket respawnPacket = new RespawnPacket();
-                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
-                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
-                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
-                this.dataPacket(respawnPacket);
-            }
-
             this.setHealth(this.getMaxHealth());
             this.foodData.setFood(20, 20);
             this.sendData(this);

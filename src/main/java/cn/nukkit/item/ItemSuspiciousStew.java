@@ -60,9 +60,4 @@ public class ItemSuspiciousStew extends ItemFood {
 
         return true;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_13_0;
-    }
 }

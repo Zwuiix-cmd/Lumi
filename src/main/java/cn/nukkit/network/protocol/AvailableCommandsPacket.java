@@ -247,10 +247,8 @@ public class AvailableCommandsPacket extends DataPacket {
             return COMMAND_PARAMS_428;
         } else if (protocol >= ProtocolInfo.v1_16_100) {
             return COMMAND_PARAMS_419;
-        } else if (protocol >= ProtocolInfo.v1_13_0) {
-            return COMMAND_PARAMS_388;
         } else {
-            return COMMAND_PARAMS_340;
+            return COMMAND_PARAMS_388;
         }
     }
 
