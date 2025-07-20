@@ -1,4 +1,4 @@
-package cn.nukkit.network.process.processor.v340;
+package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.block.Block;

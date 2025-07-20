@@ -2,9 +2,9 @@ package cn.nukkit.network.process;
 
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.network.process.processor.common.*;
-import cn.nukkit.network.process.processor.v137.CommandRequestProcessor;
-import cn.nukkit.network.process.processor.v282.SetLocalPlayerAsInitializedProcessor;
-import cn.nukkit.network.process.processor.v340.LecternUpdateProcessor;
+import cn.nukkit.network.process.processor.common.CommandRequestProcessor;
+import cn.nukkit.network.process.processor.common.SetLocalPlayerAsInitializedProcessor;
+import cn.nukkit.network.process.processor.common.LecternUpdateProcessor;
 import cn.nukkit.network.process.processor.v422.FilterTextProcessor_v422;
 import cn.nukkit.network.process.processor.v527.RequestAbilityProcessor_v527;
 import cn.nukkit.network.process.processor.v554.RequestNetworkSettingsProcessor_v554;

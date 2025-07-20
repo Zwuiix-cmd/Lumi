@@ -1,4 +1,4 @@
-package cn.nukkit.network.process.processor.v282;
+package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.event.player.PlayerLocallyInitializedEvent;
