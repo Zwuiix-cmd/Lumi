@@ -1,6 +1,7 @@
-<h3 align="center">Lumi</h3>
-
-------
+<h1 align="center">
+    ✨ Lumi
+</h1>
+<p align="center">A sunshine between dark Minecraft Bedrock clouds. Drop-in replacement for Nukkit</p>
 
 ## Introduction
 Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTime/Nukkit-MOT/) which was made to introduce many new features and improvements.
@@ -8,12 +9,14 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 ### What's new in Lumi?
 1. Support for 1.20.0 – 1.21.93 version (you can set the minimum protocol in the config)
 2. More vanilla features
-3. Better API, yeaa!!
+4. Custom enchantments
+5. Better AntiXray system
+6. Better API (effects, food and etc.)
 
 ## How to install?
 1. Install java 21 or higher
 2. Download the .jar file from the links below
-3. Write a command to run: `java -jar Lumi-1.0.0.jar`
+3. Write a command to run: `java -jar Lumi-1.0.0-SNAPSHOT.jar`
 
 ## Maven
 Adding repo:
