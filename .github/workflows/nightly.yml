@@ -48,8 +48,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: nightly
-          name: Nightly Build
-          body: "Automated nightly build from master branch."
+          name: Latest Build
+          body: |
+            **This is the latest version of Lumi built from source.**
+
+            🔗 Commit: [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+
+            ### Artifacts
+            - `Lumi-1.0.0-SNAPSHOT.jar` – recommended, includes all dependencies.
+            - `Lumi-1.0.0-SNAPSHOT-dev.jar` – same build without dependencies (for developers).
           draft: false
           prerelease: false
           files: artifacts/*.jar
