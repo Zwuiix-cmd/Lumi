@@ -10,7 +10,6 @@ public class CommandData implements Cloneable {
     public CommandEnum aliases = null;
     public String description = "description";
     public Map<String, CommandOverload> overloads = new HashMap<>();
-
     public int flags;
     public int permission;
 
