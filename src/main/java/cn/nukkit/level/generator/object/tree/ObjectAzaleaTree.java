@@ -14,6 +14,12 @@ public class ObjectAzaleaTree extends TreeGenerator {
     private static final Block AZALEA_LEAVES = Block.get(Block.AZALEA_LEAVES);
     private static final Block FLOWERING_AZALEA_LEAVES = Block.get(Block.AZALEA_LEAVES_FLOWERED);
     private static final Block ROOTED_DIRT = Block.get(Block.ROOTED_DIRT);
+    private boolean flowering;
+
+    public boolean grow(ChunkManager level, NukkitRandom rand, Vector3 position, boolean flowering) {
+        this.flowering = flowering;
+        return generate(level, rand, position);
+    }
 
     @Override
     public boolean generate(ChunkManager level, NukkitRandom rand, Vector3 position) {
@@ -21,13 +27,12 @@ public class ObjectAzaleaTree extends TreeGenerator {
         int y = position.getFloorY();
         int z = position.getFloorZ();
 
-        if (y < -64 || y >= 256) return false;
+        if (y < -64 || y >= 320) return false;
 
-        this.setBlockAndNotifyAdequately(level, new Vector3(x, y - 1, z), ROOTED_DIRT);
+        if(flowering) this.setBlockAndNotifyAdequately(level, new Vector3(x, y - 1, z), ROOTED_DIRT);
 
         int height = 4 + rand.nextBoundedInt(3);
         int bendHeight = 2 + rand.nextBoundedInt(2);
-
 
         int bendX = 0, bendZ = 0;
         switch(rand.nextBoundedInt(4)) {
