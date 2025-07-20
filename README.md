@@ -31,7 +31,7 @@ Adding dependency:
 <dependency>
     <groupId>com.koshakmine</groupId>
     <artifactId>Lumi</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ maven {
 
 Adding dependency:
 ```kts
-compileOnly("com.koshakmine:Lumi:1.0.0")
+compileOnly("com.koshakmine:Lumi:1.0.0-SNAPSHOT")
 ```
 
 ## Credits

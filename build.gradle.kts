@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.koshakmine"
-version = "1.0.0"
+version = "1.0.0-SNAPSHOT"
 application.mainClass.set("cn.nukkit.Nukkit")
 
 java {
