@@ -193,6 +193,16 @@ public class SimpleCommandMap implements CommandMap {
         return true;
     }
 
+    @Override
+    public void unregister(String... commands) {
+        for (String name : commands) {
+            Command command = this.getCommand(name);
+            if (command != null) {
+                command.unregister(this);
+            }
+        }
+    }
+
     public static ArrayList<String> parseArguments(String cmdLine) {
         StringBuilder sb = new StringBuilder(cmdLine);
         ArrayList<String> args = new ArrayList<>();
