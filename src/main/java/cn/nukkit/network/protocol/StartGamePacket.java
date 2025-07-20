@@ -334,53 +334,51 @@ public class StartGamePacket extends DataPacket {
         }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        if (protocol > ProtocolInfo.v1_5_0) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                if (this.blockDefinitions != null && !this.blockDefinitions.isEmpty()) {
-                    this.putUnsignedVarInt(this.blockDefinitions.size());
-                    for (CustomBlockDefinition definition : this.blockDefinitions) {
-                        this.putString(definition.identifier());
-                        try {
-                            this.put(NBTIO.write(definition.nbt(), ByteOrder.LITTLE_ENDIAN, true));
-                        } catch (Exception e) {
-                             log.error("Error while encoding NBT data of CustomBlockDefinition", e);
-                        }
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            if (this.blockDefinitions != null && !this.blockDefinitions.isEmpty()) {
+                this.putUnsignedVarInt(this.blockDefinitions.size());
+                for (CustomBlockDefinition definition : this.blockDefinitions) {
+                    this.putString(definition.identifier());
+                    try {
+                        this.put(NBTIO.write(definition.nbt(), ByteOrder.LITTLE_ENDIAN, true));
+                    } catch (Exception e) {
+                        log.error("Error while encoding NBT data of CustomBlockDefinition", e);
                     }
-                } else {
-                    this.putUnsignedVarInt(0); // No custom blocks
                 }
             } else {
-                this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+                this.putUnsignedVarInt(0); // No custom blocks
             }
-            if (protocol >= ProtocolInfo.v1_12_0 && protocol < ProtocolInfo.v1_21_60) {
-                this.put(RuntimeItems.getMapping(protocol).getItemPalette());
-            }
-            this.putString(this.multiplayerCorrelationId);
-            if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
-                this.putBoolean(this.isOnlySpawningV1Villagers);
-            } else if (protocol >= ProtocolInfo.v1_16_0) {
-                this.putBoolean(false); // isInventoryServerAuthoritative
-                if (protocol >= ProtocolInfo.v1_16_230_50) {
-                    this.putString(""); // serverEngine
-                    if (protocol >= ProtocolInfo.v1_18_0) {
-                        if (protocol >= ProtocolInfo.v1_19_0_29) {
-                            try {
-                                this.put(NBTIO.writeNetwork(this.playerPropertyData));
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+        } else {
+            this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+        }
+        if (protocol >= ProtocolInfo.v1_12_0 && protocol < ProtocolInfo.v1_21_60) {
+            this.put(RuntimeItems.getMapping(protocol).getItemPalette());
+        }
+        this.putString(this.multiplayerCorrelationId);
+        if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
+            this.putBoolean(this.isOnlySpawningV1Villagers);
+        } else if (protocol >= ProtocolInfo.v1_16_0) {
+            this.putBoolean(false); // isInventoryServerAuthoritative
+            if (protocol >= ProtocolInfo.v1_16_230_50) {
+                this.putString(""); // serverEngine
+                if (protocol >= ProtocolInfo.v1_18_0) {
+                    if (protocol >= ProtocolInfo.v1_19_0_29) {
+                        try {
+                            this.put(NBTIO.writeNetwork(this.playerPropertyData));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-                        this.putLLong(0L); // BlockRegistryChecksum
-                        if (protocol >= ProtocolInfo.v1_19_0_29) {
-                            //this.putUUID(new UUID(0, 0)); // worldTemplateId
-                            this.put(EMPTY_UUID); // worldTemplateId
-                            if (protocol >= ProtocolInfo.v1_19_20) {
-                                this.putBoolean(this.clientSideGenerationEnabled);
-                                if (protocol >= ProtocolInfo.v1_19_80) {
-                                    this.putBoolean(this.blockNetworkIdsHashed);
-                                    if (protocol >= ProtocolInfo.v1_20_0_23) {
-                                        this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                                    }
+                    }
+                    this.putLLong(0L); // BlockRegistryChecksum
+                    if (protocol >= ProtocolInfo.v1_19_0_29) {
+                        //this.putUUID(new UUID(0, 0)); // worldTemplateId
+                        this.put(EMPTY_UUID); // worldTemplateId
+                        if (protocol >= ProtocolInfo.v1_19_20) {
+                            this.putBoolean(this.clientSideGenerationEnabled);
+                            if (protocol >= ProtocolInfo.v1_19_80) {
+                                this.putBoolean(this.blockNetworkIdsHashed);
+                                if (protocol >= ProtocolInfo.v1_20_0_23) {
+                                    this.putBoolean(this.networkPermissions.isServerAuthSounds());
                                 }
                             }
                         }

@@ -1121,16 +1121,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.hasSpawnChunks && this.chunksSent >= server.spawnThreshold) {
             this.hasSpawnChunks = true;
-
-            if (this.protocol <= ProtocolInfo.v1_5_0) {
-                this.doFirstSpawn();
-            }
-
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
-
-            if (protocol <= ProtocolInfo.v1_5_0) {
-                this.server.getPluginManager().callEvent(new PlayerLocallyInitializedEvent(this));
-            }
         }
     }
 
@@ -1183,14 +1174,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             this.setPosition(respawnEvent.getRespawnPosition());
             this.sendPosition(respawnEvent.getRespawnPosition(), yaw, pitch, MovePlayerPacket.MODE_RESET);
-
-            if (this.protocol < ProtocolInfo.v1_5_0) {
-                RespawnPacket respawnPacket = new RespawnPacket();
-                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
-                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
-                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
-                this.dataPacket(respawnPacket);
-            }
 
             this.getLevel().sendTime(this);
             this.getLevel().sendWeather(this);

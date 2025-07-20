@@ -115,18 +115,16 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putLLong(entry.getPackSize());
             this.putString(entry.getEncryptionKey()); // encryption key
             this.putString(""); // sub-pack name
-            if (protocol > ProtocolInfo.v1_5_0) {
-                this.putString(!"".equals(entry.getEncryptionKey()) ? entry.getPackId().toString() : ""); // content identity
-                if (protocol >= ProtocolInfo.v1_9_0) {
-                    this.putBoolean(false); // scripting
-                    if (protocol >= ProtocolInfo.v1_16_200) {
-                        if (protocol >= ProtocolInfo.v1_21_20) {
-                            this.putBoolean(entry.isAddonPack());
-                        }
-                        this.putBoolean(false); // raytracing capable
-                        if (protocol >= ProtocolInfo.v1_21_40) {
-                            this.putString(entry.getCDNUrl());
-                        }
+            this.putString(!"".equals(entry.getEncryptionKey()) ? entry.getPackId().toString() : ""); // content identity
+            if (protocol >= ProtocolInfo.v1_9_0) {
+                this.putBoolean(false); // scripting
+                if (protocol >= ProtocolInfo.v1_16_200) {
+                    if (protocol >= ProtocolInfo.v1_21_20) {
+                        this.putBoolean(entry.isAddonPack());
+                    }
+                    this.putBoolean(false); // raytracing capable
+                    if (protocol >= ProtocolInfo.v1_21_40) {
+                        this.putString(entry.getCDNUrl());
                     }
                 }
             }

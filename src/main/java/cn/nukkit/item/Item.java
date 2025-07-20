@@ -505,8 +505,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
     }
 
-    private static final CreativeItems creative137 = new CreativeItems();
-    private static final CreativeItems creative274 = new CreativeItems();
     private static final CreativeItems creative291 = new CreativeItems();
     private static final CreativeItems creative313 = new CreativeItems();
     private static final CreativeItems creative332 = new CreativeItems();
@@ -552,7 +550,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
 
         // Creative inventory for oldest versions
-        registerCreativeItems(v1_5_0);
         registerCreativeItems(v1_7_0);
         registerCreativeItems(v1_8_0);
         registerCreativeItems(v1_9_0);
@@ -679,8 +676,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static void clearCreativeItems() {
-        Item.creative137.clear();
-        Item.creative274.clear();
         Item.creative291.clear();
         Item.creative313.clear();
         Item.creative332.clear();
@@ -738,128 +733,52 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static CreativeItems getCreativeItemsAndGroups(int protocol) {
-        switch (protocol) {
-            case v1_4_0:
-                return Item.creative137;
-            case v1_5_0:
-                return Item.creative274;
-            case v1_6_0_5:
-            case v1_6_0:
-            case v1_7_0:
-                return Item.creative291;
-            case v1_8_0:
-                return Item.creative313;
-            case v1_9_0:
-                return Item.creative332;
-            case v1_10_0:
-                return Item.creative340;
-            case v1_11_0:
-            case v1_12_0:
-            case v1_13_0:
-                return Item.creative354;
-            case v1_14_0:
-            case v1_14_60:
-                return Item.creative389;
-            case v1_16_0:
-            case v1_16_20:
-            case v1_16_100_0:
-            case v1_16_100_51:
-            case v1_16_100_52:
-            case v1_16_100:
-            case v1_16_200_51:
-            case v1_16_200:
-            case v1_16_210_50:
-            case v1_16_210_53:
-            case v1_16_210:
-            case v1_16_220:
-            case v1_16_230_50:
-            case v1_16_230:
-            case v1_16_230_54:
-                return Item.creative407;
-            case v1_17_0:
-                return Item.creative440;
-            case v1_17_10:
-            case v1_17_20_20:
-                return Item.creative448;
-            case v1_17_30:
-                return Item.creative465;
-            case v1_17_40:
-                return Item.creative471;
-            case v1_18_0:
-                return Item.creative475;
-            case v1_18_10_26:
-            case v1_18_10:
-                return Item.creative486;
-            case v1_18_30:
-                return Item.creative503;
-            case v1_19_0_29:
-            case v1_19_0_31:
-            case v1_19_0:
-                return Item.creative527;
-            case v1_19_10:
-                return Item.creative534;
-            case v1_19_20:
-            case v1_19_21:
-            case v1_19_30_23:
-            case v1_19_30:
-            case v1_19_40:
-                return Item.creative544;
-            case v1_19_50:
-                return Item.creative560;
-            case v1_19_60:
-            case v1_19_63:
-                return Item.creative567;
-            case v1_19_70_24:
-            case v1_19_70:
-                return Item.creative575;
-            case v1_19_80:
-                return Item.creative582;
-            case v1_20_0_23:
-            case v1_20_0:
-                return Item.creative589;
-            case v1_20_10_21:
-            case v1_20_10:
-                return Item.creative594;
-            case v1_20_30_24:
-            case v1_20_30:
-                return Item.creative618;
-            case v1_20_40:
-                return Item.creative622;
-            case v1_20_50:
-                return Item.creative630;
-            case v1_20_60:
-                return Item.creative649;
-            case v1_20_70:
-                return Item.creative662;
-            case v1_20_80:
-                return Item.creative671;
-            case v1_21_0:
-            case v1_21_2:
-                return Item.creative685;
-            case v1_21_20:
-                return Item.creative712;
-            case v1_21_30:
-                return Item.creative729;
-            case v1_21_40:
-                return Item.creative748;
-            case v1_21_50_26:
-            case v1_21_50:
-                return Item.creative766;
-            case v1_21_60:
-                return Item.creative776;
-            case v1_21_70_24:
-            case v1_21_70:
-                return Item.creative786;
-            case v1_21_80:
-                return Item.creative800;
-            case v1_21_90:
-                return Item.creative818;
-            case v1_21_93:
-                return Item.creative819;
+        return switch (protocol) {
+            case v1_6_0_5, v1_6_0, v1_7_0 -> Item.creative291;
+            case v1_8_0 -> Item.creative313;
+            case v1_9_0 -> Item.creative332;
+            case v1_10_0 -> Item.creative340;
+            case v1_11_0, v1_12_0, v1_13_0 -> Item.creative354;
+            case v1_14_0, v1_14_60 -> Item.creative389;
+            case v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51, v1_16_100_52, v1_16_100, v1_16_200_51, v1_16_200,
+                 v1_16_210_50, v1_16_210_53, v1_16_210, v1_16_220, v1_16_230_50, v1_16_230, v1_16_230_54 ->
+                    Item.creative407;
+            case v1_17_0 -> Item.creative440;
+            case v1_17_10, v1_17_20_20 -> Item.creative448;
+            case v1_17_30 -> Item.creative465;
+            case v1_17_40 -> Item.creative471;
+            case v1_18_0 -> Item.creative475;
+            case v1_18_10_26, v1_18_10 -> Item.creative486;
+            case v1_18_30 -> Item.creative503;
+            case v1_19_0_29, v1_19_0_31, v1_19_0 -> Item.creative527;
+            case v1_19_10 -> Item.creative534;
+            case v1_19_20, v1_19_21, v1_19_30_23, v1_19_30, v1_19_40 -> Item.creative544;
+            case v1_19_50 -> Item.creative560;
+            case v1_19_60, v1_19_63 -> Item.creative567;
+            case v1_19_70_24, v1_19_70 -> Item.creative575;
+            case v1_19_80 -> Item.creative582;
+            case v1_20_0_23, v1_20_0 -> Item.creative589;
+            case v1_20_10_21, v1_20_10 -> Item.creative594;
+            case v1_20_30_24, v1_20_30 -> Item.creative618;
+            case v1_20_40 -> Item.creative622;
+            case v1_20_50 -> Item.creative630;
+            case v1_20_60 -> Item.creative649;
+            case v1_20_70 -> Item.creative662;
+            case v1_20_80 -> Item.creative671;
+            case v1_21_0, v1_21_2 -> Item.creative685;
+            case v1_21_20 -> Item.creative712;
+            case v1_21_30 -> Item.creative729;
+            case v1_21_40 -> Item.creative748;
+            case v1_21_50_26, v1_21_50 -> Item.creative766;
+            case v1_21_60 -> Item.creative776;
+            case v1_21_70_24, v1_21_70 -> Item.creative786;
+            case v1_21_80 -> Item.creative800;
+            case v1_21_90 -> Item.creative818;
+            case v1_21_93 -> Item.creative819;
             // TODO Multiversion
-            default:
-                throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
-        }
+            default ->
+                    throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
+        };
     }
 
     public static void addCreativeItem(Item item) {
@@ -873,7 +792,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static void addCreativeItem(int protocol, Item item, CreativeItemCategory category, String group) {
         switch (protocol) { // NOTE: Not all versions are supposed to be here
-            case v1_5_0 -> Item.creative274.add(item.clone(), category, group);
             case v1_7_0 -> Item.creative291.add(item.clone(), category, group);
             case v1_8_0 -> Item.creative313.add(item.clone(), category, group);
             case v1_9_0 -> Item.creative332.add(item.clone(), category, group);

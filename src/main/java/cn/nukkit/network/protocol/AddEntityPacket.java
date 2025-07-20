@@ -255,11 +255,9 @@ public class AddEntityPacket extends DataPacket {
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
-        if (protocol >= ProtocolInfo.v1_5_0) {
-            this.putLFloat(this.headYaw);
-            if (protocol >= ProtocolInfo.v1_19_10) {
-                this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
-            }
+        this.putLFloat(this.headYaw);
+        if (protocol >= ProtocolInfo.v1_19_10) {
+            this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
         }
         this.putAttributeList(this.attributes);
         this.put(Binary.writeMetadata(protocol, this.metadata));

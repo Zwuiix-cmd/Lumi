@@ -42,7 +42,7 @@ public class Network {
     public static final byte CHANNEL_TEXT = 7; //Chat and other text stuff
     public static final byte CHANNEL_END = 31;
 
-    private PacketPool packetPool137;
+    private PacketPool packetPool137; // TODO: refactor packet pool naming
     private PacketPool packetPoolCurrent;
 
     private final Server server;
@@ -353,8 +353,8 @@ public class Network {
 
     private void registerPackets() {
         this.packetPool137 = PacketPool.builder()
-                .protocolVersion(ProtocolInfo.v1_4_0)
-                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_4_0))
+                .protocolVersion(ProtocolInfo.v1_6_0)
+                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_6_0))
                 .registerPacket(ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET, ServerToClientHandshakePacket.class)
                 .registerPacket(ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ClientToServerHandshakePacket.class)
                 .registerPacket(ProtocolInfo.ADD_ENTITY_PACKET, AddEntityPacket.class)

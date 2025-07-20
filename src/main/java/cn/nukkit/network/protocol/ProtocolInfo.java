@@ -10,8 +10,7 @@ import java.util.List;
  * Nukkit Project
  */
 public interface ProtocolInfo {
-    int v1_4_0 = 261;
-    int v1_5_0 = 274;
+    
     int v1_6_0_5 = 281;
     int v1_6_0 = 282;
     int v1_7_0 = 291;
