@@ -1,6 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 plugins {
     java
@@ -115,7 +113,7 @@ dependencies {
 }
 
 tasks {
-    withType<JavaCompile> {
+    compileJava {
         options.encoding = "UTF-8"
     }
 
@@ -123,7 +121,11 @@ tasks {
         useJUnitPlatform()
     }
 
-    named<ShadowJar>("shadowJar") {
+    jar {
+        archiveClassifier.set("dev")
+    }
+
+    shadowJar {
         archiveBaseName.set("Lumi")
         archiveClassifier.set("")
         manifest {
@@ -133,27 +135,18 @@ tasks {
                 "Class-Path" to "lib/"
             )
         }
-        transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
+        transform(Log4j2PluginsCacheFileTransformer())
         exclude("META-INF/versions/")
-    }
-
-    jar {
-        enabled = false
-        dependsOn(shadowJar)
     }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            val dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = "${project.version}-$dateTime"
-
-            artifact(tasks.named("shadowJar").get()) {
-                classifier = null
+            artifact(tasks.generateGitProperties) {
+                extension = "properties"
             }
+            from(components["java"])
         }
     }
     repositories {
