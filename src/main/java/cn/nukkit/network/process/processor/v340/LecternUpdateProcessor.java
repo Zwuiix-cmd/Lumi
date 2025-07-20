@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LecternUpdateProcessor_v340 extends DataPacketProcessor<LecternUpdatePacket> {
+public class LecternUpdateProcessor extends DataPacketProcessor<LecternUpdatePacket> {
 
-    public static final LecternUpdateProcessor_v340 INSTANCE = new LecternUpdateProcessor_v340();
+    public static final LecternUpdateProcessor INSTANCE = new LecternUpdateProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull LecternUpdatePacket pk) {
@@ -52,10 +52,5 @@ public class LecternUpdateProcessor_v340 extends DataPacketProcessor<LecternUpda
     @Override
     public Class<? extends DataPacket> getPacketClass() {
         return LecternUpdatePacket.class;
-    }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_10_0;
     }
 }

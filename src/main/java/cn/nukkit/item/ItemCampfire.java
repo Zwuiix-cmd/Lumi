@@ -16,9 +16,4 @@ public class ItemCampfire extends Item {
         super(CAMPFIRE, meta, count, "Campfire");
         block = new BlockCampfire();
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_10_0;
-    }
 }

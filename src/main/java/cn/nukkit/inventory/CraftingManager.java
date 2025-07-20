@@ -724,8 +724,7 @@ public class CraftingManager {
         for (SmithingRecipe recipe : this.getSmithingRecipes(protocol).values()) {
             pk.addShapelessRecipe(recipe);
         }
-        //TODO Fix 1.10.0 - 1.14.0 client crash
-        if (protocol < ProtocolInfo.v1_10_0 || protocol > ProtocolInfo.v1_13_0) {
+        if (protocol > ProtocolInfo.v1_13_0) {
             for (FurnaceRecipe recipe : this.getFurnaceRecipes(protocol).values()) {
                 pk.addFurnaceRecipe(recipe);
             }
@@ -982,11 +981,6 @@ public class CraftingManager {
                 packet354 = packetFor(ProtocolInfo.v1_11_0);
             }
             return packet354;
-        } else if (protocol == ProtocolInfo.v1_10_0) {
-            if (packet340 == null) {
-                packet340 = packetFor(ProtocolInfo.v1_10_0);
-            }
-            return packet340;
         }
         return null;
     }
@@ -1055,10 +1049,8 @@ public class CraftingManager {
             return this.furnaceRecipes;
         } else if (protocol >= ProtocolInfo.v1_17_0) {
             return this.furnaceRecipes440;
-        } else if (protocol >= ProtocolInfo.v1_10_0) {
-            return this.furnaceRecipes340;
         }
-        return this.furnaceRecipesOld;
+        return this.furnaceRecipes340;
     }
 
     public Map<Integer, BlastFurnaceRecipe> getBlastFurnaceRecipes() {

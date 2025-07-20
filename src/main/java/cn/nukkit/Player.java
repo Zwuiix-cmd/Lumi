@@ -2439,11 +2439,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
 
-        // Shields were added in 1.10
-        // Change this if you map shields to some other item for old versions
-        if (this.protocol >= ProtocolInfo.v1_10_0) {
-            updateBlockingFlag();
-        }
+        this.updateBlockingFlag();
 
         if (!this.isSleeping()) {
             this.timeSinceRest++;

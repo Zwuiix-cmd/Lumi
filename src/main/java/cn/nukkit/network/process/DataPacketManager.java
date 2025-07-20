@@ -4,7 +4,7 @@ import cn.nukkit.PlayerHandle;
 import cn.nukkit.network.process.processor.common.*;
 import cn.nukkit.network.process.processor.v137.CommandRequestProcessor;
 import cn.nukkit.network.process.processor.v282.SetLocalPlayerAsInitializedProcessor;
-import cn.nukkit.network.process.processor.v340.LecternUpdateProcessor_v340;
+import cn.nukkit.network.process.processor.v340.LecternUpdateProcessor;
 import cn.nukkit.network.process.processor.v422.FilterTextProcessor_v422;
 import cn.nukkit.network.process.processor.v527.RequestAbilityProcessor_v527;
 import cn.nukkit.network.process.processor.v554.RequestNetworkSettingsProcessor_v554;
@@ -164,6 +164,7 @@ public final class DataPacketManager {
                 0, //base
                 CommandRequestProcessor.INSTANCE,
                 SetLocalPlayerAsInitializedProcessor.INSTANCE,
+                LecternUpdateProcessor.INSTANCE,
                 AdventureSettingsProcessor.INSTANCE,
                 BookEditProcessor.INSTANCE,
                 ClientToServerHandshakeProcessor.INSTANCE,
@@ -188,11 +189,6 @@ public final class DataPacketManager {
                 SetDifficultyProcessor.INSTANCE,
                 SetPlayerGameTypeProcessor.INSTANCE,
                 TextProcessor.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_10_0,
-                LecternUpdateProcessor_v340.INSTANCE
         );
 
         registerProcessor(
