@@ -133,10 +133,6 @@ public class Binary {
 
                     if (id >= 60) id = id - 1; // 1.16.210 --> 1.16.0
                     if (id == 121) id = 119; // DATA_BUOYANCY_DATA
-
-                    if (protocol == ProtocolInfo.v1_11_0) {
-                        if (id >= 40) id = id + 1;
-                    }
                 }
             }
 

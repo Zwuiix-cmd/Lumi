@@ -976,11 +976,6 @@ public class CraftingManager {
                 packet361 = packetFor(ProtocolInfo.v1_12_0);
             }
             return packet361;
-        } else if (protocol == ProtocolInfo.v1_11_0) {
-            if (packet354 == null) {
-                packet354 = packetFor(ProtocolInfo.v1_11_0);
-            }
-            return packet354;
         }
         return null;
     }

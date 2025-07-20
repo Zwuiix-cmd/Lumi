@@ -24,9 +24,7 @@ public class LecternUpdatePacket extends DataPacket {
     @Override
     public void decode() {
         this.page = this.getByte();
-        if (protocol >= ProtocolInfo.v1_11_0) {
-            this.totalPages = this.getByte();
-        }
+        this.totalPages = this.getByte();
         this.blockPosition = this.getBlockVector3();
         if (protocol < ProtocolInfo.v1_20_70) {
             this.dropBook = this.getBoolean();
