@@ -40,11 +40,6 @@ public class BlockScaffolding extends BlockFallable {
     }
 
     @Override
-    public int getDamage() {
-        return this.meta;
-    }
-
-    @Override
     public void setDamage(int meta) {
         this.meta = meta;
     }

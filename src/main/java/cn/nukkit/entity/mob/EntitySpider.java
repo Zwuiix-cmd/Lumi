@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -13,7 +14,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -162,10 +162,10 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
     }
 
     @Override
-    public boolean canBeAffected(int effectId) {
-        if (effectId == Effect.POISON) {
+    public boolean canBeAffected(EffectType type) {
+        if (type == EffectType.POISON) {
             return false;
         }
-        return super.canBeAffected(effectId);
+        return super.canBeAffected(type);
     }
 }

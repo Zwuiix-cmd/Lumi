@@ -4,18 +4,18 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.*;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.ExplodeParticle;
 import cn.nukkit.level.sound.FizzSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 
@@ -280,23 +280,26 @@ public class ItemBucket extends Item {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
-        if (player.isSpectator() || this.getDamage() != MILK_BUCKET) {
+        if (ticksUsed < 31) {
             return false;
         }
 
-        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(player, this);
+        PlayerItemConsumeEvent event = new PlayerItemConsumeEvent(player, this);
+        Server.getInstance().getPluginManager().callEvent(event);
 
-        player.getServer().getPluginManager().callEvent(consumeEvent);
-        if (consumeEvent.isCancelled()) {
-            player.setNeedSendInventory(true);
+        if (event.isCancelled()) {
+            player.getInventory().sendContents(player);
             return false;
         }
 
-        if (!player.isCreative()) {
-            player.getInventory().setItemInHand(Item.get(Item.BUCKET));
-        }
+        player.removeAllEffects();
 
-        player.removeAllEffects(EntityPotionEffectEvent.Cause.MILK);
+        if (player.isAdventure() || player.isSurvival()) {
+            --this.count;
+            player.getInventory().addItem(Item.get(ItemID.BUCKET, 0, 1));
+            player.getInventory().setItemInHand(this);
+            player.getLevel().addSound(player, Sound.RANDOM_BURP);
+        }
         return true;
     }
 

@@ -18,9 +18,4 @@ public class ItemPhantomMembrane extends Item {
     public ItemPhantomMembrane(Integer meta, int count) {
         super(PHANTOM_MEMBRANE, meta, count, "Phantom Membrane");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_6_0;
-    }
 }

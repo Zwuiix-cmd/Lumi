@@ -101,7 +101,7 @@ public class ChunkSerializerV3 implements ChunkSerializer {
                     }
                 }
 
-                sections[ySection + dimensionInfo.getSectionOffset()] = new LevelDBChunkSection(ySection, stateBlockStorageArray);
+                sections[ySection + dimensionInfo.getSectionOffset()] = new LevelDBChunkSection(chunkBuilder.getLevel(), ySection, stateBlockStorageArray);
             }
         }
         chunkBuilder.sections(sections);

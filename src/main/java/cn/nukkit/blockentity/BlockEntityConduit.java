@@ -4,16 +4,17 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLayer;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.potion.Effect;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -104,7 +105,7 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         level.getPlayers().values().stream()
                 .filter(this::canAffect)
                 .filter(p -> conduit.distanceSquared(p.x, p.z) <= radiusSquared)
-                .forEach(p -> p.addEffect(Effect.getEffect(Effect.CONDUIT_POWER).setDuration(260).setAmbient(true), EntityPotionEffectEvent.Cause.CONDUIT));
+                .forEach(p -> p.addEffect(Effect.get(EffectType.CONDUIT_POWER).setDuration(260).setAmbient(true), EntityEffectUpdateEvent.Cause.CONDUIT));
     }
 
     private void attackMob() {

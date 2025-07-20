@@ -1,12 +1,14 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.potion.Effect;
 
 public class ItemOminousBottle extends StringItemBase {
+
     public ItemOminousBottle() {
         super(OMINOUS_BOTTLE, "Ominous Bottle");
     }
@@ -31,7 +33,7 @@ public class ItemOminousBottle extends StringItemBase {
             player.getInventory().addItem(new ItemGlassBottle());
         }
 
-        Effect effect = Effect.getEffect(Effect.BAD_OMEN);
+        Effect effect = Effect.get(EffectType.BAD_OMEN);
         effect.setDuration(20 * 60 * 100); //100m
         effect.setAmplifier(meta);
 

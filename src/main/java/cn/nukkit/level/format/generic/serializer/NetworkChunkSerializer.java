@@ -62,38 +62,10 @@ public class NetworkChunkSerializer {
 
             BinaryStream stream = ThreadCache.binaryStream.get().reset();
             NetworkChunkData networkChunkData = new NetworkChunkData(protocolId, subChunkCount, antiXray, dimensionData);
-            if (protocolId >= ProtocolInfo.v1_18_30) {
-                serialize1_18_30(stream, chunk, sections, networkChunkData);
-            } else if (protocolId >= ProtocolInfo.v1_18_0) {
-                serialize1_18_0(stream, chunk, sections, networkChunkData);
-            } else {
-                subChunkCount = Math.max(1, subChunkCount - chunk.getSectionOffset());
-                networkChunkData.setChunkSections(subChunkCount);
 
-                int maxDimensionSections = dimensionData.getHeight() >> 4;
 
-                if (protocolId < ProtocolInfo.v1_12_0) {
-                    stream.putByte((byte) subChunkCount);
-                }
+            serializeChunk(stream, chunk, sections, networkChunkData);
 
-                int offset = chunk.getSectionOffset();
-                for (int i = offset; i < subChunkCount + offset; i++) {
-                    if (protocolId < ProtocolInfo.v1_13_0) {
-                        stream.putByte((byte) 0);
-                        stream.put(sections[i].getBytes(protocolId));
-                    } else {
-                        sections[i].writeTo(protocolId, stream, antiXray);
-                    }
-                }
-
-                if (protocolId < ProtocolInfo.v1_12_0) {
-                    for (byte height : chunk.getHeightMapArray()) {
-                        stream.putByte(height);
-                    }
-                    stream.put(PAD_256);
-                }
-                stream.put(chunk.getBiomeIdArray());
-            }
             // Border blocks
             stream.putByte((byte) 0);
             if (protocolId < ProtocolInfo.v1_16_100) {
@@ -106,7 +78,7 @@ public class NetworkChunkSerializer {
         }
     }
 
-    private static void serialize1_18_30(BinaryStream stream, BaseChunk chunk, ChunkSection[] sections, NetworkChunkData chunkData) {
+    private static void serializeChunk(BinaryStream stream, BaseChunk chunk, ChunkSection[] sections, NetworkChunkData chunkData) {
         DimensionData dimensionData = chunkData.getDimensionData();
         int maxDimensionSections = dimensionData.getHeight() >> 4;
         int subChunkCount = Math.min(maxDimensionSections, chunkData.getChunkSections());
@@ -122,32 +94,6 @@ public class NetworkChunkSerializer {
         }
 
         for (int i = 0; i < subChunkCount; i++) {
-            sections[i].writeTo(chunkData.getProtocol(), stream, chunkData.isAntiXray());
-        }
-
-        stream.put(biomePalettes);
-        stream.putByte((byte) 0); // Border blocks
-
-        chunkData.setChunkSections(writtenSections);
-    }
-
-    private static void serialize1_18_0(BinaryStream stream, BaseChunk chunk, ChunkSection[] sections, NetworkChunkData chunkData) {
-        DimensionData dimensionData = chunkData.getDimensionData();
-        int maxDimensionSections = dimensionData.getHeight() >> 4;
-        int subChunkCount = Math.min(maxDimensionSections, chunkData.getChunkSections());
-
-        byte[] biomePalettes = serialize3DBiomes(chunk, chunkData.getProtocol(), 25);
-        stream.reset();
-
-        // Overworld has negative coordinates, But the anvil world does not support it
-        int writtenSections = subChunkCount;
-        if (dimensionData.getDimensionId() == Level.DIMENSION_OVERWORLD && chunk.getSectionOffset() == 0) {
-            stream.put(negativeSubChunks);
-            writtenSections += EXTENDED_NEGATIVE_SUB_CHUNKS;
-        }
-
-        int offset = chunk.getSectionOffset();
-        for (int i = offset; i < subChunkCount; i++) {
             sections[i].writeTo(chunkData.getProtocol(), stream, chunkData.isAntiXray());
         }
 

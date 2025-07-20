@@ -546,23 +546,34 @@ public class PluginManager {
         }
     }
 
-    public <T extends Event> void registerEvent(
+    public <T extends Event> void subscribeEvent(
             Class<T> eventClass,
             NonReflectionEventConsumer<T> consumer,
             Plugin plugin
     ) {
-        registerEvent(
-                eventClass, consumer, plugin,
-                EventPriority.NORMAL, false
+        subscribeEvent(
+                eventClass, consumer, EventPriority.NORMAL, plugin
         );
     }
 
-    public <T extends Event> void registerEvent(
+    public <T extends Event> void subscribeEvent(
             Class<T> eventClass,
             NonReflectionEventConsumer<T> consumer,
-            Plugin plugin,
             EventPriority priority,
-            boolean ignoreCancelled
+            Plugin plugin
+    ) {
+        subscribeEvent(
+                eventClass, consumer,
+                priority, false, plugin
+        );
+    }
+
+    public <T extends Event> void subscribeEvent(
+            Class<T> eventClass,
+            NonReflectionEventConsumer<T> consumer,
+            EventPriority priority,
+            boolean ignoreCancelled,
+            Plugin plugin
     ) {
         EventExecutor executor = new NonReflectionEventExecutor<>(eventClass, consumer);
 
@@ -577,7 +588,7 @@ public class PluginManager {
         try {
             getEventListeners(eventClass).register(rl);
         } catch (IllegalAccessException e) {
-            log.error("An error occurred while registering the event listener event: {}, consumer: {} for plugin: {} version: {}",
+            log.error("An error occurred while subscribing the event listener event: {}, consumer: {} for plugin: {} version: {}",
                     eventClass, consumer, plugin.getDescription().getName(), plugin.getDescription().getVersion(), e);
         }
     }

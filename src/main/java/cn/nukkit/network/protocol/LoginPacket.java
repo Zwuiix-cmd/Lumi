@@ -33,27 +33,14 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol_ = this.getInt();
-        if (this.protocol_ > ProtocolInfo.CURRENT_PROTOCOL + 1000) {
-            int ofs = this.getOffset();
-            this.setOffset(1);
-            try {
-                this.protocol_ = this.getInt();
-                if (this.protocol_ >= ProtocolInfo.v1_2_0) {
-                    throw new RuntimeException();
-                }
-                this.getByte(); //gameEdition
-            } catch (Throwable th) {
-                setOffset(ofs);
-            }
-        }
         if (this.protocol_ == 0) {
-            setOffset(getOffset() + 2);
-            this.protocol_ = getInt();
+            this.setOffset(getOffset() + 2);
+            this.protocol_ = this.getInt();
         }
         if (ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol_)) { // Avoid errors with unsupported versions
             this.setBuffer(this.getByteArray(), 0);
-            decodeChainData();
-            decodeSkinData();
+            this.decodeChainData();
+            this.decodeSkinData();
         }
     }
 
@@ -85,8 +72,8 @@ public class LoginPacket extends DataPacket {
             return;
         }
 
-        for (String c : chains) {
-            JsonObject chainMap = ClientChainData.decodeToken(c);
+        for (String chain : chains) {
+            JsonObject chainMap = ClientChainData.decodeToken(chain);
             if (chainMap == null) continue;
             if (chainMap.has("extraData")) {
                 JsonObject extra = chainMap.get("extraData").getAsJsonObject();
@@ -158,7 +145,7 @@ public class LoginPacket extends DataPacket {
                     skin.setFullSkinId(fullSkinId);
                     if (skin.getCapeId() != null) {
                         skin.setSkinId(fullSkinId.substring(0, fullSkinId.length() - skin.getCapeId().length()));
-                    }else {
+                    } else {
                         skin.setSkinId(fullSkinId);
                     }
                 }

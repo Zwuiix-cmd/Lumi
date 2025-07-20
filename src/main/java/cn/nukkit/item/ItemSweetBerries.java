@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockSweetBerryBush;
 import cn.nukkit.network.protocol.ProtocolInfo;
 
-public class ItemSweetBerries extends ItemEdible {
+public class ItemSweetBerries extends ItemFood {
 
     public ItemSweetBerries() {
         this(0, 1);
@@ -19,7 +19,12 @@ public class ItemSweetBerries extends ItemEdible {
     }
 
     @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_11_0;
+    public int getFoodRestore() {
+        return 2;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 0.4F;
     }
 }

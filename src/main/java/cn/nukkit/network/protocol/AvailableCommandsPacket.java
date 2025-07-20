@@ -247,16 +247,8 @@ public class AvailableCommandsPacket extends DataPacket {
             return COMMAND_PARAMS_428;
         } else if (protocol >= ProtocolInfo.v1_16_100) {
             return COMMAND_PARAMS_419;
-        } else if (protocol >= ProtocolInfo.v1_13_0) {
-            return COMMAND_PARAMS_388;
-        } else if (protocol >= ProtocolInfo.v1_10_0) {
-            return COMMAND_PARAMS_340;
-        } else if (protocol >= ProtocolInfo.v1_9_0) {
-            return COMMAND_PARAMS_332;
-        } else if (protocol >= ProtocolInfo.v1_8_0) {
-            return COMMAND_PARAMS_313;
         } else {
-            return COMMAND_PARAMS_291;
+            return COMMAND_PARAMS_388;
         }
     }
 
@@ -382,12 +374,6 @@ public class AvailableCommandsPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-
-        if (this.protocol < ProtocolInfo.v1_2_0) {
-            this.putString(new Gson().toJson(this.commands));
-            this.putString("");
-            return;
-        }
 
         LinkedHashSet<String> enumValuesSet = new LinkedHashSet<>();
         SequencedHashSet<String> subCommandValues = new SequencedHashSet<>();

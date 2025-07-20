@@ -43,9 +43,7 @@ public class TextPacket extends DataPacket {
     @Override
     public void decode() {
         this.type = (byte) getByte();
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.isLocalized = this.getBoolean() || type == TYPE_TRANSLATION;
-        }
+        this.isLocalized = this.getBoolean() || type == TYPE_TRANSLATION;
         switch (type) {
             case TYPE_CHAT:
             case TYPE_WHISPER:
@@ -86,14 +84,8 @@ public class TextPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        if (this.protocol < ProtocolInfo.v1_2_0 && this.type > 4) {
-            this.putByte((byte) (this.type - 1));
-        } else {
-            this.putByte(this.type);
-        }
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putBoolean(this.isLocalized || type == TYPE_TRANSLATION);
-        }
+        this.putByte(this.type);
+        this.putBoolean(this.isLocalized || type == TYPE_TRANSLATION);
         switch (this.type) {
             case TYPE_CHAT:
             case TYPE_WHISPER:

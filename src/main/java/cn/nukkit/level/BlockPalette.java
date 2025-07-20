@@ -173,7 +173,7 @@ public class BlockPalette {
     }
 
     public int getRuntimeId(int id, int meta) {
-        int legacyId = protocol >= 388 ? ((id << Block.DATA_BITS) | meta) : ((id << 4) | meta);
+        int legacyId = id << Block.DATA_BITS | meta;
         int runtimeId;
         runtimeId = legacyToRuntimeId.get(legacyId);
         if (runtimeId == -1) {

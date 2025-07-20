@@ -3,7 +3,6 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemCake;
-import cn.nukkit.item.food.Food;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -123,7 +122,7 @@ public class BlockCake extends BlockTransparentMeta {
             if (getDamage() >= 0x06) {
                 getLevel().setBlock(this, Block.get(BlockID.AIR), true);
             } else {
-                Food.getByRelative(this).eatenBy(player);
+                player.getFoodData().addFood(2, 0.4F);
                 getLevel().setBlock(this, this, true);
             }
             return true;

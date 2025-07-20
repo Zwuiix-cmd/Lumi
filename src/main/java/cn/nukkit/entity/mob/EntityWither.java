@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -22,7 +23,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.BossEventPacket;
 import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 import org.apache.commons.math3.util.FastMath;
 
@@ -58,6 +58,11 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     @Override
     public double getSpeed() {
         return 1.3;
+    }
+
+    @Override
+    public boolean isUndead() {
+        return true;
     }
 
     @Override
@@ -287,7 +292,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     }
 
     @Override
-    public boolean canBeAffected(int effectId) {
-        return effectId == Effect.INSTANT_DAMAGE || effectId == Effect.INSTANT_HEALTH;
+    public boolean canBeAffected(EffectType type) {
+        return type == EffectType.INSTANT_DAMAGE || type == EffectType.INSTANT_HEALTH;
     }
 }

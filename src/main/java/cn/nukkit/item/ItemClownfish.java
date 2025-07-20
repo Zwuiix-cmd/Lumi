@@ -17,4 +17,14 @@ public class ItemClownfish extends ItemFish {
     public ItemClownfish(Integer meta, int count) {
         super(CLOWNFISH, meta, count, "Tropical Fish");
     }
+
+    @Override
+    public int getFoodRestore() {
+        return 1;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 0.2F;
+    }
 }

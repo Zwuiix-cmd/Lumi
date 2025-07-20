@@ -17,4 +17,14 @@ public class ItemSalmonCooked extends ItemFish {
     public ItemSalmonCooked(Integer meta, int count) {
         super(COOKED_SALMON, meta, count, "Cooked Salmon");
     }
+
+    @Override
+    public int getFoodRestore() {
+        return 6;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 9.6F;
+    }
 }

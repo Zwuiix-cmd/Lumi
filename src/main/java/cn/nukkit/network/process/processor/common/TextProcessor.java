@@ -45,9 +45,4 @@ public class TextProcessor extends DataPacketProcessor<TextPacket> {
     public Class<? extends DataPacket> getPacketClass() {
         return TextPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

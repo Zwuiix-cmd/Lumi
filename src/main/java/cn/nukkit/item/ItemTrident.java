@@ -159,9 +159,4 @@ public class ItemTrident extends ItemTool {
 
         return true;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_4_0;
-    }
 }

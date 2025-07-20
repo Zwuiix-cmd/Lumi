@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockCauldron;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityCombustByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -59,7 +60,7 @@ public class BlockCauldronLava extends BlockCauldron {
         if (!entityCombustByBlockEvent.isCancelled() && entity.isAlive() && entity.noDamageTicks == 0) {
             entity.setOnFire(entityCombustByBlockEvent.getDuration());
         }
-        if (!entity.hasEffect(12)) {
+        if (!entity.hasEffect(EffectType.FIRE_RESISTANCE)) {
             entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.LAVA, 4.0f));
         }
     }

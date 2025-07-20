@@ -170,15 +170,7 @@ public abstract class Particle extends Vector3 {
         if (protocol < ProtocolInfo.v1_16_220 && id > 28) {
             id -= 2;
         }
-        if (protocol == ProtocolInfo.v1_13_0) {
-            if (id > 27) {
-                return id - 1;
-            } else {
-                return id;
-            }
-        } else {
-            return id;
-        }
+        return id;
     }
 
     public abstract DataPacket[] mvEncode(int protocol);

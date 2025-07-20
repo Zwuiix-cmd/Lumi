@@ -133,17 +133,6 @@ public class Binary {
 
                     if (id >= 60) id = id - 1; // 1.16.210 --> 1.16.0
                     if (id == 121) id = 119; // DATA_BUOYANCY_DATA
-
-                    if (protocol == ProtocolInfo.v1_11_0) {
-                        if (id >= 40) id = id + 1;
-                    } else if (protocol <= ProtocolInfo.v1_2_10) {
-                        if (id >= 29) id = id + 1;
-                        if (id > 76) { // Remove DATA_MAX_STRENGTH and up
-                            id = Entity.DATA_STRENGTH;
-                            type = Entity.DATA_TYPE_INT;
-                            forceEmptyData = true;
-                        }
-                    }
                 }
             }
 
@@ -174,14 +163,10 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_NBT:
                     NBTEntityData slot = (NBTEntityData) d;
-                    if (protocol < ProtocolInfo.v1_12_0) {
-                        stream.putSlot(protocol, slot.item);
-                    } else {
-                        try {
-                            stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                    try {
+                        stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                     break;
                 case Entity.DATA_TYPE_POS:
@@ -196,13 +181,7 @@ public class Binary {
                         if (id == Entity.DATA_FLAGS) {
                             dataVersions = ((LongEntityData) d).dataVersions;
                             if (dataVersions != null && dataVersions.length == 3) {
-                                if (protocol < ProtocolInfo.v1_2_13) {
-                                    stream.putVarLong(dataVersions[0]);
-                                }else if (protocol < ProtocolInfo.v1_7_0) {
-                                    stream.putVarLong(dataVersions[1]);
-                                }else {
-                                    stream.putVarLong(dataVersions[2]);
-                                }
+                                stream.putVarLong(dataVersions[2]);
                                 break;
                             }
                             if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {

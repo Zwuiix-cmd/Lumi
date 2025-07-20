@@ -1,12 +1,12 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.potion.Effect;
 
-public class ItemHoneyBottle extends ItemEdible {
+public class ItemHoneyBottle extends ItemFood {
     
     public ItemHoneyBottle() {
         this(0, 1);
@@ -31,23 +31,20 @@ public class ItemHoneyBottle extends ItemEdible {
     }
 
     @Override
-    public boolean onUse(Player player, int ticksUsed) {
-        if (ticksUsed < 10) return false;
-        super.onUse(player, ticksUsed);
-
-        if (player.hasEffect(Effect.POISON)) {
-            player.removeEffect(Effect.POISON, EntityPotionEffectEvent.Cause.FOOD);
-        }
-
-        if (!player.isCreative()) {
-            player.getInventory().setItemInHand(this);
-            player.getInventory().addItem(Item.get(ItemID.BOTTLE, 0, 1));
-        }
-        return true;
+    public int getFoodRestore() {
+        return 6;
     }
 
     @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_14_0;
+    public float getSaturationRestore() {
+        return 1.2F;
+    }
+
+    @Override
+    public boolean onEaten(Player player) {
+        player.getInventory().addItem(new ItemGlassBottle());
+        player.removeEffect(EffectType.POISON);
+
+        return true;
     }
 }

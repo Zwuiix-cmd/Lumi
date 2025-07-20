@@ -17,4 +17,14 @@ public class ItemSalmon extends ItemFish {
     public ItemSalmon(Integer meta, int count) {
         super(RAW_SALMON, meta, count, "Raw Salmon");
     }
+
+    @Override
+    public int getFoodRestore() {
+        return 2;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 0.4F;
+    }
 }

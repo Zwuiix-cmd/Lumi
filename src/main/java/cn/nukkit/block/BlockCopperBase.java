@@ -22,11 +22,6 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     }
 
     @Override
-    public boolean isWaxed() {
-        return false;
-    }
-
-    @Override
     public int onUpdate(int type) {
         return Oxidizable.super.onUpdate(type);
     }
@@ -63,21 +58,20 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
         return getValidLevel().setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
     }
 
+    @Override
+    public boolean isWaxed() {
+        return false;
+    }
+
     protected int getCopperId(boolean waxed, @Nullable OxidizationLevel oxidizationLevel) {
         if (oxidizationLevel == null) {
             return getId();
         }
-        switch (oxidizationLevel) {
-            case UNAFFECTED:
-                return waxed? WAXED_COPPER : COPPER_BLOCK;
-            case EXPOSED:
-                return waxed? WAXED_EXPOSED_COPPER : EXPOSED_COPPER;
-            case WEATHERED:
-                return waxed? WAXED_WEATHERED_COPPER : WEATHERED_COPPER;
-            case OXIDIZED:
-                return waxed? WAXED_OXIDIZED_COPPER : OXIDIZED_COPPER;
-            default:
-                return getId();
-        }
+        return switch (oxidizationLevel) {
+            case UNAFFECTED -> waxed ? WAXED_COPPER : COPPER_BLOCK;
+            case EXPOSED -> waxed ? WAXED_EXPOSED_COPPER : EXPOSED_COPPER;
+            case WEATHERED -> waxed ? WAXED_WEATHERED_COPPER : WEATHERED_COPPER;
+            case OXIDIZED -> waxed ? WAXED_OXIDIZED_COPPER : OXIDIZED_COPPER;
+        };
     }
 }

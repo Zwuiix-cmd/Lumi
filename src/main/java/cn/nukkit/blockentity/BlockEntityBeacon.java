@@ -3,12 +3,13 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.potion.Effect;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class BlockEntityBeacon extends BlockEntitySpawnable {
 
     private static final int POWER_LEVEL_MAX = 4;
-    private static final List<Integer> allowedEffects = Arrays.asList(Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION);
+    private static final List<Integer> allowedEffects = Arrays.asList(EffectType.SPEED.id(), EffectType.HASTE.id(), EffectType.RESISTANCE.id(), EffectType.JUMP_BOOST.id(), EffectType.STRENGTH.id(), EffectType.REGENERATION.id());
     private long currentTick = 0;
 
     public BlockEntityBeacon(FullChunk chunk, CompoundTag nbt) {
@@ -97,7 +98,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
 
                 if (getPrimaryPower() != 0) {
                     //Apply the primary power
-                    e = Effect.getEffect(getPrimaryPower());
+                    e = Effect.get(getPrimaryPower());
 
                     //Set duration
                     e.setDuration(duration * 20);
@@ -113,13 +114,13 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
                     e.setVisible(false);
 
                     //Add the effect
-                    p.addEffect(e, EntityPotionEffectEvent.Cause.BEACON);
+                    p.addEffect(e, EntityEffectUpdateEvent.Cause.BEACON);
                 }
 
                 //If we have a secondary power as regen, apply it
-                if (getSecondaryPower() == Effect.REGENERATION) {
+                if (getSecondaryPower() == EffectType.REGENERATION.id()) {
                     //Get the regen effect
-                    e = Effect.getEffect(Effect.REGENERATION);
+                    e = Effect.get(EffectType.REGENERATION);
 
                     //Set duration
                     e.setDuration(duration * 20);
@@ -131,7 +132,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
                     e.setVisible(false);
 
                     //Add effect
-                    p.addEffect(e, EntityPotionEffectEvent.Cause.BEACON);
+                    p.addEffect(e, EntityEffectUpdateEvent.Cause.BEACON);
                 }
             }
         }

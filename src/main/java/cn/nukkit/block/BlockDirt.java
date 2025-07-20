@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.item.*;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.generator.object.ObjectTallGrass;
@@ -86,7 +87,7 @@ public class BlockDirt extends BlockSolidMeta {
                 }
                 return true;
             }
-        } else if (item.getId() == Item.POTION && item.getDamage() == ItemPotion.NO_EFFECTS) {
+        } else if (item.getId() == Item.POTION && item.getDamage() == PotionType.WATER.id()) {
             if (player != null) {
                 if (!player.isCreative()) {
                     item.count--;

@@ -12,6 +12,8 @@ import cn.nukkit.entity.custom.EntityDefinition;
 import cn.nukkit.entity.custom.EntityManager;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.*;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.mob.EntityWolf;
@@ -35,7 +37,6 @@ import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.network.protocol.types.PropertySyncData;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.MainLogger;
@@ -45,10 +46,12 @@ import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -400,14 +403,11 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
 
     static {
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMappingOld, ProtocolInfo.v1_2_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping527, ProtocolInfo.v1_19_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping589, ProtocolInfo.v1_20_0);
 
-        initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
-        initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
         initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
         initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
         initEntityIdentifiers(ProtocolInfo.v1_19_0, AvailableEntityIdentifiersPacket.NBT527);
@@ -417,7 +417,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
 
-    protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
+    protected final Map<EffectType, Effect> effects = new ConcurrentHashMap<>();
 
     protected UUID entityUniqueId;
 
@@ -599,7 +599,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);
             for (CompoundTag e : effects.getAll()) {
-                Effect effect = Effect.getEffect(e.getByte("Id"));
+                Effect effect = Effect.get(e.getByte("Id"));
                 if (effect == null) {
                     continue;
                 }
@@ -942,106 +942,122 @@ public abstract class Entity extends Location implements Metadatable {
         return riding;
     }
 
-    public Map<Integer, Effect> getEffects() {
+    public Map<EffectType, Effect> getEffects() {
         return effects;
     }
 
     public void removeAllEffects() {
-        this.removeAllEffects(EntityPotionEffectEvent.Cause.UNKNOWN);
+        this.removeAllEffects(EntityEffectUpdateEvent.Cause.UNKNOWN);
     }
 
-    public void removeAllEffects(EntityPotionEffectEvent.Cause cause) {
+    public void removeAllEffects(EntityEffectUpdateEvent.Cause cause) {
         for (Effect effect : this.effects.values()) {
-            this.removeEffect(effect.getId(), cause);
+            this.removeEffect(effect.getType(), cause);
         }
     }
 
-    public void removeEffect(int effectId) {
-        this.removeEffect(effectId, EntityPotionEffectEvent.Cause.UNKNOWN);
+    public void removeEffect(EffectType type) {
+        this.removeEffect(type, EntityEffectUpdateEvent.Cause.UNKNOWN);
     }
 
-    /**
-     * Remove an effect from the entity
-     * @param effectId the effect id
-     * @param cause the cause of the removal
-     */
-    public void removeEffect(int effectId, EntityPotionEffectEvent.Cause cause) {
-        if (this.effects.containsKey(effectId)) {
-            Effect effect = this.effects.get(effectId);
+    public void removeEffect(EffectType type, EntityEffectUpdateEvent.Cause cause) {
+        if (effects.containsKey(type)) {
 
-            if (cause != null) {
-                EntityPotionEffectEvent event = new EntityPotionEffectEvent(this, effect, null, EntityPotionEffectEvent.Action.REMOVED, cause);
-                event.call();
-                if (event.isCancelled()) {
-                    return;
-                }
+            Effect effect = effects.get(type);
+
+            EntityEffectUpdateEvent event = new EntityEffectUpdateEvent(this, effect, null, EntityEffectUpdateEvent.Action.REMOVED, cause);
+
+            if (!event.call()) {
+                return;
             }
 
-            this.effects.remove(effectId);
+            if (this instanceof Player player && effect.getId() != null) {
+                MobEffectPacket packet = new MobEffectPacket();
+                packet.eid = player.getId();
+                packet.effectId = effect.getId();
+                packet.eventId = MobEffectPacket.EVENT_REMOVE;
+                player.dataPacket(packet);
+            }
 
-            effect.remove(this);
+            effect.onRemove(this);
+            effects.remove(type);
 
             this.recalculateEffectColor();
         }
     }
 
-    public Effect getEffect(int effectId) {
-        return this.effects.getOrDefault(effectId, null);
+    public Effect getEffect(EffectType type) {
+        return effects.getOrDefault(type, null);
     }
 
-    public boolean hasEffect(int effectId) {
-        return this.effects.containsKey(effectId);
+    public boolean hasEffect(EffectType type) {
+        return effects.containsKey(type);
     }
 
     /**
      * Check if the entity can be affected by the effect
      *
-     * @param effectId the effect id
+     * @param type the type of effect
      * @return true if the entity can be affected by the effect
      */
-    public boolean canBeAffected(int effectId) {
+    public boolean canBeAffected(EffectType type) {
         return false;
     }
 
     public void addEffect(Effect effect) {
-        this.addEffect(effect, EntityPotionEffectEvent.Cause.UNKNOWN);
+        this.addEffect(effect, EntityEffectUpdateEvent.Cause.UNKNOWN);
     }
 
-    public void addEffect(Effect effect, EntityPotionEffectEvent.Cause cause) {
-        if (effect == null) {
+    public void addEffect(Effect effect, EntityEffectUpdateEvent.Cause cause) {
+        if (effect == null || cause == null) {
             return;
         }
 
-        if (cause != null) {
-            Effect oldEffect = this.effects.get(effect.getId());
+        Effect oldEffect = this.getEffect(effect.getType());
 
-            EntityPotionEffectEvent event = new EntityPotionEffectEvent(
-                    this,
-                    oldEffect,
-                    effect,
-                    oldEffect == null ? EntityPotionEffectEvent.Action.ADDED : EntityPotionEffectEvent.Action.CHANGED,
-                    cause);
+        EntityEffectUpdateEvent event = new EntityEffectUpdateEvent(
+                this,
+                oldEffect,
+                effect,
+                oldEffect == null ? EntityEffectUpdateEvent.Action.ADDED : EntityEffectUpdateEvent.Action.CHANGED,
+                cause);
 
-            if (!canBeAffected(effect.getId())) {
-                event.setCancelled();
-            }
-            event.call();
-            if (event.isCancelled()) {
-                return;
-            }
-        } else if (!canBeAffected(effect.getId())) {
+        if (!this.canBeAffected(effect.getType())) {
+            event.setCancelled();
+        }
+
+        if (!event.call()) {
             return;
         }
 
-        effect.add(this);
+        if (oldEffect != null && (
+                Math.abs(effect.getAmplifier()) < Math.abs(oldEffect.getAmplifier()) ||
+                        (Math.abs(effect.getAmplifier()) == Math.abs(oldEffect.getAmplifier()) &&
+                                effect.getDuration() < oldEffect.getDuration())
+        )) {
+            return;
+        }
 
-        this.effects.put(effect.getId(), effect);
+        if (this instanceof Player player && effect.getId() != null) {
+            MobEffectPacket packet = new MobEffectPacket();
+            packet.eid = player.getId();
+            packet.effectId = effect.getId();
+            packet.amplifier = effect.getAmplifier();
+            packet.particles = effect.isVisible();
+            packet.duration = effect.getDuration();
+            if (oldEffect != null) {
+                packet.eventId = MobEffectPacket.EVENT_MODIFY;
+            } else {
+                packet.eventId = MobEffectPacket.EVENT_ADD;
+            }
+
+            player.dataPacket(packet);
+        }
+
+        effect.onAdd(this);
+        effects.put(effect.getType(), effect);
 
         this.recalculateEffectColor();
-
-        if (effect.getId() == Effect.HEALTH_BOOST) {
-            this.setHealth(this.health + ((effect.getAmplifier() + 1) << 2));
-        }
     }
 
     public void recalculateBoundingBox() {
@@ -1074,21 +1090,17 @@ public abstract class Entity extends Location implements Metadatable {
         int count = 0;
         boolean ambient = true;
         long effectsData = 0;
-        int packedEffectsCount = 0;
-        for (Effect effect : this.effects.values()) {
+        for (Effect effect : effects.values()) {
             if (effect.isVisible()) {
-                int[] c = effect.getColor();
-                color[0] += c[0] * (effect.getAmplifier() + 1);
-                color[1] += c[1] * (effect.getAmplifier() + 1);
-                color[2] += c[2] * (effect.getAmplifier() + 1);
-                count += effect.getAmplifier() + 1;
+                Color effectColor = effect.getColor();
+                color[0] += effectColor.getRed() * effect.getLevel();
+                color[1] += effectColor.getGreen() * effect.getLevel();
+                color[2] += effectColor.getBlue() * effect.getLevel();
+                count += effect.getLevel();
                 if (!effect.isAmbient()) {
                     ambient = false;
                 }
-                if (packedEffectsCount < 8) {
-                    effectsData = effectsData << 7 | ((effect.getId() & 0x3f) << 1) | (effect.isAmbient() ? 1 : 0);
-                    packedEffectsCount++;
-                }
+                effectsData = effectsData << 7 | ((effect.getId() & 0x3f) << 1) | (effect.isAmbient() ? 1 : 0);
             }
         }
 
@@ -1235,12 +1247,9 @@ public abstract class Entity extends Location implements Metadatable {
             return ProtocolInfo.v1_19_0;
         } else if (protocolId >= ProtocolInfo.v1_17_0) {
             return ProtocolInfo.v1_17_0;
-        } else if (protocolId >= ProtocolInfo.v1_16_100) {
+        } else {
             return ProtocolInfo.v1_16_100;
-        } else if (protocolId >= ProtocolInfo.v1_10_0) {
-            return ProtocolInfo.v1_10_0;
         }
-        return ProtocolInfo.v1_2_0;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1460,16 +1469,17 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void sendPotionEffects(Player player) {
-        for (Effect effect : this.effects.values()) {
-            MobEffectPacket pk = new MobEffectPacket();
-            pk.eid = this.id;
-            pk.effectId = effect.getId();
-            pk.amplifier = effect.getAmplifier();
-            pk.particles = effect.isVisible();
-            pk.duration = effect.getDuration();
-            pk.eventId = MobEffectPacket.EVENT_ADD;
-
-            player.dataPacket(pk);
+        for (Effect effect : effects.values()) {
+            if (effect.getId() != null) {
+                MobEffectPacket packet = new MobEffectPacket();
+                packet.eid = this.getId();
+                packet.effectId = effect.getId();
+                packet.amplifier = effect.getAmplifier();
+                packet.particles = effect.isVisible();
+                packet.duration = effect.getDuration();
+                packet.eventId = MobEffectPacket.EVENT_ADD;
+                player.dataPacket(packet);
+            }
         }
     }
 
@@ -1519,7 +1529,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean attack(EntityDamageEvent source) {
-        if (hasEffect(Effect.FIRE_RESISTANCE)
+        if (hasEffect(EffectType.FIRE_RESISTANCE)
                 && (source.getCause() == DamageCause.FIRE
                 || source.getCause() == DamageCause.FIRE_TICK
                 || source.getCause() == DamageCause.LAVA)) {
@@ -1587,12 +1597,12 @@ public abstract class Entity extends Location implements Metadatable {
                     this.getLevel().addParticleEffect(this, ParticleEffect.TOTEM);
 
                     this.extinguish();
-                    this.removeAllEffects(EntityPotionEffectEvent.Cause.TOTEM);
+                    this.removeAllEffects(EntityEffectUpdateEvent.Cause.TOTEM);
                     this.setHealth(1);
 
-                    this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1), EntityPotionEffectEvent.Cause.TOTEM);
-                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800), EntityPotionEffectEvent.Cause.TOTEM);
-                    this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(1), EntityPotionEffectEvent.Cause.TOTEM);
+                    this.addEffect(Effect.get(EffectType.REGENERATION).setDuration(800).setAmplifier(1), EntityEffectUpdateEvent.Cause.TOTEM);
+                    this.addEffect(Effect.get(EffectType.FIRE_RESISTANCE).setDuration(800), EntityEffectUpdateEvent.Cause.TOTEM);
+                    this.addEffect(Effect.get(EffectType.ABSORPTION).setDuration(100).setAmplifier(1), EntityEffectUpdateEvent.Cause.TOTEM);
 
                     EntityEventPacket pk = new EntityEventPacket();
                     pk.eid = this.getId();
@@ -1679,7 +1689,7 @@ public abstract class Entity extends Location implements Metadatable {
      *         current max health
      */
     public int getMaxHealth() {
-        return maxHealth + (this.hasEffect(Effect.HEALTH_BOOST) ? (this.getEffect(Effect.HEALTH_BOOST).getAmplifier() + 1) << 2 : 0);
+        return maxHealth + (this.hasEffect(EffectType.HEALTH_BOOST) ? (this.getEffect(EffectType.HEALTH_BOOST).getAmplifier() + 1) << 2 : 0);
     }
 
     public void setMaxHealth(int maxHealth) {
@@ -1831,7 +1841,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.justCreated = false;
 
         if (!this.isAlive()) {
-            this.removeAllEffects(EntityPotionEffectEvent.Cause.DEATH);
+            this.removeAllEffects(EntityEffectUpdateEvent.Cause.DEATH);
             this.despawnFromAll();
             if (!this.isPlayer) {
                 this.close();
@@ -1847,12 +1857,12 @@ public abstract class Entity extends Location implements Metadatable {
         if (!this.effects.isEmpty()) {
             for (Effect effect : this.effects.values()) {
                 if (effect.canTick()) {
-                    effect.applyEffect(this);
+                    effect.onApply(this, 1);
                 }
                 effect.setDuration(effect.getDuration() - tickDiff);
 
                 if (effect.getDuration() <= 0) {
-                    this.removeEffect(effect.getId(), EntityPotionEffectEvent.Cause.EXPIRATION);
+                    this.removeEffect(effect.getType(), EntityEffectUpdateEvent.Cause.EXPIRATION);
                 }
             }
         }
@@ -1880,7 +1890,7 @@ public abstract class Entity extends Location implements Metadatable {
                     this.fireTicks = 0;
                 }
             } else {
-                if (!this.hasEffect(Effect.FIRE_RESISTANCE) && ((this.fireTicks % 20) == 0 || tickDiff > 20)) {
+                if (!this.hasEffect(EffectType.FIRE_RESISTANCE) && ((this.fireTicks % 20) == 0 || tickDiff > 20)) {
                     this.attack(new EntityDamageEvent(this, DamageCause.FIRE_TICK, 1));
                 }
                 this.fireTicks -= tickDiff;
@@ -1966,19 +1976,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void broadcastMovement() {
-        MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = this.getId();
-        pk.x = this.x;
+        MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
+        packet.eid = this.getId();
+        packet.x = this.x;
         //因为以前处理MOVE_PLAYER_PACKET的时候是y - this.getBaseOffset()
         //现在统一 MOVE_PLAYER_PACKET和PLAYER_AUTH_INPUT_PACKET 均为this.y - this.getEyeHeight()，所以这里不再需要对两种移动方式分别处理
-        pk.y = this.y + this.getBaseOffset();
-        pk.z = this.z;
-        pk.headYaw = yaw;
-        pk.pitch = pitch;
-        pk.yaw = yaw;
-        pk.teleport = false;
-        pk.onGround = this.onGround;
-        Server.broadcastPacket(hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_7_0).collect(Collectors.toList()), pk);
+        packet.y = this.y + this.getBaseOffset();
+        packet.z = this.z;
+        packet.headYaw = yaw;
+        packet.pitch = pitch;
+        packet.yaw = yaw;
+        packet.teleport = false;
+        packet.onGround = this.onGround;
+        Server.broadcastPacket(hasSpawned.values(), packet);
     }
 
     @Override
@@ -2161,7 +2171,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setOnFire(int seconds) {
-        if (!hasEffect(Effect.FIRE_RESISTANCE)) {
+        if (!hasEffect(EffectType.FIRE_RESISTANCE)) {
             int ticks = seconds * 20;
             if (ticks > this.fireTicks) {
                 this.fireTicks = ticks;
@@ -2240,12 +2250,12 @@ public abstract class Entity extends Location implements Metadatable {
                 this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SPLASH, ThreadLocalRandom.current().nextInt(600000, 800000), "minecraft:player", false, false);
                 return; // TODO: Some waterlogged blocks prevent fall damage
             }
-            if (!this.hasEffect(Effect.SLOW_FALLING)) {
+            if (!this.hasEffect(EffectType.SLOW_FALLING)) {
                 Block down = this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY() - 1, this.getFloorZ(), 0, true);
                 int floor = down.getId();
 
                 if (!this.noFallDamage) {
-                    float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
+                    float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(EffectType.JUMP_BOOST) ? this.getEffect(EffectType.JUMP_BOOST).getAmplifier() + 1 : 0));
 
                     if (floor == BlockID.HAY_BALE || block == BlockID.HAY_BALE) {
                         damage -= (damage * 0.8f);
@@ -3202,6 +3212,10 @@ public abstract class Entity extends Location implements Metadatable {
 
     public Server getServer() {
         return server;
+    }
+
+    public boolean isUndead() {
+        return false;
     }
 
     @Override

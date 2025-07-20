@@ -2,8 +2,9 @@ package cn.nukkit.item.enchantment.damage;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
-import cn.nukkit.event.entity.EntityPotionEffectEvent;
-import cn.nukkit.potion.Effect;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
+import cn.nukkit.event.entity.EntityEffectUpdateEvent;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -39,8 +40,8 @@ public class EnchantmentDamageArthropods extends EnchantmentDamage {
     public void doPostAttack(Entity attacker, Entity entity) {
         if (entity instanceof EntityArthropod) {
             entity.addEffect(
-                    Effect.getEffect(Effect.SLOWNESS).setDuration(20 + Utils.random.nextInt(10 * this.level)).setAmplifier(3),
-                    EntityPotionEffectEvent.Cause.ATTACK
+                    Effect.get(EffectType.SLOWNESS).setDuration(20 + Utils.random.nextInt(10 * this.level)).setAmplifier(3),
+                    EntityEffectUpdateEvent.Cause.ATTACK
             );
         }
     }

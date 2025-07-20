@@ -44,9 +44,4 @@ public class SetDifficultyProcessor extends DataPacketProcessor<SetDifficultyPac
     public Class<? extends DataPacket> getPacketClass() {
         return SetDifficultyPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

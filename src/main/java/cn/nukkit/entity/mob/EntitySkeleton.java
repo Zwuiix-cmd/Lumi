@@ -64,6 +64,11 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
     }
 
     @Override
+    public boolean isUndead() {
+        return true;
+    }
+
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 23 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;

@@ -13,8 +13,6 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.network.protocol.v113.ContainerSetContentPacketV113;
-import cn.nukkit.network.protocol.v113.ContainerSetSlotPacketV113;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -476,41 +474,20 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public void sendContents(Player... players) {
-        InventoryContentPacket pk = new InventoryContentPacket();
-        pk.slots = new Item[this.getSize()];
+        InventoryContentPacket packet = new InventoryContentPacket();
+        packet.slots = new Item[this.getSize()];
         for (int i = 0; i < this.getSize(); ++i) {
-            pk.slots[i] = this.getItem(i);
-        }
-
-        if (Server.getInstance().minimumProtocol <= ProtocolInfo.v1_1_0) {
-            ContainerSetContentPacketV113 pk2 = new ContainerSetContentPacketV113();
-            pk2.slots = pk.slots.clone();
-            for (Player player : players) {
-                if (player.protocol > ProtocolInfo.v1_1_0) {
-                    continue;
-                }
-                pk2.eid = player.getId();
-                int id = player.getWindowId(this);
-                if (id == -1 || !player.spawned) {
-                    this.close(player);
-                    continue;
-                }
-                pk2.windowid = (byte) id;
-                player.dataPacket(pk2);
-            }
+            packet.slots[i] = this.getItem(i);
         }
 
         for (Player player : players) {
-            if (player.protocol < ProtocolInfo.v1_2_0) {
-                continue;
-            }
             int id = player.getWindowId(this);
             if (id == -1) {
                 this.close(player);
                 continue;
             }
-            pk.inventoryId = id;
-            player.dataPacket(pk);
+            packet.inventoryId = id;
+            player.dataPacket(packet);
         }
     }
 
@@ -573,40 +550,23 @@ public abstract class BaseInventory implements Inventory {
     }
 
     private void sendSlotTo(int index, Player player) {
-        if (player.protocol >= ProtocolInfo.v1_2_0) {
-            InventorySlotPacket pk = new InventorySlotPacket();
-            pk.slot = index;
-            pk.item = this.getItem(index).clone();
-            int id = player.getWindowId(this);
-            if (id == -1) {
-                this.close(player);
-                return;
-            }
-            pk.inventoryId = id;
-            player.dataPacket(pk);
-        } else {
-            ContainerSetSlotPacketV113 pk = new ContainerSetSlotPacketV113();
-            pk.slot = index;
-            pk.item = this.getItem(index).clone();
-            int id = player.getWindowId(this);
-            if (id == -1) {
-                this.close(player);
-                return;
-            }
-            pk.windowid = (byte) id;
-            player.dataPacket(pk);
+        InventorySlotPacket packet = new InventorySlotPacket();
+        packet.slot = index;
+        packet.item = this.getItem(index).clone();
+        int id = player.getWindowId(this);
+        if (id == -1) {
+            this.close(player);
+            return;
         }
+        packet.inventoryId = id;
+        player.dataPacket(packet);
     }
 
     @Override
     public void sendSlot(int index, Player... players) {
-        InventorySlotPacket pk = new InventorySlotPacket();
-        pk.slot = index;
-        pk.item = this.getItem(index).clone();
-
-        ContainerSetSlotPacketV113 pk2 = new ContainerSetSlotPacketV113();
-        pk2.slot = index;
-        pk2.item = pk.item.clone();
+        InventorySlotPacket packet = new InventorySlotPacket();
+        packet.slot = index;
+        packet.item = this.getItem(index).clone();
 
         for (Player player : players) {
             int id = player.getWindowId(this);
@@ -614,13 +574,8 @@ public abstract class BaseInventory implements Inventory {
                 this.close(player);
                 continue;
             }
-            pk.inventoryId = id;
-            pk2.windowid = id;
-            if (player.protocol >= ProtocolInfo.v1_2_0) {
-                player.dataPacket(pk);
-            } else {
-                player.dataPacket(pk2);
-            }
+            packet.inventoryId = id;
+            player.dataPacket(packet);
         }
     }
 

@@ -34,7 +34,7 @@ public class PunchBlockParticle extends Particle {
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
-        packet.data = protocol <= ProtocolInfo.v1_2_10 ? (blockId | (blockDamage << 8) | (face << 16)) : GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
+        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
         packet.protocol = protocol;
         packet.tryEncode();
         return new DataPacket[]{packet};

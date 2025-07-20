@@ -4,6 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.DimensionData;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
@@ -42,11 +43,11 @@ public class LevelDBChunk extends BaseChunk {
 
     private final DimensionData dimensionData;
 
-    public LevelDBChunk(@Nullable LevelProvider level, int chunkX, int chunkZ) {
-        this(level, chunkX, chunkZ, new LevelDBChunkSection[0], new int[SUB_CHUNK_2D_SIZE], null, null, null, null, ChunkState.NEW);
+    public LevelDBChunk(Level level, @Nullable LevelProvider provider, int chunkX, int chunkZ) {
+        this(level, provider, chunkX, chunkZ, new LevelDBChunkSection[0], new int[SUB_CHUNK_2D_SIZE], null, null, null, null, ChunkState.NEW);
     }
 
-    public LevelDBChunk(@Nullable LevelProvider provider, int chunkX, int chunkZ, @NotNull ChunkSection[] sections,
+    public LevelDBChunk(Level level, @Nullable LevelProvider provider, int chunkX, int chunkZ, @NotNull ChunkSection[] sections,
                         @Nullable int[] heightmap, @Nullable byte[] biomes2d, @Nullable PalettedBlockStorage[] biomes3d,
                         @Nullable List<CompoundTag> entities, @Nullable List<CompoundTag> blockEntities, @NotNull ChunkState state) {
         this.provider = provider;
@@ -59,7 +60,7 @@ public class LevelDBChunk extends BaseChunk {
         for (int i = minSectionY; i <= maxSectionY; i++) {
             int sectionsY = i + this.dimensionData.getSectionOffset();
             if (sectionsY >= sections.length || sections[sectionsY] == null) {
-                this.sections[sectionsY] = new LevelDBChunkSection(this, i);
+                this.sections[sectionsY] = new LevelDBChunkSection(level, this, i);
             } else {
                 ChunkSection section = sections[sectionsY];
                 ((LevelDBChunkSection) section).setParent(this);
@@ -614,12 +615,12 @@ public class LevelDBChunk extends BaseChunk {
     }
 
     @SuppressWarnings("unused")
-    public static LevelDBChunk getEmptyChunk(int chunkX, int chunkZ) {
-        return getEmptyChunk(chunkX, chunkZ, null);
+    public static LevelDBChunk getEmptyChunk(Level level, int chunkX, int chunkZ) {
+        return getEmptyChunk(level, chunkX, chunkZ, null);
     }
 
-    public static LevelDBChunk getEmptyChunk(int chunkX, int chunkZ, LevelProvider provider) {
-        return new LevelDBChunk(provider, chunkX, chunkZ);
+    public static LevelDBChunk getEmptyChunk(Level level, int chunkX, int chunkZ, LevelProvider provider) {
+        return new LevelDBChunk(level, provider, chunkX, chunkZ);
     }
 
     protected static int index2d(int x, int z) {

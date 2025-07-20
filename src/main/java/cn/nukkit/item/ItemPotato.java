@@ -6,7 +6,7 @@ import cn.nukkit.block.Block;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class ItemPotato extends ItemEdible {
+public class ItemPotato extends ItemFood {
 
     public ItemPotato() {
         this(0, 1);
@@ -23,5 +23,15 @@ public class ItemPotato extends ItemEdible {
 
     protected ItemPotato(int id, Integer meta, int count, String name) {
         super(id, meta, count, name);
+    }
+
+    @Override
+    public int getFoodRestore() {
+        return 1;
+    }
+
+    @Override
+    public float getSaturationRestore() {
+        return 0.6F;
     }
 }

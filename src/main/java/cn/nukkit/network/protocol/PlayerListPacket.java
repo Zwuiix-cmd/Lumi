@@ -36,37 +36,21 @@ public class PlayerListPacket extends DataPacket {
                     this.putUUID(entry.uuid);
                     this.putVarLong(entry.entityId);
                     this.putString(entry.name);
-                    if (protocol >= ProtocolInfo.v1_2_13 && protocol <= ProtocolInfo.v1_6_0) {
-                        this.putString("");
-                        this.putVarInt(0);
-                    }
-                    if (protocol < ProtocolInfo.v1_13_0) {
-                        this.putSkin(protocol, entry.skin);
-                        if (protocol < ProtocolInfo.v1_2_13) {
-                            this.putByteArray(new byte[0]);
-                        }
-                    }
                     this.putString(entry.xboxUserId);
-                    if (protocol >= ProtocolInfo.v1_2_13) {
-                        this.putString(entry.platformChatId);
-                        if (protocol >= 388) {
-                            this.putLInt(entry.buildPlatform);
-                            this.putSkin(protocol, entry.skin);
-                            this.putBoolean(entry.isTeacher);
-                            this.putBoolean(entry.isHost);
-                            if (protocol >= ProtocolInfo.v1_20_60) {
-                                this.putBoolean(entry.isSubClient);
-                                if (protocol >= ProtocolInfo.v1_21_80) {
-                                    this.putLInt(entry.color);
-                                }
-                            }
+                    this.putString(entry.platformChatId);
+                    this.putLInt(entry.buildPlatform);
+                    this.putSkin(protocol, entry.skin);
+                    this.putBoolean(entry.isTeacher);
+                    this.putBoolean(entry.isHost);
+                    if (protocol >= ProtocolInfo.v1_20_60) {
+                        this.putBoolean(entry.isSubClient);
+                        if (protocol >= ProtocolInfo.v1_21_80) {
+                            this.putLInt(entry.color);
                         }
                     }
                 }
-                if (protocol >= ProtocolInfo.v1_14_60) {
-                    for (Entry entry : this.entries) { // WTF Mojang
-                        this.putBoolean(entry.skin != null && entry.skin.isTrusted());
-                    }
+                for (Entry entry : this.entries) { // WTF Mojang
+                    this.putBoolean(entry.skin != null && entry.skin.isTrusted());
                 }
                 break;
             case TYPE_REMOVE:

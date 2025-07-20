@@ -12,6 +12,7 @@ import cn.nukkit.level.util.BitArray;
 import cn.nukkit.level.util.BitArrayVersion;
 import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.BinaryStream;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -218,22 +219,55 @@ public class StateBlockStorage {
         this.set(elementIndex(pos.x, pos.y, pos.z), BlockStateMapping.get().getBlockStateFromFullId(value));
     }
 
-    public void writeTo(int protocol, BinaryStream stream, boolean antiXray) {
+    public void writeTo(Level level, int protocol, BinaryStream stream, boolean antiXray) {
         PalettedBlockStorage palettedBlockStorage = PalettedBlockStorage.createFromBlockPalette(protocol);
 
-        for (int i = 0; i < SECTION_SIZE; i++) {
-            int fullId = get(i);
-            int id = fullId >> Block.DATA_BITS;
-            int meta = fullId & Block.DATA_MASK;
-            if (antiXray && id < Block.MAX_BLOCK_ID && Level.xrayableBlocks[id]) {
-                id = Block.STONE;
-                meta = 0;
+        if(antiXray) {
+            final NukkitRandom nukkitRandom = new NukkitRandom();
+            var realOreToFakeMap = level.getAntiXraySystem().getRealOreToReplacedBlockIds();
+            var fakeBlockMap = level.getAntiXraySystem().getFakeOreToPutBlockIds();
+            var XAndDenominator = level.getAntiXraySystem().getFakeOreDenominator() - 1;
+
+            for (int i = 0; i < SECTION_SIZE; i++) {
+                int x = (i >> 8) & 0xF;
+                int z = (i >> 4) & 0xF;
+                int y = i & 0xF;
+
+                final int fullId = get(i);
+                int id = fullId >> Block.DATA_BITS;
+                int meta = fullId & Block.DATA_MASK;
+
+                if (x != 0 && z != 0 && y != 0 && x != 15 && z != 15 && y != 15) {
+                    var tmp = realOreToFakeMap.getOrDefault(id, Integer.MAX_VALUE);
+                    if (tmp != Integer.MAX_VALUE && canBeObfuscated(x, y, z)) {
+                        id = tmp;
+                    } else {
+                        var tmp2 = fakeBlockMap.get(id);
+                        if (tmp2 != null && (nukkitRandom.nextInt() & XAndDenominator) == 0 && canBeObfuscated(x, y, z)) {
+                            id = tmp2.getInt(nukkitRandom.nextRange(0, tmp2.size() - 1));
+                            meta = 0;
+                        }
+                    }
+                }
+                palettedBlockStorage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, meta));
             }
-            int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, meta);
-            palettedBlockStorage.setBlock(i, runtimeId);
+        } else {
+            for (int i = 0; i < SECTION_SIZE; i++) {
+                final int fullId = get(i);
+                palettedBlockStorage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK));
+            }
         }
 
         palettedBlockStorage.writeTo(stream);
+    }
+
+    private boolean canBeObfuscated(int x, int y, int z) {
+        return !Block.transparent[get(x + 1, y, z) >> Block.DATA_BITS] &&
+                !Block.transparent[get(x - 1, y, z) >> Block.DATA_BITS] &&
+                !Block.transparent[get(x, y + 1, z) >> Block.DATA_BITS] &&
+                !Block.transparent[get(x, y - 1, z) >> Block.DATA_BITS] &&
+                !Block.transparent[get(x, y, z + 1) >> Block.DATA_BITS] &&
+                !Block.transparent[get(x, y, z - 1) >> Block.DATA_BITS];
     }
 
     private void grow(BitArrayVersion version) {
