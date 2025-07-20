@@ -1121,16 +1121,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.hasSpawnChunks && this.chunksSent >= server.spawnThreshold) {
             this.hasSpawnChunks = true;
-
-            if (this.protocol <= ProtocolInfo.v1_5_0) {
-                this.doFirstSpawn();
-            }
-
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
-
-            if (protocol <= ProtocolInfo.v1_5_0) {
-                this.server.getPluginManager().callEvent(new PlayerLocallyInitializedEvent(this));
-            }
         }
     }
 
@@ -1169,28 +1160,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.teleport(respawnEvent.getRespawnPosition(), null);
 
-            if (this.protocol < ProtocolInfo.v1_13_0) {
-                RespawnPacket respawnPacket = new RespawnPacket();
-                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
-                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
-                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
-                this.dataPacket(respawnPacket);
-            }
-
             this.setHealth(this.getMaxHealth());
             this.foodData.setFood(20, 20);
             this.sendData(this);
         } else {
             this.setPosition(respawnEvent.getRespawnPosition());
             this.sendPosition(respawnEvent.getRespawnPosition(), yaw, pitch, MovePlayerPacket.MODE_RESET);
-
-            if (this.protocol < ProtocolInfo.v1_5_0) {
-                RespawnPacket respawnPacket = new RespawnPacket();
-                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
-                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
-                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
-                this.dataPacket(respawnPacket);
-            }
 
             this.getLevel().sendTime(this);
             this.getLevel().sendWeather(this);
@@ -1303,13 +1278,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.unloadChunk(Level.getHashX(index), Level.getHashZ(index));
         }
 
-        if (this.protocol >= 313) {
-            if (!loadQueue.isEmpty()) {
-                NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
-                packet.position = this.asBlockVector3();
-                packet.radius = this.chunkRadius << 4;
-                this.dataPacket(packet);
-            }
+        if (!loadQueue.isEmpty()) {
+            NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
+            packet.position = this.asBlockVector3();
+            packet.radius = this.chunkRadius << 4;
+            this.dataPacket(packet);
         }
 
         return true;
@@ -2117,13 +2090,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!to.equals(moveEvent.getTo())) { // If plugins modify the destination
                 this.teleport(moveEvent.getTo(), null);
             } else {
-                //1.7.0-
-                this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw,
-                        this.getViewers().values()
-                                .stream()
-                                .filter(p -> p.protocol < ProtocolInfo.v1_7_0)
-                                .collect(Collectors.toList()));
-                //1.7.0+
                 this.broadcastMovement();
             }
         } else {
@@ -2357,13 +2323,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (this.needSendRotation) {
-                //1.7.0-
-                this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw,
-                        this.getViewers().values()
-                                .stream()
-                                .filter(p -> p.protocol < ProtocolInfo.v1_7_0)
-                                .collect(Collectors.toList()));
-                //1.7.0+
                 this.broadcastMovement();
                 this.needSendRotation = false;
             }
@@ -2470,11 +2429,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
 
-        // Shields were added in 1.10
-        // Change this if you map shields to some other item for old versions
-        if (this.protocol >= ProtocolInfo.v1_10_0) {
-            updateBlockingFlag();
-        }
+        this.updateBlockingFlag();
 
         if (!this.isSleeping()) {
             this.timeSinceRest++;
@@ -2880,67 +2835,63 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, 1), false);
 
         try {
-            if (this.protocol >= ProtocolInfo.v1_8_0) {
-                if (this.protocol >= ProtocolInfo.v1_12_0) {
-                    if (this.protocol >= ProtocolInfo.v1_16_100) {
-                        if (this.protocol >= ProtocolInfo.v1_17_0) {
-                            //注册实体属性
-                            for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
-                                this.dataPacket(pk);
-                            }
-                        }
-                        ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
-                        if (this.protocol >= ProtocolInfo.v1_21_60) {
-                            Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                            Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
-                            List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
-                            entries.addAll(vanillaItems);
-                            if (this.server.enableExperimentMode && !itemDefinitions.isEmpty()) {
-                                for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
-                                    try {
-                                        Item item = Item.fromString(entry.getKey());
-                                        entries.add(new ItemComponentPacket.ItemDefinition(
-                                                entry.getKey(),
-                                                item.getNetworkId(this.protocol),
-                                                true,
-                                                1,
-                                                entry.getValue().getNbt(this.protocol)
-                                        ));
-                                    } catch (Exception e) {
-                                        log.error("ItemComponentPacket encoding error", e);
-                                    }
-                                }
-                            }
-                            itemComponentPacket.setEntries(entries);
-                        } else {
-                            if (this.server.enableExperimentMode && !Item.getCustomItemDefinition().isEmpty()) {
-                                HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
-                                List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
-                                int i = 0;
-                                for (var entry : itemDefinition.entrySet()) {
-                                    try {
-                                        Item item = Item.fromString(entry.getKey());
-                                        entries.add(new ItemComponentPacket.ItemDefinition(
-                                                entry.getKey(),
-                                                item.getNetworkId(this.protocol),
-                                                true,
-                                                1,
-                                                entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
-                                        ));
-                                        i++;
-                                    } catch (Exception e) {
-                                        log.error("ItemComponentPacket encoding error", e);
-                                    }
-                                }
-                                itemComponentPacket.setEntries(entries);
-                            }
-                        }
-                        this.dataPacket(itemComponentPacket);
+            if (this.protocol >= ProtocolInfo.v1_16_100) {
+                if (this.protocol >= ProtocolInfo.v1_17_0) {
+                    //注册实体属性
+                    for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
+                        this.dataPacket(pk);
                     }
-                    this.dataPacket(BiomeDefinitionListPacket.getCachedPacket(this.protocol));
                 }
-                this.dataPacket(new AvailableEntityIdentifiersPacket());
+                ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
+                if (this.protocol >= ProtocolInfo.v1_21_60) {
+                    Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
+                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
+                    List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
+                    entries.addAll(vanillaItems);
+                    if (this.server.enableExperimentMode && !itemDefinitions.isEmpty()) {
+                        for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
+                            try {
+                                Item item = Item.fromString(entry.getKey());
+                                entries.add(new ItemComponentPacket.ItemDefinition(
+                                        entry.getKey(),
+                                        item.getNetworkId(this.protocol),
+                                        true,
+                                        1,
+                                        entry.getValue().getNbt(this.protocol)
+                                ));
+                            } catch (Exception e) {
+                                log.error("ItemComponentPacket encoding error", e);
+                            }
+                        }
+                    }
+                    itemComponentPacket.setEntries(entries);
+                } else {
+                    if (this.server.enableExperimentMode && !Item.getCustomItemDefinition().isEmpty()) {
+                        HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
+                        List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
+                        int i = 0;
+                        for (var entry : itemDefinition.entrySet()) {
+                            try {
+                                Item item = Item.fromString(entry.getKey());
+                                entries.add(new ItemComponentPacket.ItemDefinition(
+                                        entry.getKey(),
+                                        item.getNetworkId(this.protocol),
+                                        true,
+                                        1,
+                                        entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
+                                ));
+                                i++;
+                            } catch (Exception e) {
+                                log.error("ItemComponentPacket encoding error", e);
+                            }
+                        }
+                        itemComponentPacket.setEntries(entries);
+                    }
+                }
+                this.dataPacket(itemComponentPacket);
             }
+            this.dataPacket(BiomeDefinitionListPacket.getCachedPacket(this.protocol));
+            this.dataPacket(new AvailableEntityIdentifiersPacket());
 
             if (this.protocol >= ProtocolInfo.v1_16_100) {
                 this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
@@ -3914,7 +3865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                         break;
                     case InteractPacket.ACTION_MOUSEOVER:
-                        if (interactPacket.target == 0 && this.protocol >= 313) {
+                        if (interactPacket.target == 0) {
                             break packetswitch;
                         }
                         String buttonText = "";
@@ -5805,14 +5756,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.teleport(respawnPos, null);
 
-        if (this.protocol < 388) {
-            RespawnPacket respawnPacket = new RespawnPacket();
-            respawnPacket.x = (float) respawnPos.x;
-            respawnPacket.y = (float) respawnPos.y;
-            respawnPacket.z = (float) respawnPos.z;
-            this.dataPacket(respawnPacket);
-        }
-
         this.sendExperience();
         this.sendExperienceLevel();
 
@@ -6791,12 +6734,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         changeDimensionPacket.respawn = !this.isAlive();
         this.dataPacket(changeDimensionPacket);
 
-        if (this.protocol >= ProtocolInfo.v1_8_0) {
-            NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
-            pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
-            pk0.radius = this.chunkRadius << 4;
-            this.dataPacket(pk0);
-        }
+        NetworkChunkPublisherUpdatePacket chunkPublisherUpdatePacket = new NetworkChunkPublisherUpdatePacket();
+        chunkPublisherUpdatePacket.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
+        chunkPublisherUpdatePacket.radius = this.chunkRadius << 4;
+        this.dataPacket(chunkPublisherUpdatePacket);
 
         if (this.protocol >= ProtocolInfo.v1_19_50_20) {
             this.dimensionFix560 = true;
@@ -7360,7 +7301,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean isEnableNetworkEncryption() {
-        return protocol >= ProtocolInfo.v1_7_0 && this.server.encryptionEnabled /*&& loginChainData.isXboxAuthed()*/;
+        return this.server.encryptionEnabled /*&& loginChainData.isXboxAuthed()*/;
     }
 
     private List<ExperimentData> getExperiments() {

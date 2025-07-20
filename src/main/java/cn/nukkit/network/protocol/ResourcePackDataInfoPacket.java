@@ -26,7 +26,7 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public long compressedPackSize;
     public byte[] sha256;
     public boolean premium;
-    public int type = protocol < ProtocolInfo.v1_13_0 ? 1 : TYPE_RESOURCE;
+    public int type = TYPE_RESOURCE;
 
     @Override
     public void decode() {
@@ -35,10 +35,8 @@ public class ResourcePackDataInfoPacket extends DataPacket {
         this.chunkCount = this.getLInt();
         this.compressedPackSize = this.getLLong();
         this.sha256 = this.getByteArray();
-        if (protocol >= ProtocolInfo.v1_12_0) {
-            this.premium = this.getBoolean();
-            this.type = this.getByte();
-        }
+        this.premium = this.getBoolean();
+        this.type = this.getByte();
     }
 
     @Override
@@ -49,10 +47,8 @@ public class ResourcePackDataInfoPacket extends DataPacket {
         this.putLInt(this.chunkCount);
         this.putLLong(this.compressedPackSize);
         this.putByteArray(this.sha256);
-        if (protocol >= ProtocolInfo.v1_12_0) {
-            this.putBoolean(this.premium);
-            this.putByte((byte) this.type);
-        }
+        this.putBoolean(this.premium);
+        this.putByte((byte) this.type);
     }
 
     @Override

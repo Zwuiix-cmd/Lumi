@@ -1,4 +1,4 @@
-package cn.nukkit.network.process.processor.v282;
+package cn.nukkit.network.process.processor.common;
 
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.event.player.PlayerLocallyInitializedEvent;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SetLocalPlayerAsInitializedProcessor_v282 extends DataPacketProcessor<SetLocalPlayerAsInitializedPacket> {
+public class SetLocalPlayerAsInitializedProcessor extends DataPacketProcessor<SetLocalPlayerAsInitializedPacket> {
 
-    public static final SetLocalPlayerAsInitializedProcessor_v282 INSTANCE = new SetLocalPlayerAsInitializedProcessor_v282();
+    public static final SetLocalPlayerAsInitializedProcessor INSTANCE = new SetLocalPlayerAsInitializedProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull SetLocalPlayerAsInitializedPacket pk) {
@@ -34,10 +34,5 @@ public class SetLocalPlayerAsInitializedProcessor_v282 extends DataPacketProcess
     @Override
     public Class<? extends DataPacket> getPacketClass() {
         return SetLocalPlayerAsInitializedPacket.class;
-    }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_6_0_5;
     }
 }

@@ -38,9 +38,4 @@ public class ClientToServerHandshakeProcessor extends DataPacketProcessor<Client
     public Class<ClientToServerHandshakePacket> getPacketClass() {
         return ClientToServerHandshakePacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

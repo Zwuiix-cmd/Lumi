@@ -43,9 +43,4 @@ public class ItemTurtleShell extends ItemArmor {
     public int getToughness() {
         return 2;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_5_0;
-    }
 }

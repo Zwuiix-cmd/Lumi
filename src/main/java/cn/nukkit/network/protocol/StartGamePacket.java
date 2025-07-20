@@ -221,14 +221,12 @@ public class StartGamePacket extends DataPacket {
         if (protocol >= 332) {
             this.putBoolean(this.hasConfirmedPlatformLockedContent);
         }
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putBoolean(this.multiplayerGame);
-            this.putBoolean(this.broadcastToLAN);
-        }
+        this.putBoolean(this.multiplayerGame);
+        this.putBoolean(this.broadcastToLAN);
         if (protocol >= 332) {
             this.putVarInt(this.xblBroadcastIntent);
             this.putVarInt(this.platformBroadcastIntent);
-        } else if (protocol >= ProtocolInfo.v1_2_0) {
+        } else {
             this.putBoolean(this.broadcastToXboxLive);
         }
         this.putBoolean(this.commandsEnabled);
@@ -247,18 +245,16 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(false); // Were experiments previously toggled
             }
         }
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putBoolean(this.bonusChest);
-            if (protocol > 201) {
-                this.putBoolean(this.hasStartWithMapEnabled);
-            }
-            if (protocol < 332) {
-                this.putBoolean(this.trustPlayers);
-            }
-            this.putVarInt(this.permissionLevel);
-            if (protocol < 332) {
-                this.putVarInt(this.gamePublish);
-            }
+        this.putBoolean(this.bonusChest);
+        if (protocol > 201) {
+            this.putBoolean(this.hasStartWithMapEnabled);
+        }
+        if (protocol < 332) {
+            this.putBoolean(this.trustPlayers);
+        }
+        this.putVarInt(this.permissionLevel);
+        if (protocol < 332) {
+            this.putVarInt(this.gamePublish);
         }
         if (protocol >= 201) {
             this.putLInt(this.serverChunkTickRange);
@@ -280,16 +276,14 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(this.isWorldTemplateOptionLocked);
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
-                    if (protocol >= ProtocolInfo.v1_13_0) {
-                        if (protocol >= ProtocolInfo.v1_19_20) {
-                            this.putBoolean(this.isDisablingPersonas);
-                            this.putBoolean(this.isDisablingCustomSkins);
-                            if (protocol >= ProtocolInfo.v1_19_60) {
-                                this.putBoolean(this.emoteChatMuted);
-                            }
+                    if (protocol >= ProtocolInfo.v1_19_20) {
+                        this.putBoolean(this.isDisablingPersonas);
+                        this.putBoolean(this.isDisablingCustomSkins);
+                        if (protocol >= ProtocolInfo.v1_19_60) {
+                            this.putBoolean(this.emoteChatMuted);
                         }
-                        this.putString(this.vanillaVersion);
                     }
+                    this.putString(this.vanillaVersion);
                 }
             }
             if (protocol >= ProtocolInfo.v1_16_0) {
@@ -321,72 +315,66 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
-        if (protocol >= ProtocolInfo.v1_13_0) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                if (protocol >= ProtocolInfo.v1_16_210) {
-                    if (protocol < ProtocolInfo.v1_21_90) {
-                        this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
-                    }
-                    this.putVarInt(0); // RewindHistorySize
-                    this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
-                } else {
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            if (protocol >= ProtocolInfo.v1_16_210) {
+                if (protocol < ProtocolInfo.v1_21_90) {
                     this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
                 }
+                this.putVarInt(0); // RewindHistorySize
+                this.putBoolean(this.isServerAuthoritativeBlockBreaking); // isServerAuthoritativeBlockBreaking
             } else {
-                this.putBoolean(this.isMovementServerAuthoritative);
+                this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
             }
+        } else {
+            this.putBoolean(this.isMovementServerAuthoritative);
         }
         this.putLLong(this.currentTick);
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putVarInt(this.enchantmentSeed);
-        }
-        if (protocol > ProtocolInfo.v1_5_0) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
-                if (this.blockDefinitions != null && !this.blockDefinitions.isEmpty()) {
-                    this.putUnsignedVarInt(this.blockDefinitions.size());
-                    for (CustomBlockDefinition definition : this.blockDefinitions) {
-                        this.putString(definition.identifier());
-                        try {
-                            this.put(NBTIO.write(definition.nbt(), ByteOrder.LITTLE_ENDIAN, true));
-                        } catch (Exception e) {
-                             log.error("Error while encoding NBT data of CustomBlockDefinition", e);
-                        }
+        this.putVarInt(this.enchantmentSeed);
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            if (this.blockDefinitions != null && !this.blockDefinitions.isEmpty()) {
+                this.putUnsignedVarInt(this.blockDefinitions.size());
+                for (CustomBlockDefinition definition : this.blockDefinitions) {
+                    this.putString(definition.identifier());
+                    try {
+                        this.put(NBTIO.write(definition.nbt(), ByteOrder.LITTLE_ENDIAN, true));
+                    } catch (Exception e) {
+                        log.error("Error while encoding NBT data of CustomBlockDefinition", e);
                     }
-                } else {
-                    this.putUnsignedVarInt(0); // No custom blocks
                 }
             } else {
-                this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+                this.putUnsignedVarInt(0); // No custom blocks
             }
-            if (protocol >= ProtocolInfo.v1_12_0 && protocol < ProtocolInfo.v1_21_60) {
-                this.put(RuntimeItems.getMapping(protocol).getItemPalette());
-            }
-            this.putString(this.multiplayerCorrelationId);
-            if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
-                this.putBoolean(this.isOnlySpawningV1Villagers);
-            } else if (protocol >= ProtocolInfo.v1_16_0) {
-                this.putBoolean(false); // isInventoryServerAuthoritative
-                if (protocol >= ProtocolInfo.v1_16_230_50) {
-                    this.putString(""); // serverEngine
-                    if (protocol >= ProtocolInfo.v1_18_0) {
-                        if (protocol >= ProtocolInfo.v1_19_0_29) {
-                            try {
-                                this.put(NBTIO.writeNetwork(this.playerPropertyData));
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+        } else {
+            this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+        }
+        if (protocol < ProtocolInfo.v1_21_60) {
+            this.put(RuntimeItems.getMapping(protocol).getItemPalette());
+        }
+        this.putString(this.multiplayerCorrelationId);
+        if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
+            this.putBoolean(this.isOnlySpawningV1Villagers);
+        } else if (protocol >= ProtocolInfo.v1_16_0) {
+            this.putBoolean(false); // isInventoryServerAuthoritative
+            if (protocol >= ProtocolInfo.v1_16_230_50) {
+                this.putString(""); // serverEngine
+                if (protocol >= ProtocolInfo.v1_18_0) {
+                    if (protocol >= ProtocolInfo.v1_19_0_29) {
+                        try {
+                            this.put(NBTIO.writeNetwork(this.playerPropertyData));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-                        this.putLLong(0L); // BlockRegistryChecksum
-                        if (protocol >= ProtocolInfo.v1_19_0_29) {
-                            //this.putUUID(new UUID(0, 0)); // worldTemplateId
-                            this.put(EMPTY_UUID); // worldTemplateId
-                            if (protocol >= ProtocolInfo.v1_19_20) {
-                                this.putBoolean(this.clientSideGenerationEnabled);
-                                if (protocol >= ProtocolInfo.v1_19_80) {
-                                    this.putBoolean(this.blockNetworkIdsHashed);
-                                    if (protocol >= ProtocolInfo.v1_20_0_23) {
-                                        this.putBoolean(this.networkPermissions.isServerAuthSounds());
-                                    }
+                    }
+                    this.putLLong(0L); // BlockRegistryChecksum
+                    if (protocol >= ProtocolInfo.v1_19_0_29) {
+                        //this.putUUID(new UUID(0, 0)); // worldTemplateId
+                        this.put(EMPTY_UUID); // worldTemplateId
+                        if (protocol >= ProtocolInfo.v1_19_20) {
+                            this.putBoolean(this.clientSideGenerationEnabled);
+                            if (protocol >= ProtocolInfo.v1_19_80) {
+                                this.putBoolean(this.blockNetworkIdsHashed);
+                                if (protocol >= ProtocolInfo.v1_20_0_23) {
+                                    this.putBoolean(this.networkPermissions.isServerAuthSounds());
                                 }
                             }
                         }

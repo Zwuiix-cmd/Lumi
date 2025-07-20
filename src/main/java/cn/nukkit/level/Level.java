@@ -1339,25 +1339,16 @@ public class Level implements ChunkManager, Metadatable {
                 ObjectList<Player> players = targets.get(protocolId);
                 UpdateBlockPacket packet = (UpdateBlockPacket) updateBlockPacket.clone();
                 try {
-                    if (protocolId > 201) {
-                        if (b instanceof Block) {
-                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getId(), ((Block) b).getDamage());
-                        } else {
-                            packet.blockRuntimeId = this.getBlockRuntimeId(protocolId, (int) b.x, (int) b.y, (int) b.z, dataLayer);
-                        }
+                    if (b instanceof Block) {
+                        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getId(), ((Block) b).getDamage());
                     } else {
-                        Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
-                        packet.blockId = bl.getId();
-                        packet.blockData = bl.getDamage();
+                        packet.blockRuntimeId = this.getBlockRuntimeId(protocolId, (int) b.x, (int) b.y, (int) b.z, dataLayer);
                     }
                 } catch (NoSuchElementException e) {
                     throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for players with protocol " + protocolId);
                 }
 
                 for (Player player : players) {
-                    if (player.protocol < ProtocolInfo.v1_4_0 && dataLayer > 0) {
-                        continue; //1.4以前的版本不支持dataLayer
-                    }
                     player.dataPacket(packet);
                 }
             }
@@ -1377,16 +1368,10 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.flags = flags;
 
             try {
-                if (target.protocol > 201) {
-                    if (b instanceof Block) {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getId(), ((Block) b).getDamage());
-                    } else {
-                        updateBlockPacket.blockRuntimeId = this.getBlockRuntimeId(target.protocol, (int) b.x, (int) b.y, (int) b.z);
-                    }
+                if (b instanceof Block) {
+                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getId(), ((Block) b).getDamage());
                 } else {
-                    Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
-                    updateBlockPacket.blockId = bl.getId();
-                    updateBlockPacket.blockData = bl.getDamage();
+                    updateBlockPacket.blockRuntimeId = this.getBlockRuntimeId(target.protocol, (int) b.x, (int) b.y, (int) b.z);
                 }
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for player " + target.getName() + " with protocol " + target.protocol);
@@ -2823,8 +2808,7 @@ public class Level implements ChunkManager, Metadatable {
             Int2ObjectMap<ObjectList<Player>> players = Server.sortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
-                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10
-                        hand.getId(), hand.getDamage());
+                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, hand.getId(), hand.getDamage());
                 this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, soundData, targets.toArray(Player.EMPTY_ARRAY));
             }
         }
@@ -5093,28 +5077,11 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_16_100;
         } else if (protocol >= ProtocolInfo.v1_16_0 && protocol <= ProtocolInfo.v1_16_100_52) {
             return ProtocolInfo.v1_16_0;
-        } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
-            return ProtocolInfo.v1_14_0;
-        } else if (protocol == ProtocolInfo.v1_13_0) {
-            return ProtocolInfo.v1_13_0;
-        } else if (protocol == ProtocolInfo.v1_12_0) {
-            return ProtocolInfo.v1_12_0;
-        } else if (protocol >= ProtocolInfo.v1_2_0 && protocol < ProtocolInfo.v1_12_0) {
-            return ProtocolInfo.v1_2_0;
-        } else if (protocol < ProtocolInfo.v1_2_0) {
-            return 0;
         }
         throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        if (chunk == 0) if (player < ProtocolInfo.v1_2_0) return true;
-        if (chunk == ProtocolInfo.v1_2_0)
-            if (player >= ProtocolInfo.v1_2_0) if (player < ProtocolInfo.v1_12_0) return true;
-        if (chunk == ProtocolInfo.v1_12_0) if (player == ProtocolInfo.v1_12_0) return true;
-        if (chunk == ProtocolInfo.v1_13_0) if (player == ProtocolInfo.v1_13_0) return true;
-        if (chunk == ProtocolInfo.v1_14_0)
-            if (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60) return true;
         if (chunk == ProtocolInfo.v1_16_0)
             if (player >= ProtocolInfo.v1_16_0) if (player <= ProtocolInfo.v1_16_100_52) return true;
         if (chunk == ProtocolInfo.v1_16_100)

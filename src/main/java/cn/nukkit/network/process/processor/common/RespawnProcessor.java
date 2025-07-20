@@ -45,9 +45,4 @@ public class RespawnProcessor extends DataPacketProcessor<RespawnPacket> {
     public Class<? extends DataPacket> getPacketClass() {
         return RespawnPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

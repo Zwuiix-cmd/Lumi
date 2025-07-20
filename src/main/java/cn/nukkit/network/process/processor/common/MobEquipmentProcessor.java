@@ -73,9 +73,4 @@ public class MobEquipmentProcessor extends DataPacketProcessor<MobEquipmentPacke
     public Class<? extends DataPacket> getPacketClass() {
         return MobEquipmentPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

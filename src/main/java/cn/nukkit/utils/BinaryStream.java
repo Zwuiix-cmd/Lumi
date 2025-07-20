@@ -327,87 +327,67 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        if (protocol < ProtocolInfo.v1_13_0) {
-            if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
-                this.putByteArray(steveSkinDecoded != null ? steveSkinDecoded : (steveSkinDecoded = Base64.getDecoder().decode(Skin.STEVE_SKIN)));
-                if (protocol >= ProtocolInfo.v1_2_13) {
-                    this.putByteArray(skin.getCapeData().data);
-                }
-                this.putString("geometry.humanoid.custom");
-                this.putString(Skin.STEVE_GEOMETRY);
-            } else {
-                this.putByteArray(skin.getSkinData().data);
-                if (protocol >= ProtocolInfo.v1_2_13) {
-                    this.putByteArray(skin.getCapeData().data);
-                }
-                this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
-                this.putString(skin.getGeometryData());
-            }
-        } else {
-            if (protocol >= ProtocolInfo.v1_16_210) {
-                this.putString(skin.getPlayFabId());
-            }
-            this.putString(skin.getSkinResourcePatch());
-            this.putImage(skin.getSkinData());
+        if (protocol >= ProtocolInfo.v1_16_210) {
+            this.putString(skin.getPlayFabId());
+        }
+        this.putString(skin.getSkinResourcePatch());
+        this.putImage(skin.getSkinData());
 
-            List<SkinAnimation> animations = skin.getAnimations();
-            this.putLInt(animations.size());
-            for (SkinAnimation animation : animations) {
-                this.putImage(animation.image);
-                this.putLInt(animation.type);
-                this.putLFloat(animation.frames);
-                if (protocol >= ProtocolInfo.v1_16_100) {
-                    this.putLInt(animation.expression);
-                }
+        List<SkinAnimation> animations = skin.getAnimations();
+        this.putLInt(animations.size());
+        for (SkinAnimation animation : animations) {
+            this.putImage(animation.image);
+            this.putLInt(animation.type);
+            this.putLFloat(animation.frames);
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.putLInt(animation.expression);
             }
+        }
 
-            this.putImage(skin.getCapeData());
-            this.putString(skin.getGeometryData());
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                this.putString(skin.getGeometryDataEngineVersion());
+        this.putImage(skin.getCapeData());
+        this.putString(skin.getGeometryData());
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putString(skin.getGeometryDataEngineVersion());
+        }
+        this.putString(skin.getAnimationData());
+        if (protocol < ProtocolInfo.v1_17_30) {
+            this.putBoolean(skin.isPremium());
+            this.putBoolean(skin.isPersona());
+            this.putBoolean(skin.isCapeOnClassic());
+        }
+        this.putString(skin.getCapeId());
+        this.putString(skin.getFullSkinId());
+        this.putString(skin.getArmSize());
+        this.putString(skin.getSkinColor());
+
+        List<PersonaPiece> pieces = skin.getPersonaPieces();
+        this.putLInt(pieces.size());
+        for (PersonaPiece piece : pieces) {
+            this.putString(piece.id);
+            this.putString(piece.type);
+            this.putString(piece.packId);
+            this.putBoolean(piece.isDefault);
+            this.putString(piece.productId);
+        }
+
+        List<PersonaPieceTint> tints = skin.getTintColors();
+        this.putLInt(tints.size());
+        for (PersonaPieceTint tint : tints) {
+            this.putString(tint.pieceType);
+            List<String> colors = tint.colors;
+            this.putLInt(colors.size());
+            for (String color : colors) {
+                this.putString(color);
             }
-            this.putString(skin.getAnimationData());
-            if (protocol < ProtocolInfo.v1_17_30) {
-                this.putBoolean(skin.isPremium());
-                this.putBoolean(skin.isPersona());
-                this.putBoolean(skin.isCapeOnClassic());
-            }
-            this.putString(skin.getCapeId());
-            this.putString(skin.getFullSkinId());
-            if (protocol >= ProtocolInfo.v1_14_60) {
-                this.putString(skin.getArmSize());
-                this.putString(skin.getSkinColor());
+        }
 
-                List<PersonaPiece> pieces = skin.getPersonaPieces();
-                this.putLInt(pieces.size());
-                for (PersonaPiece piece : pieces) {
-                    this.putString(piece.id);
-                    this.putString(piece.type);
-                    this.putString(piece.packId);
-                    this.putBoolean(piece.isDefault);
-                    this.putString(piece.productId);
-                }
-
-                List<PersonaPieceTint> tints = skin.getTintColors();
-                this.putLInt(tints.size());
-                for (PersonaPieceTint tint : tints) {
-                    this.putString(tint.pieceType);
-                    List<String> colors = tint.colors;
-                    this.putLInt(colors.size());
-                    for (String color : colors) {
-                        this.putString(color);
-                    }
-                }
-
-                if (protocol >= ProtocolInfo.v1_17_30) {
-                    this.putBoolean(skin.isPremium());
-                    this.putBoolean(skin.isPersona());
-                    this.putBoolean(skin.isCapeOnClassic());
-                    this.putBoolean(skin.isPrimaryUser());
-                    if (protocol >= ProtocolInfo.v1_19_63) {
-                        this.putBoolean(skin.isOverridingPlayerAppearance());
-                    }
-                }
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putBoolean(skin.isPremium());
+            this.putBoolean(skin.isPersona());
+            this.putBoolean(skin.isCapeOnClassic());
+            this.putBoolean(skin.isPrimaryUser());
+            if (protocol >= ProtocolInfo.v1_19_63) {
+                this.putBoolean(skin.isOverridingPlayerAppearance());
             }
         }
     }
@@ -468,39 +448,37 @@ public class BinaryStream {
         }
         skin.setCapeId(this.getString());
         skin.setFullSkinId(this.getString());
-        if (protocol >= ProtocolInfo.v1_14_60) {
-            skin.setArmSize(this.getString());
-            skin.setSkinColor(this.getString());
+        skin.setArmSize(this.getString());
+        skin.setSkinColor(this.getString());
 
-            int piecesLength = this.getLInt();
-            for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
-                String pieceId = this.getString();
-                String pieceType = this.getString();
-                String packId = this.getString();
-                boolean isDefault = this.getBoolean();
-                String productId = this.getString();
-                skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+        int piecesLength = this.getLInt();
+        for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+            String pieceId = this.getString();
+            String pieceType = this.getString();
+            String packId = this.getString();
+            boolean isDefault = this.getBoolean();
+            String productId = this.getString();
+            skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+        }
+
+        int tintsLength = this.getLInt();
+        for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+            String pieceType = this.getString();
+            List<String> colors = new ArrayList<>();
+            int colorsLength = this.getLInt();
+            for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
+                colors.add(this.getString());
             }
+            skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+        }
 
-            int tintsLength = this.getLInt();
-            for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
-                String pieceType = this.getString();
-                List<String> colors = new ArrayList<>();
-                int colorsLength = this.getLInt();
-                for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
-                    colors.add(this.getString());
-                }
-                skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
-            }
-
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                skin.setPremium(this.getBoolean());
-                skin.setPersona(this.getBoolean());
-                skin.setCapeOnClassic(this.getBoolean());
-                skin.setPrimaryUser(this.getBoolean());
-                if (protocol >= ProtocolInfo.v1_19_63) {
-                    skin.setOverridingPlayerAppearance(this.getBoolean());
-                }
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            skin.setPremium(this.getBoolean());
+            skin.setPersona(this.getBoolean());
+            skin.setCapeOnClassic(this.getBoolean());
+            skin.setPrimaryUser(this.getBoolean());
+            if (protocol >= ProtocolInfo.v1_19_63) {
+                skin.setOverridingPlayerAppearance(this.getBoolean());
             }
         }
         return skin;
@@ -692,7 +670,7 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
-        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
+        if (item.getId() == ItemID.SHIELD) {
             this.getVarLong();
         }
 
@@ -889,11 +867,6 @@ public class BinaryStream {
             return;
         }
 
-        if (protocolId < ProtocolInfo.v1_2_0) {
-            this.putSlotV113(item);
-            return;
-        }
-
         if (item == null || item.getId() == Item.AIR) {
             this.putVarInt(0);
             return;
@@ -944,18 +917,6 @@ public class BinaryStream {
                             runtimeId = Item.INFO_UPDATE;
                             break;
                     }
-                } else {
-                    if (protocolId < ProtocolInfo.v1_14_0) {
-                        if (runtimeId == Item.HONEYCOMB || runtimeId == Item.HONEY_BOTTLE) {
-                            saveOriginalID = true;
-                            runtimeId = Item.INFO_UPDATE;
-                        } else if (protocolId < ProtocolInfo.v1_13_0) {
-                            if (runtimeId == Item.SUSPICIOUS_STEW) {
-                                saveOriginalID = true;
-                                runtimeId = Item.INFO_UPDATE;
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -981,22 +942,16 @@ public class BinaryStream {
 
         this.putVarInt(runtimeId);
 
-        int auxValue;
         boolean isDurable = item instanceof ItemDurable;
-
-        if (protocolId >= ProtocolInfo.v1_12_0) {
-            auxValue = item.getCount();
-            if (!isDurable) {
-                int meta;
-                if (protocolId < ProtocolInfo.v1_16_100) {
-                    meta = item.hasMeta() ? item.getDamage() : -1;
-                } else {
-                    meta = damage;
-                }
-                auxValue |= ((meta & 0x7fff) << 8);
+        int auxValue = item.getCount();
+        if (!isDurable) {
+            int meta;
+            if (protocolId < ProtocolInfo.v1_16_100) {
+                meta = item.hasMeta() ? item.getDamage() : -1;
+            } else {
+                meta = damage;
             }
-        } else {
-            auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
+            auxValue |= ((meta & 0x7fff) << 8);
         }
 
         this.putVarInt(auxValue);
@@ -1006,71 +961,48 @@ public class BinaryStream {
             this.putLShort(0);
             this.putVarInt(0);
             this.putVarInt(0);
-            if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
+            if (item.getId() == ItemID.SHIELD) {
                 this.putVarLong(0);
             }
             return;
         }
 
-        if (item.hasCompoundTag()
-                || (isDurable && protocolId >= ProtocolInfo.v1_12_0)
-                || saveOriginalID) {
-            if (protocolId < ProtocolInfo.v1_12_0) {
+        if (item.hasCompoundTag() || isDurable || saveOriginalID) {
+            try {
+                // Hack for tool damage
+                byte[] nbt = item.getCompoundTag();
+                CompoundTag tag;
+                if (nbt == null || nbt.length == 0) {
+                    tag = new CompoundTag();
+                } else {
+                    tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
+                }
+                if (tag.contains("Damage")) {
+                    tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
+                }
+                if (isDurable) {
+                    tag.putInt("Damage", item.getDamage());
+                }
+
                 if (saveOriginalID) {
                     try {
-                        CompoundTag compoundTag = item.getNamedTag();
-                        if (compoundTag != null) {
-                            item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, compoundTag));
-                        }
+                        item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, tag));
                         item.setCustomName(item.getName());
                         item.setNamedTag(item.getNamedTag().putInt(MV_ORIGIN_ID, item.getId()).putInt(MV_ORIGIN_META, item.getDamage()));
                         if (isStringItem) {
                             item.setNamedTag(item.getNamedTag().putString(MV_ORIGIN_NAMESPACE, item.getNamespaceId(protocolId)));
                         }
+                        tag = item.getNamedTag();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
-                byte[] nbt = item.getCompoundTag();
-                this.putLShort(nbt.length);
-                this.put(nbt);
-            } else {
-                try {
-                    // Hack for tool damage
-                    byte[] nbt = item.getCompoundTag();
-                    CompoundTag tag;
-                    if (nbt == null || nbt.length == 0) {
-                        tag = new CompoundTag();
-                    } else {
-                        tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
-                    }
-                    if (tag.contains("Damage")) {
-                        tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
-                    }
-                    if (isDurable) {
-                        tag.putInt("Damage", item.getDamage());
-                    }
 
-                    if (saveOriginalID) {
-                        try {
-                            item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, tag));
-                            item.setCustomName(item.getName());
-                            item.setNamedTag(item.getNamedTag().putInt(MV_ORIGIN_ID, item.getId()).putInt(MV_ORIGIN_META, item.getDamage()));
-                            if (isStringItem) {
-                                item.setNamedTag(item.getNamedTag().putString(MV_ORIGIN_NAMESPACE, item.getNamespaceId(protocolId)));
-                            }
-                            tag = item.getNamedTag();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
-                    this.putLShort(0xffff);
-                    this.putByte((byte) 1);
-                    this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                this.putLShort(0xffff);
+                this.putByte((byte) 1);
+                this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } else {
             this.putLShort(0);
@@ -1086,25 +1018,9 @@ public class BinaryStream {
             this.putString(block);
         }
 
-        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
+        if (item.getId() == ItemID.SHIELD) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
-    }
-
-    private void putSlotV113(Item item) {
-        if (item == null || item.getId() == Item.AIR) {
-            this.putVarInt(0);
-            return;
-        }
-
-        this.putVarInt(item.getId());
-        int auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
-        this.putVarInt(auxValue);
-        byte[] nbt = item.getCompoundTag();
-        this.putLShort(nbt.length);
-        this.put(nbt);
-        this.putVarInt(0); //CanPlaceOn entry count
-        this.putVarInt(0); //CanDestroy entry count
     }
 
     private void putSlotNew(int protocolId, Item item, boolean instanceItem) {
@@ -1514,13 +1430,11 @@ public class BinaryStream {
         this.putEntityUniqueId(link.fromEntityUniquieId);
         this.putEntityUniqueId(link.toEntityUniquieId);
         this.putByte(link.type);
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putBoolean(link.immediate);
-            if (protocol >= ProtocolInfo.v1_16_0) {
-                this.putBoolean(link.riderInitiated);
-                if (protocol >= ProtocolInfo.v1_21_20) {
-                    this.putLFloat(link.vehicleAngularVelocity);
-                }
+        this.putBoolean(link.immediate);
+        if (protocol >= ProtocolInfo.v1_16_0) {
+            this.putBoolean(link.riderInitiated);
+            if (protocol >= ProtocolInfo.v1_21_20) {
+                this.putLFloat(link.vehicleAngularVelocity);
             }
         }
     }

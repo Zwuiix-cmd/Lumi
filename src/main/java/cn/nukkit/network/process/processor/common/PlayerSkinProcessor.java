@@ -55,9 +55,4 @@ public class PlayerSkinProcessor extends DataPacketProcessor<PlayerSkinPacket> {
     public Class<? extends DataPacket> getPacketClass() {
         return PlayerSkinPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

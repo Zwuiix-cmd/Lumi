@@ -40,27 +40,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     @Override
     public DataPacket reset() {
         super.reset();
-
-        if (protocol <= 274) {
-            if (protocol >= ProtocolInfo.v1_2_0) {
-                this.putByte(this.pid());
-                this.putShort(0);
-            } else {
-                int packetId;
-                try {
-                    packetId = Server.getInstance().getNetwork().getPacketPool(protocol).getPacketId(this.getClass());
-                } catch (IllegalArgumentException e) {
-                    packetId = 0x6a; //使用1.1不存在的id，所有不支持的数据包
-                    if (Nukkit.DEBUG > 1) {
-                        log.warn("Unknown packet {} for protocol {}", this.getClass().getName(), protocol);
-                    }
-                }
-                this.putByte((byte) (packetId & 0xff));
-            }
-        } else {
-            this.putUnsignedVarInt(this.packetId());
-        }
-
+        this.putUnsignedVarInt(this.packetId());
         return this;
     }
 

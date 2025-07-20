@@ -53,10 +53,8 @@ public class CommandBlockUpdatePacket extends DataPacket {
             this.filteredName = this.getString();
         }
         this.shouldTrackOutput = this.getBoolean();
-        if (this.protocol >= ProtocolInfo.v1_12_0) {
-            this.tickDelay = this.getLInt();
-            this.executingOnFirstTick = this.getBoolean();
-        }
+        this.tickDelay = this.getLInt();
+        this.executingOnFirstTick = this.getBoolean();
     }
 
     @Override
@@ -78,9 +76,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
             this.putString(this.filteredName);
         }
         this.putBoolean(this.shouldTrackOutput);
-        if (this.protocol >= ProtocolInfo.v1_12_0) {
-            this.putLInt(this.tickDelay);
-            this.putBoolean(this.executingOnFirstTick);
-        }
+        this.putLInt(this.tickDelay);
+        this.putBoolean(this.executingOnFirstTick);
     }
 }

@@ -403,14 +403,11 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
 
     static {
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMappingOld, ProtocolInfo.v1_2_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping527, ProtocolInfo.v1_19_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping589, ProtocolInfo.v1_20_0);
 
-        initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
-        initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
         initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
         initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
         initEntityIdentifiers(ProtocolInfo.v1_19_0, AvailableEntityIdentifiersPacket.NBT527);
@@ -1250,12 +1247,9 @@ public abstract class Entity extends Location implements Metadatable {
             return ProtocolInfo.v1_19_0;
         } else if (protocolId >= ProtocolInfo.v1_17_0) {
             return ProtocolInfo.v1_17_0;
-        } else if (protocolId >= ProtocolInfo.v1_16_100) {
+        } else {
             return ProtocolInfo.v1_16_100;
-        } else if (protocolId >= ProtocolInfo.v1_10_0) {
-            return ProtocolInfo.v1_10_0;
         }
-        return ProtocolInfo.v1_2_0;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1982,19 +1976,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void broadcastMovement() {
-        MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = this.getId();
-        pk.x = this.x;
+        MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
+        packet.eid = this.getId();
+        packet.x = this.x;
         //因为以前处理MOVE_PLAYER_PACKET的时候是y - this.getBaseOffset()
         //现在统一 MOVE_PLAYER_PACKET和PLAYER_AUTH_INPUT_PACKET 均为this.y - this.getEyeHeight()，所以这里不再需要对两种移动方式分别处理
-        pk.y = this.y + this.getBaseOffset();
-        pk.z = this.z;
-        pk.headYaw = yaw;
-        pk.pitch = pitch;
-        pk.yaw = yaw;
-        pk.teleport = false;
-        pk.onGround = this.onGround;
-        Server.broadcastPacket(hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_7_0).collect(Collectors.toList()), pk);
+        packet.y = this.y + this.getBaseOffset();
+        packet.z = this.z;
+        packet.headYaw = yaw;
+        packet.pitch = pitch;
+        packet.yaw = yaw;
+        packet.teleport = false;
+        packet.onGround = this.onGround;
+        Server.broadcastPacket(hasSpawned.values(), packet);
     }
 
     @Override

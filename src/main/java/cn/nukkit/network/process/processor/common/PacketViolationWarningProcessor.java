@@ -55,9 +55,4 @@ public class PacketViolationWarningProcessor extends DataPacketProcessor<PacketV
     public Class<? extends DataPacket> getPacketClass() {
         return PacketViolationWarningPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }

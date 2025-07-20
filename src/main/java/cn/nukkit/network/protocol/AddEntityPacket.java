@@ -130,20 +130,10 @@ public class AddEntityPacket extends DataPacket {
         mapping.put(EntityRavager.NETWORK_ID, "minecraft:ravager");
         mapping.put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2");
         mapping.put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2");
+        mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
+        mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
 
         // Correct new entities for older protocols
-        if (protocolId < ProtocolInfo.v1_13_0) {
-            mapping.put(EntityFox.NETWORK_ID, mapping.get(EntityWolf.NETWORK_ID));
-        } else {
-            mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
-        }
-
-        if (protocolId < ProtocolInfo.v1_14_0) {
-            mapping.put(EntityBee.NETWORK_ID, mapping.get(EntityBat.NETWORK_ID));
-        } else {
-            mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
-        }
-
         if (protocolId < ProtocolInfo.v1_16_0) {
             mapping.put(EntityPiglin.NETWORK_ID, mapping.get(EntityZombiePigman.NETWORK_ID));
             mapping.put(EntityHoglin.NETWORK_ID, mapping.get(EntityPig.NETWORK_ID));
@@ -246,20 +236,14 @@ public class AddEntityPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (this.protocol < ProtocolInfo.v1_8_0) {
-            this.putUnsignedVarInt(this.type);
-        }else {
-            this.putString(this.getIdentifier());
-        }
+        this.putString(this.getIdentifier());
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
-        if (protocol >= ProtocolInfo.v1_5_0) {
-            this.putLFloat(this.headYaw);
-            if (protocol >= ProtocolInfo.v1_19_10) {
-                this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
-            }
+        this.putLFloat(this.headYaw);
+        if (protocol >= ProtocolInfo.v1_19_10) {
+            this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw);
         }
         this.putAttributeList(this.attributes);
         this.put(Binary.writeMetadata(protocol, this.metadata));
@@ -322,13 +306,6 @@ public class AddEntityPacket extends DataPacket {
                             return "minecraft:zombie_pigman";
                         } else if (this.type == EntityHoglin.NETWORK_ID || this.type == EntityStrider.NETWORK_ID || this.type == EntityZoglin.NETWORK_ID) {
                             return "minecraft:pig";
-                        }
-
-                        if (this.protocol < ProtocolInfo.v1_14_0 && this.type == EntityBee.NETWORK_ID) {
-                            return "minecraft:bat";
-                        }
-                        if (this.protocol < ProtocolInfo.v1_13_0 && this.type == EntityFox.NETWORK_ID) {
-                            return "minecraft:wolf";
                         }
                     }
                 }

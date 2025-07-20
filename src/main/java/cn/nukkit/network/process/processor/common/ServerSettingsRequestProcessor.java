@@ -48,9 +48,4 @@ public class ServerSettingsRequestProcessor extends DataPacketProcessor<ServerSe
     public Class<? extends DataPacket> getPacketClass() {
         return ServerSettingsRequestPacket.class;
     }
-
-    @Override
-    public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_1_0;
-    }
 }
