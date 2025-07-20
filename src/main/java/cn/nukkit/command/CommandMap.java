@@ -14,7 +14,7 @@ public interface CommandMap {
 
     boolean register(String fallbackPrefix, Command command, String label);
 
-    void registerSimpleCommands(Object object);
+    void unregister(String... commands);
 
     boolean dispatch(CommandSender sender, String cmdLine);
 

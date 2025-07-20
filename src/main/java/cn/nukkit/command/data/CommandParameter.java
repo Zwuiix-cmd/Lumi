@@ -1,6 +1,5 @@
 package cn.nukkit.command.data;
 
-
 import cn.nukkit.command.tree.node.IParamNode;
 import com.google.common.collect.Lists;
 
@@ -10,37 +9,13 @@ import java.util.List;
 
 public class CommandParameter {
 
-    public final static String ARG_TYPE_STRING = "string";
-    public final static String ARG_TYPE_STRING_ENUM = "stringenum";
-    public final static String ARG_TYPE_BOOL = "bool";
-    public final static String ARG_TYPE_TARGET = "target";
-    public final static String ARG_TYPE_PLAYER = "target";
-    public final static String ARG_TYPE_BLOCK_POS = "blockpos";
-    public final static String ARG_TYPE_RAW_TEXT = "rawtext";
-    public final static String ARG_TYPE_INT = "int";
-
-    public static final String ENUM_TYPE_ITEM_LIST = "Item";
-    public static final String ENUM_TYPE_BLOCK_LIST = "Block";
-    public static final String ENUM_TYPE_COMMAND_LIST = "commandName";
-    public static final String ENUM_TYPE_ENCHANTMENT_LIST = "enchantmentType";
-    public static final String ENUM_TYPE_ENTITY_LIST = "entityType";
-    public static final String ENUM_TYPE_EFFECT_LIST = "effectType";
-    public static final String ENUM_TYPE_PARTICLE_LIST = "particleType";
-
     public String name;
     public CommandParamType type;
     public boolean optional;
-    @Deprecated
-    public byte options = 0;
     public List<CommandParamOption> paramOptions;
-
     public CommandEnum enumData;
     public String postFix;
     public final IParamNode<?> paramNode;
-
-    public CommandParameter(String name, String type, boolean optional) {
-        this(name, fromString(type), optional);
-    }
 
     public CommandParameter(String name, CommandParamType type, boolean optional) {
         this.name = name;
@@ -240,23 +215,5 @@ public class CommandParameter {
             result.paramOptions = Lists.newArrayList(options);
         }
         return result;
-    }
-
-    protected static CommandParamType fromString(String param) {
-        switch (param) {
-            case "string":
-            case "stringenum":
-                return CommandParamType.STRING;
-            case "target":
-                return CommandParamType.TARGET;
-            case "blockpos":
-                return CommandParamType.POSITION;
-            case "rawtext":
-                return CommandParamType.RAWTEXT;
-            case "int":
-                return CommandParamType.INT;
-        }
-
-        return CommandParamType.RAWTEXT;
     }
 }

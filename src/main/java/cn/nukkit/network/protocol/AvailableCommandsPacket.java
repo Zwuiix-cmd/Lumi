@@ -553,8 +553,6 @@ public class AvailableCommandsPacket extends DataPacket {
                             for (CommandParamOption option : parameter.paramOptions) {
                                 options |= (byte) (1 << option.ordinal());
                             }
-                        } else {
-                            options = parameter.options;
                         }
                         this.putByte(options);
                     }
