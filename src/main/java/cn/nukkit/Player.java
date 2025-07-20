@@ -2849,67 +2849,65 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, 1), false);
 
         try {
-            if (this.protocol >= ProtocolInfo.v1_8_0) {
-                if (this.protocol >= ProtocolInfo.v1_12_0) {
-                    if (this.protocol >= ProtocolInfo.v1_16_100) {
-                        if (this.protocol >= ProtocolInfo.v1_17_0) {
-                            //注册实体属性
-                            for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
-                                this.dataPacket(pk);
+            if (this.protocol >= ProtocolInfo.v1_12_0) {
+                if (this.protocol >= ProtocolInfo.v1_16_100) {
+                    if (this.protocol >= ProtocolInfo.v1_17_0) {
+                        //注册实体属性
+                        for (SyncEntityPropertyPacket pk : EntityProperty.getPacketCache()) {
+                            this.dataPacket(pk);
+                        }
+                    }
+                    ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
+                    if (this.protocol >= ProtocolInfo.v1_21_60) {
+                        Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
+                        Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
+                        List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
+                        entries.addAll(vanillaItems);
+                        if (this.server.enableExperimentMode && !itemDefinitions.isEmpty()) {
+                            for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
+                                try {
+                                    Item item = Item.fromString(entry.getKey());
+                                    entries.add(new ItemComponentPacket.ItemDefinition(
+                                            entry.getKey(),
+                                            item.getNetworkId(this.protocol),
+                                            true,
+                                            1,
+                                            entry.getValue().getNbt(this.protocol)
+                                    ));
+                                } catch (Exception e) {
+                                    log.error("ItemComponentPacket encoding error", e);
+                                }
                             }
                         }
-                        ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
-                        if (this.protocol >= ProtocolInfo.v1_21_60) {
-                            Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                            Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
-                            List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
-                            entries.addAll(vanillaItems);
-                            if (this.server.enableExperimentMode && !itemDefinitions.isEmpty()) {
-                                for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
-                                    try {
-                                        Item item = Item.fromString(entry.getKey());
-                                        entries.add(new ItemComponentPacket.ItemDefinition(
-                                                entry.getKey(),
-                                                item.getNetworkId(this.protocol),
-                                                true,
-                                                1,
-                                                entry.getValue().getNbt(this.protocol)
-                                        ));
-                                    } catch (Exception e) {
-                                        log.error("ItemComponentPacket encoding error", e);
-                                    }
+                        itemComponentPacket.setEntries(entries);
+                    } else {
+                        if (this.server.enableExperimentMode && !Item.getCustomItemDefinition().isEmpty()) {
+                            HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
+                            List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
+                            int i = 0;
+                            for (var entry : itemDefinition.entrySet()) {
+                                try {
+                                    Item item = Item.fromString(entry.getKey());
+                                    entries.add(new ItemComponentPacket.ItemDefinition(
+                                            entry.getKey(),
+                                            item.getNetworkId(this.protocol),
+                                            true,
+                                            1,
+                                            entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
+                                    ));
+                                    i++;
+                                } catch (Exception e) {
+                                    log.error("ItemComponentPacket encoding error", e);
                                 }
                             }
                             itemComponentPacket.setEntries(entries);
-                        } else {
-                            if (this.server.enableExperimentMode && !Item.getCustomItemDefinition().isEmpty()) {
-                                HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
-                                List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
-                                int i = 0;
-                                for (var entry : itemDefinition.entrySet()) {
-                                    try {
-                                        Item item = Item.fromString(entry.getKey());
-                                        entries.add(new ItemComponentPacket.ItemDefinition(
-                                                entry.getKey(),
-                                                item.getNetworkId(this.protocol),
-                                                true,
-                                                1,
-                                                entry.getValue().getNbt(this.protocol).putShort("minecraft:identifier", i)
-                                        ));
-                                        i++;
-                                    } catch (Exception e) {
-                                        log.error("ItemComponentPacket encoding error", e);
-                                    }
-                                }
-                                itemComponentPacket.setEntries(entries);
-                            }
                         }
-                        this.dataPacket(itemComponentPacket);
                     }
-                    this.dataPacket(BiomeDefinitionListPacket.getCachedPacket(this.protocol));
+                    this.dataPacket(itemComponentPacket);
                 }
-                this.dataPacket(new AvailableEntityIdentifiersPacket());
+                this.dataPacket(BiomeDefinitionListPacket.getCachedPacket(this.protocol));
             }
+            this.dataPacket(new AvailableEntityIdentifiersPacket());
 
             if (this.protocol >= ProtocolInfo.v1_16_100) {
                 this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
@@ -6760,12 +6758,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         changeDimensionPacket.respawn = !this.isAlive();
         this.dataPacket(changeDimensionPacket);
 
-        if (this.protocol >= ProtocolInfo.v1_8_0) {
-            NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
-            pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
-            pk0.radius = this.chunkRadius << 4;
-            this.dataPacket(pk0);
-        }
+        NetworkChunkPublisherUpdatePacket chunkPublisherUpdatePacket = new NetworkChunkPublisherUpdatePacket();
+        chunkPublisherUpdatePacket.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
+        chunkPublisherUpdatePacket.radius = this.chunkRadius << 4;
+        this.dataPacket(chunkPublisherUpdatePacket);
 
         if (this.protocol >= ProtocolInfo.v1_19_50_20) {
             this.dimensionFix560 = true;

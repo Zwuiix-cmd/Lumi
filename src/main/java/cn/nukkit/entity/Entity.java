@@ -1250,10 +1250,8 @@ public abstract class Entity extends Location implements Metadatable {
             return ProtocolInfo.v1_17_0;
         } else if (protocolId >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
-        } else if (protocolId >= ProtocolInfo.v1_10_0) {
-            return ProtocolInfo.v1_10_0;
         }
-        return ProtocolInfo.v1_8_0;
+        return ProtocolInfo.v1_10_0;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {

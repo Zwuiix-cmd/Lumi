@@ -287,9 +287,4 @@ public class ItemCrossbow extends ItemBow {
         }
         return arrow;
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_8_0;
-    }
 }

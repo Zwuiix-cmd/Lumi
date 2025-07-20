@@ -56,14 +56,12 @@ public class ResourcePacksInfoPacket extends DataPacket {
         if (this.protocol >= ProtocolInfo.v1_20_70) {
             this.putBoolean(this.hasAddonPacks);
         }
-        if (this.protocol >= ProtocolInfo.v1_9_0) {
-            this.putBoolean(this.scripting);
-            if (this.protocol >= ProtocolInfo.v1_21_90) {
-                this.putBoolean(this.forceDisableVibrantVisuals);
-            }
-            if (this.protocol >= ProtocolInfo.v1_17_10 && this.protocol < ProtocolInfo.v1_21_30) {
-                this.putBoolean(this.forceServerPacks);
-            }
+        this.putBoolean(this.scripting);
+        if (this.protocol >= ProtocolInfo.v1_21_90) {
+            this.putBoolean(this.forceDisableVibrantVisuals);
+        }
+        if (this.protocol >= ProtocolInfo.v1_17_10 && this.protocol < ProtocolInfo.v1_21_30) {
+            this.putBoolean(this.forceServerPacks);
         }
         if (this.protocol >= ProtocolInfo.v1_21_50) {
             this.putUUID(this.worldTemplateId);
@@ -116,16 +114,14 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putString(entry.getEncryptionKey()); // encryption key
             this.putString(""); // sub-pack name
             this.putString(!"".equals(entry.getEncryptionKey()) ? entry.getPackId().toString() : ""); // content identity
-            if (protocol >= ProtocolInfo.v1_9_0) {
-                this.putBoolean(false); // scripting
-                if (protocol >= ProtocolInfo.v1_16_200) {
-                    if (protocol >= ProtocolInfo.v1_21_20) {
-                        this.putBoolean(entry.isAddonPack());
-                    }
-                    this.putBoolean(false); // raytracing capable
-                    if (protocol >= ProtocolInfo.v1_21_40) {
-                        this.putString(entry.getCDNUrl());
-                    }
+            this.putBoolean(false); // scripting
+            if (protocol >= ProtocolInfo.v1_16_200) {
+                if (protocol >= ProtocolInfo.v1_21_20) {
+                    this.putBoolean(entry.isAddonPack());
+                }
+                this.putBoolean(false); // raytracing capable
+                if (protocol >= ProtocolInfo.v1_21_40) {
+                    this.putString(entry.getCDNUrl());
                 }
             }
         }

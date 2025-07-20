@@ -34,7 +34,6 @@ public class CraftingManager {
     private final Collection<Recipe> recipes527 = new ArrayDeque<>();
     public final Collection<Recipe> recipes = new ArrayDeque<>(); //649
 
-    private static BatchPacket packet313;
     private static BatchPacket packet340;
     private static BatchPacket packet361;
     private static BatchPacket packet354;
@@ -786,7 +785,6 @@ public class CraftingManager {
         packet361 = null;
         packet354 = null;
         packet340 = null;
-        packet313 = null;
 
         this.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL); // 缓存当前协议版本的数据包
     }
@@ -989,11 +987,6 @@ public class CraftingManager {
                 packet340 = packetFor(ProtocolInfo.v1_10_0);
             }
             return packet340;
-        } else if (protocol == ProtocolInfo.v1_9_0 || protocol == ProtocolInfo.v1_8_0) { // these should work just fine
-            if (packet313 == null) {
-                packet313 = packetFor(ProtocolInfo.v1_8_0);
-            }
-            return packet313;
         }
         return null;
     }

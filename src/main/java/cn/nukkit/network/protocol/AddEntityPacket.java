@@ -246,11 +246,7 @@ public class AddEntityPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (this.protocol < ProtocolInfo.v1_8_0) {
-            this.putUnsignedVarInt(this.type);
-        }else {
-            this.putString(this.getIdentifier());
-        }
+        this.putString(this.getIdentifier());
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
