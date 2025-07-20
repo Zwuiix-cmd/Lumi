@@ -1253,7 +1253,7 @@ public abstract class Entity extends Location implements Metadatable {
         } else if (protocolId >= ProtocolInfo.v1_10_0) {
             return ProtocolInfo.v1_10_0;
         }
-        return ProtocolInfo.v1_7_0;
+        return ProtocolInfo.v1_8_0;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
@@ -1980,19 +1980,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void broadcastMovement() {
-        MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = this.getId();
-        pk.x = this.x;
+        MoveEntityAbsolutePacket packet = new MoveEntityAbsolutePacket();
+        packet.eid = this.getId();
+        packet.x = this.x;
         //因为以前处理MOVE_PLAYER_PACKET的时候是y - this.getBaseOffset()
         //现在统一 MOVE_PLAYER_PACKET和PLAYER_AUTH_INPUT_PACKET 均为this.y - this.getEyeHeight()，所以这里不再需要对两种移动方式分别处理
-        pk.y = this.y + this.getBaseOffset();
-        pk.z = this.z;
-        pk.headYaw = yaw;
-        pk.pitch = pitch;
-        pk.yaw = yaw;
-        pk.teleport = false;
-        pk.onGround = this.onGround;
-        Server.broadcastPacket(hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_7_0).collect(Collectors.toList()), pk);
+        packet.y = this.y + this.getBaseOffset();
+        packet.z = this.z;
+        packet.headYaw = yaw;
+        packet.pitch = pitch;
+        packet.yaw = yaw;
+        packet.teleport = false;
+        packet.onGround = this.onGround;
+        Server.broadcastPacket(hasSpawned.values(), packet);
     }
 
     @Override

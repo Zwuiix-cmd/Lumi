@@ -505,7 +505,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
     }
 
-    private static final CreativeItems creative291 = new CreativeItems();
     private static final CreativeItems creative313 = new CreativeItems();
     private static final CreativeItems creative332 = new CreativeItems();
     private static final CreativeItems creative340 = new CreativeItems();
@@ -550,7 +549,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
 
         // Creative inventory for oldest versions
-        registerCreativeItems(v1_7_0);
         registerCreativeItems(v1_8_0);
         registerCreativeItems(v1_9_0);
         registerCreativeItems(v1_10_0);
@@ -676,7 +674,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static void clearCreativeItems() {
-        Item.creative291.clear();
         Item.creative313.clear();
         Item.creative332.clear();
         Item.creative340.clear();
@@ -734,7 +731,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static CreativeItems getCreativeItemsAndGroups(int protocol) {
         return switch (protocol) {
-            case v1_7_0 -> Item.creative291;
             case v1_8_0 -> Item.creative313;
             case v1_9_0 -> Item.creative332;
             case v1_10_0 -> Item.creative340;
@@ -792,7 +788,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static void addCreativeItem(int protocol, Item item, CreativeItemCategory category, String group) {
         switch (protocol) { // NOTE: Not all versions are supposed to be here
-            case v1_7_0 -> Item.creative291.add(item.clone(), category, group);
             case v1_8_0 -> Item.creative313.add(item.clone(), category, group);
             case v1_9_0 -> Item.creative332.add(item.clone(), category, group);
             case v1_10_0 -> Item.creative340.add(item.clone(), category, group);

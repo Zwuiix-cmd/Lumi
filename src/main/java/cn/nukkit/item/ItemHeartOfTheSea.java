@@ -18,9 +18,4 @@ public class ItemHeartOfTheSea extends Item {
     public ItemHeartOfTheSea(Integer meta, int count) {
         super(HEART_OF_THE_SEA, meta, count, "Heart Of The Sea");
     }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_7_0;
-    }
 }

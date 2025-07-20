@@ -989,7 +989,7 @@ public class CraftingManager {
                 packet340 = packetFor(ProtocolInfo.v1_10_0);
             }
             return packet340;
-        } else if (protocol == ProtocolInfo.v1_9_0 || protocol == ProtocolInfo.v1_8_0 || protocol == ProtocolInfo.v1_7_0) { // these should work just fine
+        } else if (protocol == ProtocolInfo.v1_9_0 || protocol == ProtocolInfo.v1_8_0) { // these should work just fine
             if (packet313 == null) {
                 packet313 = packetFor(ProtocolInfo.v1_8_0);
             }

@@ -2100,13 +2100,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!to.equals(moveEvent.getTo())) { // If plugins modify the destination
                 this.teleport(moveEvent.getTo(), null);
             } else {
-                //1.7.0-
-                this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw,
-                        this.getViewers().values()
-                                .stream()
-                                .filter(p -> p.protocol < ProtocolInfo.v1_7_0)
-                                .collect(Collectors.toList()));
-                //1.7.0+
                 this.broadcastMovement();
             }
         } else {
@@ -2340,13 +2333,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (this.needSendRotation) {
-                //1.7.0-
-                this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw,
-                        this.getViewers().values()
-                                .stream()
-                                .filter(p -> p.protocol < ProtocolInfo.v1_7_0)
-                                .collect(Collectors.toList()));
-                //1.7.0+
                 this.broadcastMovement();
                 this.needSendRotation = false;
             }
@@ -7343,7 +7329,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean isEnableNetworkEncryption() {
-        return protocol >= ProtocolInfo.v1_7_0 && this.server.encryptionEnabled /*&& loginChainData.isXboxAuthed()*/;
+        return this.server.encryptionEnabled /*&& loginChainData.isXboxAuthed()*/;
     }
 
     private List<ExperimentData> getExperiments() {

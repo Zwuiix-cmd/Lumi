@@ -353,8 +353,8 @@ public class Network {
 
     private void registerPackets() {
         this.packetPool137 = PacketPool.builder()
-                .protocolVersion(ProtocolInfo.v1_7_0)
-                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_7_0))
+                .protocolVersion(ProtocolInfo.v1_8_0)
+                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_8_0))
                 .registerPacket(ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET, ServerToClientHandshakePacket.class)
                 .registerPacket(ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ClientToServerHandshakePacket.class)
                 .registerPacket(ProtocolInfo.ADD_ENTITY_PACKET, AddEntityPacket.class)

@@ -189,11 +189,7 @@ public class Binary {
                         if (id == Entity.DATA_FLAGS) {
                             dataVersions = ((LongEntityData) d).dataVersions;
                             if (dataVersions != null && dataVersions.length == 3) {
-                                if (protocol < ProtocolInfo.v1_7_0) {
-                                    stream.putVarLong(dataVersions[1]);
-                                }else {
-                                    stream.putVarLong(dataVersions[2]);
-                                }
+                                stream.putVarLong(dataVersions[2]);
                                 break;
                             }
                             if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
