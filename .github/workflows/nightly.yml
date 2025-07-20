@@ -1,0 +1,47 @@
+name: Nightly Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Find artifacts
+        id: find_artifacts
+        run: |
+          mkdir artifacts
+          find build/libs -name "*.jar" -exec cp {} artifacts/ \;
+          echo "files=$(ls artifacts | paste -sd ',' -)" >> $GITHUB_OUTPUT
+
+      - name: Create or Update Nightly Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          body: "Automated nightly build from master branch."
+          draft: false
+          prerelease: true
+          files: artifacts/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
