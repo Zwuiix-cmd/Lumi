@@ -1278,13 +1278,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.unloadChunk(Level.getHashX(index), Level.getHashZ(index));
         }
 
-        if (this.protocol >= 313) {
-            if (!loadQueue.isEmpty()) {
-                NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
-                packet.position = this.asBlockVector3();
-                packet.radius = this.chunkRadius << 4;
-                this.dataPacket(packet);
-            }
+        if (!loadQueue.isEmpty()) {
+            NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
+            packet.position = this.asBlockVector3();
+            packet.radius = this.chunkRadius << 4;
+            this.dataPacket(packet);
         }
 
         return true;
@@ -3867,7 +3865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                         break;
                     case InteractPacket.ACTION_MOUSEOVER:
-                        if (interactPacket.target == 0 && this.protocol >= 313) {
+                        if (interactPacket.target == 0) {
                             break packetswitch;
                         }
                         String buttonText = "";
@@ -5757,14 +5755,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Position respawnPos = playerRespawnEvent.getRespawnPosition();
 
         this.teleport(respawnPos, null);
-
-        if (this.protocol < 388) {
-            RespawnPacket respawnPacket = new RespawnPacket();
-            respawnPacket.x = (float) respawnPos.x;
-            respawnPacket.y = (float) respawnPos.y;
-            respawnPacket.z = (float) respawnPos.z;
-            this.dataPacket(respawnPacket);
-        }
 
         this.sendExperience();
         this.sendExperienceLevel();
