@@ -1,9 +1,7 @@
 package cn.nukkit.command;
 
 import cn.nukkit.Server;
-import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.defaults.*;
-import cn.nukkit.command.simple.*;
 import cn.nukkit.command.utils.CommandLogger;
 import cn.nukkit.lang.CommandOutputContainer;
 import cn.nukkit.lang.TranslationContainer;
@@ -12,10 +10,8 @@ import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
 import io.netty.util.internal.EmptyArrays;
 
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * @author MagicDroidX
@@ -147,44 +143,6 @@ public class SimpleCommandMap implements CommandMap {
         command.register(this);
 
         return registered;
-    }
-
-    @Override
-    public void registerSimpleCommands(Object object) {
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            cn.nukkit.command.simple.Command def = method.getAnnotation(cn.nukkit.command.simple.Command.class);
-            if (def != null) {
-                SimpleCommand sc = new SimpleCommand(object, method, def.name(), def.description(), def.usageMessage(), def.aliases());
-
-                Arguments args = method.getAnnotation(Arguments.class);
-                if (args != null) {
-                    sc.setMaxArgs(args.max());
-                    sc.setMinArgs(args.min());
-                }
-
-                CommandPermission perm = method.getAnnotation(CommandPermission.class);
-                if (perm != null) {
-                    sc.setPermission(perm.value());
-                }
-
-                if (method.isAnnotationPresent(ForbidConsole.class)) {
-                    sc.setForbidConsole(true);
-                }
-
-                CommandParameters commandParameters = method.getAnnotation(CommandParameters.class);
-                if (commandParameters != null) {
-                    Map<String, CommandParameter[]> map = Arrays.stream(commandParameters.parameters())
-                            .collect(Collectors.toMap(Parameters::name, parameters -> Arrays.stream(parameters.parameters())
-                                    .map(parameter -> new CommandParameter(parameter.name(), parameter.type(), parameter.optional()))
-                                    .distinct()
-                                    .toArray(CommandParameter[]::new)));
-
-                    sc.commandParameters.putAll(map);
-                }
-
-                this.register(def.name(), sc);
-            }
-        }
     }
 
     private boolean registerAlias(Command command, boolean isAlias, String fallbackPrefix, String label) {
