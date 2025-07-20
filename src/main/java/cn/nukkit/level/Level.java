@@ -5089,15 +5089,11 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_16_100;
         } else if (protocol >= ProtocolInfo.v1_16_0 && protocol <= ProtocolInfo.v1_16_100_52) {
             return ProtocolInfo.v1_16_0;
-        } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
-            return ProtocolInfo.v1_14_0;
         }
         throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        if (chunk == ProtocolInfo.v1_14_0)
-            if (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60) return true;
         if (chunk == ProtocolInfo.v1_16_0)
             if (player >= ProtocolInfo.v1_16_0) if (player <= ProtocolInfo.v1_16_100_52) return true;
         if (chunk == ProtocolInfo.v1_16_100)

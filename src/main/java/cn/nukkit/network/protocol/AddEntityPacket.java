@@ -307,10 +307,6 @@ public class AddEntityPacket extends DataPacket {
                         } else if (this.type == EntityHoglin.NETWORK_ID || this.type == EntityStrider.NETWORK_ID || this.type == EntityZoglin.NETWORK_ID) {
                             return "minecraft:pig";
                         }
-
-                        if (this.protocol < ProtocolInfo.v1_14_0 && this.type == EntityBee.NETWORK_ID) {
-                            return "minecraft:bat";
-                        }
                     }
                 }
             }

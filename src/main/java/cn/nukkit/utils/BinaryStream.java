@@ -357,39 +357,37 @@ public class BinaryStream {
         }
         this.putString(skin.getCapeId());
         this.putString(skin.getFullSkinId());
-        if (protocol >= ProtocolInfo.v1_14_60) {
-            this.putString(skin.getArmSize());
-            this.putString(skin.getSkinColor());
+        this.putString(skin.getArmSize());
+        this.putString(skin.getSkinColor());
 
-            List<PersonaPiece> pieces = skin.getPersonaPieces();
-            this.putLInt(pieces.size());
-            for (PersonaPiece piece : pieces) {
-                this.putString(piece.id);
-                this.putString(piece.type);
-                this.putString(piece.packId);
-                this.putBoolean(piece.isDefault);
-                this.putString(piece.productId);
+        List<PersonaPiece> pieces = skin.getPersonaPieces();
+        this.putLInt(pieces.size());
+        for (PersonaPiece piece : pieces) {
+            this.putString(piece.id);
+            this.putString(piece.type);
+            this.putString(piece.packId);
+            this.putBoolean(piece.isDefault);
+            this.putString(piece.productId);
+        }
+
+        List<PersonaPieceTint> tints = skin.getTintColors();
+        this.putLInt(tints.size());
+        for (PersonaPieceTint tint : tints) {
+            this.putString(tint.pieceType);
+            List<String> colors = tint.colors;
+            this.putLInt(colors.size());
+            for (String color : colors) {
+                this.putString(color);
             }
+        }
 
-            List<PersonaPieceTint> tints = skin.getTintColors();
-            this.putLInt(tints.size());
-            for (PersonaPieceTint tint : tints) {
-                this.putString(tint.pieceType);
-                List<String> colors = tint.colors;
-                this.putLInt(colors.size());
-                for (String color : colors) {
-                    this.putString(color);
-                }
-            }
-
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                this.putBoolean(skin.isPremium());
-                this.putBoolean(skin.isPersona());
-                this.putBoolean(skin.isCapeOnClassic());
-                this.putBoolean(skin.isPrimaryUser());
-                if (protocol >= ProtocolInfo.v1_19_63) {
-                    this.putBoolean(skin.isOverridingPlayerAppearance());
-                }
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putBoolean(skin.isPremium());
+            this.putBoolean(skin.isPersona());
+            this.putBoolean(skin.isCapeOnClassic());
+            this.putBoolean(skin.isPrimaryUser());
+            if (protocol >= ProtocolInfo.v1_19_63) {
+                this.putBoolean(skin.isOverridingPlayerAppearance());
             }
         }
     }
@@ -450,39 +448,37 @@ public class BinaryStream {
         }
         skin.setCapeId(this.getString());
         skin.setFullSkinId(this.getString());
-        if (protocol >= ProtocolInfo.v1_14_60) {
-            skin.setArmSize(this.getString());
-            skin.setSkinColor(this.getString());
+        skin.setArmSize(this.getString());
+        skin.setSkinColor(this.getString());
 
-            int piecesLength = this.getLInt();
-            for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
-                String pieceId = this.getString();
-                String pieceType = this.getString();
-                String packId = this.getString();
-                boolean isDefault = this.getBoolean();
-                String productId = this.getString();
-                skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+        int piecesLength = this.getLInt();
+        for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+            String pieceId = this.getString();
+            String pieceType = this.getString();
+            String packId = this.getString();
+            boolean isDefault = this.getBoolean();
+            String productId = this.getString();
+            skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+        }
+
+        int tintsLength = this.getLInt();
+        for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+            String pieceType = this.getString();
+            List<String> colors = new ArrayList<>();
+            int colorsLength = this.getLInt();
+            for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
+                colors.add(this.getString());
             }
+            skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+        }
 
-            int tintsLength = this.getLInt();
-            for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
-                String pieceType = this.getString();
-                List<String> colors = new ArrayList<>();
-                int colorsLength = this.getLInt();
-                for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
-                    colors.add(this.getString());
-                }
-                skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
-            }
-
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                skin.setPremium(this.getBoolean());
-                skin.setPersona(this.getBoolean());
-                skin.setCapeOnClassic(this.getBoolean());
-                skin.setPrimaryUser(this.getBoolean());
-                if (protocol >= ProtocolInfo.v1_19_63) {
-                    skin.setOverridingPlayerAppearance(this.getBoolean());
-                }
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            skin.setPremium(this.getBoolean());
+            skin.setPersona(this.getBoolean());
+            skin.setCapeOnClassic(this.getBoolean());
+            skin.setPrimaryUser(this.getBoolean());
+            if (protocol >= ProtocolInfo.v1_19_63) {
+                skin.setOverridingPlayerAppearance(this.getBoolean());
             }
         }
         return skin;
@@ -920,13 +916,6 @@ public class BinaryStream {
                         default:
                             runtimeId = Item.INFO_UPDATE;
                             break;
-                    }
-                } else {
-                    if (protocolId < ProtocolInfo.v1_14_0) {
-                        if (runtimeId == Item.HONEYCOMB || runtimeId == Item.HONEY_BOTTLE) {
-                            saveOriginalID = true;
-                            runtimeId = Item.INFO_UPDATE;
-                        }
                     }
                 }
             }

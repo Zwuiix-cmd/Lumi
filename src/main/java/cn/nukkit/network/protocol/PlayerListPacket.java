@@ -49,10 +49,8 @@ public class PlayerListPacket extends DataPacket {
                         }
                     }
                 }
-                if (protocol >= ProtocolInfo.v1_14_60) {
-                    for (Entry entry : this.entries) { // WTF Mojang
-                        this.putBoolean(entry.skin != null && entry.skin.isTrusted());
-                    }
+                for (Entry entry : this.entries) { // WTF Mojang
+                    this.putBoolean(entry.skin != null && entry.skin.isTrusted());
                 }
                 break;
             case TYPE_REMOVE:
