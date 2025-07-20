@@ -42,16 +42,9 @@ public class UpdateBlockPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBlockVector3(x, y, z);
-        if (protocol > ProtocolInfo.v1_2_10) {
-            this.putUnsignedVarInt(blockRuntimeId);
-            this.putUnsignedVarInt(flags);
-        } else {
-            this.putUnsignedVarInt(blockId);
-            this.putUnsignedVarInt(176 | blockData & 0xf); // (0xb << 4) | blockData & 0xf
-        }
-        if (protocol > ProtocolInfo.v1_2_13_11) {
-            this.putUnsignedVarInt(dataLayer);
-        }
+        this.putUnsignedVarInt(blockRuntimeId);
+        this.putUnsignedVarInt(flags);
+        this.putUnsignedVarInt(dataLayer);
     }
 
     public static class Entry {

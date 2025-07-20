@@ -552,7 +552,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         clearCreativeItems();
 
         // Creative inventory for oldest versions
-        registerCreativeItems(v1_2_0);
         registerCreativeItems(v1_5_0);
         registerCreativeItems(v1_7_0);
         registerCreativeItems(v1_8_0);
@@ -740,14 +739,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static CreativeItems getCreativeItemsAndGroups(int protocol) {
         switch (protocol) {
-            case v1_2_0:
-            case v1_2_5_11:
-            case v1_2_5:
-            case v1_2_6:
-            case v1_2_7:
-            case v1_2_10:
-            case v1_2_13:
-            case v1_2_13_11:
             case v1_4_0:
                 return Item.creative137;
             case v1_5_0:
@@ -882,7 +873,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static void addCreativeItem(int protocol, Item item, CreativeItemCategory category, String group) {
         switch (protocol) { // NOTE: Not all versions are supposed to be here
-            case v1_2_0 -> Item.creative137.add(item.clone(), category, group);
             case v1_5_0 -> Item.creative274.add(item.clone(), category, group);
             case v1_7_0 -> Item.creative291.add(item.clone(), category, group);
             case v1_8_0 -> Item.creative313.add(item.clone(), category, group);

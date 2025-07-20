@@ -403,13 +403,11 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
 
     static {
-        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMappingOld, ProtocolInfo.v1_2_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping527, ProtocolInfo.v1_19_0);
         AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping589, ProtocolInfo.v1_20_0);
 
-        initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
         initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
         initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
         initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
@@ -1255,7 +1253,7 @@ public abstract class Entity extends Location implements Metadatable {
         } else if (protocolId >= ProtocolInfo.v1_10_0) {
             return ProtocolInfo.v1_10_0;
         }
-        return ProtocolInfo.v1_2_0;
+        return ProtocolInfo.v1_4_0;
     }
 
     public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {

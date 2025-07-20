@@ -2823,8 +2823,7 @@ public class Level implements ChunkManager, Metadatable {
             Int2ObjectMap<ObjectList<Player>> players = Server.sortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
-                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10
-                        hand.getId(), hand.getDamage());
+                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, hand.getId(), hand.getDamage());
                 this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, soundData, targets.toArray(Player.EMPTY_ARRAY));
             }
         }
@@ -5099,18 +5098,11 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_13_0;
         } else if (protocol == ProtocolInfo.v1_12_0) {
             return ProtocolInfo.v1_12_0;
-        } else if (protocol >= ProtocolInfo.v1_2_0 && protocol < ProtocolInfo.v1_12_0) {
-            return ProtocolInfo.v1_2_0;
-        } else if (protocol < ProtocolInfo.v1_2_0) {
-            return 0;
         }
         throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        if (chunk == 0) if (player < ProtocolInfo.v1_2_0) return true;
-        if (chunk == ProtocolInfo.v1_2_0)
-            if (player >= ProtocolInfo.v1_2_0) if (player < ProtocolInfo.v1_12_0) return true;
         if (chunk == ProtocolInfo.v1_12_0) if (player == ProtocolInfo.v1_12_0) return true;
         if (chunk == ProtocolInfo.v1_13_0) if (player == ProtocolInfo.v1_13_0) return true;
         if (chunk == ProtocolInfo.v1_14_0)

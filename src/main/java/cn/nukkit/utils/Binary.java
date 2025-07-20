@@ -136,13 +136,6 @@ public class Binary {
 
                     if (protocol == ProtocolInfo.v1_11_0) {
                         if (id >= 40) id = id + 1;
-                    } else if (protocol <= ProtocolInfo.v1_2_10) {
-                        if (id >= 29) id = id + 1;
-                        if (id > 76) { // Remove DATA_MAX_STRENGTH and up
-                            id = Entity.DATA_STRENGTH;
-                            type = Entity.DATA_TYPE_INT;
-                            forceEmptyData = true;
-                        }
                     }
                 }
             }
@@ -196,9 +189,7 @@ public class Binary {
                         if (id == Entity.DATA_FLAGS) {
                             dataVersions = ((LongEntityData) d).dataVersions;
                             if (dataVersions != null && dataVersions.length == 3) {
-                                if (protocol < ProtocolInfo.v1_2_13) {
-                                    stream.putVarLong(dataVersions[0]);
-                                }else if (protocol < ProtocolInfo.v1_7_0) {
+                                if (protocol < ProtocolInfo.v1_7_0) {
                                     stream.putVarLong(dataVersions[1]);
                                 }else {
                                     stream.putVarLong(dataVersions[2]);

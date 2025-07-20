@@ -67,12 +67,10 @@ public class AdventureSettingsPacket extends DataPacket {
     public void decode() {
         this.flags = getUnsignedVarInt();
         this.commandPermission = getUnsignedVarInt();
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.flags2 = getUnsignedVarInt();
-            this.playerPermission = getUnsignedVarInt();
-            this.customFlags = getUnsignedVarInt();
-            this.entityUniqueId = getLLong();
-        }
+        this.flags2 = getUnsignedVarInt();
+        this.playerPermission = getUnsignedVarInt();
+        this.customFlags = getUnsignedVarInt();
+        this.entityUniqueId = getLLong();
     }
 
     @Override
@@ -80,12 +78,10 @@ public class AdventureSettingsPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(this.flags);
         this.putUnsignedVarInt(this.commandPermission);
-        if (protocol >= ProtocolInfo.v1_2_0) {
-            this.putUnsignedVarInt(this.flags2);
-            this.putUnsignedVarInt(this.playerPermission);
-            this.putUnsignedVarInt(this.customFlags);
-            this.putLLong(this.entityUniqueId);
-        }
+        this.putUnsignedVarInt(this.flags2);
+        this.putUnsignedVarInt(this.playerPermission);
+        this.putUnsignedVarInt(this.customFlags);
+        this.putLLong(this.entityUniqueId);
     }
 
     public boolean getFlag(int flag) {

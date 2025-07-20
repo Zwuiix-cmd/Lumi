@@ -461,9 +461,6 @@ public class PlayerInventory extends BaseInventory {
         }
 
         for (Player player : players) {
-            if (player.protocol < ProtocolInfo.v1_2_0) {
-                continue;
-            }
             int id = player.getWindowId(this);
             if (id == -1) {
                 if (this.getHolder() != player) {

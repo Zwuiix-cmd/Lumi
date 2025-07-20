@@ -23,6 +23,6 @@ public abstract class DataPacketProcessor<T extends DataPacket> {
     public abstract Class<? extends DataPacket> getPacketClass();
 
     public boolean isSupported(int protocol) {
-        return protocol >= ProtocolInfo.v1_2_0;
+        return protocol >= ProtocolInfo.v1_4_0;
     }
 }

@@ -383,12 +383,6 @@ public class AvailableCommandsPacket extends DataPacket {
     public void encode() {
         this.reset();
 
-        if (this.protocol < ProtocolInfo.v1_2_0) {
-            this.putString(new Gson().toJson(this.commands));
-            this.putString("");
-            return;
-        }
-
         LinkedHashSet<String> enumValuesSet = new LinkedHashSet<>();
         SequencedHashSet<String> subCommandValues = new SequencedHashSet<>();
         LinkedHashSet<String> postFixesSet = new LinkedHashSet<>();

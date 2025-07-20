@@ -262,7 +262,7 @@ public class Network {
                         if (raknetProtocol > 8) {
                             pk.decode();
                         } else { // version < 1.6
-                            pk.setBuffer(buf, pk.protocol < ProtocolInfo.v1_2_0 ? 1 : 3);
+                            pk.setBuffer(buf, 3);
                             pk.decode();
                         }
                     } catch (Exception e) {
@@ -353,8 +353,8 @@ public class Network {
 
     private void registerPackets() {
         this.packetPool137 = PacketPool.builder()
-                .protocolVersion(ProtocolInfo.v1_2_0)
-                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_2_0))
+                .protocolVersion(ProtocolInfo.v1_4_0)
+                .minecraftVersion(Utils.getVersionByProtocol(ProtocolInfo.v1_4_0))
                 .registerPacket(ProtocolInfo.SERVER_TO_CLIENT_HANDSHAKE_PACKET, ServerToClientHandshakePacket.class)
                 .registerPacket(ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ClientToServerHandshakePacket.class)
                 .registerPacket(ProtocolInfo.ADD_ENTITY_PACKET, AddEntityPacket.class)

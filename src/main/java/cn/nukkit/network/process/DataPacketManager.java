@@ -162,6 +162,7 @@ public final class DataPacketManager {
     public static void registerDefaultProcessors() {
         registerProcessor(
                 0, //base
+                CommandRequestProcessor_v137.INSTANCE,
                 AdventureSettingsProcessor.INSTANCE,
                 BookEditProcessor.INSTANCE,
                 ClientToServerHandshakeProcessor.INSTANCE,
@@ -186,11 +187,6 @@ public final class DataPacketManager {
                 SetDifficultyProcessor.INSTANCE,
                 SetPlayerGameTypeProcessor.INSTANCE,
                 TextProcessor.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_2_0,
-                CommandRequestProcessor_v137.INSTANCE
         );
 
         registerProcessor(
