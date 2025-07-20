@@ -21,6 +21,6 @@ public class ItemScute extends Item {
 
     @Override
     public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_6_0;
+        return protocolId >= ProtocolInfo.v1_7_0;
     }
 }

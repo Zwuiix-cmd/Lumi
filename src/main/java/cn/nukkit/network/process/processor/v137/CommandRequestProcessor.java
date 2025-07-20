@@ -15,9 +15,9 @@ import org.jetbrains.annotations.NotNull;
  * @author LT_Name
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommandRequestProcessor_v137 extends DataPacketProcessor<CommandRequestPacket> {
+public class CommandRequestProcessor extends DataPacketProcessor<CommandRequestPacket> {
 
-    public static final CommandRequestProcessor_v137 INSTANCE = new CommandRequestProcessor_v137();
+    public static final CommandRequestProcessor INSTANCE = new CommandRequestProcessor();
 
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull CommandRequestPacket pk) {

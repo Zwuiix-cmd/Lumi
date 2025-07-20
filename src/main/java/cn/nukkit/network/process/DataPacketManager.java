@@ -2,8 +2,8 @@ package cn.nukkit.network.process;
 
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.network.process.processor.common.*;
-import cn.nukkit.network.process.processor.v137.CommandRequestProcessor_v137;
-import cn.nukkit.network.process.processor.v282.SetLocalPlayerAsInitializedProcessor_v282;
+import cn.nukkit.network.process.processor.v137.CommandRequestProcessor;
+import cn.nukkit.network.process.processor.v282.SetLocalPlayerAsInitializedProcessor;
 import cn.nukkit.network.process.processor.v340.LecternUpdateProcessor_v340;
 import cn.nukkit.network.process.processor.v422.FilterTextProcessor_v422;
 import cn.nukkit.network.process.processor.v527.RequestAbilityProcessor_v527;
@@ -162,7 +162,8 @@ public final class DataPacketManager {
     public static void registerDefaultProcessors() {
         registerProcessor(
                 0, //base
-                CommandRequestProcessor_v137.INSTANCE,
+                CommandRequestProcessor.INSTANCE,
+                SetLocalPlayerAsInitializedProcessor.INSTANCE,
                 AdventureSettingsProcessor.INSTANCE,
                 BookEditProcessor.INSTANCE,
                 ClientToServerHandshakeProcessor.INSTANCE,
@@ -187,11 +188,6 @@ public final class DataPacketManager {
                 SetDifficultyProcessor.INSTANCE,
                 SetPlayerGameTypeProcessor.INSTANCE,
                 TextProcessor.INSTANCE
-        );
-
-        registerProcessor(
-                ProtocolInfo.v1_6_0_5,
-                SetLocalPlayerAsInitializedProcessor_v282.INSTANCE
         );
 
         registerProcessor(
