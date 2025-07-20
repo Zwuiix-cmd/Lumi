@@ -49,7 +49,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
         try {
             TAG_361 = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
             BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
-            pk.protocol = ProtocolInfo.v1_12_0;
+            pk.protocol = ProtocolInfo.v1_13_0;
             pk.tryEncode();
             CACHED_PACKET_361 = pk.compress(Deflater.BEST_COMPRESSION);
         } catch (Exception e) {

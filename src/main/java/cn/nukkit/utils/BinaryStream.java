@@ -972,22 +972,16 @@ public class BinaryStream {
 
         this.putVarInt(runtimeId);
 
-        int auxValue;
         boolean isDurable = item instanceof ItemDurable;
-
-        if (protocolId >= ProtocolInfo.v1_12_0) {
-            auxValue = item.getCount();
-            if (!isDurable) {
-                int meta;
-                if (protocolId < ProtocolInfo.v1_16_100) {
-                    meta = item.hasMeta() ? item.getDamage() : -1;
-                } else {
-                    meta = damage;
-                }
-                auxValue |= ((meta & 0x7fff) << 8);
+        int auxValue = item.getCount();
+        if (!isDurable) {
+            int meta;
+            if (protocolId < ProtocolInfo.v1_16_100) {
+                meta = item.hasMeta() ? item.getDamage() : -1;
+            } else {
+                meta = damage;
             }
-        } else {
-            auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
+            auxValue |= ((meta & 0x7fff) << 8);
         }
 
         this.putVarInt(auxValue);
@@ -1003,65 +997,42 @@ public class BinaryStream {
             return;
         }
 
-        if (item.hasCompoundTag()
-                || (isDurable && protocolId >= ProtocolInfo.v1_12_0)
-                || saveOriginalID) {
-            if (protocolId < ProtocolInfo.v1_12_0) {
+        if (item.hasCompoundTag() || isDurable || saveOriginalID) {
+            try {
+                // Hack for tool damage
+                byte[] nbt = item.getCompoundTag();
+                CompoundTag tag;
+                if (nbt == null || nbt.length == 0) {
+                    tag = new CompoundTag();
+                } else {
+                    tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
+                }
+                if (tag.contains("Damage")) {
+                    tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
+                }
+                if (isDurable) {
+                    tag.putInt("Damage", item.getDamage());
+                }
+
                 if (saveOriginalID) {
                     try {
-                        CompoundTag compoundTag = item.getNamedTag();
-                        if (compoundTag != null) {
-                            item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, compoundTag));
-                        }
+                        item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, tag));
                         item.setCustomName(item.getName());
                         item.setNamedTag(item.getNamedTag().putInt(MV_ORIGIN_ID, item.getId()).putInt(MV_ORIGIN_META, item.getDamage()));
                         if (isStringItem) {
                             item.setNamedTag(item.getNamedTag().putString(MV_ORIGIN_NAMESPACE, item.getNamespaceId(protocolId)));
                         }
+                        tag = item.getNamedTag();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
-                byte[] nbt = item.getCompoundTag();
-                this.putLShort(nbt.length);
-                this.put(nbt);
-            } else {
-                try {
-                    // Hack for tool damage
-                    byte[] nbt = item.getCompoundTag();
-                    CompoundTag tag;
-                    if (nbt == null || nbt.length == 0) {
-                        tag = new CompoundTag();
-                    } else {
-                        tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
-                    }
-                    if (tag.contains("Damage")) {
-                        tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
-                    }
-                    if (isDurable) {
-                        tag.putInt("Damage", item.getDamage());
-                    }
 
-                    if (saveOriginalID) {
-                        try {
-                            item.setNamedTag(new CompoundTag().putCompound(MV_ORIGIN_NBT, tag));
-                            item.setCustomName(item.getName());
-                            item.setNamedTag(item.getNamedTag().putInt(MV_ORIGIN_ID, item.getId()).putInt(MV_ORIGIN_META, item.getDamage()));
-                            if (isStringItem) {
-                                item.setNamedTag(item.getNamedTag().putString(MV_ORIGIN_NAMESPACE, item.getNamespaceId(protocolId)));
-                            }
-                            tag = item.getNamedTag();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
-                    this.putLShort(0xffff);
-                    this.putByte((byte) 1);
-                    this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                this.putLShort(0xffff);
+                this.putByte((byte) 1);
+                this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } else {
             this.putLShort(0);

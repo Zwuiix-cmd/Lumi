@@ -21,7 +21,6 @@ public class RuntimeItems {
 
     private static final Map<String, Integer> legacyString2LegacyInt = new HashMap<>();
 
-    private static RuntimeItemMapping mapping361;
     private static RuntimeItemMapping mapping419;
     private static RuntimeItemMapping mapping440;
     private static RuntimeItemMapping mapping448;
@@ -97,7 +96,6 @@ public class RuntimeItems {
             }
         }
 
-        mapping361 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_12_0);
         mapping419 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_16_100);
         mapping440 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_17_0);
         mapping448 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_17_10);
@@ -129,7 +127,6 @@ public class RuntimeItems {
         mapping819 = new RuntimeItemMapping(mappingEntries, ProtocolInfo.v1_21_93);
 
         VALUES = new RuntimeItemMapping[]{
-                mapping361,
                 mapping419,
                 mapping440,
                 mapping448,
@@ -219,10 +216,8 @@ public class RuntimeItems {
             return mapping448;
         } else if (protocolId >= ProtocolInfo.v1_17_0) {
             return mapping440;
-        } else if (protocolId >= ProtocolInfo.v1_16_100) {
-            return mapping419;
         }
-        return mapping361;
+        return mapping419;
     }
 
     public static int getLegacyIdFromLegacyString(String identifier) {

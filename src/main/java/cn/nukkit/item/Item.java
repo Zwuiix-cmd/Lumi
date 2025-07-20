@@ -721,7 +721,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static CreativeItems getCreativeItemsAndGroups(int protocol) {
         return switch (protocol) {
-            case v1_12_0, v1_13_0 -> Item.creative354;
+            case v1_13_0 -> Item.creative354;
             case v1_14_0, v1_14_60 -> Item.creative389;
             case v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51, v1_16_100_52, v1_16_100, v1_16_200_51, v1_16_200,
                  v1_16_210_50, v1_16_210_53, v1_16_210, v1_16_220, v1_16_230_50, v1_16_230, v1_16_230_54 ->
