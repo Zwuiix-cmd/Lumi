@@ -78,6 +78,7 @@ import cn.nukkit.scheduler.Task;
 import cn.nukkit.scoreboard.manager.IScoreboardManager;
 import cn.nukkit.scoreboard.manager.ScoreboardManager;
 import cn.nukkit.scoreboard.storage.JSONScoreboardStorage;
+import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.base.Preconditions;
@@ -214,7 +215,7 @@ public class Server {
      */
     public static final List<String> multiNetherWorlds = new ArrayList<>();
     public static final List<String> antiXrayWorlds = new ArrayList<>();
-    public static AntiXraySystem.AntiXrayMode antiXrayMode;
+    public static WorldSettings.AntiXraySettings.AntiXrayMode antiXrayMode;
     public static boolean antiXrayPreDeobfuscate;
     /**
      * Worlds where random block ticking is disabled.
@@ -3066,7 +3067,7 @@ public class Server {
                 antiXrayWorlds.add(tokenizer.nextToken());
             }
         }
-        antiXrayMode = AntiXraySystem.AntiXrayMode.valueOf(this.getPropertyString("anti-xray-mode"));
+        antiXrayMode = WorldSettings.AntiXraySettings.AntiXrayMode.valueOf(this.getPropertyString("anti-xray-mode"));
         antiXrayPreDeobfuscate = this.getPropertyBoolean("anti-xray-pre-deobfuscate");
 
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
@@ -3279,7 +3280,7 @@ public class Server {
             put("portal-ticks", 80);
             put("multi-nether-worlds", "");
             put("anti-xray-worlds", "");
-            put("anti-xray-mode", AntiXraySystem.AntiXrayMode.LOW);
+            put("anti-xray-mode", WorldSettings.AntiXraySettings.AntiXrayMode.LOW);
             put("anti-xray-pre-deobfuscate", true);
 
             put("do-not-tick-worlds", "");

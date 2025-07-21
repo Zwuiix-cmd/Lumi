@@ -182,10 +182,4 @@ public final class AntiXraySystem {
                 BlockID.DEEPSLATE_COPPER_ORE
         ));
     }
-
-    public enum AntiXrayMode {
-        LOW,
-        MEDIUM,
-        HIGH
-    }
 }
