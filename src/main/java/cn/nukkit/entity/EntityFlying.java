@@ -88,7 +88,7 @@ public abstract class EntityFlying extends BaseEntity {
                 return null;
             }
 
-            if (this.getServer().getMobAiEnabled()) {
+            if (this.getServer().getSettings().getWorld().getEntity().isMobAi()) {
                 if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                     double x = this.followTarget.x - this.x;
                     double y = this.followTarget.y - this.y;

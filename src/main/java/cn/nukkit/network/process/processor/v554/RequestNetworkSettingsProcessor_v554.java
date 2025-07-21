@@ -55,12 +55,12 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
             log.debug(player.getAddress() + " disconnected with unsupported protocol (SupportedProtocols) " + player.protocol);
             return;
         }
-        if (player.protocol < player.getServer().minimumProtocol) {
+        if (player.protocol < player.getServer().getSettings().getGeneral().getMultiversion().getMinProtocol()) {
             player.close("", "Support for this Minecraft version is not enabled");
-            log.debug(player.getAddress() + " disconnected with unsupported protocol (minimumProtocol) " + player.protocol);
-        } else if (player.getServer().maximumProtocol >= Math.max(0, player.getServer().minimumProtocol) && player.protocol > player.getServer().maximumProtocol) {
+            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().getGeneral().getMultiversion().getMinProtocol()) " + player.protocol);
+        } else if (player.getServer().getSettings().getGeneral().getMultiversion().getMaxProtocol() >= Math.max(0, player.getServer().getSettings().getGeneral().getMultiversion().getMinProtocol()) && player.protocol > player.getServer().getSettings().getGeneral().getMultiversion().getMaxProtocol()) {
             player.close("", "Support for this Minecraft version is not enabled");
-            log.debug(player.getAddress() + " disconnected with unsupported protocol (maximumProtocol) " + player.protocol);
+            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().getGeneral().getMultiversion().getMaxProtocol()) " + player.protocol);
         }
     }
 

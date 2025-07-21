@@ -358,7 +358,7 @@ public class Level implements ChunkManager, Metadatable {
         this.blockMetadata = new BlockMetadataStore(this);
         this.server = server;
         this.autoSave = server.getAutoSave();
-        this.autoCompaction = server.isAutoCompactionEnabled();
+        this.autoCompaction = server.getSettings().getWorld().isWorldAutoCompaction();
 
         try {
             this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
@@ -399,12 +399,12 @@ public class Level implements ChunkManager, Metadatable {
         this.levelCurrentTick = levelProvider.getCurrentTick();
         this.updateQueue = new BlockUpdateScheduler(this, levelCurrentTick);
 
-        this.chunkTickRadius = Math.min(this.server.getViewDistance(), Math.max(1, this.server.getPropertyInt("chunk-ticking-radius", 4)));
-        this.chunksPerTicks = this.server.getPropertyInt("chunk-ticking-per-tick", 40);
-        this.chunkGenerationQueueSize = this.server.getPropertyInt("chunk-generation-queue-size", 8);
-        this.chunkPopulationQueueSize = this.server.getPropertyInt("chunk-generation-population-queue-size", 8);
+        this.chunkTickRadius = Math.min(this.server.getSettings().getWorld().getViewDistance(), Math.max(1, server.getSettings().getWorld().getChunk().getTickingRadius()));
+        this.chunksPerTicks = this.server.getSettings().getWorld().getChunk().getTickingPerTick();
+        this.chunkGenerationQueueSize = this.server.getSettings().getWorld().getChunk().getGenerationQueueSize();
+        this.chunkPopulationQueueSize = this.server.getSettings().getWorld().getChunk().getGenerationPopulationQueueSize();
         this.chunkTickList.clear();
-        this.clearChunksOnTick = this.server.getPropertyBoolean("clear-chunk-tick-list", true);
+        this.clearChunksOnTick = this.server.getSettings().getWorld().isClearChunkTickList();
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
 
@@ -413,20 +413,20 @@ public class Level implements ChunkManager, Metadatable {
         this.isNether = name.equals("nether");
         this.isEnd = name.equals("the_end");
 
-        this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
+        this.randomTickingEnabled = !Server.getInstance().getSettings().getWorld().getDoNotTickWorlds().contains(name);
 
-        if (Server.antiXrayWorlds.contains(name)) {
+        if (Server.getInstance().getSettings().getWorld().getAntiXray().containsKey(name)) {
             this.antiXraySystem = new AntiXraySystem(this);
-            this.antiXraySystem.setFakeOreDenominator(switch (Server.antiXrayMode) {
+            this.antiXraySystem.setFakeOreDenominator(switch (Server.getInstance().getSettings().getWorld().getAntiXray().get(this.getName()).getMode()) {
                 case HIGH -> 4;
                 case MEDIUM -> 8;
                 default -> 16;
             });
-            this.antiXraySystem.setPreDeObfuscate(Server.antiXrayPreDeobfuscate);
+            this.antiXraySystem.setPreDeObfuscate(Server.getInstance().getSettings().getWorld().getAntiXray().get(this.getName()).isPreDeobfuscate());
             this.antiXraySystem.reinitAntiXray();
         }
 
-        if (this.server.asyncChunkSending) {
+        if (this.server.getSettings().getWorld().isAsyncChunks()) {
             this.asyncChuckExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AsyncChunkThread for " + name).build());
         }
     }
@@ -1064,7 +1064,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (Server.getInstance().lightUpdates) {
+        if (Server.getInstance().getSettings().getWorld().isLightUpdates()) {
             this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
         }
 
@@ -1149,9 +1149,9 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (this.server.asyncChunkSending) {
+        if (this.server.getSettings().getWorld().isAsyncChunks()) {
             NetworkChunkSerializer.NetworkChunkSerializerCallbackData data;
-            int count = (this.getPlayers().size() + 1) * this.server.chunksPerTick;
+            int count = (this.getPlayers().size() + 1) * this.server.getSettings().getWorld().getChunk().getSendingPerTick();
             for (int i = 0; i < count && (data = this.asyncChunkRequestCallbackQueue.poll()) != null; ++i) {
                 this.chunkRequestCallback(data.getProtocol(), data.getTimestamp(), data.getX(), data.getZ(), data.getSubChunkCount(), data.getPayload());
             }
@@ -2677,7 +2677,7 @@ public class Level implements ChunkManager, Metadatable {
                 return null;
             }
 
-            if (server.mobsFromBlocks) {
+            if (server.getSettings().getPlayer().isSpawnMobsFromBlocks()) {
                 if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
                         block.getLevel().setBlock(target, Block.get(BlockID.AIR));
@@ -2824,7 +2824,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isInSpawnRadius(Vector3 vector3) {
-        return server.getSpawnRadius() > -1 && new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= server.getSpawnRadius();
+        return server.getSettings().getWorld().getSpawnProtection() > -1 && new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= server.getSpawnRadius();
     }
 
     public Entity getEntity(long entityId) {
@@ -3690,7 +3690,7 @@ public class Level implements ChunkManager, Metadatable {
     public void chunkRequestCallback(int protocol, long timestamp, int x, int z, int subChunkCount, byte[] payload) {
         long index = Level.chunkHash(x, z);
 
-        if (server.cacheChunks) {
+        if (server.getSettings().getWorld().isCacheChunks()) {
             BatchPacket data = Player.getChunkCacheFromData(protocol, x, z, subChunkCount, payload, this.getDimension());
             BaseFullChunk chunk = getChunkIfLoaded(x, z);
             if (chunk != null && chunk.getChanges() <= timestamp) {
@@ -3812,7 +3812,7 @@ public class Level implements ChunkManager, Metadatable {
 
         chunk.initChunk();
 
-        if (!chunk.isLightPopulated() && chunk.isPopulated() && this.server.lightUpdates) {
+        if (!chunk.isLightPopulated() && chunk.isPopulated() && this.server.getSettings().getWorld().isLightUpdates()) {
             this.server.getScheduler().scheduleAsyncTask(InternalPlugin.INSTANCE, new LightPopulationTask(this, chunk));
         }
 
@@ -4622,7 +4622,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isMobSpawningAllowed() {
-        return !Server.disabledSpawnWorlds.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
+        //TODO: fix
+        return true;
+        //return !Server.getSettings().getWorld().worldsE.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {

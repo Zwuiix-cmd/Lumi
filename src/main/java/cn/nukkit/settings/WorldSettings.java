@@ -52,7 +52,7 @@ public class WorldSettings extends OkaeriConfig {
     private boolean enableEnd = true;
 
     @CustomKey("drop-spawners")
-    public boolean dropSpawners = true;
+    private boolean dropSpawners = true;
 
     @CustomKey("multi-nether-worlds")
     private List<String> multiNetherWorlds = new ArrayList<>();

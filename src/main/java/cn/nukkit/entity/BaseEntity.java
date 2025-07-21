@@ -700,7 +700,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
      * @return 是否满足
      */
     public boolean isMeetAttackConditions(Vector3 target) {
-        return this.getServer().getMobAiEnabled() && target instanceof Entity;
+        return this.getServer().getSettings().getWorld().getEntity().isMobAi() && target instanceof Entity;
     }
 
     /**

@@ -184,7 +184,7 @@ public class Binary {
                                 stream.putVarLong(dataVersions[2]);
                                 break;
                             }
-                            if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                            if (Server.getInstance().getSettings().getGeneral().getMultiversion().getMinProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
                                 Server.getInstance().getLogger().debug("Invalid LongEntityData dataVersions for DATA_FLAGS, reverting to non-multiversion compatible flags: expected 3, got " + (dataVersions == null ? 0 : dataVersions.length));
                             }
                         } else if (id == Entity.DATA_FLAGS_EXTENDED) {
@@ -193,7 +193,7 @@ public class Binary {
                                 stream.putVarLong(dataVersions[0]);
                                 break;
                             }
-                            if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                            if (Server.getInstance().getSettings().getGeneral().getMultiversion().getMinProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
                                 Server.getInstance().getLogger().debug("Invalid LongEntityData dataVersions for DATA_FLAGS_EXTENDED, reverting to non-multiversion compatible flags: expected 1, got " + (dataVersions == null ? 0 : dataVersions.length));
                             }
                         }

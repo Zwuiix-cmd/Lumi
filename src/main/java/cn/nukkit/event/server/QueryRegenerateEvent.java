@@ -46,16 +46,16 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     public QueryRegenerateEvent(Server server, int timeout) {
         this.timeout = timeout;
-        this.serverName = server.getMotd();
-        this.listPlugins = server.queryPlugins;
+        this.serverName = server.getSettings().getGeneral().getMotd();
+        this.listPlugins = server.getSettings().getNetwork().isQueryPlugins();
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
         this.players = server.getOnlinePlayers().values().toArray(Player.EMPTY_ARRAY);
-        this.gameType = server.getGamemode() == 1 ? "CMP" : "SMP";
+        this.gameType = server.getSettings().getPlayer().getDefaultGamemode() == 1 ? "CMP" : "SMP";
         this.version = server.getVersion();
         this.map = server.getDefaultLevel() == null ? "unknown" : server.getDefaultLevel().getName();
         this.numPlayers = this.players.length;
         this.maxPlayers = server.getMaxPlayers();
-        this.whitelist = server.hasWhitelist() ? "on" : "off";
+        this.whitelist = server.getSettings().getPlayer().isWhitelist() ? "on" : "off";
         this.port = server.getPort();
         this.ip = server.getIp();
     }
