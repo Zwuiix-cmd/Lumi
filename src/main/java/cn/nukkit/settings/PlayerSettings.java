@@ -49,6 +49,9 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("check-op-movement")
     private boolean checkOpMovement = false;
 
+    @CustomKey("allow-flight")
+    private boolean allowFlight = false;
+
     @CustomKey("stop-in-game")
     private boolean stopInGame = false;
 

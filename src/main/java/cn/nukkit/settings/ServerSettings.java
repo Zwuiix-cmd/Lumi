@@ -2,29 +2,23 @@ package cn.nukkit.settings;
 
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
-import eu.okaeri.configs.annotation.CustomKey;
 import lombok.Getter;
 
 @Getter
 public class ServerSettings extends OkaeriConfig {
 
-    @CustomKey("general")
     @Comment("General server settings")
-    private GeneralSettings generalSettings = new GeneralSettings();
+    private GeneralSettings general = new GeneralSettings();
 
-    @CustomKey("network")
     @Comment("Server network settings")
-    private NetworkSettings networkSettings = new NetworkSettings();
+    private NetworkSettings network = new NetworkSettings();
 
-    @CustomKey("performance")
     @Comment("Server performance settings")
-    private PerformanceSettings performanceSettings = new PerformanceSettings();
+    private PerformanceSettings performance = new PerformanceSettings();
 
-    @CustomKey("world")
     @Comment("World-related settings")
-    private WorldSettings worldSettings = new WorldSettings();
+    private WorldSettings world = new WorldSettings();
 
-    @CustomKey("player")
     @Comment("Player-related settings")
-    private PlayerSettings playerSettings = new PlayerSettings();
+    private PlayerSettings player = new PlayerSettings();
 }

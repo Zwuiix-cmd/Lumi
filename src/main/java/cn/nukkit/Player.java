@@ -590,7 +590,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned && player.spawned &&
                 this.isAlive() && player.isAlive()
                 && player.getLevel() == this.level && player.canSee(this) &&
-                (!this.isSpectator() || (this.server.useClientSpectator && player.protocol >= ProtocolInfo.v1_19_30)) &&
+                (!this.isSpectator() || (this.server.getSettings().getPlayer().isUseClientSpectator() && player.protocol >= ProtocolInfo.v1_19_30)) &&
                 this.showToOthers) {
             super.spawnTo(player);
             if (this.isSpectator()) {
@@ -818,7 +818,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.loaderId = Level.generateChunkLoaderId(this);
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
-        this.viewDistance = this.server.getViewDistance();
+        this.viewDistance = this.server.getSettings().getWorld().getViewDistance();
         this.chunkRadius = viewDistance;
         this.boundingBox = new SimpleAxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
@@ -1083,7 +1083,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             int count = 0;
             LongIterator iter = loadQueue.longIterator();
             while (iter.hasNext()) {
-                if (count >= server.chunksPerTick) {
+                if (count >= server.getSettings().getWorld().getChunk().getSendingPerTick()) {
                     break;
                 }
 
@@ -1153,7 +1153,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.getPluginManager().callEvent(respawnEvent);
 
         if (dead) {
-            if (this.server.isHardcore()) {
+            if (this.server.getSettings().getWorld().isEnableHardcore()) {
                 this.setBanned(true);
                 return;
             }
@@ -1196,7 +1196,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         // Prevent PlayerTeleportEvent during player spawn
         //this.teleport(pos, null);
 
-        if (!this.isSpectator() || this.server.useClientSpectator) {
+        if (!this.isSpectator() || this.server.getSettings().getPlayer().isUseClientSpectator()) {
             this.spawnToAll();
         }
 
@@ -1307,7 +1307,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet = packet.clone();
         packet.protocol = this.protocol;
 
-        if (server.callDataPkSendEv) {
+        if (server.getSettings().getGeneral().isCallDataPkSendEvent()) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -1388,12 +1388,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, (int) pos.x, (int) pos.y, (int) pos.z));
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, true);
 
-        if (this.getServer().bedSpawnpoints) {
-            //if (!this.getSpawn().equals(pos)) {
-            //    this.setSpawn(pos);
+        if (this.getServer().getSettings().getPlayer().isBedSpawnpoints()) {
             this.setSpawnBlock(pos);
             this.sendTranslation("§7%tile.bed.respawnSet");
-            //}
         }
 
         this.level.sleepTicks = 60;
@@ -1478,7 +1475,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        if(server.achievementsEnabled) {
+        if (server.getSettings().getPlayer().isAchievements()) {
             Achievement achievement = Achievement.achievements.get(achievementId);
 
             if (achievement == null || hasAchievement(achievementId)) {
@@ -1527,7 +1524,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         gamemode &= 0x03;
         if (gamemode == Player.SPECTATOR) {
             //1.19.30+使用真正的旁观模式
-            if (this.server.useClientSpectator && this.protocol >= ProtocolInfo.v1_19_30) {
+            if (this.server.getSettings().getPlayer().isUseClientSpectator() && this.protocol >= ProtocolInfo.v1_19_30) {
                 return GameType.SPECTATOR.ordinal();
             }
             return Player.CREATIVE;
@@ -1583,7 +1580,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.gamemode = gamemode;
 
-        if (this.server.useClientSpectator) {
+        if (this.server.getSettings().getPlayer().isUseClientSpectator()) {
             List<Player> updatePlayers = this.hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_19_30).filter(p -> p != this).toList();
             ArrayList<Player> spawnPlayers = new ArrayList<>(this.hasSpawned.values());
             spawnPlayers.removeAll(updatePlayers);
@@ -1805,7 +1802,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inEndPortalTicks = 0;
         }
 
-        if (server.endEnabled && inEndPortalTicks == (this.gamemode == CREATIVE ? 1 : 80)) {
+        if (server.getSettings().getWorld().isEnableEnd() && inEndPortalTicks == (this.gamemode == CREATIVE ? 1 : 80)) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.END);
 
             if (this.portalPos == null) {
@@ -1816,7 +1813,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (!ev.isCancelled()) {
                 if (this.getLevel().isEnd) {
-                    if (server.vanillaPortals && this.getSpawn().getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
+                    if (this.server.getSettings().getWorld().getFeatures().isVanillaPortals() && this.getSpawn().getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
                         this.teleport(this.getSpawn(), TeleportCause.END_PORTAL);
                     } else {
                         this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.END_PORTAL);
@@ -1837,8 +1834,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.portalPos = null;
         }
 
-        if (this.server.isNetherAllowed()) {
-            if (this.server.vanillaPortals && (this.inPortalTicks == 40 || this.inPortalTicks == 10 && this.gamemode == CREATIVE) && this.portalPos == null) {
+        if (this.server.getSettings().getWorld().isEnableNether()) {
+            if (this.server.getSettings().getWorld().getFeatures().isVanillaPortals() &&
+                    (this.inPortalTicks == 40 || this.inPortalTicks == 10 && this.gamemode == CREATIVE) && this.portalPos == null) {
                 Position portalPos = this.level.calculatePortalMirror(this);
                 if (portalPos == null) {
                     return;

@@ -34,7 +34,7 @@ public class LegacyPropertiesConverter {
         log.info("Converting the old server.properties configuration to the new format...");
 
         // General Settings
-        var general = settings.getGeneralSettings();
+        var general = settings.getGeneral();
         general.setMotd(this.getPropertyString("motd", general.getMotd()));
         general.setSubMotd(this.getPropertyString("sub-motd", general.getSubMotd()));
         general.setServerPort(this.getPropertyInt("server-port", general.getServerPort()));
@@ -66,7 +66,7 @@ public class LegacyPropertiesConverter {
         general.getMultiversion().setMaxProtocol(this.getPropertyInt("multiversion-max-protocol", general.getMultiversion().getMaxProtocol()));
 
         // Network Settings
-        var network = settings.getNetworkSettings();
+        var network = settings.getNetwork();
         network.setXboxAuth(this.getPropertyBoolean("xbox-auth", network.isXboxAuth()));
         network.setXboxAuthTempIpBan(this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", network.isXboxAuthTempIpBan()));
         network.setStrongIpBans(this.getPropertyBoolean("strong-ip-bans", network.isStrongIpBans()));
@@ -89,7 +89,7 @@ public class LegacyPropertiesConverter {
         network.getCompression().setUseSnappyCompression(this.getPropertyBoolean("use-snappy-compression", network.getCompression().isUseSnappyCompression()));
 
         // World Settings
-        var world = settings.getWorldSettings();
+        var world = settings.getWorld();
         world.setDefaultWorldName(this.getPropertyString("level-name", world.getDefaultWorldName()));
         world.setDefaultWorldSeed(this.getPropertyString("level-seed", world.getDefaultWorldSeed()));
         world.setDefaultWorldType(this.getPropertyString("level-type", world.getDefaultWorldType()));
@@ -97,7 +97,7 @@ public class LegacyPropertiesConverter {
         world.setLoadAllWorlds(this.getPropertyBoolean("load-all-worlds", world.isLoadAllWorlds()));
         world.setViewDistance(this.getPropertyInt("view-distance", world.getViewDistance()));
         world.setSpawnProtection(this.getPropertyInt("spawn-protection", world.getSpawnProtection()));
-        world.setDifficulty(this.getPropertyInt("difficulty", world.getDifficulty()));
+        world.setDifficulty(this.getPropertyString("difficulty", world.getDifficulty()));
         world.setAllowPvp(this.getPropertyBoolean("pvp", world.isAllowPvp()));
         world.setEnableHardcore(this.getPropertyBoolean("hardcore", world.isEnableHardcore()));
         world.setEnableNether(this.getPropertyBoolean("nether", world.isEnableNether()));
@@ -178,7 +178,7 @@ public class LegacyPropertiesConverter {
         world.getFeatures().setEnableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", world.getFeatures().isEnableNewChickenEggsLaying()));
 
         // Player Settings
-        var player = settings.getPlayerSettings();
+        var player = settings.getPlayer();
         player.setDefaultGamemode(this.getPropertyInt("gamemode", player.getDefaultGamemode()));
         player.setForceGamemode(this.getPropertyBoolean("force-gamemode", player.isForceGamemode()));
         player.setAchievements(this.getPropertyBoolean("achievements", player.isAchievements()));
@@ -193,6 +193,7 @@ public class LegacyPropertiesConverter {
         player.setDoNotLimitInteractions(this.getPropertyBoolean("do-not-limit-interactions", player.isDoNotLimitInteractions()));
         player.setPersonaSkins(this.getPropertyBoolean("persona-skins", player.isPersonaSkins()));
         player.setCheckOpMovement(this.getPropertyBoolean("check-op-movement", player.isCheckOpMovement()));
+        player.setCheckOpMovement(this.getPropertyBoolean("allow-flight", player.isAllowFlight()));
         player.setStopInGame(this.getPropertyBoolean("stop-in-game", player.isStopInGame()));
         player.setOpInGame(this.getPropertyBoolean("op-in-game", player.isOpInGame()));
         player.setSpawnEggs(this.getPropertyBoolean("spawn-eggs", player.isSpawnEggs()));
@@ -204,8 +205,8 @@ public class LegacyPropertiesConverter {
         player.setUseClientSpectator(this.getPropertyBoolean("use-client-spectator", player.isUseClientSpectator()));
 
         // Performance Settings
-        var performance = settings.getPerformanceSettings();
-        performance.setAsyncWorkers(this.getPropertyString("async-workers", performance.getAsyncWorkers()));
+        var performance = settings.getPerformance();
+        performance.setAsyncWorkers(this.getPropertyString("async-workers", String.valueOf(performance.getAsyncWorkers())));
         performance.setAutoTickRate(this.getPropertyBoolean("auto-tick-rate", performance.isAutoTickRate()));
         performance.setAutoTickRateLimit(this.getPropertyInt("auto-tick-rate-limit", performance.getAutoTickRateLimit()));
         performance.setBaseTickRate(this.getPropertyInt("base-tick-rate", performance.getBaseTickRate()));

@@ -37,7 +37,7 @@ public class WorldSettings extends OkaeriConfig {
     @CustomKey("spawn-protection")
     private int spawnProtection = 10;
 
-    private int difficulty = 2;
+    private String difficulty = "2";
 
     @CustomKey("allow-pvp")
     private boolean allowPvp = true;

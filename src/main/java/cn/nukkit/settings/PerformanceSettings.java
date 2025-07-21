@@ -10,7 +10,7 @@ import lombok.Setter;
 public class PerformanceSettings extends OkaeriConfig {
 
     @CustomKey("async-workers")
-    private String asyncWorkers = "auto";
+    private Object asyncWorkers = "auto";
 
     @CustomKey("auto-tick-rate")
     private boolean autoTickRate = true;
