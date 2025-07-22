@@ -49,7 +49,6 @@ public class LegacyPropertiesConverter {
         general.shutdownMessage(this.getPropertyString("shutdown-message", general.shutdownMessage()));
         general.bstatsMetrics(this.getPropertyBoolean("bstats-metrics", general.bstatsMetrics()));
         general.debugLevel(this.getPropertyInt("debug-level", general.debugLevel()));
-        general.deprecatedVerbose(this.getPropertyBoolean("deprecated-verbose", general.deprecatedVerbose()));
         general.enableSpark(this.getPropertyBoolean("enable-spark", general.enableSpark()));
         general.useWaterdog(this.getPropertyBoolean("use-waterdog", general.useWaterdog()));
         general.serverAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.serverAuthoritativeMovement()));
