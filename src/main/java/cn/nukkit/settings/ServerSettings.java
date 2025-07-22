@@ -2,7 +2,6 @@ package cn.nukkit.settings;
 
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
-import eu.okaeri.configs.annotation.CustomKey;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -22,7 +21,7 @@ public class ServerSettings extends OkaeriConfig {
     @Comment("World-related settings")
     private WorldSettings world = new WorldSettings();
 
-    @CustomKey("features")
+    @Comment("Switchable server features")
     private FeaturesSettings features = new FeaturesSettings();
 
     @Comment("Player-related settings")

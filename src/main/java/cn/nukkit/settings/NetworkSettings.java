@@ -1,6 +1,7 @@
 package cn.nukkit.settings;
 
 import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.configs.annotation.Comment;
 import eu.okaeri.configs.annotation.CustomKey;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,9 +17,11 @@ import java.util.UUID;
 public class NetworkSettings extends OkaeriConfig {
 
     @CustomKey("xbox-auth")
+    @Comment("Enable authorization by Xbox (for Waterdog this parameter should be disabled)")
     private boolean xboxAuth = true;
 
     @CustomKey("xbox-auth-temp-ip-ban-on-failed")
+    @Comment("Will the player be temporarily blocked when the Xbox authorization fails")
     private boolean xboxAuthTempIpBan = false;
 
     @CustomKey("strong-ip-bans")
@@ -34,17 +37,22 @@ public class NetworkSettings extends OkaeriConfig {
     private int timeoutMilliseconds = 25000;
 
     @CustomKey("enable-query")
+    @Comment("Enable query sending")
     private boolean enableQuery = true;
 
     @CustomKey("query-plugins")
+    @Comment("Enable display of plugins list in query")
     private boolean queryPlugins = false;
 
+    @Comment("Connection encryption (recommended if proxy is not used)")
     private boolean encryption;
 
     @Setter(value = AccessLevel.NONE)
+    @Comment("RCON settings")
     private RconSettings rcon = new RconSettings();
 
     @Setter(value = AccessLevel.NONE)
+    @Comment("Compression settings")
     private CompressionSettings compression = new CompressionSettings();
 
     @Getter
