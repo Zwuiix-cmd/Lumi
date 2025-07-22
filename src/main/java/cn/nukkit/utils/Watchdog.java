@@ -1,7 +1,6 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.Server;
-import cn.nukkit.utils.bugreport.BugReportGenerator;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
@@ -65,10 +64,6 @@ public class Watchdog extends Thread {
                         dumpThread(threads[i], logger, log);
                     }
                     print("---------------------------------------------", logger, log);
-                    try {
-                        new BugReportGenerator(log.toString()).start();
-                        Thread.sleep(1000); // Wait for the report to be sent
-                    } catch (Exception ignored) {}
                     responding = false;
                     this.server.forceShutdown("\u00A7cServer stopped responding");
                 }

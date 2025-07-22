@@ -67,12 +67,6 @@ public class GeneralSettings extends OkaeriConfig {
     @CustomKey("server-authoritative-block-breaking")
     private boolean serverAuthoritativeBlockBreaking = true;
 
-    @CustomKey("automatic-bug-report")
-    private boolean automaticBugReport = true;
-
-    @CustomKey("hastebin-token")
-    private String hastebinToken = "";
-
     @Setter(value = AccessLevel.NONE)
     private MultiversionSettings multiversion = new MultiversionSettings();
 

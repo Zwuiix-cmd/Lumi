@@ -33,7 +33,10 @@ import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
-import cn.nukkit.level.*;
+import cn.nukkit.level.EnumLevel;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
@@ -79,23 +82,18 @@ import cn.nukkit.scoreboard.manager.IScoreboardManager;
 import cn.nukkit.scoreboard.manager.ScoreboardManager;
 import cn.nukkit.scoreboard.storage.JSONScoreboardStorage;
 import cn.nukkit.settings.ServerSettings;
-import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.settings.converter.LegacyPropertiesConverter;
 import cn.nukkit.settings.initializer.ServerSettingsConfigInitializer;
 import cn.nukkit.utils.*;
-import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import eu.okaeri.configs.ConfigManager;
 import io.netty.buffer.ByteBuf;
-import io.sentry.Sentry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.cloudburstmc.netty.channel.raknet.RakConstants;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
@@ -266,17 +264,6 @@ public class Server {
             debugLvl = 2;
         }
         Nukkit.DEBUG = debugLvl;
-
-        if (settings.general().automaticBugReport()) {
-            ExceptionHandler.registerExceptionHandler();
-            Sentry.init(options -> {
-                options.setDsn("https://b61b4bfc0057480e9644111aa4e78844@o4504694990700544.ingest.sentry.io/4504694992535552");
-                options.setTracesSampleRate(0.8); //错误报告率 0.0-1.0
-                options.setDebug(false);
-                options.setTag("nukkit_version", Nukkit.VERSION);
-                options.setTag("branch", Nukkit.getBranch());
-            });
-        }
 
         if (!new File(dataPath + "players/").exists() && settings.player().savePlayerData()) {
             new File(dataPath + "players/").mkdirs();
