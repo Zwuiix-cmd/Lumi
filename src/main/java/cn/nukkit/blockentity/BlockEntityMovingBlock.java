@@ -82,4 +82,9 @@ public class BlockEntityMovingBlock extends BlockEntitySpawnable {
                         .putInt("meta", this.block.getDamage())
                 );
     }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return true;
+    }
 }
