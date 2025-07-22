@@ -29,6 +29,7 @@ public class WorldSettings extends OkaeriConfig {
     private String defaultWorldType = "default";
 
     @CustomKey("generator-settings")
+    @Comment("Settings for selected world generator")
     private String generatorSettings = "";
 
     @CustomKey("load-all-worlds")
@@ -61,9 +62,11 @@ public class WorldSettings extends OkaeriConfig {
     private boolean explosionBreakBlocks;
 
     @CustomKey("multi-nether-worlds")
+    @Comment("Ability to have separate nether world for every other overworld")
     private List<String> multiNetherWorlds = new ArrayList<>();
 
     @CustomKey("portal-ticks")
+    @Comment("Time in ticks before player will be teleported to another dimension in portal")
     private int portalTicks = 80;
 
     @CustomKey("do-not-tick-worlds")
@@ -141,7 +144,8 @@ public class WorldSettings extends OkaeriConfig {
         private boolean mobAi = true;
 
         @CustomKey("worlds-entity-spawning-disabled")
-        private String worldsEntitySpawningDisabled = "";
+        @Comment("List of worlds where entity shouldn't spawn")
+        private List<String> worldsEntitySpawningDisabled = new ArrayList<>();
     }
 
     @Getter

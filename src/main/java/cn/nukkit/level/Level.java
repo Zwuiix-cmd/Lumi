@@ -4624,9 +4624,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isMobSpawningAllowed() {
-        //TODO: fix
-        return true;
-        //return !Server.getSettings().world().worldsE.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
+        return !Server.getInstance().getSettings().world().entity().worldsEntitySpawningDisabled().contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {
