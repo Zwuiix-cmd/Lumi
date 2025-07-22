@@ -7,7 +7,6 @@ import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.entity.mob.EntityZombiePigman;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -85,17 +84,17 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable, En
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (item.getId() == Item.CARROT && !this.isBaby() && !this.isInLoveCooldown()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.CARROT)));
             this.setInLove();
             return true;
         } else if (item.getId() == Item.POTATO && !this.isBaby() && !this.isInLoveCooldown()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.POTATO)));
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.POTATO)));
             this.setInLove();
             return true;
         } else if (item.getId() == Item.BEETROOT && !this.isBaby() && !this.isInLoveCooldown()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.BEETROOT)));
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.BEETROOT)));
             this.setInLove();
             return true;
         } else if (item.getId() == Item.SADDLE && !this.isSaddled() && !this.isBaby() && !this.isInLoveCooldown()) {
@@ -285,18 +284,6 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable, En
 
             updatePassengerPosition(passenger);
         }
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        boolean attack = super.attack(source);
-        if (attack && this.isSaddled() && source.getCause() == EntityDamageEvent.DamageCause.FALL && source.getFinalDamage() >= 2 && !this.passengers.isEmpty()) {
-            Entity p = this.passengers.get(0);
-            if (p instanceof Player player) {
-                player.awardAchievement("flyPig");
-            }
-        }
-        return attack;
     }
 
     @Override

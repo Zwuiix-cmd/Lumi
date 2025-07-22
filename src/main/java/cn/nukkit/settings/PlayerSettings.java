@@ -18,11 +18,6 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("force-gamemode")
     private boolean forceGamemode = true;
 
-    private boolean achievements = false;
-
-    @CustomKey("announce-player-achievements")
-    private boolean announcePlayerAchievements = false;
-
     private boolean whitelist = false;
 
     @CustomKey("whitelist-reason")

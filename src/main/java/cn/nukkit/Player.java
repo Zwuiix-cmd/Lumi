@@ -198,7 +198,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public Vector3 speed = null;
 
     private final Queue<Vector3> clientMovements = PlatformDependent.newMpscQueue(4);
-    public final HashSet<String> achievements = new HashSet<>();
 
     public int craftingType = CRAFTING_SMALL;
 
@@ -852,14 +851,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this;
     }
 
-    public void removeAchievement(String achievementId) {
-        achievements.remove(achievementId);
-    }
-
-    public boolean hasAchievement(String achievementId) {
-        return achievements.contains(achievementId);
-    }
-
     public boolean isConnected() {
         return connected;
     }
@@ -1470,34 +1461,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public Vector3 getSleepingPos() {
         return this.sleeping;
-    }
-
-    public boolean awardAchievement(String achievementId) {
-        if (server.getSettings().player().achievements()) {
-            Achievement achievement = Achievement.achievements.get(achievementId);
-
-            if (achievement == null || hasAchievement(achievementId)) {
-                return false;
-            }
-
-            for (String id : achievement.requires) {
-                if (!this.hasAchievement(id)) {
-                    return false;
-                }
-            }
-            PlayerAchievementAwardedEvent event = new PlayerAchievementAwardedEvent(this, achievementId);
-            this.server.getPluginManager().callEvent(event);
-
-            if (event.isCancelled()) {
-                return false;
-            }
-
-            this.achievements.add(achievementId);
-            achievement.broadcast(this);
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -2705,17 +2668,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.fogStack.add(i, new PlayerFogPacket.Fog(Identifier.tryParse(fogIdentifiers.get(i).data), userProvidedFogIds.get(i).data));
         }
 
-
-        for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
-            if (!(achievement instanceof ByteTag)) {
-                continue;
-            }
-
-            if (((ByteTag) achievement).getData() > 0) {
-                this.achievements.add(achievement.getName());
-            }
-        }
-
         nbt.putLong("lastPlayed", System.currentTimeMillis() / 1000);
 
         UUID uuid = getUniqueId();
@@ -3838,7 +3790,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } else if (this.protocol >= 407) {
                                 if (this.inventory.open(this)) {
                                     this.inventoryOpen = true;
-                                    this.awardAchievement("openInventory");
                                 }
                             }
                         } else if (Nukkit.DEBUG > 1) {
@@ -5424,13 +5375,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         .putString("SpawnBlockLevel", this.spawnBlockPosition.getLevel().getFolderName());
             }
 
-            CompoundTag achievements = new CompoundTag();
-            for (String achievement : this.achievements) {
-                achievements.putByte(achievement, 1);
-            }
-
-            this.namedTag.putCompound("Achievements", achievements);
-
             this.namedTag.putInt("playerGameType", this.gamemode);
             this.namedTag.putLong("lastPlayed", System.currentTimeMillis() / 1000);
 
@@ -6976,11 +6920,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.server.getPluginManager().callEvent(ev = new InventoryPickupItemEvent(this.inventory, (EntityItem) entity));
                         if (ev.isCancelled()) {
                             return false;
-                        }
-
-                        switch (item.getId()) {
-                            case Item.WOOD, Item.WOOD2 -> this.awardAchievement("mineWood");
-                            case Item.DIAMOND -> this.awardAchievement("diamond");
                         }
 
                         TakeItemEntityPacket pk = new TakeItemEntityPacket();

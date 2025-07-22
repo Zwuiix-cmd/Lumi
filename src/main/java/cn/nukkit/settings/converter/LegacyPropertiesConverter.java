@@ -140,7 +140,7 @@ public class LegacyPropertiesConverter {
         // Worlds with disabled entity spawning
         String worldsEntitySpawningDisabled = this.getPropertyString("worlds-entity-spawning-disabled", "");
         if (!worldsEntitySpawningDisabled.isEmpty()) {
-            world.entity().worldsEntitySpawningDisabled((Arrays.asList(worldsEntitySpawningDisabled.split(","))));
+            world.entity().worldsEntitySpawningDisabled(Arrays.asList(worldsEntitySpawningDisabled.split(",")));
         }
 
         // Chunk Settings
@@ -189,8 +189,6 @@ public class LegacyPropertiesConverter {
         var player = settings.player();
         player.defaultGamemode(this.getPropertyInt("gamemode", player.defaultGamemode()));
         player.forceGamemode(this.getPropertyBoolean("force-gamemode", player.forceGamemode()));
-        player.achievements(this.getPropertyBoolean("achievements", player.achievements()));
-        player.announcePlayerAchievements(this.getPropertyBoolean("announce-player-achievements", player.announcePlayerAchievements()));
         player.whitelist(this.getPropertyBoolean("white-list", player.whitelist()));
         player.whitelistReason(this.getPropertyString("whitelist-reason", player.whitelistReason()));
         player.savePlayerData(this.getPropertyBoolean("save-player-data", player.savePlayerData()));
