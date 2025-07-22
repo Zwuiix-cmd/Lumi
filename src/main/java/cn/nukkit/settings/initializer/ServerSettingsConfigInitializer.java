@@ -1,6 +1,8 @@
 package cn.nukkit.settings.initializer;
 
 import cn.nukkit.settings.transformer.DifficultyTransformer;
+import cn.nukkit.settings.transformer.ServerAuthoritativeMovementTransformer;
+import cn.nukkit.settings.transformer.SpaceNameModeTransformer;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.OkaeriConfigInitializer;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
@@ -19,6 +21,8 @@ public class ServerSettingsConfigInitializer implements OkaeriConfigInitializer 
         config.withBindFile(path);
         config.withSerdesPack(registry -> {
             registry.register(new DifficultyTransformer());
+            registry.register(new ServerAuthoritativeMovementTransformer());
+            registry.register(new SpaceNameModeTransformer());
         });
         config.withRemoveOrphans(true);
         config.saveDefaults();
