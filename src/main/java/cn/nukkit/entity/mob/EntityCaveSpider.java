@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
@@ -72,8 +73,9 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
 
                 EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
 
-                if (player.attack(ev) && !ev.isCancelled() && this.server.getDifficulty() > 0) {
-                    player.addEffect(Effect.get(EffectType.POISON).setDuration(this.server.getDifficulty() > 1 ? 300 : 140), EntityEffectUpdateEvent.Cause.ATTACK);
+                Difficulty difficulty = this.server.getDifficulty();
+                if (player.attack(ev) && !ev.isCancelled() && difficulty != Difficulty.PEACEFUL) {
+                    player.addEffect(Effect.get(EffectType.POISON).setDuration(difficulty.ordinal() > 1 ? 300 : 140), EntityEffectUpdateEvent.Cause.ATTACK);
                 }
             }
         }

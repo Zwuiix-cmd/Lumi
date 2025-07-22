@@ -1,5 +1,6 @@
 package cn.nukkit.settings;
 
+import cn.nukkit.Difficulty;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
 import eu.okaeri.configs.annotation.CustomKey;
@@ -39,7 +40,7 @@ public class WorldSettings extends OkaeriConfig {
     @CustomKey("spawn-protection")
     private int spawnProtection = 10;
 
-    private String difficulty = "2";
+    private Difficulty difficulty = Difficulty.NORMAL;
 
     @CustomKey("allow-pvp")
     private boolean allowPvp = true;

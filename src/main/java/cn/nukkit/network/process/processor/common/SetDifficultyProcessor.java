@@ -1,5 +1,6 @@
 package cn.nukkit.network.process.processor.common;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.Server;
@@ -28,9 +29,14 @@ public class SetDifficultyProcessor extends DataPacketProcessor<SetDifficultyPac
         if (!player.spawned || !player.hasPermission("nukkit.command.difficulty")) {
             return;
         }
-        player.getServer().setDifficulty(pk.difficulty);
+        Difficulty difficulty = Difficulty.byId(pk.difficulty);
+        if (difficulty == null) {
+            return;
+        }
+        player.getServer().setDifficulty(difficulty);
+
         SetDifficultyPacket difficultyPacket = new SetDifficultyPacket();
-        difficultyPacket.difficulty = player.getServer().getDifficulty();
+        difficultyPacket.difficulty = difficulty.ordinal();
         Server.broadcastPacket(player.getServer().getOnlinePlayers().values(), difficultyPacket);
         Command.broadcastCommandMessage(player, new TranslationContainer("commands.difficulty.success", String.valueOf(player.getServer().getDifficulty())));
     }

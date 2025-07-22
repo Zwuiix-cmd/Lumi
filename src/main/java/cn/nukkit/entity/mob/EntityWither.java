@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
@@ -163,7 +164,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
+        if (this.server.getDifficulty() == Difficulty.PEACEFUL) {
             this.close();
             return true;
         }
@@ -244,14 +245,11 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     }
 
     private int witherMaxHealth() {
-        switch (this.getServer().getDifficulty()) {
-            case 2:
-                return 450;
-            case 3:
-                return 600;
-            default:
-                return 300;
-        }
+        return switch (this.getServer().getDifficulty()) {
+            case NORMAL -> 450;
+            case HARD -> 600;
+            default -> 300;
+        };
     }
 
     private void explode() {

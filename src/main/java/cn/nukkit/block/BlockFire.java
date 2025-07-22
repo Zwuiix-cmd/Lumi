@@ -158,7 +158,7 @@ public class BlockFire extends BlockFlowable {
                 this.tryToCatchBlockOnFire(this.getSideIfLoaded(BlockFace.SOUTH), 300 + o, meta);
                 this.tryToCatchBlockOnFire(this.getSideIfLoaded(BlockFace.NORTH), 300 + o, meta);
 
-                int dif = 40 + this.getLevel().getServer().getDifficulty() * 7;
+                int dif = 40 + this.getLevel().getServer().getDifficulty().getId() * 7;
 
                 for (int x = (int) (this.x - 1); x <= (int) (this.x + 1); ++x) {
                     for (int z = (int) (this.z - 1); z <= (int) (this.z + 1); ++z) {

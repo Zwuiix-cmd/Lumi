@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
@@ -29,7 +30,7 @@ public class BlockWitherRose extends BlockFlower {
 
     @Override
     public void onEntityCollide(Entity entity) {
-        if (level.getServer().getDifficulty() != 0 && entity instanceof EntityLiving living) {
+        if (level.getServer().getDifficulty() != Difficulty.PEACEFUL && entity instanceof EntityLiving living) {
             if (!living.invulnerable && !living.hasEffect(EffectType.WITHER)
                     && (!(living instanceof Player) || !((Player) living).isCreative() && !((Player) living).isSpectator())) {
                 Effect effect = Effect.get(EffectType.WITHER);

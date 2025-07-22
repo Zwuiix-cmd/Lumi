@@ -1,5 +1,6 @@
 package cn.nukkit.command.defaults;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandEnum;
@@ -34,32 +35,29 @@ public class DifficultyCommand extends VanillaCommand {
     @Override
     public int execute(CommandSender sender, String commandLabel, Map.Entry<String, ParamList> result, CommandLogger log) {
         var list = result.getValue();
-        int difficulty;
-        switch (result.getKey()) {
-            case "default" -> {
-                difficulty = list.getResult(0);
-            }
-            case "byString" -> {
-                String str = list.getResult(0);
-                difficulty = Server.getDifficultyFromString(str);
-            }
-            default -> {
-                return 0;
-            }
-        }
-        if (sender.getServer().getSettings().world().enableHardcore()) {
-            difficulty = 3;
-        }
-        if (difficulty != -1) {
-            sender.getServer().setDifficulty(difficulty);
-            SetDifficultyPacket pk = new SetDifficultyPacket();
-            pk.difficulty = sender.getServer().getDifficulty();
-            Server.broadcastPacket(new ArrayList<>(sender.getServer().getOnlinePlayers().values()), pk);
-            log.addSuccess("commands.difficulty.success", String.valueOf(difficulty)).output(true);
-            return 1;
-        } else {
+
+        Difficulty difficulty = switch (result.getKey()) {
+            case "default" -> Difficulty.byId(list.getResult(0));
+            case "byString" -> Difficulty.byName(list.getResult(0));
+            default -> null;
+        };
+
+        if (difficulty == null) {
             log.addSyntaxErrors(0).output();
             return 0;
         }
+
+        if (Server.getInstance().getSettings().world().enableHardcore()) {
+            difficulty = Difficulty.HARD;
+        }
+
+        Server.getInstance().setDifficulty(difficulty);
+
+        SetDifficultyPacket packet = new SetDifficultyPacket();
+        packet.difficulty = difficulty.ordinal();
+        Server.broadcastPacket(new ArrayList<>(Server.getInstance().getOnlinePlayers().values()), packet);
+
+        log.addSuccess("commands.difficulty.success", String.valueOf(difficulty)).output(true);
+        return 1;
     }
 }

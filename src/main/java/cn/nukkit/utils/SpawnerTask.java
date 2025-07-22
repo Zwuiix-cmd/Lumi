@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
@@ -354,8 +355,8 @@ public class SpawnerTask implements Runnable {
             case EntityWitch.NETWORK_ID:
                 return end || nether ? 0 : 1;
             case EntityPhantom.NETWORK_ID:
-                int difficulty = Server.getInstance().getDifficulty();
-                return end || nether ? 0 : difficulty == 1 ? 2 : difficulty == 2 ? 3 : 4;
+                Difficulty difficulty = Server.getInstance().getDifficulty();
+                return end || nether ? 0 : difficulty == Difficulty.EASY ? 2 : difficulty == Difficulty.NORMAL ? 3 : 4;
             default:
                 return end || nether ? 0 : 2;
         }

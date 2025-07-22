@@ -1,5 +1,6 @@
 package cn.nukkit.settings.converter;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.settings.PlayerSettings;
 import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.WorldSettings;
@@ -94,7 +95,9 @@ public class LegacyPropertiesConverter {
         world.loadAllWorlds(this.getPropertyBoolean("load-all-worlds", world.loadAllWorlds()));
         world.viewDistance(this.getPropertyInt("view-distance", world.viewDistance()));
         world.spawnProtection(this.getPropertyInt("spawn-protection", world.spawnProtection()));
-        world.difficulty(this.getPropertyString("difficulty", world.difficulty()));
+        world.difficulty(Difficulty.byName(
+                this.getPropertyString("difficulty", world.difficulty().getLowerName())
+        ));
         world.allowPvp(this.getPropertyBoolean("pvp", world.allowPvp()));
         world.enableHardcore(this.getPropertyBoolean("hardcore", world.enableHardcore()));
         world.enableNether(this.getPropertyBoolean("nether", world.enableNether()));

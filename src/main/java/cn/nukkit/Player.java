@@ -2105,7 +2105,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.riding == null && this.inventory != null) {
-            if (this.getFoodData().isEnabled() && this.getServer().getDifficulty() > 0 && distanceSquared >= 0.05) {
+            if (this.getFoodData().isEnabled() && this.server.getDifficulty() != Difficulty.PEACEFUL && distanceSquared >= 0.05) {
                 double jump = 0;
                 double swimming = this.isInsideOfWater() ? 0.015 * distanceSquared : 0;
                 double distance2 = distanceSquared;
@@ -2330,7 +2330,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.entityBaseTick(tickDiff);
 
-            if (this.getServer().getDifficulty() == 0 && this.level.getGameRules().getBoolean(GameRule.NATURAL_REGENERATION)) {
+            if (this.server.getDifficulty() == Difficulty.PEACEFUL && this.level.getGameRules().getBoolean(GameRule.NATURAL_REGENERATION)) {
                 if (this.getHealth() < this.getMaxHealth() && this.age % 20 == 0) {
                     this.heal(1);
                 }
@@ -2797,7 +2797,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.pitch = (float) this.pitch;
         startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
         startGamePacket.worldGamemode = this.getClientFriendlyGamemode(this.gamemode);
-        startGamePacket.difficulty = this.server.getDifficulty();
+        startGamePacket.difficulty = this.server.getDifficulty().getId();
         startGamePacket.spawnX = (int) this.x;
         startGamePacket.spawnY = (int) this.y;
         startGamePacket.spawnZ = (int) this.z;
@@ -2894,7 +2894,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getLevel().sendTime(this);
 
             SetDifficultyPacket difficultyPacket = new SetDifficultyPacket();
-            difficultyPacket.difficulty = this.server.getDifficulty();
+            difficultyPacket.difficulty = this.server.getDifficulty().getId();
             this.dataPacket(difficultyPacket);
 
             SetCommandsEnabledPacket commandsPacket = new SetCommandsEnabledPacket();
@@ -7463,7 +7463,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return can eat
      */
     public boolean canEat(boolean update) {
-        if (this.foodData.isHungry() || this.isCreative() || this.server.getDifficulty() == 0) {
+        if (this.foodData.isHungry() || this.isCreative() || this.server.getDifficulty() == Difficulty.PEACEFUL) {
             return true;
         }
         if (update) {

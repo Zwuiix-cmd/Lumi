@@ -127,7 +127,7 @@ public class PlayerFood {
     }
 
     public void exhaust(double amount) {
-        if (!this.isEnabled() || Server.getInstance().getDifficulty() == 0 || player.hasEffect(EffectType.SATURATION)) {
+        if (!this.isEnabled() || Server.getInstance().getDifficulty() == Difficulty.PEACEFUL || player.hasEffect(EffectType.SATURATION)) {
             return;
         }
 
@@ -176,9 +176,9 @@ public class PlayerFood {
             this.foodTickTimer = 0;
         }
 
-        int difficulty = Server.getInstance().getDifficulty();
+        Difficulty difficulty = Server.getInstance().getDifficulty();
 
-        if (difficulty == 0 && this.foodTickTimer % 10 == 0) {
+        if (difficulty == Difficulty.PEACEFUL && this.foodTickTimer % 10 == 0) {
             if (this.isHungry()) {
                 this.addFood(1, 0);
             }
@@ -194,7 +194,7 @@ public class PlayerFood {
                     this.exhaust(6);
                 }
             } else if (food <= 0) {
-                if ((difficulty == 1 && health > 10) || (difficulty == 2 && health > 1) || difficulty == 3) {
+                if ((difficulty == Difficulty.PEACEFUL && health > 10) || (difficulty == Difficulty.NORMAL && health > 1) || difficulty == Difficulty.HARD) {
                     this.player.attack(new EntityDamageEvent(this.player, EntityDamageEvent.DamageCause.HUNGER, 1));
                 }
             }

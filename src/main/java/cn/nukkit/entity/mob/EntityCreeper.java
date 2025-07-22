@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -91,7 +92,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             return false;
         }
 
-        if (this.server.getDifficulty() < 1) {
+        if (this.server.getDifficulty() == Difficulty.PEACEFUL) {
             this.close();
             return false;
         }

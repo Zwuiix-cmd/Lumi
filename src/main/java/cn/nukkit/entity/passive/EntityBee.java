@@ -1,5 +1,6 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntityBeehive;
 import cn.nukkit.entity.Entity;
@@ -83,9 +84,9 @@ public class EntityBee extends EntityFlyingMob implements EntityArthropod { // A
                                 damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
             }
             if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
-                if (this.getServer().getDifficulty() == 2) {
+                if (this.server.getDifficulty() == Difficulty.NORMAL) {
                     player.addEffect(Effect.get(EffectType.POISON).setDuration(200), EntityEffectUpdateEvent.Cause.ATTACK);
-                } else if (this.getServer().getDifficulty() == 3) {
+                } else if (this.server.getDifficulty() == Difficulty.HARD) {
                     player.addEffect(Effect.get(EffectType.POISON).setDuration(360), EntityEffectUpdateEvent.Cause.ATTACK);
                 }
             }

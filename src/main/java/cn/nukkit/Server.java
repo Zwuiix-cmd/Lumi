@@ -327,10 +327,8 @@ public class Server {
 
         this.setAutoSave(settings.world().autoSave().enable());
 
-        if (this.settings.world().enableHardcore() && this.getDifficulty() < 3) {
-            this.setDifficulty(3);
-        } else {
-            this.setDifficulty(getDifficultyFromString(settings.world().difficulty()));
+        if (this.settings.world().enableHardcore() && this.getDifficulty() != Difficulty.HARD) {
+            this.setDifficulty(Difficulty.HARD);
         }
 
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
@@ -660,8 +658,8 @@ public class Server {
         log.info("Reloading server settings...");
         this.settings.load();
 
-        if (this.settings.world().enableHardcore() && this.getDifficulty() < 3) {
-            this.setDifficulty(3);
+        if (this.settings.world().enableHardcore() && this.getDifficulty() != Difficulty.HARD) {
+            this.setDifficulty(Difficulty.HARD);
         }
 
         this.banByIP.load();
@@ -1195,12 +1193,12 @@ public class Server {
         this.settings.general().maxPlayers(maxPlayers);
     }
 
-    public int getDifficulty() {
-        return getDifficultyFromString(this.settings.world().difficulty());
+    public Difficulty getDifficulty() {
+        return this.settings.world().difficulty();
     }
 
-    public void setDifficulty(int difficulty) {
-        this.settings.world().difficulty(String.valueOf(difficulty));
+    public void setDifficulty(Difficulty difficulty) {
+        this.settings.world().difficulty(difficulty);
     }
 
     public int getPort() {
@@ -1254,16 +1252,6 @@ public class Server {
             case "1", "creative", "c" -> Player.CREATIVE;
             case "2", "adventure", "a" -> Player.ADVENTURE;
             case "3", "spectator", "spc", "view", "v" -> Player.SPECTATOR;
-            default -> -1;
-        };
-    }
-
-    public static int getDifficultyFromString(String str) {
-        return switch (str.trim().toLowerCase(Locale.ROOT)) {
-            case "0", "peaceful", "p" -> 0;
-            case "1", "easy", "e" -> 1;
-            case "2", "normal", "n" -> 2;
-            case "3", "hard", "h" -> 3;
             default -> -1;
         };
     }
