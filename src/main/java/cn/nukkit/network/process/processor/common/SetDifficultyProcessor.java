@@ -38,7 +38,7 @@ public class SetDifficultyProcessor extends DataPacketProcessor<SetDifficultyPac
         SetDifficultyPacket difficultyPacket = new SetDifficultyPacket();
         difficultyPacket.difficulty = difficulty.ordinal();
         Server.broadcastPacket(player.getServer().getOnlinePlayers().values(), difficultyPacket);
-        Command.broadcastCommandMessage(player, new TranslationContainer("commands.difficulty.success", String.valueOf(player.getServer().getDifficulty())));
+        Command.broadcastCommandMessage(player, new TranslationContainer("commands.difficulty.success", difficulty.getTranslationKey()));
     }
 
     @Override

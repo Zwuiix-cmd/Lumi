@@ -57,7 +57,7 @@ public class DifficultyCommand extends VanillaCommand {
         packet.difficulty = difficulty.ordinal();
         Server.broadcastPacket(new ArrayList<>(Server.getInstance().getOnlinePlayers().values()), packet);
 
-        log.addSuccess("commands.difficulty.success", String.valueOf(difficulty)).output(true);
+        log.addSuccess("commands.difficulty.success", difficulty.getTranslationKey()).output(true);
         return 1;
     }
 }
