@@ -23,7 +23,7 @@ public class NukkitMetrics {
         metrics.addCustomChart(new Metrics.SingleLineChart("players", server::getOnlinePlayersCount));
         metrics.addCustomChart(new Metrics.SimplePie("codename", () -> "Lumi"));
         metrics.addCustomChart(new Metrics.SimplePie("nukkit_version", () -> "Lumi " + Nukkit.API_VERSION));
-        metrics.addCustomChart(new Metrics.SimplePie("xbox_auth", () -> server.xboxAuth ? "Required" : "Not required"));
+        metrics.addCustomChart(new Metrics.SimplePie("xbox_auth", () -> server.getSettings().network().xboxAuth() ? "Required" : "Not required"));
 
         metrics.addCustomChart(new Metrics.AdvancedPie("player_platform", () -> {
             Map<String, Integer> valueMap = new HashMap<>();

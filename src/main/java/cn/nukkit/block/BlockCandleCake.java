@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemCake;
@@ -136,7 +137,7 @@ public class BlockCandleCake extends BlockTransparentMeta {
             this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
             this.getLevel().setBlock(this, this, true, true);
             return true;
-        } else if (player != null && (player.getFoodData().isHungry() || player.isCreative() || player.getServer().getDifficulty() == 0)) {
+        } else if (player != null && (player.getFoodData().isHungry() || player.isCreative() || player.getServer().getDifficulty() == Difficulty.PEACEFUL)) {
             final Block cake = new BlockCake();
             this.getLevel().setBlock(this, cake, true, true);
             this.getLevel().dropItem(this.add(0.5, 0.5, 0.5), getDrops(null)[0]);

@@ -1,5 +1,6 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;
@@ -49,9 +50,9 @@ public class EntityWitherSkull extends EntityProjectile {
 
     @Override
     protected double getBaseDamage() {
-        return switch (server.getDifficulty()) {
-            case 2 -> 8; // normal
-            case 3 -> 12; // hard
+        return switch (this.server.getDifficulty()) {
+            case NORMAL -> 8; // normal
+            case HARD -> 12; // hard
             default -> 5;
         };
     }

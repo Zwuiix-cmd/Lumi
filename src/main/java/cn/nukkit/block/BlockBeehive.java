@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBeehive;
@@ -123,7 +124,7 @@ public class BlockBeehive extends BlockSolidMeta implements Faceable, BlockEntit
     }
 
     public void honeyCollected(Player player) {
-        honeyCollected(player, level.getServer().getDifficulty() > 0 && !player.isCreative());
+        honeyCollected(player, level.getServer().getDifficulty() != Difficulty.PEACEFUL && !player.isCreative());
     }
 
     public void honeyCollected(Player player, boolean angerBees) {

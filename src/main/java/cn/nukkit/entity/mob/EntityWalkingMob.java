@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
@@ -58,7 +59,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
     @Override
     public int getMinDamage(Integer difficulty) {
         if (difficulty == null || difficulty > 3 || difficulty < 0) {
-            difficulty = Server.getInstance().getDifficulty();
+            difficulty = this.server.getDifficulty().getId();
         }
         return this.minDamage[difficulty];
     }
@@ -71,14 +72,14 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
     @Override
     public int getMaxDamage(Integer difficulty) {
         if (difficulty == null || difficulty > 3 || difficulty < 0) {
-            difficulty = Server.getInstance().getDifficulty();
+            difficulty = this.server.getDifficulty().getId();
         }
         return this.maxDamage[difficulty];
     }
 
     @Override
     public void setDamage(int damage) {
-        this.setDamage(damage, Server.getInstance().getDifficulty());
+        this.setDamage(damage, this.server.getDifficulty().getId());
     }
 
     @Override
@@ -122,7 +123,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     @Override
     public void setMinDamage(int damage) {
-        this.setMinDamage(damage, Server.getInstance().getDifficulty());
+        this.setMinDamage(damage, this.server.getDifficulty().getId());
     }
 
     @Override
@@ -145,7 +146,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     @Override
     public void setMaxDamage(int damage) {
-        this.setMaxDamage(damage, Server.getInstance().getDifficulty());
+        this.setMaxDamage(damage, this.server.getDifficulty().getId());
     }
 
     @Override
@@ -161,7 +162,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
             return false;
         }
 
-        if (this.server.getDifficulty() < 1) {
+        if (this.server.getDifficulty() == Difficulty.PEACEFUL) {
             this.close();
             return false;
         }
@@ -199,7 +200,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     @Override
     public boolean isMeetAttackConditions(Vector3 target) {
-        return this.getServer().getMobAiEnabled() &&
+        return this.getServer().getSettings().world().entity().mobAi() &&
                 target instanceof EntityCreature &&
                 (!this.isFriendly() || !(target instanceof Player) || ((Entity) target).getId() == this.isAngryTo);
     }

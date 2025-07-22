@@ -31,6 +31,7 @@ repositories {
         url = uri("https://repo.lanink.cn/repository/maven-public/")
     }
     mavenCentral()
+    maven("https://storehouse.okaeri.eu/repository/maven-public/")
 }
 
 val log4j2Version = "2.17.1"
@@ -59,6 +60,7 @@ dependencies {
     }
     implementation("org.yaml:snakeyaml:2.0")
     implementation("org.snakeyaml:snakeyaml-engine:2.7")
+    implementation("eu.okaeri:okaeri-configs-yaml-snakeyaml:5.0.9")
     implementation("com.nimbusds:nimbus-jose-jwt:9.37.2")
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.apache.logging.log4j:log4j-api:$log4j2Version")

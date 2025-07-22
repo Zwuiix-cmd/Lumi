@@ -73,12 +73,12 @@ public class RakNetInterface implements AdvancedSourceInterface {
                 .option(RakChannelOption.RAK_GUID, this.serverId)
                 .option(RakChannelOption.RAK_SUPPORTED_PROTOCOLS, new int[]{8, 9, 10, 11})
                 .childOption(RakChannelOption.RAK_ORDERING_CHANNELS, 1)
-                .option(RakChannelOption.RAK_SEND_COOKIE, this.server.enableRakSendCookie)
-                .option(RakChannelOption.RAK_PACKET_LIMIT, this.server.rakPacketLimit)
+                .option(RakChannelOption.RAK_SEND_COOKIE, this.server.getSettings().network().enableRakSendCookie())
+                .option(RakChannelOption.RAK_PACKET_LIMIT, this.server.getSettings().network().rakPacketLimit())
                 .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel channel) {
-                        if (server.getPropertyBoolean("enable-query", false)) {
+                        if (server.getSettings().network().enableQuery()) {
                             channel.pipeline().addLast("query-handler", new SimpleChannelInboundHandler<DatagramPacket>() {
                                 @Override
                                 protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {

@@ -210,7 +210,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        if (this.canDespawn() && this.age > Server.getInstance().mobDespawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
+        int ticksPerEntityDespawns = Server.getInstance().getSettings().world().entity().ticksPerEntityDespawns();
+        if (this.canDespawn() && this.age > ticksPerEntityDespawns && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             return true;
         }
@@ -616,7 +617,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
      * @return can despawn
      */
     public boolean canDespawn() {
-        return Server.getInstance().despawnMobs;
+        return Server.getInstance().getSettings().world().entity().entityDespawnTask();
     }
 
     /**
@@ -700,7 +701,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
      * @return 是否满足
      */
     public boolean isMeetAttackConditions(Vector3 target) {
-        return this.getServer().getMobAiEnabled() && target instanceof Entity;
+        return this.getServer().getSettings().world().entity().mobAi() && target instanceof Entity;
     }
 
     /**

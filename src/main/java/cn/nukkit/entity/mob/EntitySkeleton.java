@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
@@ -144,9 +145,7 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate;
-
-        if (getServer().getDifficulty() == 0) {
+        if (this.server.getDifficulty() == Difficulty.PEACEFUL) {
             this.close();
             return true;
         }

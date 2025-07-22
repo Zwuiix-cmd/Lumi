@@ -62,6 +62,7 @@ import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
+import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.collection.nb.Long2ObjectNonBlockingMap;
 import cn.nukkit.utils.collection.nb.LongObjectEntry;
@@ -358,7 +359,7 @@ public class Level implements ChunkManager, Metadatable {
         this.blockMetadata = new BlockMetadataStore(this);
         this.server = server;
         this.autoSave = server.getAutoSave();
-        this.autoCompaction = server.isAutoCompactionEnabled();
+        this.autoCompaction = server.getSettings().world().worldAutoCompaction();
 
         try {
             this.provider = provider.getConstructor(Level.class, String.class).newInstance(this, path);
@@ -399,12 +400,12 @@ public class Level implements ChunkManager, Metadatable {
         this.levelCurrentTick = levelProvider.getCurrentTick();
         this.updateQueue = new BlockUpdateScheduler(this, levelCurrentTick);
 
-        this.chunkTickRadius = Math.min(this.server.getViewDistance(), Math.max(1, this.server.getPropertyInt("chunk-ticking-radius", 4)));
-        this.chunksPerTicks = this.server.getPropertyInt("chunk-ticking-per-tick", 40);
-        this.chunkGenerationQueueSize = this.server.getPropertyInt("chunk-generation-queue-size", 8);
-        this.chunkPopulationQueueSize = this.server.getPropertyInt("chunk-generation-population-queue-size", 8);
+        this.chunkTickRadius = Math.min(this.server.getSettings().world().viewDistance(), Math.max(1, server.getSettings().world().chunk().tickingRadius()));
+        this.chunksPerTicks = this.server.getSettings().world().chunk().tickingPerTick();
+        this.chunkGenerationQueueSize = this.server.getSettings().world().chunk().generationQueueSize();
+        this.chunkPopulationQueueSize = this.server.getSettings().world().chunk().generationPopulationQueueSize();
         this.chunkTickList.clear();
-        this.clearChunksOnTick = this.server.getPropertyBoolean("clear-chunk-tick-list", true);
+        this.clearChunksOnTick = this.server.getSettings().world().clearChunkTickList();
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
 
@@ -413,20 +414,21 @@ public class Level implements ChunkManager, Metadatable {
         this.isNether = name.equals("nether");
         this.isEnd = name.equals("the_end");
 
-        this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
+        this.randomTickingEnabled = !Server.getInstance().getSettings().world().doNotTickWorlds().contains(name);
 
-        if (Server.antiXrayWorlds.contains(name)) {
+        WorldSettings.AntiXraySettings antiXraySettings = Server.getInstance().getSettings().world().antiXray().get(this.getName());
+        if (antiXraySettings != null) {
             this.antiXraySystem = new AntiXraySystem(this);
-            this.antiXraySystem.setFakeOreDenominator(switch (Server.antiXrayMode) {
+            this.antiXraySystem.setFakeOreDenominator(switch (antiXraySettings.mode()) {
                 case HIGH -> 4;
                 case MEDIUM -> 8;
                 default -> 16;
             });
-            this.antiXraySystem.setPreDeObfuscate(Server.antiXrayPreDeobfuscate);
+            this.antiXraySystem.setPreDeObfuscate(antiXraySettings.preDeobfuscate());
             this.antiXraySystem.reinitAntiXray();
         }
 
-        if (this.server.asyncChunkSending) {
+        if (this.server.getSettings().world().chunk().asyncChunks()) {
             this.asyncChuckExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AsyncChunkThread for " + name).build());
         }
     }
@@ -1064,7 +1066,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (Server.getInstance().lightUpdates) {
+        if (Server.getInstance().getSettings().world().lightUpdates()) {
             this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
         }
 
@@ -1149,9 +1151,9 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (this.server.asyncChunkSending) {
+        if (this.server.getSettings().world().chunk().asyncChunks()) {
             NetworkChunkSerializer.NetworkChunkSerializerCallbackData data;
-            int count = (this.getPlayers().size() + 1) * this.server.chunksPerTick;
+            int count = (this.getPlayers().size() + 1) * this.server.getSettings().world().chunk().sendingPerTick();
             for (int i = 0; i < count && (data = this.asyncChunkRequestCallbackQueue.poll()) != null; ++i) {
                 this.chunkRequestCallback(data.getProtocol(), data.getTimestamp(), data.getX(), data.getZ(), data.getSubChunkCount(), data.getPayload());
             }
@@ -1495,7 +1497,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean save(boolean force) {
-        if ((!this.autoSave || server.holdWorldSave) && !force) {
+        if (!this.autoSave && !force) {
             return false;
         }
 
@@ -2677,106 +2679,104 @@ public class Level implements ChunkManager, Metadatable {
                 return null;
             }
 
-            if (server.mobsFromBlocks) {
-                if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
-                    if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
-                        block.getLevel().setBlock(target, Block.get(BlockID.AIR));
-                        block.getLevel().setBlock(target.add(0, -1, 0), Block.get(BlockID.AIR));
+            if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
+                if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
+                    block.getLevel().setBlock(target, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(target.add(0, -1, 0), Block.get(BlockID.AIR));
 
-                        Position spawnPos = target.add(0.5, -1, 0.5);
+                    Position spawnPos = target.add(0.5, -1, 0.5);
 
-                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, player);
-                        server.getPluginManager().callEvent(ev);
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN, player);
+                    server.getPluginManager().callEvent(ev);
 
-                        if (ev.isCancelled()) {
-                            return null;
-                        }
-
-                        Entity.createEntity("SnowGolem", spawnPos).spawnToAll();
-
-                        if (!player.isCreative()) {
-                            item.setCount(item.getCount() - 1);
-                            player.getInventory().setItemInHand(item);
-                        }
+                    if (ev.isCancelled()) {
                         return null;
-                    } else if (block.getSide(BlockFace.DOWN).getId() == Item.IRON_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.IRON_BLOCK) {
-                        block = block.getSide(BlockFace.DOWN);
-                        Block first, second = null;
-                        if ((first = block.getSide(BlockFace.EAST)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.WEST)).getId() == Item.IRON_BLOCK) {
-                            block.getLevel().setBlock(first, Block.get(BlockID.AIR));
-                            block.getLevel().setBlock(second, Block.get(BlockID.AIR));
-                        } else if ((first = block.getSide(BlockFace.NORTH)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.SOUTH)).getId() == Item.IRON_BLOCK) {
-                            block.getLevel().setBlock(first, Block.get(BlockID.AIR));
-                            block.getLevel().setBlock(second, Block.get(BlockID.AIR));
-                        }
-
-                        if (second != null) {
-                            block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                            block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
-
-                            Position spawnPos = block.add(0.5, -1, 0.5);
-
-                            CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, player);
-                            server.getPluginManager().callEvent(ev);
-
-                            if (ev.isCancelled()) {
-                                return null;
-                            }
-
-                            Entity.createEntity("IronGolem", spawnPos).spawnToAll();
-
-                            if (!player.isCreative()) {
-                                item.setCount(item.getCount() - 1);
-                                player.getInventory().setItemInHand(item);
-                            }
-                            return null;
-                        }
                     }
-                } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
-                    if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
-                        Block first, second;
 
-                        if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL && second.toItem().getDamage() == 1))) {
-                            return null;
-                        }
+                    Entity.createEntity("SnowGolem", spawnPos).spawnToAll();
 
-                        block = block.getSide(BlockFace.DOWN);
-
-                        Block first2, second2;
-
-                        if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
-                            return null;
-                        }
-
+                    if (!player.isCreative()) {
+                        item.setCount(item.getCount() - 1);
+                        player.getInventory().setItemInHand(item);
+                    }
+                    return null;
+                } else if (block.getSide(BlockFace.DOWN).getId() == Item.IRON_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.IRON_BLOCK) {
+                    block = block.getSide(BlockFace.DOWN);
+                    Block first, second = null;
+                    if ((first = block.getSide(BlockFace.EAST)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.WEST)).getId() == Item.IRON_BLOCK) {
                         block.getLevel().setBlock(first, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(second, Block.get(BlockID.AIR));
-                        block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
-                        block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
+                    } else if ((first = block.getSide(BlockFace.NORTH)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.SOUTH)).getId() == Item.IRON_BLOCK) {
+                        block.getLevel().setBlock(first, Block.get(BlockID.AIR));
+                        block.getLevel().setBlock(second, Block.get(BlockID.AIR));
+                    }
+
+                    if (second != null) {
                         block.getLevel().setBlock(block, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
 
                         Position spawnPos = block.add(0.5, -1, 0.5);
 
-                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_WITHER, player);
+                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM, player);
                         server.getPluginManager().callEvent(ev);
 
                         if (ev.isCancelled()) {
                             return null;
                         }
 
+                        Entity.createEntity("IronGolem", spawnPos).spawnToAll();
+
                         if (!player.isCreative()) {
                             item.setCount(item.getCount() - 1);
                             player.getInventory().setItemInHand(item);
                         }
-
-                        player.awardAchievement("spawnWither");
-
-                        EntityWither wither = (EntityWither) Entity.createEntity("Wither", spawnPos);
-                        wither.stayTime = 220;
-                        wither.spawnToAll();
-                        this.addSoundToViewers(wither, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
                         return null;
                     }
+                }
+            } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+                if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
+                    Block first, second;
+
+                    if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL && second.toItem().getDamage() == 1))) {
+                        return null;
+                    }
+
+                    block = block.getSide(BlockFace.DOWN);
+
+                    Block first2, second2;
+
+                    if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
+                        return null;
+                    }
+
+                    block.getLevel().setBlock(first, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(second, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(block, Block.get(BlockID.AIR));
+                    block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
+
+                    Position spawnPos = block.add(0.5, -1, 0.5);
+
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.BUILD_WITHER, player);
+                    server.getPluginManager().callEvent(ev);
+
+                    if (ev.isCancelled()) {
+                        return null;
+                    }
+
+                    if (!player.isCreative()) {
+                        item.setCount(item.getCount() - 1);
+                        player.getInventory().setItemInHand(item);
+                    }
+
+                    player.awardAchievement("spawnWither");
+
+                    EntityWither wither = (EntityWither) Entity.createEntity("Wither", spawnPos);
+                    wither.stayTime = 220;
+                    wither.spawnToAll();
+                    this.addSoundToViewers(wither, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
+                    return null;
                 }
             }
         }
@@ -2824,7 +2824,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isInSpawnRadius(Vector3 vector3) {
-        return server.getSpawnRadius() > -1 && new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= server.getSpawnRadius();
+        return server.getSettings().world().spawnProtection() > -1 &&
+                new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <=
+                        server.getSettings().world().spawnProtection();
     }
 
     public Entity getEntity(long entityId) {
@@ -3690,7 +3692,7 @@ public class Level implements ChunkManager, Metadatable {
     public void chunkRequestCallback(int protocol, long timestamp, int x, int z, int subChunkCount, byte[] payload) {
         long index = Level.chunkHash(x, z);
 
-        if (server.cacheChunks) {
+        if (server.getSettings().world().chunk().cacheChunks()) {
             BatchPacket data = Player.getChunkCacheFromData(protocol, x, z, subChunkCount, payload, this.getDimension());
             BaseFullChunk chunk = getChunkIfLoaded(x, z);
             if (chunk != null && chunk.getChanges() <= timestamp) {
@@ -3812,7 +3814,7 @@ public class Level implements ChunkManager, Metadatable {
 
         chunk.initChunk();
 
-        if (!chunk.isLightPopulated() && chunk.isPopulated() && this.server.lightUpdates) {
+        if (!chunk.isLightPopulated() && chunk.isPopulated() && this.server.getSettings().world().lightUpdates()) {
             this.server.getScheduler().scheduleAsyncTask(InternalPlugin.INSTANCE, new LightPopulationTask(this, chunk));
         }
 
@@ -4127,7 +4129,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void unloadChunks(int maxUnload, boolean force) {
-        if (server.holdWorldSave && !force && this.saveOnUnloadEnabled) {
+        if (!force && this.saveOnUnloadEnabled) {
             return;
         }
 
@@ -4179,7 +4181,7 @@ public class Level implements ChunkManager, Metadatable {
      * @return true if there is allocated time remaining
      */
     private boolean unloadChunks(long now, long allocatedTime, boolean force) {
-        if (server.holdWorldSave && !force && this.saveOnUnloadEnabled) {
+        if (!force && this.saveOnUnloadEnabled) {
             return false;
         }
 
@@ -4622,7 +4624,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isMobSpawningAllowed() {
-        return !Server.disabledSpawnWorlds.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
+        return !Server.getInstance().getSettings().world().entity().worldsEntitySpawningDisabled().contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {

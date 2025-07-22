@@ -87,7 +87,7 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        if (this.getServer().mobsFromBlocks && !this.isBaby()) {
+        if (!this.isBaby()) {
             if (this.eggLayTime > 0) {
                 eggLayTime -= tickDiff;
             } else {
@@ -101,11 +101,10 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
     }
 
     private Item getEgg() {
-        if (Server.getInstance().enableNewChickenEggsLaying) {
-            if(getVariant() == Variant.COLD) return Item.fromString(Item.BLUE_EGG);
-            if(getVariant() == Variant.WARM) return Item.fromString(Item.BROWN_EGG);
+        if (Server.getInstance().getSettings().features().enableNewChickenEggsLaying()) {
+            if (getVariant() == Variant.COLD) return Item.fromString(Item.BLUE_EGG);
+            if (getVariant() == Variant.WARM) return Item.fromString(Item.BROWN_EGG);
         }
-
         return Item.get(Item.EGG, 0, 1);
     }
 
@@ -162,7 +161,7 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
         return false;
     }
 
-    private static  int getRandomEggLayTime() {
+    private static int getRandomEggLayTime() {
         return Utils.rand(6000, 12000);
     }
 

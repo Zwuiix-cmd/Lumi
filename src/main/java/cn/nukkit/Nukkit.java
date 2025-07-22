@@ -81,17 +81,14 @@ public class Nukkit {
         }
 
         try {
-            if (TITLE) {
-                System.out.print("\u001B]0;Lumi\u0007");
-            }
+            System.out.print("\u001B]0;Lumi\u0007");
             new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins, debug);
         } catch (Throwable t) {
             log.throwing(t);
         }
 
-        if (TITLE) {
-            System.out.print("\u001B]0;Server shutting down...\u0007");
-        }
+        System.out.print("\u001B]0;Server shutting down...\u0007");
+
 
         log.debug("Stopping other threads...");
 

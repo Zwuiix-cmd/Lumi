@@ -74,7 +74,7 @@ public class Skin {
     private boolean overridingPlayerAppearance = true;
 
     public boolean isValid() {
-        return isValid(Server.getInstance().doNotLimitSkinGeometry);
+        return isValid(Server.getInstance().getSettings().player().doNotLimitSkinGeometry());
     }
 
     public boolean isValid(boolean doNotLimitSkinGeometry) {
@@ -82,7 +82,7 @@ public class Skin {
     }
 
     private boolean isValidSkin() {
-        return isValidSkin(Server.getInstance().doNotLimitSkinGeometry);
+        return isValidSkin(Server.getInstance().getSettings().player().doNotLimitSkinGeometry());
     }
 
     private boolean isValidSkin(boolean doNotLimitSkinGeometry) {
@@ -221,7 +221,7 @@ public class Skin {
     public void setGeometryData(String geometryData) {
         Preconditions.checkNotNull(geometryData, "geometryData");
         if (!geometryData.equals(this.geometryData)) {
-            if (Server.getInstance().doNotLimitSkinGeometry || geometryData.getBytes().length < MAX_DATA_SIZE) {
+            if (Server.getInstance().getSettings().player().doNotLimitSkinGeometry() || geometryData.getBytes().length < MAX_DATA_SIZE) {
                 this.geometryData = geometryData;
             }
         }
@@ -237,7 +237,7 @@ public class Skin {
     public void setAnimationData(String animationData) {
         Preconditions.checkNotNull(animationData, "animationData");
         if (!animationData.equals(this.animationData)) {
-            if (Server.getInstance().doNotLimitSkinGeometry|| animationData.getBytes().length < MAX_DATA_SIZE) {
+            if (Server.getInstance().getSettings().player().doNotLimitSkinGeometry() || animationData.getBytes().length < MAX_DATA_SIZE) {
                 this.animationData = animationData;
             }
         }

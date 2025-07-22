@@ -205,7 +205,7 @@ public class CustomBlockManager {
         boolean result = false;
         ObjectSet<BlockPalette> set = new ObjectArraySet<>();
         for (int protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
-            if (protocol < ProtocolInfo.v1_16_100 || protocol < this.server.minimumProtocol) {
+            if (protocol < ProtocolInfo.v1_16_100 || protocol < this.server.getSettings().general().multiversion().minProtocol()) {
                 continue;
             }
 

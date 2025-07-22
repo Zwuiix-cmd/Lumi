@@ -206,7 +206,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 Block block = destroyBlocks.get(i);
                 this.level.useBreakOn(block, null, null, false);
 
-                if (Server.getInstance().dropSpawners && block instanceof BlockMobSpawner){
+                if (Server.getInstance().getSettings().world().dropSpawners() && block instanceof BlockMobSpawner){
                     this.level.dropItem(block.add(0.5, 0.5, 0.5), Item.get(Item.MONSTER_SPAWNER, 0, 1));
                 }
             }

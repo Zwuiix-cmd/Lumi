@@ -55,11 +55,6 @@ public class ItemSpawnEgg extends Item {
             return false;
         }
 
-        if (!Server.getInstance().spawnEggsEnabled) {
-            player.sendMessage("\u00A7cSpawn eggs are disabled on this server");
-            return false;
-        }
-
         if (target instanceof BlockMobSpawner) {
             BlockEntity blockEntity = level.getBlockEntity(target);
             if (blockEntity instanceof BlockEntitySpawner) {

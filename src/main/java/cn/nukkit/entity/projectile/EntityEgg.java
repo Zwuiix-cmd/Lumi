@@ -79,29 +79,28 @@ public class EntityEgg extends EntityProjectile implements EntityClimateVariant 
         } else if (this.isCollided) {
             this.close();
 
-            if (Server.getInstance().mobsFromBlocks) {
-                if (Utils.rand(1, 20) == 5) {
-                    Position spawnPos = add(0.5, 1, 0.5);
 
-                    CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.EGG, shootingEntity);
-                    level.getServer().getPluginManager().callEvent(ev);
+            if (Utils.rand(1, 20) == 5) {
+                Position spawnPos = add(0.5, 1, 0.5);
 
-                    if (ev.isCancelled()) {
-                        return false;
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.EGG, shootingEntity);
+                level.getServer().getPluginManager().callEvent(ev);
+
+                if (ev.isCancelled()) {
+                    return false;
+                }
+
+                EntityChicken entity = (EntityChicken) Entity.createEntity("Chicken", spawnPos);
+
+                if (entity != null) {
+                    if (namedTag.containsString("variant")) {
+                        entity.setVariant(Variant.get(namedTag.getString("variant")));
+                    } else {
+                        entity.setVariant(Variant.TEMPERATE);
                     }
 
-                    EntityChicken entity = (EntityChicken) Entity.createEntity("Chicken", spawnPos);
-
-                    if (entity != null) {
-                        if (namedTag.containsString("variant")) {
-                            entity.setVariant(Variant.get(namedTag.getString("variant")));
-                        } else {
-                            entity.setVariant(Variant.TEMPERATE);
-                        }
-
-                        entity.spawnToAll();
-                        entity.setBaby(true);
-                    }
+                    entity.spawnToAll();
+                    entity.setBaby(true);
                 }
             }
         }

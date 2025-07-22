@@ -130,8 +130,7 @@ public class LevelDBProvider implements LevelProvider {
         }
 
         if (!levelData.contains("generatorName")) {
-
-            levelData.putString("generatorName", level.getServer().getPropertyString("level-type", "default"));
+            levelData.putString("generatorName", level.getServer().getSettings().world().defaultWorldType());
         }
 
         try {
@@ -148,7 +147,7 @@ public class LevelDBProvider implements LevelProvider {
         this.executor = Executors.newSingleThreadExecutor(builder.build());
 
         if (level.isAutoCompaction()) {
-            int delay = level.getServer().getAutoCompactionTicks();
+            int delay = level.getServer().getSettings().world().worldAutoCompactionTicks();
             level.getServer().getScheduler().scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, new Task() {
                 @Override
                 public void onRun(int currentTick) {
@@ -223,9 +222,9 @@ public class LevelDBProvider implements LevelProvider {
         Options options = new Options()
                 .createIfMissing(true)
                 .compressionType(CompressionType.ZLIB_RAW)
-                .cacheSize(1024L * 1024L * Server.getInstance().levelDbCache)
+                .cacheSize(1024L * 1024L * Server.getInstance().getSettings().world().leveldbCacheMb())
                 .blockSize(64 * 1024);
-        return Server.getInstance().useNativeLevelDB ? LevelDB.PROVIDER.open(dir, options) : JAVA_LDB_PROVIDER.open(dir, options);
+        return Server.getInstance().getSettings().world().useNativeLeveldb() ? LevelDB.PROVIDER.open(dir, options) : JAVA_LDB_PROVIDER.open(dir, options);
     }
 
     public static void updateLevelData(CompoundTag levelData) {
@@ -324,7 +323,7 @@ public class LevelDBProvider implements LevelProvider {
 
         long timestamp = chunk.getChanges();
 
-        if (this.getServer().asyncChunkSending) {
+        if (this.getServer().getSettings().world().chunk().asyncChunks()) {
             final BaseChunk chunkClone = chunk.cloneForChunkSending();
             this.level.getAsyncChuckExecutor().execute(() -> {
                 NetworkChunkSerializer.serialize(protocols, chunkClone, networkChunkSerializerCallback -> {
@@ -1112,6 +1111,6 @@ public class LevelDBProvider implements LevelProvider {
     }
 
     static {
-        log.info("native LevelDB provider: {}", Server.getInstance().useNativeLevelDB && LevelDB.PROVIDER.isNative());
+        log.info("native LevelDB provider: {}", Server.getInstance().getSettings().world().useNativeLeveldb() && LevelDB.PROVIDER.isNative());
     }
 }

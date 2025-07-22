@@ -34,7 +34,7 @@ public class EntityManager {
     }
 
     public void registerDefinition(EntityDefinition entityDefinition) {
-        if (!Server.getInstance().enableExperimentMode) {
+        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
             Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register custom entity!");
             return;
         }

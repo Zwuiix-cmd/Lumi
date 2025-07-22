@@ -236,7 +236,7 @@ public class RakNetPlayerSession extends SimpleChannelInboundHandler<RakMessage>
                     batched.put(buf);
 
                     try {
-                        this.sendPacket(this.compressionOut.compress(batched, Server.getInstance().networkCompressionLevel));
+                        this.sendPacket(this.compressionOut.compress(batched, Server.getInstance().getSettings().network().compression().compressionLevel()));
                     } catch (Exception e) {
                         log.error("Unable to compress disconnect packet", e);
                     }
@@ -297,7 +297,7 @@ public class RakNetPlayerSession extends SimpleChannelInboundHandler<RakMessage>
 
     private void sendPackets(BinaryStream batched) {
         try {
-            this.sendPacket(this.compressionOut.compress(batched, Server.getInstance().networkCompressionLevel));
+            this.sendPacket(this.compressionOut.compress(batched, Server.getInstance().getSettings().network().compression().compressionLevel()));
         } catch (Exception e) {
             log.error("Unable to compress batched packets", e);
         }

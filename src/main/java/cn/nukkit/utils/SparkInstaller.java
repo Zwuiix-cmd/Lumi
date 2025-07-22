@@ -73,7 +73,7 @@ public class SparkInstaller {
         if (download) {
             log.info("Downloading spark...");
             log.info("If the download fails, please download it manually from https://ci.lucko.me/job/spark-extra-platforms/");
-            log.info("Or set enable-spark=off in server.properties to disable automatic download.");
+            log.info("Or set enable-spark: false in settings.yml to disable automatic download.");
             File newFile = new File(server.getPluginPath() + "/" + fileName);
             try (InputStream in = new URL(downloadUrl).openStream()) {
                 try (OutputStream out = Files.newOutputStream(newFile.toPath())) {

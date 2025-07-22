@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
@@ -120,7 +121,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         if (!player.getLevel().isMobSpawningAllowed() || Utils.rand(1, 4) == 1) {
             return false;
         }
-        if (Server.getInstance().getDifficulty() == 0) {
+        if (Server.getInstance().getDifficulty() == Difficulty.PEACEFUL) {
             return !Utils.monstersList.contains(this.getEntityNetworkId());
         }
         return true;
