@@ -34,126 +34,126 @@ public class LegacyPropertiesConverter {
         log.info("Converting the old server.properties configuration to the new format...");
 
         // General Settings
-        var general = settings.getGeneral();
-        general.setMotd(this.getPropertyString("motd", general.getMotd()));
-        general.setSubMotd(this.getPropertyString("sub-motd", general.getSubMotd()));
-        general.setServerPort(this.getPropertyInt("server-port", general.getServerPort()));
-        general.setServerIp(this.getPropertyString("server-ip", general.getServerIp()));
-        general.setMaxPlayers(this.getPropertyInt("max-players", general.getMaxPlayers()));
-        general.setLanguage(this.getPropertyString("language", general.getLanguage()));
-        general.setForceLanguage(this.getPropertyBoolean("force-language", general.isForceLanguage()));
-        general.setForceResources(this.getPropertyBoolean("force-resources", general.isForceResources()));
-        general.setForceResourcesAllowClientPacks(this.getPropertyBoolean("force-resources-allow-client-packs", general.isForceResourcesAllowClientPacks()));
-        general.setShutdownMessage(this.getPropertyString("shutdown-message", general.getShutdownMessage()));
-        general.setUpdateNotifications(this.getPropertyBoolean("update-notifications", general.isUpdateNotifications()));
-        general.setBstatsMetrics(this.getPropertyBoolean("bstats-metrics", general.isBstatsMetrics()));
-        general.setAnsiTitle(this.getPropertyBoolean("ansi-title", general.isAnsiTitle()));
-        general.setDebugLevel(this.getPropertyInt("debug-level", general.getDebugLevel()));
-        general.setDeprecatedVerbose(this.getPropertyBoolean("deprecated-verbose", general.isDeprecatedVerbose()));
-        general.setEnableSpark(this.getPropertyBoolean("enable-spark", general.isEnableSpark()));
-        general.setUseWaterdog(this.getPropertyBoolean("use-waterdog", general.isUseWaterdog()));
-        general.setEnableExperimentMode(this.getPropertyBoolean("enable-experiment-mode", general.isEnableExperimentMode()));
-        general.setServerAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.getServerAuthoritativeMovement()));
-        general.setServerAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.isServerAuthoritativeBlockBreaking()));
-        general.setAutomaticBugReport(this.getPropertyBoolean("automatic-bug-report", general.isAutomaticBugReport()));
-        general.setHastebinToken(this.getPropertyString("hastebin-token", general.getHastebinToken()));
-        general.setCallDataPkSendEvent(this.getPropertyBoolean("call-data-pk-send-event", general.isCallDataPkSendEvent()));
-        general.setCallBatchPkSendEvent(this.getPropertyBoolean("call-batch-pk-send-event", general.isCallBatchPkSendEvent()));
-        general.setCallEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", general.isCallEntityMotionEvent()));
+        var general = settings.general();
+        general.motd(this.getPropertyString("motd", general.motd()));
+        general.subMotd(this.getPropertyString("sub-motd", general.subMotd()));
+        general.serverPort(this.getPropertyInt("server-port", general.serverPort()));
+        general.serverIp(this.getPropertyString("server-ip", general.serverIp()));
+        general.maxPlayers(this.getPropertyInt("max-players", general.maxPlayers()));
+        general.language(this.getPropertyString("language", general.language()));
+        general.forceLanguage(this.getPropertyBoolean("force-language", general.forceLanguage()));
+        general.forceResources(this.getPropertyBoolean("force-resources", general.forceResources()));
+        general.forceResourcesAllowClientPacks(this.getPropertyBoolean("force-resources-allow-client-packs", general.forceResourcesAllowClientPacks()));
+        general.shutdownMessage(this.getPropertyString("shutdown-message", general.shutdownMessage()));
+        general.updateNotifications(this.getPropertyBoolean("update-notifications", general.updateNotifications()));
+        general.bstatsMetrics(this.getPropertyBoolean("bstats-metrics", general.bstatsMetrics()));
+        general.ansiTitle(this.getPropertyBoolean("ansi-title", general.ansiTitle()));
+        general.debugLevel(this.getPropertyInt("debug-level", general.debugLevel()));
+        general.deprecatedVerbose(this.getPropertyBoolean("deprecated-verbose", general.deprecatedVerbose()));
+        general.enableSpark(this.getPropertyBoolean("enable-spark", general.enableSpark()));
+        general.useWaterdog(this.getPropertyBoolean("use-waterdog", general.useWaterdog()));
+        general.enableExperimentMode(this.getPropertyBoolean("enable-experiment-mode", general.enableExperimentMode()));
+        general.serverAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.serverAuthoritativeMovement()));
+        general.serverAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.serverAuthoritativeBlockBreaking()));
+        general.automaticBugReport(this.getPropertyBoolean("automatic-bug-report", general.automaticBugReport()));
+        general.hastebinToken(this.getPropertyString("hastebin-token", general.hastebinToken()));
+        general.callDataPkSendEvent(this.getPropertyBoolean("call-data-pk-send-event", general.callDataPkSendEvent()));
+        general.callBatchPkSendEvent(this.getPropertyBoolean("call-batch-pk-send-event", general.callBatchPkSendEvent()));
+        general.callEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", general.callEntityMotionEvent()));
 
         // Multiversion settings
-        general.getMultiversion().setMinProtocol(this.getPropertyInt("multiversion-min-protocol", general.getMultiversion().getMinProtocol()));
-        general.getMultiversion().setMaxProtocol(this.getPropertyInt("multiversion-max-protocol", general.getMultiversion().getMaxProtocol()));
+        general.multiversion().minProtocol(this.getPropertyInt("multiversion-min-protocol", general.multiversion().minProtocol()));
+        general.multiversion().maxProtocol(this.getPropertyInt("multiversion-max-protocol", general.multiversion().maxProtocol()));
 
         // Network Settings
-        var network = settings.getNetwork();
-        network.setXboxAuth(this.getPropertyBoolean("xbox-auth", network.isXboxAuth()));
-        network.setXboxAuthTempIpBan(this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", network.isXboxAuthTempIpBan()));
-        network.setStrongIpBans(this.getPropertyBoolean("strong-ip-bans", network.isStrongIpBans()));
-        network.setEnableRakSendCookie(this.getPropertyBoolean("enable-rak-send-cookie", network.isEnableRakSendCookie()));
-        network.setRakPacketLimit(this.getPropertyInt("rak-packet-limit", network.getRakPacketLimit()));
-        network.setTimeoutMilliseconds(this.getPropertyInt("timeout-milliseconds", network.getTimeoutMilliseconds()));
-        network.setEnableQuery(this.getPropertyBoolean("enable-query", network.isEnableQuery()));
-        network.setQueryPlugins(this.getPropertyBoolean("query-plugins", network.isQueryPlugins()));
-        network.setEncryption(this.getPropertyBoolean("encryption", network.isEncryption()));
+        var network = settings.network();
+        network.xboxAuth(this.getPropertyBoolean("xbox-auth", network.xboxAuth()));
+        network.xboxAuthTempIpBan(this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", network.xboxAuthTempIpBan()));
+        network.strongIpBans(this.getPropertyBoolean("strong-ip-bans", network.strongIpBans()));
+        network.enableRakSendCookie(this.getPropertyBoolean("enable-rak-send-cookie", network.enableRakSendCookie()));
+        network.rakPacketLimit(this.getPropertyInt("rak-packet-limit", network.rakPacketLimit()));
+        network.timeoutMilliseconds(this.getPropertyInt("timeout-milliseconds", network.timeoutMilliseconds()));
+        network.enableQuery(this.getPropertyBoolean("enable-query", network.enableQuery()));
+        network.queryPlugins(this.getPropertyBoolean("query-plugins", network.queryPlugins()));
+        network.encryption(this.getPropertyBoolean("encryption", network.encryption()));
 
         // RCON Settings
-        network.getRcon().setEnable(this.getPropertyBoolean("enable-rcon", network.getRcon().isEnable()));
-        network.getRcon().setPassword(this.getPropertyString("rcon.password", network.getRcon().getPassword()));
-        network.getRcon().setPort(this.getPropertyInt("rcon.port", network.getRcon().getPort()));
+        network.rcon().enable(this.getPropertyBoolean("enable-rcon", network.rcon().enable()));
+        network.rcon().password(this.getPropertyString("rcon.password", network.rcon().password()));
+        network.rcon().port(this.getPropertyInt("rcon.port", network.rcon().port()));
 
         // Compression Settings
-        network.getCompression().setZlibProvider(this.getPropertyInt("zlib-provider", network.getCompression().getZlibProvider()));
-        network.getCompression().setCompressionLevel(this.getPropertyInt("compression-level", network.getCompression().getCompressionLevel()));
-        network.getCompression().setCompressionThreshold(this.getPropertyInt("compression-threshold", network.getCompression().getCompressionThreshold()));
-        network.getCompression().setUseSnappyCompression(this.getPropertyBoolean("use-snappy-compression", network.getCompression().isUseSnappyCompression()));
+        network.compression().zlibProvider(this.getPropertyInt("zlib-provider", network.compression().zlibProvider()));
+        network.compression().compressionLevel(this.getPropertyInt("compression-level", network.compression().compressionLevel()));
+        network.compression().compressionThreshold(this.getPropertyInt("compression-threshold", network.compression().compressionThreshold()));
+        network.compression().useSnappyCompression(this.getPropertyBoolean("use-snappy-compression", network.compression().useSnappyCompression()));
 
         // World Settings
-        var world = settings.getWorld();
-        world.setDefaultWorldName(this.getPropertyString("level-name", world.getDefaultWorldName()));
-        world.setDefaultWorldSeed(this.getPropertyString("level-seed", world.getDefaultWorldSeed()));
-        world.setDefaultWorldType(this.getPropertyString("level-type", world.getDefaultWorldType()));
-        world.setGeneratorSettings(this.getPropertyString("generator-settings", world.getGeneratorSettings()));
-        world.setLoadAllWorlds(this.getPropertyBoolean("load-all-worlds", world.isLoadAllWorlds()));
-        world.setViewDistance(this.getPropertyInt("view-distance", world.getViewDistance()));
-        world.setSpawnProtection(this.getPropertyInt("spawn-protection", world.getSpawnProtection()));
-        world.setDifficulty(this.getPropertyString("difficulty", world.getDifficulty()));
-        world.setAllowPvp(this.getPropertyBoolean("pvp", world.isAllowPvp()));
-        world.setEnableHardcore(this.getPropertyBoolean("hardcore", world.isEnableHardcore()));
-        world.setEnableNether(this.getPropertyBoolean("nether", world.isEnableNether()));
-        world.setEnableEnd(this.getPropertyBoolean("end", world.isEnableEnd()));
-        world.setDropSpawners(this.getPropertyBoolean("drop-spawners", world.isDropSpawners()));
-        world.setExplosionBreakBlocks(this.getPropertyBoolean("explosion-break-blocks", world.isExplosionBreakBlocks()));
-        world.setPortalTicks(this.getPropertyInt("portal-ticks", world.getPortalTicks()));
-        world.setWorldAutoCompaction(this.getPropertyBoolean("level-auto-compaction", world.isWorldAutoCompaction()));
-        world.setWorldAutoCompactionTicks(this.getPropertyInt("level-auto-compaction-ticks", world.getWorldAutoCompactionTicks()));
-        world.setCacheChunks(this.getPropertyBoolean("cache-chunks", world.isCacheChunks()));
-        world.setAsyncChunks(this.getPropertyBoolean("async-chunks", world.isAsyncChunks()));
-        world.setLightUpdates(this.getPropertyBoolean("light-updates", world.isLightUpdates()));
-        world.setClearChunkTickList(this.getPropertyBoolean("clear-chunk-tick-list", world.isClearChunkTickList()));
-        world.setLeveldbCacheMb(this.getPropertyInt("leveldb-cache-mb", world.getLeveldbCacheMb()));
-        world.setUseNativeLeveldb(this.getPropertyBoolean("use-native-leveldb", world.isUseNativeLeveldb()));
+        var world = settings.world();
+        world.defaultWorldName(this.getPropertyString("level-name", world.defaultWorldName()));
+        world.defaultWorldSeed(this.getPropertyString("level-seed", world.defaultWorldSeed()));
+        world.defaultWorldType(this.getPropertyString("level-type", world.defaultWorldType()));
+        world.generatorSettings(this.getPropertyString("generator-settings", world.generatorSettings()));
+        world.loadAllWorlds(this.getPropertyBoolean("load-all-worlds", world.loadAllWorlds()));
+        world.viewDistance(this.getPropertyInt("view-distance", world.viewDistance()));
+        world.spawnProtection(this.getPropertyInt("spawn-protection", world.spawnProtection()));
+        world.difficulty(this.getPropertyString("difficulty", world.difficulty()));
+        world.allowPvp(this.getPropertyBoolean("pvp", world.allowPvp()));
+        world.enableHardcore(this.getPropertyBoolean("hardcore", world.enableHardcore()));
+        world.enableNether(this.getPropertyBoolean("nether", world.enableNether()));
+        world.enableEnd(this.getPropertyBoolean("end", world.enableEnd()));
+        world.dropSpawners(this.getPropertyBoolean("drop-spawners", world.dropSpawners()));
+        world.explosionBreakBlocks(this.getPropertyBoolean("explosion-break-blocks", world.explosionBreakBlocks()));
+        world.portalTicks(this.getPropertyInt("portal-ticks", world.portalTicks()));
+        world.worldAutoCompaction(this.getPropertyBoolean("level-auto-compaction", world.worldAutoCompaction()));
+        world.worldAutoCompactionTicks(this.getPropertyInt("level-auto-compaction-ticks", world.worldAutoCompactionTicks()));
+        world.cacheChunks(this.getPropertyBoolean("cache-chunks", world.cacheChunks()));
+        world.asyncChunks(this.getPropertyBoolean("async-chunks", world.asyncChunks()));
+        world.lightUpdates(this.getPropertyBoolean("light-updates", world.lightUpdates()));
+        world.clearChunkTickList(this.getPropertyBoolean("clear-chunk-tick-list", world.clearChunkTickList()));
+        world.leveldbCacheMb(this.getPropertyInt("leveldb-cache-mb", world.leveldbCacheMb()));
+        world.useNativeLeveldb(this.getPropertyBoolean("use-native-leveldb", world.useNativeLeveldb()));
 
         // Multi-nether worlds
         String multiNetherWorlds = this.getPropertyString("multi-nether-worlds", "");
         if (!multiNetherWorlds.isEmpty()) {
-            world.setMultiNetherWorlds(Arrays.asList(multiNetherWorlds.split(",")));
+            world.multiNetherWorlds(Arrays.asList(multiNetherWorlds.split(",")));
         }
 
         // Do not tick worlds
         String doNotTickWorlds = this.getPropertyString("do-not-tick-worlds", "");
         if (!doNotTickWorlds.isEmpty()) {
-            world.setDoNotTickWorlds(Arrays.asList(doNotTickWorlds.split(",")));
+            world.doNotTickWorlds(Arrays.asList(doNotTickWorlds.split(",")));
         }
 
-        world.setDoWorldGc(this.getPropertyBoolean("do-level-gc", world.isDoWorldGc()));
+        world.doWorldGc(this.getPropertyBoolean("do-level-gc", world.doWorldGc()));
 
         // Entity Settings
-        world.getEntity().setSpawnAnimals(this.getPropertyBoolean("spawn-animals", world.getEntity().isSpawnAnimals()));
-        world.getEntity().setSpawnMobs(this.getPropertyBoolean("spawn-mobs", world.getEntity().isSpawnMobs()));
-        world.getEntity().setEntityAutoSpawnTask(this.getPropertyBoolean("entity-auto-spawn-task", world.getEntity().isEntityAutoSpawnTask()));
-        world.getEntity().setEntityDespawnTask(this.getPropertyBoolean("entity-despawn-task", world.getEntity().isEntityDespawnTask()));
-        world.getEntity().setTicksPerEntitySpawns(this.getPropertyInt("ticks-per-entity-spawns", world.getEntity().getTicksPerEntitySpawns()));
-        world.getEntity().setTicksPerEntityDespawns(this.getPropertyInt("ticks-per-entity-despawns", world.getEntity().getTicksPerEntityDespawns()));
-        world.getEntity().setMobAi(this.getPropertyBoolean("mob-ai", world.getEntity().isMobAi()));
-        world.getEntity().setSpawnThreshold(this.getPropertyInt("spawn-threshold", world.getEntity().getSpawnThreshold()));
-        world.getEntity().setCallEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", world.getEntity().isCallEntityMotionEvent()));
-        world.getEntity().setWorldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.getEntity().getWorldsEntitySpawningDisabled()));
+        world.entity().spawnAnimals(this.getPropertyBoolean("spawn-animals", world.entity().spawnAnimals()));
+        world.entity().spawnMobs(this.getPropertyBoolean("spawn-mobs", world.entity().spawnMobs()));
+        world.entity().entityAutoSpawnTask(this.getPropertyBoolean("entity-auto-spawn-task", world.entity().entityAutoSpawnTask()));
+        world.entity().entityDespawnTask(this.getPropertyBoolean("entity-despawn-task", world.entity().entityDespawnTask()));
+        world.entity().ticksPerEntitySpawns(this.getPropertyInt("ticks-per-entity-spawns", world.entity().ticksPerEntitySpawns()));
+        world.entity().ticksPerEntityDespawns(this.getPropertyInt("ticks-per-entity-despawns", world.entity().ticksPerEntityDespawns()));
+        world.entity().mobAi(this.getPropertyBoolean("mob-ai", world.entity().mobAi()));
+        world.entity().spawnThreshold(this.getPropertyInt("spawn-threshold", world.entity().spawnThreshold()));
+        world.entity().callEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", world.entity().callEntityMotionEvent()));
+        world.entity().worldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.entity().worldsEntitySpawningDisabled()));
 
         // Chunk Settings
-        world.getChunk().setCompressionLevel(Math.max(Math.min(this.getPropertyInt("chunk-compression-level", 7), 9), 1));
-        world.getChunk().setSendingPerTick(this.getPropertyInt("chunk-sending-per-tick", world.getChunk().getSendingPerTick()));
-        world.getChunk().setTickingPerTick(this.getPropertyInt("chunk-ticking-per-tick", world.getChunk().getTickingPerTick()));
-        world.getChunk().setTickingRadius(this.getPropertyInt("chunk-ticking-radius", world.getChunk().getTickingRadius()));
-        world.getChunk().setGenerationQueueSize(this.getPropertyInt("chunk-generation-queue-size", world.getChunk().getGenerationQueueSize()));
-        world.getChunk().setGenerationPopulationQueueSize(this.getPropertyInt("chunk-generation-population-queue-size", world.getChunk().getGenerationPopulationQueueSize()));
+        world.chunk().compressionLevel(Math.max(Math.min(this.getPropertyInt("chunk-compression-level", 7), 9), 1));
+        world.chunk().sendingPerTick(this.getPropertyInt("chunk-sending-per-tick", world.chunk().sendingPerTick()));
+        world.chunk().tickingPerTick(this.getPropertyInt("chunk-ticking-per-tick", world.chunk().tickingPerTick()));
+        world.chunk().tickingRadius(this.getPropertyInt("chunk-ticking-radius", world.chunk().tickingRadius()));
+        world.chunk().generationQueueSize(this.getPropertyInt("chunk-generation-queue-size", world.chunk().generationQueueSize()));
+        world.chunk().generationPopulationQueueSize(this.getPropertyInt("chunk-generation-population-queue-size", world.chunk().generationPopulationQueueSize()));
 
         // AutoSave Settings
-        world.getAutoSave().setEnable(this.getPropertyBoolean("auto-save", world.getAutoSave().isEnable()));
-        world.getAutoSave().setPerTicks(this.getPropertyInt("ticks-per-autosave", world.getAutoSave().getPerTicks()));
+        world.autoSave().enable(this.getPropertyBoolean("auto-save", world.autoSave().enable()));
+        world.autoSave().perTicks(this.getPropertyInt("ticks-per-autosave", world.autoSave().perTicks()));
         String disabledWorlds = this.getPropertyString("worlds-level-auto-save-disabled", "");
         if (!disabledWorlds.isEmpty()) {
-            world.getAutoSave().setDisabledWorlds(Arrays.asList(disabledWorlds.split(",")));
+            world.autoSave().disabledWorlds(Arrays.asList(disabledWorlds.split(",")));
         }
 
         // Anti-Xray Settings
@@ -165,56 +165,56 @@ public class LegacyPropertiesConverter {
             Map<String, WorldSettings.AntiXraySettings> antiXrayMap = new HashMap<>();
             for (String worldName : antiXrayWorlds.split(",")) {
                 WorldSettings.AntiXraySettings antiXraySettings = new WorldSettings.AntiXraySettings();
-                antiXraySettings.setMode(mode);
-                antiXraySettings.setPreDeobfuscate(preDeobfuscate);
+                antiXraySettings.mode(mode);
+                antiXraySettings.preDeobfuscate(preDeobfuscate);
                 antiXrayMap.put(worldName.trim(), antiXraySettings);
             }
-            world.getAntiXray().putAll(antiXrayMap);
+            world.antiXray().putAll(antiXrayMap);
         }
 
         // Features Settings
-        world.getFeatures().setVanillaPortals(this.getPropertyBoolean("vanilla-portals", world.getFeatures().isVanillaPortals()));
-        world.getFeatures().setVanillaBossbars(this.getPropertyBoolean("vanilla-bossbars", world.getFeatures().isVanillaBossbars()));
-        world.getFeatures().setEnableRawOres(this.getPropertyBoolean("enable-raw-ores", world.getFeatures().isEnableRawOres()));
-        world.getFeatures().setEnableNewPaintings(this.getPropertyBoolean("enable-new-paintings", world.getFeatures().isEnableNewPaintings()));
-        world.getFeatures().setEnableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", world.getFeatures().isEnableNewChickenEggsLaying()));
+        world.features().vanillaPortals(this.getPropertyBoolean("vanilla-portals", world.features().vanillaPortals()));
+        world.features().vanillaBossbars(this.getPropertyBoolean("vanilla-bossbars", world.features().vanillaBossbars()));
+        world.features().enableRawOres(this.getPropertyBoolean("enable-raw-ores", world.features().enableRawOres()));
+        world.features().enableNewPaintings(this.getPropertyBoolean("enable-new-paintings", world.features().enableNewPaintings()));
+        world.features().enableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", world.features().enableNewChickenEggsLaying()));
 
         // Player Settings
-        var player = settings.getPlayer();
-        player.setDefaultGamemode(this.getPropertyInt("gamemode", player.getDefaultGamemode()));
-        player.setForceGamemode(this.getPropertyBoolean("force-gamemode", player.isForceGamemode()));
-        player.setAchievements(this.getPropertyBoolean("achievements", player.isAchievements()));
-        player.setAnnouncePlayerAchievements(this.getPropertyBoolean("announce-player-achievements", player.isAnnouncePlayerAchievements()));
-        player.setWhitelist(this.getPropertyBoolean("white-list", player.isWhitelist()));
-        player.setWhitelistReason(this.getPropertyString("whitelist-reason", player.getWhitelistReason()));
-        player.setBedSpawnpoints(this.getPropertyBoolean("bed-spawnpoints", player.isBedSpawnpoints()));
-        player.setSavePlayerData(this.getPropertyBoolean("save-player-data", player.isSavePlayerData()));
-        player.setSavePlayerDataByUuid(this.getPropertyBoolean("save-player-data-by-uuid", player.isSavePlayerDataByUuid()));
-        player.setSkinChangeCooldown(this.getPropertyInt("skin-change-cooldown", player.getSkinChangeCooldown()));
-        player.setDoNotLimitSkinGeometry(this.getPropertyBoolean("do-not-limit-skin-geometry", player.isDoNotLimitSkinGeometry()));
-        player.setDoNotLimitInteractions(this.getPropertyBoolean("do-not-limit-interactions", player.isDoNotLimitInteractions()));
-        player.setPersonaSkins(this.getPropertyBoolean("persona-skins", player.isPersonaSkins()));
-        player.setCheckOpMovement(this.getPropertyBoolean("check-op-movement", player.isCheckOpMovement()));
-        player.setCheckOpMovement(this.getPropertyBoolean("allow-flight", player.isAllowFlight()));
-        player.setStopInGame(this.getPropertyBoolean("stop-in-game", player.isStopInGame()));
-        player.setOpInGame(this.getPropertyBoolean("op-in-game", player.isOpInGame()));
-        player.setSpawnEggs(this.getPropertyBoolean("spawn-eggs", player.isSpawnEggs()));
-        player.setSpawnMobsFromBlocks(this.getPropertyBoolean("spawn-mobs-from-blocks", player.isSpawnMobsFromBlocks()));
-        player.setAnvilsEnabled(this.getPropertyBoolean("anvils-enabled", player.isAnvilsEnabled()));
-        player.setForcedSafetyEnchant(this.getPropertyBoolean("forced-safety-enchant", player.isForcedSafetyEnchant()));
-        player.setXpBottlesOnCreative(this.getPropertyBoolean("xp-bottles-on-creative", player.isXpBottlesOnCreative()));
-        player.setSpaceNameMode(this.getPropertyString("space-name-mode", player.getSpaceNameMode()));
-        player.setUseClientSpectator(this.getPropertyBoolean("use-client-spectator", player.isUseClientSpectator()));
+        var player = settings.player();
+        player.defaultGamemode(this.getPropertyInt("gamemode", player.defaultGamemode()));
+        player.forceGamemode(this.getPropertyBoolean("force-gamemode", player.forceGamemode()));
+        player.achievements(this.getPropertyBoolean("achievements", player.achievements()));
+        player.announcePlayerAchievements(this.getPropertyBoolean("announce-player-achievements", player.announcePlayerAchievements()));
+        player.whitelist(this.getPropertyBoolean("white-list", player.whitelist()));
+        player.whitelistReason(this.getPropertyString("whitelist-reason", player.whitelistReason()));
+        player.bedSpawnpoints(this.getPropertyBoolean("bed-spawnpoints", player.bedSpawnpoints()));
+        player.savePlayerData(this.getPropertyBoolean("save-player-data", player.savePlayerData()));
+        player.savePlayerDataByUuid(this.getPropertyBoolean("save-player-data-by-uuid", player.savePlayerDataByUuid()));
+        player.skinChangeCooldown(this.getPropertyInt("skin-change-cooldown", player.skinChangeCooldown()));
+        player.doNotLimitSkinGeometry(this.getPropertyBoolean("do-not-limit-skin-geometry", player.doNotLimitSkinGeometry()));
+        player.doNotLimitInteractions(this.getPropertyBoolean("do-not-limit-interactions", player.doNotLimitInteractions()));
+        player.personaSkins(this.getPropertyBoolean("persona-skins", player.personaSkins()));
+        player.checkOpMovement(this.getPropertyBoolean("check-op-movement", player.checkOpMovement()));
+        player.checkOpMovement(this.getPropertyBoolean("allow-flight", player.allowFlight()));
+        player.stopInGame(this.getPropertyBoolean("stop-in-game", player.stopInGame()));
+        player.opInGame(this.getPropertyBoolean("op-in-game", player.opInGame()));
+        player.spawnEggs(this.getPropertyBoolean("spawn-eggs", player.spawnEggs()));
+        player.spawnMobsFromBlocks(this.getPropertyBoolean("spawn-mobs-from-blocks", player.spawnMobsFromBlocks()));
+        player.anvilsEnabled(this.getPropertyBoolean("anvils-enabled", player.anvilsEnabled()));
+        player.forcedSafetyEnchant(this.getPropertyBoolean("forced-safety-enchant", player.forcedSafetyEnchant()));
+        player.xpBottlesOnCreative(this.getPropertyBoolean("xp-bottles-on-creative", player.xpBottlesOnCreative()));
+        player.spaceNameMode(this.getPropertyString("space-name-mode", player.spaceNameMode()));
+        player.useClientSpectator(this.getPropertyBoolean("use-client-spectator", player.useClientSpectator()));
 
         // Performance Settings
-        var performance = settings.getPerformance();
-        performance.setAsyncWorkers(this.getPropertyString("async-workers", String.valueOf(performance.getAsyncWorkers())));
-        performance.setAutoTickRate(this.getPropertyBoolean("auto-tick-rate", performance.isAutoTickRate()));
-        performance.setAutoTickRateLimit(this.getPropertyInt("auto-tick-rate-limit", performance.getAutoTickRateLimit()));
-        performance.setBaseTickRate(this.getPropertyInt("base-tick-rate", performance.getBaseTickRate()));
-        performance.setAlwaysTickPlayers(this.getPropertyBoolean("always-tick-players", performance.isAlwaysTickPlayers()));
-        performance.setThreadWatchdog(this.getPropertyBoolean("thread-watchdog", performance.isThreadWatchdog()));
-        performance.setThreadWatchdogTick(this.getPropertyInt("thread-watchdog-tick", performance.getThreadWatchdogTick()));
+        var performance = settings.performance();
+        performance.asyncWorkers(this.getPropertyString("async-workers", String.valueOf(performance.asyncWorkers())));
+        performance.autoTickRate(this.getPropertyBoolean("auto-tick-rate", performance.autoTickRate()));
+        performance.autoTickRateLimit(this.getPropertyInt("auto-tick-rate-limit", performance.autoTickRateLimit()));
+        performance.baseTickRate(this.getPropertyInt("base-tick-rate", performance.baseTickRate()));
+        performance.alwaysTickPlayers(this.getPropertyBoolean("always-tick-players", performance.alwaysTickPlayers()));
+        performance.threadWatchdog(this.getPropertyBoolean("thread-watchdog", performance.threadWatchdog()));
+        performance.threadWatchdogTick(this.getPropertyInt("thread-watchdog-tick", performance.threadWatchdogTick()));
 
         settings.save();
 

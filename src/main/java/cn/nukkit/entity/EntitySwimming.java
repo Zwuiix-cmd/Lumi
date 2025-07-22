@@ -91,7 +91,7 @@ public abstract class EntitySwimming extends BaseEntity {
                 return null;
             }
 
-            if (this.getServer().getSettings().getWorld().getEntity().isMobAi()) {
+            if (this.getServer().getSettings().world().entity().mobAi()) {
                 if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                     double x = this.followTarget.x - this.x;
                     double z = this.followTarget.z - this.z;

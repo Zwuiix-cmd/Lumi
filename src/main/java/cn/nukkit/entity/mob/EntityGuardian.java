@@ -89,7 +89,7 @@ public class EntityGuardian extends EntitySwimmingMob {
             }
             if (targetOption((EntityCreature) followTarget, this.distanceSquared(followTarget))) {
                 if (--laserChargeTick < 0) {
-                    if (this.getServer().getSettings().getWorld().getEntity().isMobAi()) {
+                    if (this.getServer().getSettings().world().entity().mobAi()) {
                         attackEntity(followTarget);
                     }
                     this.setDataProperty(new LongEntityData(Entity.DATA_TARGET_EID, laserTargetEid = -1));

@@ -73,7 +73,7 @@ public class EntityPainting extends EntityHanging {
     }
 
     public final static Motive[] motives = Arrays.stream(Motive.values())
-            .filter(m -> (!m.newPainting || Server.getInstance().getSettings().getWorld().getFeatures().isEnableNewPaintings()))
+            .filter(m -> (!m.newPainting || Server.getInstance().getSettings().world().features().enableNewPaintings()))
             .toArray(Motive[]::new);
 
     private Motive motive;

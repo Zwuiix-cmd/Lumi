@@ -6,6 +6,7 @@ import eu.okaeri.configs.annotation.CustomKey;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 public class WorldSettings extends OkaeriConfig {
 
     @CustomKey("default-world-name")

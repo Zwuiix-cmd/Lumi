@@ -5,9 +5,11 @@ import eu.okaeri.configs.annotation.CustomKey;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 public class GeneralSettings extends OkaeriConfig {
 
     private String motd = "An Lumi server";

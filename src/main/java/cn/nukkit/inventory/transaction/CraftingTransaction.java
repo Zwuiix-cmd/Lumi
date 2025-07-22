@@ -154,7 +154,7 @@ public class CraftingTransaction extends InventoryTransaction {
     @Override
     public boolean execute() {
         if (super.execute()) {
-            if (Server.getInstance().getSettings().getPlayer().isAchievements()) {
+            if (Server.getInstance().getSettings().player().achievements()) {
                 switch (this.primaryOutput.getId()) {
                     case Item.CRAFTING_TABLE -> source.awardAchievement("buildWorkBench");
                     case Item.WOODEN_PICKAXE -> source.awardAchievement("buildPickaxe");

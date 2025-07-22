@@ -34,7 +34,7 @@ public class RequestAbilityProcessor_v527 extends DataPacketProcessor<RequestAbi
             return;
         }
 
-        if (!player.getServer().getSettings().getPlayer().isAllowFlight() && pk.boolValue && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
+        if (!player.getServer().getSettings().player().allowFlight() && pk.boolValue && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)) {
             player.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
             return;
         }

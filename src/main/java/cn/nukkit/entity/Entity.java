@@ -1427,7 +1427,7 @@ public abstract class Entity extends Location implements Metadatable {
                 player.dataPacket(pkk);
             }
 
-            if (server.getSettings().getWorld().getFeatures().isVanillaPortals() && this instanceof EntityBoss) {
+            if (server.getSettings().world().features().vanillaPortals() && this instanceof EntityBoss) {
                 BossEventPacket pkBoss = new BossEventPacket();
                 pkBoss.bossEid = this.id;
                 pkBoss.type = BossEventPacket.TYPE_SHOW;
@@ -1910,7 +1910,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        if (this.inPortalTicks == 80 && server.getSettings().getWorld().isEnableNether() && this instanceof BaseEntity) {
+        if (this.inPortalTicks == 80 && server.getSettings().world().enableNether() && this instanceof BaseEntity) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.server.getPluginManager().callEvent(ev);
 
@@ -2470,7 +2470,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         AxisAlignedBB newBB = this.boundingBox.getOffsetBoundingBox(dx, dy, dz);
 
-        if (this.server.getSettings().getPlayer().isAllowFlight() || !this.level.hasCollision(this, newBB, false)) {
+        if (this.server.getSettings().player().allowFlight() || !this.level.hasCollision(this, newBB, false)) {
             this.boundingBox = newBB;
         }
 
@@ -2854,7 +2854,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean setMotion(Vector3 motion) {
-        if (server.getSettings().getGeneral().isCallEntityMotionEvent() && !this.justCreated) {
+        if (server.getSettings().general().callEntityMotionEvent() && !this.justCreated) {
             EntityMotionEvent ev = new EntityMotionEvent(this, motion);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {

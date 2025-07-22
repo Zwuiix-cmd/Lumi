@@ -24,7 +24,7 @@ public class StopCommand extends VanillaCommand {
             return true;
         }
 
-        if (sender instanceof Player && !(Server.getInstance().getSettings().getPlayer().isStopInGame())) {
+        if (sender instanceof Player && !(Server.getInstance().getSettings().player().stopInGame())) {
             sender.sendMessage(TextFormat.RED + "Can't use this command in game");
             return true;
         }

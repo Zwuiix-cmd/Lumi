@@ -4,9 +4,11 @@ import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.CustomKey;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 public class PerformanceSettings extends OkaeriConfig {
 
     @CustomKey("async-workers")

@@ -910,7 +910,7 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        if (!Server.getInstance().getSettings().getGeneral().isEnableExperimentMode()) {
+        if (!Server.getInstance().getSettings().general().enableExperimentMode()) {
             Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
             return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
         }

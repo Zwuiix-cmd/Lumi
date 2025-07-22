@@ -106,7 +106,7 @@ public class Anvil extends BaseLevelProvider {
 
         long timestamp = chunk.getChanges();
 
-        if (this.getServer().getSettings().getWorld().isAsyncChunks()) {
+        if (this.getServer().getSettings().world().asyncChunks()) {
             final Chunk chunkClone = chunk.cloneForChunkSending();
             this.level.getAsyncChuckExecutor().execute(() -> {
                 NetworkChunkSerializer.serialize(protocols, chunkClone, networkChunkSerializerCallback -> {

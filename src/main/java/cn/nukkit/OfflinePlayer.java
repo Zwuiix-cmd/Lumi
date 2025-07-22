@@ -42,7 +42,7 @@ public class OfflinePlayer implements IPlayer {
         this.server = server;
 
         CompoundTag nbt;
-        if (server.getSettings().getPlayer().isSavePlayerDataByUuid()) {
+        if (server.getSettings().player().savePlayerDataByUuid()) {
             if (uuid != null) {
                 nbt = this.server.getOfflinePlayerData(uuid, false);
             } else if (name != null) {

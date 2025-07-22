@@ -62,12 +62,12 @@ public class WhitelistCommand extends VanillaCommand {
                         return 1;
                     }
                     case "on" -> {
-                        sender.getServer().getSettings().getPlayer().setWhitelist(true);
+                        sender.getServer().getSettings().player().whitelist(true);
                         log.addSuccess("commands.allowlist.enabled").output(true);
                         return 1;
                     }
                     case "off" -> {
-                        sender.getServer().getSettings().getPlayer().setWhitelist(false);
+                        sender.getServer().getSettings().player().whitelist(false);
                         log.addSuccess("commands.allowlist.disabled").output(true);
                         return 1;
                     }

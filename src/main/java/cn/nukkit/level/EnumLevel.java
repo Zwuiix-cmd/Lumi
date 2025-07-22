@@ -30,13 +30,13 @@ public enum EnumLevel {
         Server server = Server.getInstance();
 
         OVERWORLD.level = server.getDefaultLevel();
-        if (server.getSettings().getWorld().isEnableNether()) {
+        if (server.getSettings().world().enableNether()) {
             if (server.getLevelByName("nether") == null) {
                 server.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
                 server.loadLevel("nether");
             }
             NETHER.level = server.getLevelByName("nether");
-            if (server.getSettings().getWorld().isEnableEnd()) {
+            if (server.getSettings().world().enableEnd()) {
                 if (server.getLevelByName("the_end") == null) {
                     server.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
                     server.loadLevel("the_end");

@@ -47,7 +47,7 @@ public class DifficultyCommand extends VanillaCommand {
                 return 0;
             }
         }
-        if (sender.getServer().getSettings().getWorld().isEnableHardcore()) {
+        if (sender.getServer().getSettings().world().enableHardcore()) {
             difficulty = 3;
         }
         if (difficulty != -1) {

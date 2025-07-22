@@ -56,7 +56,7 @@ public class BlockOreGold extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (Server.getInstance().getSettings().getWorld().getFeatures().isEnableRawOres()) {
+        if (Server.getInstance().getSettings().world().features().enableRawOres()) {
             if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
                 if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
                     return new Item[]{this.toItem()};

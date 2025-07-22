@@ -39,7 +39,7 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
 
         NetworkSettingsPacket settingsPacket = new NetworkSettingsPacket();
         PacketCompressionAlgorithm algorithm;
-        if (player.getServer().getSettings().getNetwork().getCompression().isUseSnappyCompression() && player.protocol >= ProtocolInfo.v1_19_30_23) {
+        if (player.getServer().getSettings().network().compression().useSnappyCompression() && player.protocol >= ProtocolInfo.v1_19_30_23) {
             algorithm = PacketCompressionAlgorithm.SNAPPY;
         } else {
             algorithm = PacketCompressionAlgorithm.ZLIB;
@@ -55,12 +55,12 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
             log.debug(player.getAddress() + " disconnected with unsupported protocol (SupportedProtocols) " + player.protocol);
             return;
         }
-        if (player.protocol < player.getServer().getSettings().getGeneral().getMultiversion().getMinProtocol()) {
+        if (player.protocol < player.getServer().getSettings().general().multiversion().minProtocol()) {
             player.close("", "Support for this Minecraft version is not enabled");
-            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().getGeneral().getMultiversion().getMinProtocol()) " + player.protocol);
-        } else if (player.getServer().getSettings().getGeneral().getMultiversion().getMaxProtocol() >= Math.max(0, player.getServer().getSettings().getGeneral().getMultiversion().getMinProtocol()) && player.protocol > player.getServer().getSettings().getGeneral().getMultiversion().getMaxProtocol()) {
+            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().general().multiversion().minProtocol()) " + player.protocol);
+        } else if (player.getServer().getSettings().general().multiversion().maxProtocol() >= Math.max(0, player.getServer().getSettings().general().multiversion().minProtocol()) && player.protocol > player.getServer().getSettings().general().multiversion().maxProtocol()) {
             player.close("", "Support for this Minecraft version is not enabled");
-            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().getGeneral().getMultiversion().getMaxProtocol()) " + player.protocol);
+            log.debug(player.getAddress() + " disconnected with unsupported protocol (getSettings().general().multiversion().maxProtocol()) " + player.protocol);
         }
     }
 

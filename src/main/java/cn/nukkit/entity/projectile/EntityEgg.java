@@ -79,7 +79,7 @@ public class EntityEgg extends EntityProjectile implements EntityClimateVariant 
         } else if (this.isCollided) {
             this.close();
 
-            if (Server.getInstance().getSettings().getPlayer().isSpawnMobsFromBlocks()) {
+            if (Server.getInstance().getSettings().player().spawnMobsFromBlocks()) {
                 if (Utils.rand(1, 20) == 5) {
                     Position spawnPos = add(0.5, 1, 0.5);
 

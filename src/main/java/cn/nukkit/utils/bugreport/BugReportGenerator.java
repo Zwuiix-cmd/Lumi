@@ -44,7 +44,7 @@ public class BugReportGenerator extends Thread {
             }
         }
         try {
-            if (Server.getInstance().getSettings().getGeneral().isAutomaticBugReport()) {
+            if (Server.getInstance().getSettings().general().automaticBugReport()) {
                 sentry();
             }
         } catch (Exception ex) {
