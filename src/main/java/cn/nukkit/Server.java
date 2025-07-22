@@ -257,10 +257,6 @@ public class Server {
             log.warn("Encryption is not enabled. For better security, it's recommended to enable it if you don't use a proxy software.");
         }
 
-        if (!settings.general().ansiTitle()) {
-            Nukkit.TITLE = false;
-        }
-
         int debugLvl = NukkitMath.clamp(settings.general().debugLevel(), 1, 3);
         if (debug && debugLvl < 2) {
             debugLvl = 2;
@@ -1064,7 +1060,6 @@ public class Server {
         }
 
         if ((this.tickCounter & 0b1111) == 0) {
-            this.titleTick();
 
             this.network.resetStatistics();
             this.maxTick = 20;
@@ -1125,19 +1120,6 @@ public class Server {
 
     public long getNextTick() {
         return nextTick;
-    }
-
-    private void titleTick() {
-        if (!Nukkit.TITLE) return;
-
-        Runtime runtime = Runtime.getRuntime();
-        double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
-        double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
-        System.out.print((char) 0x1b + "]0;" + Nukkit.NUKKIT +
-                " | Online " + this.players.size() + '/' + this.settings.general().maxPlayers() +
-                " | Memory " + Math.round(used / max * 100) + '%' +
-                " | TPS " + this.getTicksPerSecond() +
-                " | Load " + this.getTickUsage() + '%' + (char) 0x07);
     }
 
     public QueryRegenerateEvent getQueryInformation() {

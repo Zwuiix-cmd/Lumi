@@ -17,12 +17,6 @@ public class FeaturesSettings extends OkaeriConfig {
     @CustomKey("vanilla-portals")
     private boolean vanillaPortals = true;
 
-    @CustomKey("vanilla-bossbars")
-    private boolean vanillaBossbars = true;
-
-    @CustomKey("enable-raw-ores")
-    private boolean enableRawOres = true;
-
     @CustomKey("enable-new-paintings")
     private boolean enableNewPaintings = true;
 

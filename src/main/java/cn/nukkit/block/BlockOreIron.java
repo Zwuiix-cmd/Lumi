@@ -56,31 +56,30 @@ public class BlockOreIron extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (Server.getInstance().getSettings().features().enableRawOres()) {
-            if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
-                if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-                    return new Item[]{this.toItem()};
-                }
-                int count = 1;
-                Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
-                if (fortune != null && fortune.getLevel() >= 1) {
-                    int i = Utils.random.nextInt(fortune.getLevel() + 2) - 1;
-
-                    if (i < 0) {
-                        i = 0;
-                    }
-
-                    count = i + 1;
-                }
-
-                Item rawIron = Item.fromString("minecraft:raw_iron");
-                rawIron.setCount(count);
-                return new Item[]{
-                        rawIron
-                };
-            } else {
-                return Item.EMPTY_ARRAY;
+        if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
             }
-        } else return new Item[]{this.toItem()};
+            int count = 1;
+            Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
+            if (fortune != null && fortune.getLevel() >= 1) {
+                int i = Utils.random.nextInt(fortune.getLevel() + 2) - 1;
+
+                if (i < 0) {
+                    i = 0;
+                }
+
+                count = i + 1;
+            }
+
+            Item rawIron = Item.fromString("minecraft:raw_iron");
+            rawIron.setCount(count);
+            return new Item[]{
+                    rawIron
+            };
+        } else {
+            return Item.EMPTY_ARRAY;
+        }
     }
+
 }

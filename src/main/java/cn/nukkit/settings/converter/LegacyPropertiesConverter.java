@@ -47,9 +47,7 @@ public class LegacyPropertiesConverter {
         general.forceResources(this.getPropertyBoolean("force-resources", general.forceResources()));
         general.forceResourcesAllowClientPacks(this.getPropertyBoolean("force-resources-allow-client-packs", general.forceResourcesAllowClientPacks()));
         general.shutdownMessage(this.getPropertyString("shutdown-message", general.shutdownMessage()));
-        general.updateNotifications(this.getPropertyBoolean("update-notifications", general.updateNotifications()));
         general.bstatsMetrics(this.getPropertyBoolean("bstats-metrics", general.bstatsMetrics()));
-        general.ansiTitle(this.getPropertyBoolean("ansi-title", general.ansiTitle()));
         general.debugLevel(this.getPropertyInt("debug-level", general.debugLevel()));
         general.deprecatedVerbose(this.getPropertyBoolean("deprecated-verbose", general.deprecatedVerbose()));
         general.enableSpark(this.getPropertyBoolean("enable-spark", general.enableSpark()));
@@ -176,8 +174,6 @@ public class LegacyPropertiesConverter {
         var features = settings.features();
         features.enableExperimentMode(this.getPropertyBoolean("enable-experiment-mode", features.enableExperimentMode()));
         features.vanillaPortals(this.getPropertyBoolean("vanilla-portals", features.vanillaPortals()));
-        features.vanillaBossbars(this.getPropertyBoolean("vanilla-bossbars", features.vanillaBossbars()));
-        features.enableRawOres(this.getPropertyBoolean("enable-raw-ores", features.enableRawOres()));
         features.enableNewPaintings(this.getPropertyBoolean("enable-new-paintings", features.enableNewPaintings()));
         features.enableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", features.enableNewChickenEggsLaying()));
 
@@ -200,14 +196,10 @@ public class LegacyPropertiesConverter {
         player.checkOpMovement(this.getPropertyBoolean("allow-flight", player.allowFlight()));
         player.stopInGame(this.getPropertyBoolean("stop-in-game", player.stopInGame()));
         player.opInGame(this.getPropertyBoolean("op-in-game", player.opInGame()));
-        player.spawnEggs(this.getPropertyBoolean("spawn-eggs", player.spawnEggs()));
-        player.spawnMobsFromBlocks(this.getPropertyBoolean("spawn-mobs-from-blocks", player.spawnMobsFromBlocks()));
-        player.anvilsEnabled(this.getPropertyBoolean("anvils-enabled", player.anvilsEnabled()));
         player.forcedSafetyEnchant(this.getPropertyBoolean("forced-safety-enchant", player.forcedSafetyEnchant()));
         player.spaceNameMode(PlayerSettings.SpaceNameMode.valueOf(
                 this.getPropertyString("space-name-mode", player.spaceNameMode().name()).toUpperCase()
         ));
-        player.useClientSpectator(this.getPropertyBoolean("use-client-spectator", player.useClientSpectator()));
 
         // Performance Settings
         var performance = settings.performance();

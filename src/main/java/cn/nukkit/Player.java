@@ -590,7 +590,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned && player.spawned &&
                 this.isAlive() && player.isAlive()
                 && player.getLevel() == this.level && player.canSee(this) &&
-                (!this.isSpectator() || (this.server.getSettings().player().useClientSpectator() && player.protocol >= ProtocolInfo.v1_19_30)) &&
+                (!this.isSpectator() || (player.protocol >= ProtocolInfo.v1_19_30)) &&
                 this.showToOthers) {
             super.spawnTo(player);
             if (this.isSpectator()) {
@@ -1196,7 +1196,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         // Prevent PlayerTeleportEvent during player spawn
         //this.teleport(pos, null);
 
-        if (!this.isSpectator() || this.server.getSettings().player().useClientSpectator()) {
+        if (!this.isSpectator()) {
             this.spawnToAll();
         }
 
@@ -1522,7 +1522,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         gamemode &= 0x03;
         if (gamemode == Player.SPECTATOR) {
             //1.19.30+使用真正的旁观模式
-            if (this.server.getSettings().player().useClientSpectator() && this.protocol >= ProtocolInfo.v1_19_30) {
+            if (this.protocol >= ProtocolInfo.v1_19_30) {
                 return GameType.SPECTATOR.ordinal();
             }
             return Player.CREATIVE;
@@ -1578,35 +1578,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.gamemode = gamemode;
 
-        if (this.server.getSettings().player().useClientSpectator()) {
-            List<Player> updatePlayers = this.hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_19_30).filter(p -> p != this).toList();
-            ArrayList<Player> spawnPlayers = new ArrayList<>(this.hasSpawned.values());
-            spawnPlayers.removeAll(updatePlayers);
+        List<Player> updatePlayers = this.hasSpawned.values().stream().filter(p -> p.protocol >= ProtocolInfo.v1_19_30).filter(p -> p != this).toList();
+        ArrayList<Player> spawnPlayers = new ArrayList<>(this.hasSpawned.values());
+        spawnPlayers.removeAll(updatePlayers);
 
-            if (this.isSpectator()) {
-                this.keepMovement = true;
-                this.onGround = false;
-                spawnPlayers.forEach(this::despawnFrom);
-            } else {
-                this.keepMovement = false;
-                spawnPlayers.forEach(this::spawnTo);
-            }
-
-            if (!clientSide) {
-                UpdatePlayerGameTypePacket pk = new UpdatePlayerGameTypePacket();
-                pk.gameType = GameType.from(getClientFriendlyGamemode(gamemode));
-                pk.entityId = this.getId();
-                Server.broadcastPacket(updatePlayers, pk);
-            }
+        if (this.isSpectator()) {
+            this.keepMovement = true;
+            this.onGround = false;
+            spawnPlayers.forEach(this::despawnFrom);
         } else {
-            if (this.isSpectator()) {
-                this.keepMovement = true;
-                this.onGround = false;
-                this.despawnFromAll();
-            } else {
-                this.keepMovement = false;
-                this.spawnToAll();
-            }
+            this.keepMovement = false;
+            spawnPlayers.forEach(this::spawnTo);
+        }
+
+        if (!clientSide) {
+            UpdatePlayerGameTypePacket pk = new UpdatePlayerGameTypePacket();
+            pk.gameType = GameType.from(getClientFriendlyGamemode(gamemode));
+            pk.entityId = this.getId();
+            Server.broadcastPacket(updatePlayers, pk);
         }
 
         this.namedTag.putInt("playerGameType", this.gamemode);

@@ -60,23 +60,11 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("op-in-game")
     private boolean opInGame = true;
 
-    @CustomKey("spawn-eggs")
-    private boolean spawnEggs = true;
-
-    @CustomKey("spawn-mobs-from-blocks")
-    private boolean spawnMobsFromBlocks;
-
-    @CustomKey("anvils-enabled")
-    private boolean anvilsEnabled = true;
-
     @CustomKey("forced-safety-enchant")
     private boolean forcedSafetyEnchant = true;
 
     @CustomKey("space-name-mode")
     private SpaceNameMode spaceNameMode = SpaceNameMode.IGNORE;
-
-    @CustomKey("use-client-spectator")
-    private boolean useClientSpectator = true;
 
     public enum SpaceNameMode {
         DISABLED,

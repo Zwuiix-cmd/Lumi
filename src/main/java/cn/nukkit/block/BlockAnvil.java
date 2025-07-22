@@ -55,7 +55,7 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
     @Override
     public boolean canBeActivated() {
-        return Server.getInstance().getSettings().player().anvilsEnabled();
+        return true;
     }
 
     @Override

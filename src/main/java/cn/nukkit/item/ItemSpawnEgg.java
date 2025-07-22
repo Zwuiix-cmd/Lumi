@@ -55,10 +55,6 @@ public class ItemSpawnEgg extends Item {
             return false;
         }
 
-        if (!Server.getInstance().getSettings().player().spawnEggs()) {
-            return false;
-        }
-
         if (target instanceof BlockMobSpawner) {
             BlockEntity blockEntity = level.getBlockEntity(target);
             if (blockEntity instanceof BlockEntitySpawner) {

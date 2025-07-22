@@ -40,14 +40,8 @@ public class GeneralSettings extends OkaeriConfig {
     @CustomKey("shutdown-message")
     private String shutdownMessage = "Server closed";
 
-    @CustomKey("update-notifications")
-    private boolean updateNotifications = false;
-
     @CustomKey("bstats-metrics")
     private boolean bstatsMetrics = true;
-
-    @CustomKey("ansi-title")
-    private boolean ansiTitle = false;
 
     @CustomKey("debug-level")
     private int debugLevel = 1;
