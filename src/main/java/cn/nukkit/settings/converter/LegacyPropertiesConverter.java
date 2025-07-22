@@ -54,8 +54,6 @@ public class LegacyPropertiesConverter {
         general.useWaterdog(this.getPropertyBoolean("use-waterdog", general.useWaterdog()));
         general.serverAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.serverAuthoritativeMovement()));
         general.serverAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.serverAuthoritativeBlockBreaking()));
-        general.automaticBugReport(this.getPropertyBoolean("automatic-bug-report", general.automaticBugReport()));
-        general.hastebinToken(this.getPropertyString("hastebin-token", general.hastebinToken()));
 
         // Multiversion settings
         general.multiversion().minProtocol(this.getPropertyInt("multiversion-min-protocol", general.multiversion().minProtocol()));
