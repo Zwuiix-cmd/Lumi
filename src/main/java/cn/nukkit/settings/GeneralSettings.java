@@ -73,15 +73,6 @@ public class GeneralSettings extends OkaeriConfig {
     @CustomKey("hastebin-token")
     private String hastebinToken = "";
 
-    @CustomKey("call-data-pk-send-event")
-    private boolean callDataPkSendEvent = true;
-
-    @CustomKey("call-batch-pk-send-event")
-    private boolean callBatchPkSendEvent = true;
-
-    @CustomKey("call-entity-motion-event")
-    private boolean callEntityMotionEvent = true;
-
     @Setter(value = AccessLevel.NONE)
     private MultiversionSettings multiversion = new MultiversionSettings();
 

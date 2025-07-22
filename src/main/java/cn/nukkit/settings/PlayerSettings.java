@@ -72,12 +72,15 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("forced-safety-enchant")
     private boolean forcedSafetyEnchant = true;
 
-    @CustomKey("xp-bottles-on-creative")
-    private boolean xpBottlesOnCreative = true;
-
     @CustomKey("space-name-mode")
-    private String spaceNameMode = "ignore";
+    private SpaceNameMode spaceNameMode = SpaceNameMode.IGNORE;
 
     @CustomKey("use-client-spectator")
     private boolean useClientSpectator = true;
+
+    public enum SpaceNameMode {
+        DISABLED,
+        REPLACING,
+        IGNORE
+    }
 }

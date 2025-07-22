@@ -1,5 +1,6 @@
 package cn.nukkit.settings.converter;
 
+import cn.nukkit.settings.PlayerSettings;
 import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.settings.WorldSettings.AntiXraySettings.AntiXrayMode;
@@ -56,9 +57,6 @@ public class LegacyPropertiesConverter {
         general.serverAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.serverAuthoritativeBlockBreaking()));
         general.automaticBugReport(this.getPropertyBoolean("automatic-bug-report", general.automaticBugReport()));
         general.hastebinToken(this.getPropertyString("hastebin-token", general.hastebinToken()));
-        general.callDataPkSendEvent(this.getPropertyBoolean("call-data-pk-send-event", general.callDataPkSendEvent()));
-        general.callBatchPkSendEvent(this.getPropertyBoolean("call-batch-pk-send-event", general.callBatchPkSendEvent()));
-        general.callEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", general.callEntityMotionEvent()));
 
         // Multiversion settings
         general.multiversion().minProtocol(this.getPropertyInt("multiversion-min-protocol", general.multiversion().minProtocol()));
@@ -203,8 +201,9 @@ public class LegacyPropertiesConverter {
         player.spawnMobsFromBlocks(this.getPropertyBoolean("spawn-mobs-from-blocks", player.spawnMobsFromBlocks()));
         player.anvilsEnabled(this.getPropertyBoolean("anvils-enabled", player.anvilsEnabled()));
         player.forcedSafetyEnchant(this.getPropertyBoolean("forced-safety-enchant", player.forcedSafetyEnchant()));
-        player.xpBottlesOnCreative(this.getPropertyBoolean("xp-bottles-on-creative", player.xpBottlesOnCreative()));
-        player.spaceNameMode(this.getPropertyString("space-name-mode", player.spaceNameMode()));
+        player.spaceNameMode(PlayerSettings.SpaceNameMode.valueOf(
+                this.getPropertyString("space-name-mode", player.spaceNameMode().name()).toUpperCase()
+        ));
         player.useClientSpectator(this.getPropertyBoolean("use-client-spectator", player.useClientSpectator()));
 
         // Performance Settings

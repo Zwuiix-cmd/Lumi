@@ -32,4 +32,3 @@ public class PerformanceSettings extends OkaeriConfig {
     @CustomKey("thread-watchdog-tick")
     private int threadWatchdogTick = 60000;
 }
-

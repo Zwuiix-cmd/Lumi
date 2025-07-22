@@ -1307,15 +1307,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet = packet.clone();
         packet.protocol = this.protocol;
 
-        if (server.getSettings().general().callDataPkSendEvent()) {
-            DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-            this.server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
-            }
+        DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
+        if (!event.call()) {
+            return false;
         }
 
-        if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+        if (Nukkit.DEBUG > 2) {
             log.trace("Outbound {}: {}", this.getName(), packet);
         }
 
@@ -3016,29 +3013,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.loginPacketReceived = true;
 
                 LoginPacket loginPacket = (LoginPacket) packet;
-
                 this.protocol = loginPacket.getProtocol();
 
                 switch (this.server.getSettings().player().spaceNameMode()) {
-                    case "disabled":
+                    case DISABLED -> {
                         if (TextFormat.clean(loginPacket.username).contains(" ")) {
                             this.close("", "Invalid name (please remove spaces)");
                             return;
                         }
                         this.unverifiedUsername = TextFormat.clean(loginPacket.username);
-                        break;
-                    case "replacing":
+                    }
+                    case REPLACING -> {
                         if (protocol >= ProtocolInfo.v1_16_0) {
-                            this.unverifiedUsername = TextFormat.clean(loginPacket.username)
-                                    .replace(" ", "_");
+                            this.unverifiedUsername = TextFormat.clean(loginPacket.username).replace(" ", "_");
                         } else {
                             // There are compatibility issues in <1.16, ignore
                             this.unverifiedUsername = TextFormat.clean(loginPacket.username);
                         }
-                        break;
-                    default:
-                        this.unverifiedUsername = TextFormat.clean(loginPacket.username);
-                        break;
+                    }
+                    default -> this.unverifiedUsername = TextFormat.clean(loginPacket.username);
                 }
 
                 if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol)) {
