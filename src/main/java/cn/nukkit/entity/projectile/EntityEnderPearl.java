@@ -81,21 +81,19 @@ public class EntityEnderPearl extends EntityProjectile {
             if (!portal) {
                 teleport();
 
-                if (Server.getInstance().getSettings().player().spawnMobsFromBlocks()) {
-                    if (Utils.rand(1, 20) == 5) {
-                        Position spawnPos = add(0.5, 1, 0.5);
+                if (Utils.rand(1, 20) == 5) {
+                    Position spawnPos = add(0.5, 1, 0.5);
 
-                        CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.ENDER_PEARL, this.shootingEntity);
-                        level.getServer().getPluginManager().callEvent(ev);
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, spawnPos, CreatureSpawnEvent.SpawnReason.ENDER_PEARL, this.shootingEntity);
+                    level.getServer().getPluginManager().callEvent(ev);
 
-                        if (ev.isCancelled()) {
-                            return false;
-                        }
+                    if (ev.isCancelled()) {
+                        return false;
+                    }
 
-                        Entity entity = Entity.createEntity("Endermite", spawnPos);
-                        if (entity != null) {
-                            entity.spawnToAll();
-                        }
+                    Entity entity = Entity.createEntity("Endermite", spawnPos);
+                    if (entity != null) {
+                        entity.spawnToAll();
                     }
                 }
             }

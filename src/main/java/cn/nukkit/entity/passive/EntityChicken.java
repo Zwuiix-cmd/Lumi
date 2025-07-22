@@ -87,7 +87,7 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        if (this.getServer().getSettings().player().spawnMobsFromBlocks() && !this.isBaby()) {
+        if (!this.isBaby()) {
             if (this.eggLayTime > 0) {
                 eggLayTime -= tickDiff;
             } else {

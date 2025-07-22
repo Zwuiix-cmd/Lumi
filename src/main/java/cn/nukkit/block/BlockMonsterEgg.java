@@ -61,15 +61,13 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        if (Server.getInstance().getSettings().player().spawnMobsFromBlocks()) {
-            if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
-                EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
-                entity.spawnToAll();
-                EntityEventPacket pk = new EntityEventPacket();
-                pk.eid = entity.getId();
-                pk.event = EntityEventPacket.SILVERFISH_SPAWN_ANIMATION;
-                entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
-            }
+        if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
+            EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
+            entity.spawnToAll();
+            EntityEventPacket pk = new EntityEventPacket();
+            pk.eid = entity.getId();
+            pk.event = EntityEventPacket.SILVERFISH_SPAWN_ANIMATION;
+            entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
         }
         return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
     }

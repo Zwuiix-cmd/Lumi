@@ -218,7 +218,7 @@ public class ItemBucket extends Item {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
                 }
 
-                if (Server.getInstance().getSettings().player().spawnMobsFromBlocks() && ev.isMobSpawningAllowed()) {
+                if (ev.isMobSpawningAllowed()) {
                     String entityName = switch (this.getDamage()) {
                         case COD_BUCKET -> "Cod";
                         case SALMON_BUCKET -> "Salmon";
