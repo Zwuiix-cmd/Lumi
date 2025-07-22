@@ -182,7 +182,6 @@ public class LegacyPropertiesConverter {
         player.announcePlayerAchievements(this.getPropertyBoolean("announce-player-achievements", player.announcePlayerAchievements()));
         player.whitelist(this.getPropertyBoolean("white-list", player.whitelist()));
         player.whitelistReason(this.getPropertyString("whitelist-reason", player.whitelistReason()));
-        player.bedSpawnpoints(this.getPropertyBoolean("bed-spawnpoints", player.bedSpawnpoints()));
         player.savePlayerData(this.getPropertyBoolean("save-player-data", player.savePlayerData()));
         player.savePlayerDataByUuid(this.getPropertyBoolean("save-player-data-by-uuid", player.savePlayerDataByUuid()));
         player.skinChangeCooldown(this.getPropertyInt("skin-change-cooldown", player.skinChangeCooldown()));

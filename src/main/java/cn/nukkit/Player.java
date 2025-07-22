@@ -1386,10 +1386,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, (int) pos.x, (int) pos.y, (int) pos.z));
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, true);
 
-        if (this.getServer().getSettings().player().bedSpawnpoints()) {
-            this.setSpawnBlock(pos);
-            this.sendTranslation("§7%tile.bed.respawnSet");
-        }
+        this.setSpawnBlock(pos);
+        this.sendTranslation(TextFormat.GRAY + "%tile.bed.respawnSet");
 
         this.level.sleepTicks = 60;
         this.timeSinceRest = 0;

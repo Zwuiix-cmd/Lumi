@@ -28,9 +28,6 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("whitelist-reason")
     private String whitelistReason = "§cServer is white-listed";
 
-    @CustomKey("bed-spawnpoints")
-    private boolean bedSpawnpoints = true;
-
     @CustomKey("save-player-data")
     private boolean savePlayerData = true;
 
