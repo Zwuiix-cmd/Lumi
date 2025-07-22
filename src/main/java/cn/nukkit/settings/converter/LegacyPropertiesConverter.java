@@ -1,6 +1,7 @@
 package cn.nukkit.settings.converter;
 
 import cn.nukkit.Difficulty;
+import cn.nukkit.settings.GeneralSettings;
 import cn.nukkit.settings.PlayerSettings;
 import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.WorldSettings;
@@ -13,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static cn.nukkit.settings.GeneralSettings.*;
 
 @Slf4j
 public class LegacyPropertiesConverter {
@@ -51,7 +54,11 @@ public class LegacyPropertiesConverter {
         general.debugLevel(this.getPropertyInt("debug-level", general.debugLevel()));
         general.enableSpark(this.getPropertyBoolean("enable-spark", general.enableSpark()));
         general.useWaterdog(this.getPropertyBoolean("use-waterdog", general.useWaterdog()));
-        general.serverAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.serverAuthoritativeMovement()));
+        general.serverAuthoritativeMovement(switch (this.getPropertyString("server-authoritative-movement", "server-auth")) {
+            case "client-auth" -> ServerAuthoritativeMovement.CLIENT_AUTH;
+            case "server-auth-with-rewind" -> ServerAuthoritativeMovement.SERVER_AUTH_WITH_REWIND;
+            default -> ServerAuthoritativeMovement.SERVER_AUTH;
+        });
         general.serverAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.serverAuthoritativeBlockBreaking()));
 
         // Multiversion settings

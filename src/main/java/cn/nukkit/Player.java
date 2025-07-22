@@ -76,6 +76,8 @@ import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
 import cn.nukkit.scoreboard.scorer.PlayerScorer;
+import cn.nukkit.settings.GeneralSettings;
+import cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 import cn.nukkit.utils.*;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
@@ -7272,7 +7274,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean isMovementServerAuthoritative() {
-        return (!this.server.getSettings().general().serverAuthoritativeMovement().equals("client-auth") && !this.server.getSettings().general().serverAuthoritativeMovement().equals("server-auth-with-rewind"))  && this.protocol >= ProtocolInfo.v1_17_0;
+        return this.server.getSettings().general().serverAuthoritativeMovement() == ServerAuthoritativeMovement.SERVER_AUTH && this.protocol >= ProtocolInfo.v1_17_0;
     }
 
     public boolean isServerAuthoritativeBlockBreaking() {

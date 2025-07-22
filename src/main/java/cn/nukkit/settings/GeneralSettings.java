@@ -63,7 +63,8 @@ public class GeneralSettings extends OkaeriConfig {
 
     @CustomKey("server-authoritative-movement")
     @Comment("Whether to enable server authoritative movement")
-    private String serverAuthoritativeMovement = "server-auth";
+    @Comment("Allowed values: \"client-auth\", \"server-auth\", \"server-auth-with-rewind\"")
+    private ServerAuthoritativeMovement serverAuthoritativeMovement = ServerAuthoritativeMovement.SERVER_AUTH;
 
     @CustomKey("server-authoritative-block-breaking")
     @Comment("Whether to enable server authoritative block breaking")
@@ -72,6 +73,12 @@ public class GeneralSettings extends OkaeriConfig {
     @Setter(value = AccessLevel.NONE)
     @Comment("Multiversion settings")
     private MultiversionSettings multiversion = new MultiversionSettings();
+
+    public enum ServerAuthoritativeMovement {
+        CLIENT_AUTH,
+        SERVER_AUTH,
+        SERVER_AUTH_WITH_REWIND
+    }
 
     @Getter
     @Setter
