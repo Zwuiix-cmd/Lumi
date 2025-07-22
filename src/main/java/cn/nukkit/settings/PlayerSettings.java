@@ -16,7 +16,7 @@ public class PlayerSettings extends OkaeriConfig {
     private int defaultGamemode = 0;
 
     @CustomKey("force-gamemode")
-    private boolean forceGamemode = true;
+    private boolean forceGamemode = false;
 
     private boolean whitelist = false;
 
