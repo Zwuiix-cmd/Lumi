@@ -1,6 +1,7 @@
 package cn.nukkit.settings;
 
 import eu.okaeri.configs.OkaeriConfig;
+import eu.okaeri.configs.annotation.Comment;
 import eu.okaeri.configs.annotation.CustomKey;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,15 +56,19 @@ public class PlayerSettings extends OkaeriConfig {
     private boolean allowFlight = false;
 
     @CustomKey("stop-in-game")
+    @Comment("Allows to use /stop command in game")
     private boolean stopInGame = false;
 
+    @Comment("Allows to use /op command in game")
     @CustomKey("op-in-game")
     private boolean opInGame = true;
 
     @CustomKey("forced-safety-enchant")
+    @Comment("Forcing server to set enchantment levels to value calculated by server")
     private boolean forcedSafetyEnchant = true;
 
     @CustomKey("space-name-mode")
+    @Comment("Handling player names with space. It can be DISABLED, IGNORE and REPLACING")
     private SpaceNameMode spaceNameMode = SpaceNameMode.IGNORE;
 
     public enum SpaceNameMode {
