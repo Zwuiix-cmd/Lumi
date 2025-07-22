@@ -103,6 +103,7 @@ public class LegacyPropertiesConverter {
         world.setEnableNether(this.getPropertyBoolean("nether", world.isEnableNether()));
         world.setEnableEnd(this.getPropertyBoolean("end", world.isEnableEnd()));
         world.setDropSpawners(this.getPropertyBoolean("drop-spawners", world.isDropSpawners()));
+        world.setExplosionBreakBlocks(this.getPropertyBoolean("explosion-break-blocks", world.isExplosionBreakBlocks()));
         world.setPortalTicks(this.getPropertyInt("portal-ticks", world.getPortalTicks()));
         world.setWorldAutoCompaction(this.getPropertyBoolean("level-auto-compaction", world.isWorldAutoCompaction()));
         world.setWorldAutoCompactionTicks(this.getPropertyInt("level-auto-compaction-ticks", world.getWorldAutoCompactionTicks()));
@@ -140,6 +141,7 @@ public class LegacyPropertiesConverter {
         world.getEntity().setWorldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.getEntity().getWorldsEntitySpawningDisabled()));
 
         // Chunk Settings
+        world.getChunk().setCompressionLevel(Math.max(Math.min(this.getPropertyInt("chunk-compression-level", 7), 9), 1));
         world.getChunk().setSendingPerTick(this.getPropertyInt("chunk-sending-per-tick", world.getChunk().getSendingPerTick()));
         world.getChunk().setTickingPerTick(this.getPropertyInt("chunk-ticking-per-tick", world.getChunk().getTickingPerTick()));
         world.getChunk().setTickingRadius(this.getPropertyInt("chunk-ticking-radius", world.getChunk().getTickingRadius()));

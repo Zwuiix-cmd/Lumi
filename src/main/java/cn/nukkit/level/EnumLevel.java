@@ -4,13 +4,10 @@ import cn.nukkit.Server;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.math.Vector3;
 
-import java.util.StringTokenizer;
-
 /**
  * Default dimensions and their Levels
  */
 public enum EnumLevel {
-
     OVERWORLD,
     NETHER,
     THE_END;
@@ -31,34 +28,22 @@ public enum EnumLevel {
      */
     public static void initLevels() {
         Server server = Server.getInstance();
+
         OVERWORLD.level = server.getDefaultLevel();
-        if (server.netherEnabled) {
+        if (server.getSettings().getWorld().isEnableNether()) {
             if (server.getLevelByName("nether") == null) {
                 server.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
                 server.loadLevel("nether");
             }
             NETHER.level = server.getLevelByName("nether");
-            String list = server.getPropertyString("multi-nether-worlds");
-            if (!list.trim().isEmpty()) {
-                StringTokenizer tokenizer = new StringTokenizer(list, ", ");
-                while (tokenizer.hasMoreTokens()) {
-                    String world = tokenizer.nextToken();
-                    Server.multiNetherWorlds.add(world);
-                    String nether = world + "-nether";
-                    if (server.getLevelByName(nether) == null) {
-                        server.generateLevel(nether, System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
-                        server.loadLevel(nether);
-                    }
+            if (server.getSettings().getWorld().isEnableEnd()) {
+                if (server.getLevelByName("the_end") == null) {
+                    server.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
+                    server.loadLevel("the_end");
+                    server.getLevelByName("the_end").setSpawnLocation(new Vector3(100.5, 49, 0.5));
                 }
+                THE_END.level = server.getLevelByName("the_end");
             }
-        }
-        if (server.endEnabled) {
-            if (server.getLevelByName("the_end") == null) {
-                server.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
-                server.loadLevel("the_end");
-                server.getLevelByName("the_end").setSpawnLocation(new Vector3(100.5, 49, 0.5));
-            }
-            THE_END.level = server.getLevelByName("the_end");
         }
     }
 }

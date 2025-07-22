@@ -32,7 +32,7 @@ public class HastebinUtility {
         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod("POST");
-        String key = Server.getInstance().getPropertyString("hastebin-token");
+        String key = Server.getInstance().getSettings().getGeneral().getHastebinToken();
         if (key == null || key.isBlank()) {
             log.error("You haven't set a Hastebin token yet! Please create a token on https://www.toptal.com/developers/hastebin/documentation and fill in the obtained key as `hastebin-token` in the `server.properties` file.");
         } else {
@@ -77,7 +77,7 @@ public class HastebinUtility {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.contains("rcon.password=") && !line.contains("hastebin-token=")) {
+                if (!line.contains("password") && !line.contains("token")) {
                     lines.add(line);
                 }
             }

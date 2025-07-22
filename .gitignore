@@ -18,7 +18,7 @@ banned-ips.json
 banned-players.json
 ops.txt
 server.log
-server.properties
+settings.yml
 white-list.txt
 worlds
 worlds/*

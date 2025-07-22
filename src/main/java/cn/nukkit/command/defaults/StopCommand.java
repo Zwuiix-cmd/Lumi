@@ -2,9 +2,9 @@ package cn.nukkit.command.defaults;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.utils.TextFormat;
 
 /**
  * @author MagicDroidX
@@ -24,15 +24,14 @@ public class StopCommand extends VanillaCommand {
             return true;
         }
 
-        if (sender instanceof Player && !(Server.getInstance().stopInGame)) {
-            sender.sendMessage("\u00A7cCan't use this command in game");
+        if (sender instanceof Player && !(Server.getInstance().getSettings().getPlayer().isStopInGame())) {
+            sender.sendMessage(TextFormat.RED + "Can't use this command in game");
             return true;
         }
 
         broadcastCommandMessage(sender, new TranslationContainer("commands.stop.start"));
 
-        sender.getServer().shutdown();
-
+        Server.getInstance().shutdown();
         return true;
     }
 }

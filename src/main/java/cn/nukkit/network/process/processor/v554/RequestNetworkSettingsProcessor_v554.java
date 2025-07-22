@@ -39,7 +39,7 @@ public class RequestNetworkSettingsProcessor_v554 extends DataPacketProcessor<Re
 
         NetworkSettingsPacket settingsPacket = new NetworkSettingsPacket();
         PacketCompressionAlgorithm algorithm;
-        if (player.getServer().useSnappy && player.protocol >= ProtocolInfo.v1_19_30_23) {
+        if (player.getServer().getSettings().getNetwork().getCompression().isUseSnappyCompression() && player.protocol >= ProtocolInfo.v1_19_30_23) {
             algorithm = PacketCompressionAlgorithm.SNAPPY;
         } else {
             algorithm = PacketCompressionAlgorithm.ZLIB;

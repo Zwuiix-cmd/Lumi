@@ -26,7 +26,7 @@ public class AdventureSettingsProcessor extends DataPacketProcessor<AdventureSet
         if (pk.entityUniqueId != player.getId()) {
             return;
         }
-        if (!player.getServer().getAllowFlight() && pk.getFlag(AdventureSettingsPacket.FLYING) && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)
+        if (!player.getServer().getSettings().getPlayer().isAllowFlight() && pk.getFlag(AdventureSettingsPacket.FLYING) && !player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT)
                 || pk.getFlag(AdventureSettingsPacket.NO_CLIP) && !player.getAdventureSettings().get(AdventureSettings.Type.NO_CLIP)) {
             player.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on player server", true, "type=AdventureSettingsPacket, flags=ALLOW_FLIGHT: " + pk.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) + ", FLYING: " + pk.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT));
             return;

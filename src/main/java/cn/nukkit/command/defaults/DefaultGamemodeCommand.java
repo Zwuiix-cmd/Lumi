@@ -32,25 +32,25 @@ public class DefaultGamemodeCommand extends VanillaCommand {
     @Override
     public int execute(CommandSender sender, String commandLabel, Map.Entry<String, ParamList> result, CommandLogger log) {
         var list = result.getValue();
-        int gameMode;
+        int gamemode;
         switch (result.getKey()) {
-            case "default" -> gameMode = list.getResult(0);
+            case "default" -> gamemode = list.getResult(0);
             case "byString" -> {
                 String mode = list.getResult(0);
-                gameMode = Server.getGamemodeFromString(mode);
+                gamemode = Server.getGamemodeFromString(mode);
             }
             default -> {
                 return 0;
             }
         }
 
-        boolean valid = gameMode >= 0 && gameMode <= 3;
+        boolean valid = gamemode >= 0 && gamemode <= 3;
         if (valid) {
-            sender.getServer().setPropertyInt("gamemode", gameMode);
-            log.addSuccess("commands.defaultgamemode.success", Server.getGamemodeString(gameMode)).output();
+            sender.getServer().getSettings().getPlayer().setDefaultGamemode(gamemode);
+            log.addSuccess("commands.defaultgamemode.success", Server.getGamemodeString(gamemode)).output();
             return 1;
         } else {
-            log.addError("commands.gamemode.fail.invalid", String.valueOf(gameMode)).output();
+            log.addError("commands.gamemode.fail.invalid", String.valueOf(gamemode)).output();
             return 0;
         }
     }

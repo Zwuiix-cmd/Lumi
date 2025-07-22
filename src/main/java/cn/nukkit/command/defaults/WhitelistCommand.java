@@ -62,14 +62,12 @@ public class WhitelistCommand extends VanillaCommand {
                         return 1;
                     }
                     case "on" -> {
-                        sender.getServer().setWhitelisted(true);
-                        sender.getServer().setPropertyBoolean("white-list", true);
+                        sender.getServer().getSettings().getPlayer().setWhitelist(true);
                         log.addSuccess("commands.allowlist.enabled").output(true);
                         return 1;
                     }
                     case "off" -> {
-                        sender.getServer().setWhitelisted(false);
-                        sender.getServer().setPropertyBoolean("white-list", false);
+                        sender.getServer().getSettings().getPlayer().setWhitelist(false);
                         log.addSuccess("commands.allowlist.disabled").output(true);
                         return 1;
                     }
@@ -81,7 +79,7 @@ public class WhitelistCommand extends VanillaCommand {
                             ++count;
                         }
                         log.addSuccess("commands.allowlist.list", String.valueOf(count), String.valueOf(count));
-                        log.addSuccess(re.length() > 0 ? re.substring(0, re.length() - 2) : "").output();
+                        log.addSuccess(!re.isEmpty() ? re.substring(0, re.length() - 2) : "").output();
                         return 1;
                     }
                 }

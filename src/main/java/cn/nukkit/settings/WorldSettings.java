@@ -54,6 +54,9 @@ public class WorldSettings extends OkaeriConfig {
     @CustomKey("drop-spawners")
     private boolean dropSpawners = true;
 
+    @CustomKey("explosion-break-blocks")
+    private boolean explosionBreakBlocks;
+
     @CustomKey("multi-nether-worlds")
     private List<String> multiNetherWorlds = new ArrayList<>();
 
@@ -153,6 +156,9 @@ public class WorldSettings extends OkaeriConfig {
     @Getter
     @Setter
     public static class ChunkSettings extends OkaeriConfig {
+
+        @CustomKey("compression-level")
+        private int compressionLevel;
 
         @CustomKey("sending-per-tick")
         private int sendingPerTick = 4;

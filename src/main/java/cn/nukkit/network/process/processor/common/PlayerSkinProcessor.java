@@ -35,14 +35,16 @@ public class PlayerSkinProcessor extends DataPacketProcessor<PlayerSkinPacket> {
         }
 
         PlayerChangeSkinEvent playerChangeSkinEvent = new PlayerChangeSkinEvent(player, skin);
-        if (TimeUnit.SECONDS.toMillis(player.getServer().getPlayerSkinChangeCooldown()) > System.currentTimeMillis() - player.lastSkinChange) {
+        int skinChangeCooldown = Server.getInstance().getSettings().getPlayer().getSkinChangeCooldown();
+        if (TimeUnit.SECONDS.toMillis(skinChangeCooldown) > System.currentTimeMillis() - player.lastSkinChange) {
             playerChangeSkinEvent.setCancelled(true);
             Server.getInstance().getLogger().warning("Player " + playerHandle.getUsername() + " change skin too quick!");
         }
         player.getServer().getPluginManager().callEvent(playerChangeSkinEvent);
         if (!playerChangeSkinEvent.isCancelled()) {
+            boolean personaSkins = Server.getInstance().getSettings().getPlayer().isPersonaSkins();
             player.lastSkinChange = System.currentTimeMillis();
-            player.setSkin(skin.isPersona() && !player.getServer().personaSkins ? Skin.NO_PERSONA_SKIN : skin);
+            player.setSkin(skin.isPersona() && !personaSkins ? Skin.NO_PERSONA_SKIN : skin);
         }
     }
 

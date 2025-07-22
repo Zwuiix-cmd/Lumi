@@ -40,7 +40,7 @@ public class AddPlayerPacket extends DataPacket {
     /**
      * v1.18.30 and above
      */
-    public int gameType = Server.getInstance().getGamemode();
+    public int gameType = Server.getInstance().getDefaultGamemode();
     public EntityMetadata metadata = new EntityMetadata();
     public EntityLink[] links = new EntityLink[0];
     public String deviceId = "";

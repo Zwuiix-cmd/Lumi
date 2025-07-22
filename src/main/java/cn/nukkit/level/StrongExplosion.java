@@ -56,7 +56,7 @@ public class StrongExplosion extends Explosion {
         }
 
         if (this.size < 0.1) return false;
-        if (!level.getServer().explosionBreakBlocks) return true;
+        if (!level.getServer().getSettings().getWorld().isExplosionBreakBlocks()) return true;
 
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);

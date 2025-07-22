@@ -233,7 +233,7 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(protocol, gameRules);
         if (protocol >= ProtocolInfo.v1_16_100) {
-            if (Server.getInstance().enableExperimentMode && !this.experiments.isEmpty()) {
+            if (Server.getInstance().getSettings().getGeneral().isEnableExperimentMode() && !this.experiments.isEmpty()) {
                 this.putLInt(this.experiments.size()); // Experiment count
                 for (ExperimentData experiment : this.experiments) {
                     this.putString(experiment.getName());

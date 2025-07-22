@@ -1495,7 +1495,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean save(boolean force) {
-        if ((!this.autoSave || server.holdWorldSave) && !force) {
+        if (!this.autoSave && !force) {
             return false;
         }
 
@@ -2824,7 +2824,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isInSpawnRadius(Vector3 vector3) {
-        return server.getSettings().getWorld().getSpawnProtection() > -1 && new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= server.getSpawnRadius();
+        return server.getSettings().getWorld().getSpawnProtection() > -1 &&
+                new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <=
+                        server.getSettings().getWorld().getSpawnProtection();
     }
 
     public Entity getEntity(long entityId) {
@@ -4127,7 +4129,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void unloadChunks(int maxUnload, boolean force) {
-        if (server.holdWorldSave && !force && this.saveOnUnloadEnabled) {
+        if (!force && this.saveOnUnloadEnabled) {
             return;
         }
 
@@ -4179,7 +4181,7 @@ public class Level implements ChunkManager, Metadatable {
      * @return true if there is allocated time remaining
      */
     private boolean unloadChunks(long now, long allocatedTime, boolean force) {
-        if (server.holdWorldSave && !force && this.saveOnUnloadEnabled) {
+        if (!force && this.saveOnUnloadEnabled) {
             return false;
         }
 

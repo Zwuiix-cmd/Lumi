@@ -171,8 +171,6 @@ public class Server {
     private final PlayerMetadataStore playerMetadata;
     private final LevelMetadataStore levelMetadata;
     private final Network network;
-
-    private int difficulty;
     int c_s_spawnThreshold;
     private int autoSaveTicker;
     private final BaseLang baseLang;
@@ -256,6 +254,10 @@ public class Server {
         LegacyPropertiesConverter legacyPropertiesConverter = new LegacyPropertiesConverter(settings);
         legacyPropertiesConverter.convert();
 
+        if (!settings.getNetwork().isEncryption()) {
+            log.warn("Encryption is not enabled. For better security, it's recommended to enable it if you don't use a proxy software.");
+        }
+
         if (!settings.getGeneral().isAnsiTitle()) {
             Nukkit.TITLE = false;
         }
@@ -325,7 +327,7 @@ public class Server {
 
         this.setAutoSave(settings.getWorld().getAutoSave().isEnable());
 
-        if (this.settings.getWorld().isEnableHardcore() && this.difficulty < 3) {
+        if (this.settings.getWorld().isEnableHardcore() && this.getDifficulty() < 3) {
             this.setDifficulty(3);
         } else {
             this.setDifficulty(getDifficultyFromString(settings.getWorld().getDifficulty()));
@@ -658,7 +660,7 @@ public class Server {
         log.info("Reloading server settings...");
         this.settings.load();
 
-        if (this.settings.getWorld().isEnableHardcore() && this.difficulty < 3) {
+        if (this.settings.getWorld().isEnableHardcore() && this.getDifficulty() < 3) {
             this.setDifficulty(3);
         }
 

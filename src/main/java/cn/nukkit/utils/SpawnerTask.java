@@ -164,14 +164,14 @@ public class SpawnerTask implements Runnable {
         if (Server.getInstance().getOnlinePlayersCount() != 0) {
             if (mobsNext) {
                 mobsNext = false;
-                if (Server.getInstance().spawnMonsters) {
+                if (Server.getInstance().getSettings().getWorld().getEntity().isSpawnMobs()) {
                     for (EntitySpawner spawner : mobSpawners.values()) {
                         spawner.spawn();
                     }
                 }
             } else {
                 mobsNext = true;
-                if (Server.getInstance().spawnAnimals) {
+                if (Server.getInstance().getSettings().getWorld().getEntity().isSpawnAnimals()) {
                     for (EntitySpawner spawner : animalSpawners.values()) {
                         spawner.spawn();
                     }
