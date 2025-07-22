@@ -38,9 +38,11 @@ public class PlayerSettings extends OkaeriConfig {
     private int skinChangeCooldown = 15;
 
     @CustomKey("do-not-limit-skin-geometry")
+    @Comment("Do not limit the geometry of the player's skin")
     private boolean doNotLimitSkinGeometry = true;
 
     @CustomKey("do-not-limit-interactions")
+    @Comment("Do not limit the number of player interactions")
     private boolean doNotLimitInteractions = false;
 
     @CustomKey("persona-skins")
@@ -50,6 +52,7 @@ public class PlayerSettings extends OkaeriConfig {
     private boolean checkOpMovement = false;
 
     @CustomKey("allow-flight")
+    @Comment("Allow players to fly in survival mode with cheats")
     private boolean allowFlight = false;
 
     @CustomKey("stop-in-game")
