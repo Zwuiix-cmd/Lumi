@@ -46,9 +46,6 @@ public class GeneralSettings extends OkaeriConfig {
     @CustomKey("debug-level")
     private int debugLevel = 1;
 
-    @CustomKey("deprecated-verbose")
-    private boolean deprecatedVerbose = true;
-
     @CustomKey("enable-spark")
     private boolean enableSpark = false;
 
