@@ -129,7 +129,6 @@ public class LegacyPropertiesConverter {
         world.entity().ticksPerEntitySpawns(this.getPropertyInt("ticks-per-entity-spawns", world.entity().ticksPerEntitySpawns()));
         world.entity().ticksPerEntityDespawns(this.getPropertyInt("ticks-per-entity-despawns", world.entity().ticksPerEntityDespawns()));
         world.entity().mobAi(this.getPropertyBoolean("mob-ai", world.entity().mobAi()));
-        world.entity().callEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", world.entity().callEntityMotionEvent()));
         world.entity().worldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.entity().worldsEntitySpawningDisabled()));
 
         // Chunk Settings

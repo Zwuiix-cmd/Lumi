@@ -55,7 +55,7 @@ public class WorldSettings extends OkaeriConfig {
     private boolean enableEnd = true;
 
     @CustomKey("drop-spawners")
-    private boolean dropSpawners = true;
+    private boolean dropSpawners = false;
 
     @CustomKey("explosion-break-blocks")
     private boolean explosionBreakBlocks;
@@ -92,14 +92,17 @@ public class WorldSettings extends OkaeriConfig {
 
     @Setter(value = AccessLevel.NONE)
     @CustomKey("entity")
+    @Comment("World entities settings")
     private EntitySettings entity = new EntitySettings();
 
     @Setter(value = AccessLevel.NONE)
     @CustomKey("chunk")
+    @Comment("World chunks settings")
     private ChunkSettings chunk = new ChunkSettings();
 
     @Setter(value = AccessLevel.NONE)
     @CustomKey("auto-save")
+    @Comment("World auto save settings")
     private AutoSaveSettings autoSave = new AutoSaveSettings();
 
     @CustomKey("anti-xray")
@@ -136,9 +139,6 @@ public class WorldSettings extends OkaeriConfig {
 
         @CustomKey("mob-ai")
         private boolean mobAi = true;
-
-        @CustomKey("call-entity-motion-event")
-        private boolean callEntityMotionEvent = true;
 
         @CustomKey("worlds-entity-spawning-disabled")
         private String worldsEntitySpawningDisabled = "";
@@ -184,6 +184,7 @@ public class WorldSettings extends OkaeriConfig {
         private boolean enable = true;
 
         @CustomKey("per-ticks")
+        @Comment("Save worlds per ticks")
         private int perTicks = 6000;
 
         @CustomKey("disabled-worlds")
