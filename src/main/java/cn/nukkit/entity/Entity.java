@@ -1427,7 +1427,7 @@ public abstract class Entity extends Location implements Metadatable {
                 player.dataPacket(pkk);
             }
 
-            if (server.getSettings().world().features().vanillaPortals() && this instanceof EntityBoss) {
+            if (server.getSettings().features().vanillaPortals() && this instanceof EntityBoss) {
                 BossEventPacket pkBoss = new BossEventPacket();
                 pkBoss.bossEid = this.id;
                 pkBoss.type = BossEventPacket.TYPE_SHOW;

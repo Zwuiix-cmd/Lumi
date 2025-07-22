@@ -52,7 +52,6 @@ public class LegacyPropertiesConverter {
         general.deprecatedVerbose(this.getPropertyBoolean("deprecated-verbose", general.deprecatedVerbose()));
         general.enableSpark(this.getPropertyBoolean("enable-spark", general.enableSpark()));
         general.useWaterdog(this.getPropertyBoolean("use-waterdog", general.useWaterdog()));
-        general.enableExperimentMode(this.getPropertyBoolean("enable-experiment-mode", general.enableExperimentMode()));
         general.serverAuthoritativeMovement(this.getPropertyString("server-authoritative-movement", general.serverAuthoritativeMovement()));
         general.serverAuthoritativeBlockBreaking(this.getPropertyBoolean("server-authoritative-block-breaking", general.serverAuthoritativeBlockBreaking()));
         general.automaticBugReport(this.getPropertyBoolean("automatic-bug-report", general.automaticBugReport()));
@@ -107,8 +106,6 @@ public class LegacyPropertiesConverter {
         world.portalTicks(this.getPropertyInt("portal-ticks", world.portalTicks()));
         world.worldAutoCompaction(this.getPropertyBoolean("level-auto-compaction", world.worldAutoCompaction()));
         world.worldAutoCompactionTicks(this.getPropertyInt("level-auto-compaction-ticks", world.worldAutoCompactionTicks()));
-        world.cacheChunks(this.getPropertyBoolean("cache-chunks", world.cacheChunks()));
-        world.asyncChunks(this.getPropertyBoolean("async-chunks", world.asyncChunks()));
         world.lightUpdates(this.getPropertyBoolean("light-updates", world.lightUpdates()));
         world.clearChunkTickList(this.getPropertyBoolean("clear-chunk-tick-list", world.clearChunkTickList()));
         world.leveldbCacheMb(this.getPropertyInt("leveldb-cache-mb", world.leveldbCacheMb()));
@@ -141,6 +138,8 @@ public class LegacyPropertiesConverter {
         world.entity().worldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.entity().worldsEntitySpawningDisabled()));
 
         // Chunk Settings
+        world.chunk().cacheChunks(this.getPropertyBoolean("cache-chunks", world.chunk().cacheChunks()));
+        world.chunk().asyncChunks(this.getPropertyBoolean("async-chunks", world.chunk().asyncChunks()));
         world.chunk().compressionLevel(Math.max(Math.min(this.getPropertyInt("chunk-compression-level", 7), 9), 1));
         world.chunk().sendingPerTick(this.getPropertyInt("chunk-sending-per-tick", world.chunk().sendingPerTick()));
         world.chunk().tickingPerTick(this.getPropertyInt("chunk-ticking-per-tick", world.chunk().tickingPerTick()));
@@ -173,11 +172,13 @@ public class LegacyPropertiesConverter {
         }
 
         // Features Settings
-        world.features().vanillaPortals(this.getPropertyBoolean("vanilla-portals", world.features().vanillaPortals()));
-        world.features().vanillaBossbars(this.getPropertyBoolean("vanilla-bossbars", world.features().vanillaBossbars()));
-        world.features().enableRawOres(this.getPropertyBoolean("enable-raw-ores", world.features().enableRawOres()));
-        world.features().enableNewPaintings(this.getPropertyBoolean("enable-new-paintings", world.features().enableNewPaintings()));
-        world.features().enableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", world.features().enableNewChickenEggsLaying()));
+        var features = settings.features();
+        features.enableExperimentMode(this.getPropertyBoolean("enable-experiment-mode", features.enableExperimentMode()));
+        features.vanillaPortals(this.getPropertyBoolean("vanilla-portals", features.vanillaPortals()));
+        features.vanillaBossbars(this.getPropertyBoolean("vanilla-bossbars", features.vanillaBossbars()));
+        features.enableRawOres(this.getPropertyBoolean("enable-raw-ores", features.enableRawOres()));
+        features.enableNewPaintings(this.getPropertyBoolean("enable-new-paintings", features.enableNewPaintings()));
+        features.enableNewChickenEggsLaying(this.getPropertyBoolean("enable-new-chicken-eggs-laying", features.enableNewChickenEggsLaying()));
 
         // Player Settings
         var player = settings.player();

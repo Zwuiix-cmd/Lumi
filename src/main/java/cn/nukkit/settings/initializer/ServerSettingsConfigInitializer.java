@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 @AllArgsConstructor
 public class ServerSettingsConfigInitializer implements OkaeriConfigInitializer {
+
     private final Path path;
 
     @Override

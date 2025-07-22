@@ -77,12 +77,6 @@ public class WorldSettings extends OkaeriConfig {
     @CustomKey("world-auto-compaction-ticks")
     private int worldAutoCompactionTicks = 36000;
 
-    @CustomKey("cache-chunks")
-    private boolean cacheChunks = false;
-
-    @CustomKey("async-chunks")
-    private boolean asyncChunks = true;
-
     @CustomKey("light-updates")
     private boolean lightUpdates = false;
 
@@ -116,9 +110,6 @@ public class WorldSettings extends OkaeriConfig {
     @Comment("      pre-deobfuscate: false")
     @Setter(value = AccessLevel.NONE)
     private Map<String, AntiXraySettings> antiXray = new HashMap<>();
-
-    @CustomKey("features")
-    private FeaturesSettings features = new FeaturesSettings();
 
     @Getter
     @Setter
@@ -158,6 +149,12 @@ public class WorldSettings extends OkaeriConfig {
     @Getter
     @Setter
     public static class ChunkSettings extends OkaeriConfig {
+
+        @CustomKey("cache-chunks")
+        private boolean cacheChunks = false;
+
+        @CustomKey("async-chunks")
+        private boolean asyncChunks = true;
 
         @CustomKey("compression-level")
         private int compressionLevel;
@@ -206,25 +203,5 @@ public class WorldSettings extends OkaeriConfig {
             MEDIUM,
             HIGH
         }
-    }
-
-    @Getter
-    @Setter
-    public static class FeaturesSettings extends OkaeriConfig {
-
-        @CustomKey("vanilla-portals")
-        private boolean vanillaPortals = true;
-
-        @CustomKey("vanilla-bossbars")
-        private boolean vanillaBossbars = true;
-
-        @CustomKey("enable-raw-ores")
-        private boolean enableRawOres = true;
-
-        @CustomKey("enable-new-paintings")
-        private boolean enableNewPaintings = true;
-
-        @CustomKey("enable-new-chicken-eggs-laying")
-        private boolean enableNewChickenEggsLaying = true;
     }
 }

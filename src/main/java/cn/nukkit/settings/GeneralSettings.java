@@ -61,9 +61,6 @@ public class GeneralSettings extends OkaeriConfig {
     @CustomKey("use-waterdog")
     private boolean useWaterdog = false;
 
-    @CustomKey("enable-experiment-mode")
-    private boolean enableExperimentMode = true;
-
     @CustomKey("server-authoritative-movement")
     private String serverAuthoritativeMovement = "server-auth";
 

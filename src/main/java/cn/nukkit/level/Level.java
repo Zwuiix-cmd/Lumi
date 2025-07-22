@@ -428,7 +428,7 @@ public class Level implements ChunkManager, Metadatable {
             this.antiXraySystem.reinitAntiXray();
         }
 
-        if (this.server.getSettings().world().asyncChunks()) {
+        if (this.server.getSettings().world().chunk().asyncChunks()) {
             this.asyncChuckExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AsyncChunkThread for " + name).build());
         }
     }
@@ -1151,7 +1151,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (this.server.getSettings().world().asyncChunks()) {
+        if (this.server.getSettings().world().chunk().asyncChunks()) {
             NetworkChunkSerializer.NetworkChunkSerializerCallbackData data;
             int count = (this.getPlayers().size() + 1) * this.server.getSettings().world().chunk().sendingPerTick();
             for (int i = 0; i < count && (data = this.asyncChunkRequestCallbackQueue.poll()) != null; ++i) {
@@ -3694,7 +3694,7 @@ public class Level implements ChunkManager, Metadatable {
     public void chunkRequestCallback(int protocol, long timestamp, int x, int z, int subChunkCount, byte[] payload) {
         long index = Level.chunkHash(x, z);
 
-        if (server.getSettings().world().cacheChunks()) {
+        if (server.getSettings().world().chunk().cacheChunks()) {
             BatchPacket data = Player.getChunkCacheFromData(protocol, x, z, subChunkCount, payload, this.getDimension());
             BaseFullChunk chunk = getChunkIfLoaded(x, z);
             if (chunk != null && chunk.getChanges() <= timestamp) {

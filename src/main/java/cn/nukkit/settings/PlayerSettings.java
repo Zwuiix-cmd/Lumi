@@ -81,4 +81,3 @@ public class PlayerSettings extends OkaeriConfig {
     @CustomKey("use-client-spectator")
     private boolean useClientSpectator = true;
 }
-

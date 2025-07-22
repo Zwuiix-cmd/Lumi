@@ -1813,7 +1813,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (!ev.isCancelled()) {
                 if (this.getLevel().isEnd) {
-                    if (this.server.getSettings().world().features().vanillaPortals() && this.getSpawn().getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
+                    if (this.server.getSettings().features().vanillaPortals() && this.getSpawn().getLevel().getDimension() == Level.DIMENSION_OVERWORLD) {
                         this.teleport(this.getSpawn(), TeleportCause.END_PORTAL);
                     } else {
                         this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.END_PORTAL);
@@ -1835,7 +1835,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.server.getSettings().world().enableNether()) {
-            if (this.server.getSettings().world().features().vanillaPortals() &&
+            if (this.server.getSettings().features().vanillaPortals() &&
                     (this.inPortalTicks == 40 || this.inPortalTicks == 10 && this.gamemode == CREATIVE) && this.portalPos == null) {
                 Position portalPos = this.level.calculatePortalMirror(this);
                 if (portalPos == null) {
@@ -1854,7 +1854,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.portalPos = portalPos;
             }
 
-            if (this.inPortalTicks == this.server.getSettings().world().portalTicks() || (this.server.getSettings().world().features().vanillaPortals() && this.inPortalTicks == 25 && this.gamemode == CREATIVE)) {
+            if (this.inPortalTicks == this.server.getSettings().world().portalTicks() || (this.server.getSettings().features().vanillaPortals() && this.inPortalTicks == 25 && this.gamemode == CREATIVE)) {
                 EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
                 this.getServer().getPluginManager().callEvent(ev);
 
@@ -1863,7 +1863,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     return;
                 }
 
-                if (server.getSettings().world().features().vanillaPortals()) {
+                if (server.getSettings().features().vanillaPortals()) {
                     this.inPortalTicks = 81;
                     this.getServer().getScheduler().scheduleAsyncTask(InternalPlugin.INSTANCE, new AsyncTask() {
                         @Override
@@ -2846,7 +2846,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
                     List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
                     entries.addAll(vanillaItems);
-                    if (this.server.getSettings().general().enableExperimentMode() && !itemDefinitions.isEmpty()) {
+                    if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
                         for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
                             try {
                                 Item item = Item.fromString(entry.getKey());
@@ -2864,7 +2864,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     itemComponentPacket.setEntries(entries);
                 } else {
-                    if (this.server.getSettings().general().enableExperimentMode() && !Item.getCustomItemDefinition().isEmpty()) {
+                    if (this.server.getSettings().features().enableExperimentMode() && !Item.getCustomItemDefinition().isEmpty()) {
                         HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
                         List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
                         int i = 0;
@@ -3518,7 +3518,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 if (protocol >= ProtocolInfo.v1_20_30_24 //1.20.20.22开始爬行模式不属于实验性玩法
-                        || (protocol >= ProtocolInfo.v1_20_10_21 && this.server.getSettings().general().enableExperimentMode())) {
+                        || (protocol >= ProtocolInfo.v1_20_10_21 && this.server.getSettings().features().enableExperimentMode())) {
                     if (authPacket.getInputData().contains(AuthInputAction.START_CRAWLING)) {
                         PlayerToggleCrawlEvent playerToggleCrawlEvent = new PlayerToggleCrawlEvent(this, true);
                         if (this.riding != null || this.sleeping != null) {
@@ -3769,7 +3769,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isMovementServerAuthoritative()
                                 || this.isLockMovementInput()
                                 || this.protocol < ProtocolInfo.v1_20_10_21
-                                || (!this.server.getSettings().general().enableExperimentMode() && this.protocol < ProtocolInfo.v1_20_30_24)) break;
+                                || (!this.server.getSettings().features().enableExperimentMode() && this.protocol < ProtocolInfo.v1_20_30_24)) break;
                         PlayerToggleCrawlEvent playerToggleCrawlEvent = new PlayerToggleCrawlEvent(this, true);
                         this.server.getPluginManager().callEvent(playerToggleCrawlEvent);
                         if (playerToggleCrawlEvent.isCancelled()) {
@@ -3782,7 +3782,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isMovementServerAuthoritative()
                                 || this.isLockMovementInput()
                                 || this.protocol < ProtocolInfo.v1_20_10_21
-                                || (!this.server.getSettings().general().enableExperimentMode() && this.protocol < ProtocolInfo.v1_20_30_24)) break;
+                                || (!this.server.getSettings().features().enableExperimentMode() && this.protocol < ProtocolInfo.v1_20_30_24)) break;
                         playerToggleCrawlEvent = new PlayerToggleCrawlEvent(this, false);
                         this.server.getPluginManager().callEvent(playerToggleCrawlEvent);
                         if (playerToggleCrawlEvent.isCancelled()) {
@@ -7305,7 +7305,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private List<ExperimentData> getExperiments() {
         List<ExperimentData> experiments = new ObjectArrayList<>();
         //TODO Multiversion 当新版本删除部分实验性玩法时，这里也需要加上判断
-        if (this.server.getSettings().general().enableExperimentMode()) {
+        if (this.server.getSettings().features().enableExperimentMode()) {
             experiments.add(new ExperimentData("data_driven_items", true));
             experiments.add(new ExperimentData("experimental_custom_ui", true));
             experiments.add(new ExperimentData("upcoming_creator_features", true));
