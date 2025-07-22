@@ -137,9 +137,6 @@ public class WorldSettings extends OkaeriConfig {
         @CustomKey("mob-ai")
         private boolean mobAi = true;
 
-        @CustomKey("spawn-threshold")
-        private int spawnThreshold = 56;
-
         @CustomKey("call-entity-motion-event")
         private boolean callEntityMotionEvent = true;
 
@@ -159,6 +156,9 @@ public class WorldSettings extends OkaeriConfig {
 
         @CustomKey("compression-level")
         private int compressionLevel;
+
+        @CustomKey("spawn-chunks-threshold")
+        private int spawnChunksThreshold = 56;
 
         @CustomKey("sending-per-tick")
         private int sendingPerTick = 4;

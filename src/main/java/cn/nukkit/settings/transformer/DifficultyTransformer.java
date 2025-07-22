@@ -23,4 +23,3 @@ public class DifficultyTransformer extends BidirectionalTransformer<String, Diff
         return data.getLowerName();
     }
 }
-

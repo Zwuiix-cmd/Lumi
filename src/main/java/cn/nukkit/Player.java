@@ -1119,7 +1119,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (!this.hasSpawnChunks && this.chunksSent >= server.getSettings().world().entity().spawnThreshold()) {
+        if (!this.hasSpawnChunks && this.chunksSent >= server.getSettings().world().chunk().spawnChunksThreshold()) {
             this.hasSpawnChunks = true;
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
         }
@@ -1217,7 +1217,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int centerX = (int) this.x >> 4;
         int centerZ = (int) this.z >> 4;
 
-        int radius = spawned ? this.chunkRadius : server.c_s_spawnThreshold;
+        int spawnThreshold = (int) Math.ceil(Math.sqrt(this.server.getSettings().world().chunk().spawnChunksThreshold()));
+        int radius = spawned ? this.chunkRadius : spawnThreshold;
         int radiusSqr = radius * radius;
 
         long index;
@@ -7284,7 +7285,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean isMovementServerAuthoritative() {
-        return (this.server.getSettings().general().serverAuthoritativeMovement().equals("client-auth") && this.server.getSettings().general().serverAuthoritativeMovement().equals("server-auth-with-rewind"))  && this.protocol >= ProtocolInfo.v1_17_0;
+        return (!this.server.getSettings().general().serverAuthoritativeMovement().equals("client-auth") && !this.server.getSettings().general().serverAuthoritativeMovement().equals("server-auth-with-rewind"))  && this.protocol >= ProtocolInfo.v1_17_0;
     }
 
     public boolean isServerAuthoritativeBlockBreaking() {

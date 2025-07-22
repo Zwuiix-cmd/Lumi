@@ -171,7 +171,6 @@ public class Server {
     private final PlayerMetadataStore playerMetadata;
     private final LevelMetadataStore levelMetadata;
     private final Network network;
-    int c_s_spawnThreshold;
     private int autoSaveTicker;
     private final BaseLang baseLang;
     private final String filePath;

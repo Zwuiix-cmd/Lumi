@@ -134,13 +134,13 @@ public class LegacyPropertiesConverter {
         world.entity().ticksPerEntitySpawns(this.getPropertyInt("ticks-per-entity-spawns", world.entity().ticksPerEntitySpawns()));
         world.entity().ticksPerEntityDespawns(this.getPropertyInt("ticks-per-entity-despawns", world.entity().ticksPerEntityDespawns()));
         world.entity().mobAi(this.getPropertyBoolean("mob-ai", world.entity().mobAi()));
-        world.entity().spawnThreshold(this.getPropertyInt("spawn-threshold", world.entity().spawnThreshold()));
         world.entity().callEntityMotionEvent(this.getPropertyBoolean("call-entity-motion-event", world.entity().callEntityMotionEvent()));
         world.entity().worldsEntitySpawningDisabled(this.getPropertyString("worlds-entity-spawning-disabled", world.entity().worldsEntitySpawningDisabled()));
 
         // Chunk Settings
         world.chunk().cacheChunks(this.getPropertyBoolean("cache-chunks", world.chunk().cacheChunks()));
         world.chunk().asyncChunks(this.getPropertyBoolean("async-chunks", world.chunk().asyncChunks()));
+        world.chunk().spawnChunksThreshold(this.getPropertyInt("spawn-threshold", world.chunk().spawnChunksThreshold()));
         world.chunk().compressionLevel(Math.max(Math.min(this.getPropertyInt("chunk-compression-level", 7), 9), 1));
         world.chunk().sendingPerTick(this.getPropertyInt("chunk-sending-per-tick", world.chunk().sendingPerTick()));
         world.chunk().tickingPerTick(this.getPropertyInt("chunk-ticking-per-tick", world.chunk().tickingPerTick()));
@@ -148,7 +148,7 @@ public class LegacyPropertiesConverter {
         world.chunk().generationQueueSize(this.getPropertyInt("chunk-generation-queue-size", world.chunk().generationQueueSize()));
         world.chunk().generationPopulationQueueSize(this.getPropertyInt("chunk-generation-population-queue-size", world.chunk().generationPopulationQueueSize()));
 
-        // AutoSave Settings
+        // Auto-save Settings
         world.autoSave().enable(this.getPropertyBoolean("auto-save", world.autoSave().enable()));
         world.autoSave().perTicks(this.getPropertyInt("ticks-per-autosave", world.autoSave().perTicks()));
         String disabledWorlds = this.getPropertyString("worlds-level-auto-save-disabled", "");
@@ -258,4 +258,3 @@ public class LegacyPropertiesConverter {
         };
     }
 }
-
