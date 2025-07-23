@@ -140,7 +140,7 @@ public class CustomBlockManager {
 
         int itemId = 255 - nukkitId;
         for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
-            mapping.registerItem(identifier, nukkitId, itemId, 0);
+            mapping.registerCustomBlockItem(identifier, itemId, 0);
         }
 
         if (properties != null) {
