@@ -1880,6 +1880,10 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return false;
     }
 
+    public boolean isMace() {
+        return false;
+    }
+
     public boolean isShovel() {
         return false;
     }
@@ -1924,6 +1928,10 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return 1;
     }
 
+    public int getAttackDamage(Entity entity) {
+        return this.getAttackDamage();
+    }
+
     public int getArmorPoints() {
         return 0;
     }
@@ -1964,6 +1972,10 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public boolean onRelease(Player player, int ticksUsed) {
+        return false;
+    }
+
+    public boolean onAttack(Player player, Entity entity) {
         return false;
     }
 
