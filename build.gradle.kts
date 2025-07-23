@@ -124,7 +124,7 @@ tasks {
     }
 
     jar {
-        archiveClassifier.set("dev")
+        enabled = false
     }
 
     shadowJar {
@@ -145,10 +145,12 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
+            artifact(tasks.shadowJar) {
+                classifier = null
+            }
             artifact(tasks.generateGitProperties) {
                 extension = "properties"
             }
-            from(components["java"])
         }
     }
     repositories {
