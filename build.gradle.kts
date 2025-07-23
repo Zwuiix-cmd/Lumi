@@ -125,6 +125,7 @@ tasks {
 
     jar {
         enabled = false
+        dependsOn(shadowJar)
     }
 
     shadowJar {
