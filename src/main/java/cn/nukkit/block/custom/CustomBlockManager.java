@@ -8,12 +8,16 @@ import cn.nukkit.block.custom.comparator.HashedPaletteComparator;
 import cn.nukkit.block.custom.container.BlockContainer;
 import cn.nukkit.block.custom.container.BlockContainerFactory;
 import cn.nukkit.block.custom.container.BlockStorageContainer;
+import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.block.custom.properties.BlockProperties;
 import cn.nukkit.block.custom.properties.BlockProperty;
 import cn.nukkit.block.custom.properties.EnumBlockProperty;
 import cn.nukkit.block.custom.properties.exception.InvalidBlockPropertyMetaException;
+import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.item.customitem.CustomItemDefinition;
+import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.level.BlockPalette;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
@@ -22,6 +26,7 @@ import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.*;
@@ -113,6 +118,18 @@ public class CustomBlockManager {
         return variants;
     }
 
+    private static class CustomBlockItem extends ItemCustom {
+        public CustomBlockItem(CustomBlock block) {
+            super(block.getIdentifier(), block.getName());
+            this.block = new CustomBlock("swp:ruby_block", CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID);
+        }
+
+        @Override
+        public CustomItemDefinition getDefinition() {
+            return CustomItemDefinition.simpleBuilder(this, CreativeItemCategory.ITEMS).build();
+        }
+    }
+
     public void registerCustomBlock(String identifier, int nukkitId, BlockProperties properties, CustomBlockDefinition blockDefinition, BlockContainerFactory factory) {
         if (this.closed) {
             throw new IllegalStateException("Block registry was already closed");
@@ -138,10 +155,13 @@ public class CustomBlockManager {
         // TODO: unsure if this is per state or not
         this.blockDefinitions.put(defaultState.getLegacyId(), blockDefinition);
 
-        int itemId = 255 - nukkitId;
+
+        Item.registerCustomItem(CustomBlockItem.class, (CustomBlock) blockSample, true);
+
+        /*int itemId = 255 - nukkitId;
         for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
             mapping.registerCustomBlockItem(identifier, itemId, 0);
-        }
+        }*/
 
         if (properties != null) {
             BlockProperties finalProperties = properties;

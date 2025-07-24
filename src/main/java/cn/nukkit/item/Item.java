@@ -5,6 +5,8 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.block.custom.container.BlockContainer;
+import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.inventory.ItemTag;
@@ -35,6 +37,7 @@ import lombok.extern.log4j.Log4j2;
 import me.sunlan.fastreflection.FastConstructor;
 import me.sunlan.fastreflection.FastMemberLoader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -906,10 +909,14 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
-        return registerCustomItem(clazz, true);
+        return registerCustomItem(clazz,true);
     }
 
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
+        return registerCustomItem(clazz, null, addCreativeItem);
+    }
+
+    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, @Nullable CustomBlock block, boolean addCreativeItem) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
             Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
             return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
@@ -919,20 +926,35 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         Supplier<Item> supplier;
 
         try {
-            var method = clazz.getDeclaredConstructor();
+            Constructor<? extends CustomItem> method;
+            if(block != null) {
+                method = clazz.getDeclaredConstructor(CustomBlock.class);
+            } else {
+                method = clazz.getDeclaredConstructor();
+            }
+
             method.setAccessible(true);
-            customItem = method.newInstance();
+            if (block != null) {
+                customItem = method.newInstance(block);
+            } else {
+                customItem = method.newInstance();
+            }
             supplier = () -> {
                 try {
-                    return (Item) method.newInstance();
+                    if (block != null) {
+                        return (Item) method.newInstance(block);
+                    } else {
+                        return (Item) method.newInstance();
+                    }
                 } catch (ReflectiveOperationException e) {
                     throw new UnsupportedOperationException(e);
                 }
             };
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            return new OK<>(false, e);
+            throw new UnsupportedOperationException(e);
         }
+
 
         if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
             return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
