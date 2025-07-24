@@ -4651,9 +4651,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                 Enchantment[] enchantments = item.getEnchantments();
 
-                                float itemDamage = item.getAttackDamage();
+                                float itemDamage = item.getAttackDamage(this);
                                 for (Enchantment enchantment : enchantments) {
-                                    itemDamage += enchantment.getDamageBonus(target, this);
+                                    itemDamage += (float) enchantment.getDamageBonus(target, this);
                                 }
 
                                 Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
@@ -4670,6 +4670,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                 if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                     entityDamageByEntityEvent.setCancelled();
+                                }
+
+                                if (!item.onAttack(this, target)) {
+                                    this.inventory.sendContents(this);
                                 }
 
                                 if (!target.attack(entityDamageByEntityEvent)) {

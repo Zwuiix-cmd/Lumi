@@ -54,7 +54,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.*;
 import static cn.nukkit.utils.Utils.dynamic;
@@ -1009,7 +1008,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void addEffect(Effect effect, EntityEffectUpdateEvent.Cause cause) {
-        if (effect == null || cause == null) {
+        if (effect == null) {
             return;
         }
 
@@ -1026,7 +1025,7 @@ public abstract class Entity extends Location implements Metadatable {
             event.setCancelled();
         }
 
-        if (!event.call()) {
+        if (cause != null && !event.call()) {
             return;
         }
 
