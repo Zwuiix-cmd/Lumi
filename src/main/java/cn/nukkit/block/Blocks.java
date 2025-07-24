@@ -705,11 +705,17 @@ public class Blocks {
 
         list[PITCHER_PLANT] = BlockPitcherPlant.class; //867
 
+        list[TUFF_STAIRS] = BlockStairsTuff.class; //1001
+        list[TUFF_WALL] = BlockTuffWall.class; //1002
         list[POLISHED_TUFF] = BlockPolishedTuff.class; //1003
 
+        list[POLISHED_TUFF_STAIRS] = BlockStairsTuffPolished.class; //1006
+        list[POLISHED_TUFF_WALL] = BlockPolishedTuffWall.class; //1007
         list[CHISELED_TUFF] = BlockChiseledTuff.class; //1008
         list[TUFF_BRICKS] = BlockTuffBricks.class; //1009
 
+        list[TUFF_BRICK_STAIRS] = BlockStairsTuffBrick.class; //1012
+        list[TUFF_BRICK_WALL] = BlockTuffBrickWall.class; //1013
         list[CHISELED_TUFF_BRICKS] = BlockChiseledTuffBricks.class; //1014
         list[CHISELED_COPPER] = BlockChiseledCopper.class; //1015
         list[EXPOSED_CHISELED_COPPER] = BlockExposedChiseledCopper.class; //1016
