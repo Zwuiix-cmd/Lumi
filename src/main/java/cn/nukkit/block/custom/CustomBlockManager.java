@@ -159,8 +159,9 @@ public class CustomBlockManager {
         for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
             mapping.registerCustomBlockItem(identifier, itemId, 0);
         }
+        // TODO: adding item to creative
 
-        Item.registerCustomItem(CustomBlockItem.class, (CustomBlock) blockSample, true);
+        Item.addCreativeItem(((CustomBlock) blockSample).toItem());
 
         if (properties != null) {
             BlockProperties finalProperties = properties;

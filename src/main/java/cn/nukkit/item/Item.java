@@ -4,9 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.block.custom.CustomBlockManager;
-import cn.nukkit.block.custom.container.BlockContainer;
-import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.inventory.ItemTag;
@@ -20,7 +17,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.plugin.Plugin;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemData;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemGroup;
@@ -34,10 +30,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import me.sunlan.fastreflection.FastConstructor;
-import me.sunlan.fastreflection.FastMemberLoader;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -913,10 +906,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        return registerCustomItem(clazz, null, addCreativeItem);
-    }
-
-    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, @Nullable CustomBlock block, boolean addCreativeItem) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
             Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
             return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
@@ -926,35 +915,20 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         Supplier<Item> supplier;
 
         try {
-            Constructor<? extends CustomItem> method;
-            if(block != null) {
-                method = clazz.getDeclaredConstructor(CustomBlock.class);
-            } else {
-                method = clazz.getDeclaredConstructor();
-            }
-
+            var method = clazz.getDeclaredConstructor();
             method.setAccessible(true);
-            if (block != null) {
-                customItem = method.newInstance(block);
-            } else {
-                customItem = method.newInstance();
-            }
+            customItem = method.newInstance();
             supplier = () -> {
                 try {
-                    if (block != null) {
-                        return (Item) method.newInstance(block);
-                    } else {
-                        return (Item) method.newInstance();
-                    }
+                    return (Item) method.newInstance();
                 } catch (ReflectiveOperationException e) {
                     throw new UnsupportedOperationException(e);
                 }
             };
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            throw new UnsupportedOperationException(e);
+            return new OK<>(false, e);
         }
-
 
         if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
             return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
@@ -1089,14 +1063,16 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class<?> c = null;
-            if (id < 0) {
+            Class<?> c;
+            if (id < 255 - Block.MAX_BLOCK_ID) {
+                var customBlockItem = Block.get(255 - id).toItem();
+                customBlockItem.setCount(count);
+                customBlockItem.setDamage(meta);
+                customBlockItem.setCompoundTag(tags);
+                return customBlockItem;
+            } else if (id < 0) {
                 int blockId = 255 - id;
-                if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-                    c = CustomBlockManager.get().getClassType(blockId);
-                } else {
-                    c = Block.list[blockId];
-                }
+                c = Block.list[blockId];
             } else {
                 c = list[id];
             }
@@ -1171,6 +1147,8 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
                 } catch (Exception e) {
                     log.warn("Could not create a new instance of {} using the namespaced id {}", constructor, namespacedId, e);
                 }
+            } else {
+                return RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL).getItemByNamespaceId(namespacedId, 1);
             }
 
             //common item
