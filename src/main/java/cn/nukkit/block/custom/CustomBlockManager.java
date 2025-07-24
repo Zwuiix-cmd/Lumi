@@ -121,7 +121,7 @@ public class CustomBlockManager {
     private static class CustomBlockItem extends ItemCustom {
         public CustomBlockItem(CustomBlock block) {
             super(block.getIdentifier(), block.getName());
-            this.block = new CustomBlock("swp:ruby_block", CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID);
+            this.block = block;
         }
 
         @Override
@@ -155,13 +155,12 @@ public class CustomBlockManager {
         // TODO: unsure if this is per state or not
         this.blockDefinitions.put(defaultState.getLegacyId(), blockDefinition);
 
-
-        Item.registerCustomItem(CustomBlockItem.class, (CustomBlock) blockSample, true);
-
-        /*int itemId = 255 - nukkitId;
+        int itemId = 255 - nukkitId;
         for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
             mapping.registerCustomBlockItem(identifier, itemId, 0);
-        }*/
+        }
+
+        Item.registerCustomItem(CustomBlockItem.class, (CustomBlock) blockSample, true);
 
         if (properties != null) {
             BlockProperties finalProperties = properties;

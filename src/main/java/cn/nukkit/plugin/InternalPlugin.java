@@ -21,6 +21,16 @@ public final class InternalPlugin extends PluginBase {
                         .build(), () -> {
                     return block;
                 });
+
+        final CustomBlock block1 = new CustomBlock("swp:test", CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID + 1);
+        CustomBlockManager.get().registerCustomBlock("swp:test", CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID + 1,
+                CustomBlockDefinition.builder(block1)
+                        .name("Я ебал эту хуйню 2 ")
+                        .breakTime(0.1)
+                        .texture("dirt")
+                        .build(), () -> {
+                    return block1;
+                });
     }
 
     @Override
