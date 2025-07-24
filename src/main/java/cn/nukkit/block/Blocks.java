@@ -459,6 +459,7 @@ public class Blocks {
         list[COPPER_ORE] = BlockOreCopper.class; //566
         list[LIGHTNING_ROD] = BlockLightningRod.class; //567
 
+        list[HEAVY_CORE] = BlockHeavyCore.class; //571
         list[DRIPSTONE_BLOCK] = BlockDripstone.class; //572
         list[ROOTED_DIRT] = BlockDirtRooted.class; //573
         list[HANGING_ROOTS] = BlockRootsHanging.class; //574
@@ -704,6 +705,12 @@ public class Blocks {
 
         list[PITCHER_PLANT] = BlockPitcherPlant.class; //867
 
+        list[POLISHED_TUFF] = BlockPolishedTuff.class; //1003
+
+        list[CHISELED_TUFF] = BlockChiseledTuff.class; //1008
+        list[TUFF_BRICKS] = BlockTuffBricks.class; //1009
+
+        list[CHISELED_TUFF_BRICKS] = BlockChiseledTuffBricks.class; //1014
         list[CHISELED_COPPER] = BlockChiseledCopper.class; //1015
         list[EXPOSED_CHISELED_COPPER] = BlockExposedChiseledCopper.class; //1016
         list[WEATHERED_CHISELED_COPPER] = BlockWeatheredChiseledCopper.class; //1017
