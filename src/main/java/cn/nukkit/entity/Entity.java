@@ -1025,7 +1025,7 @@ public abstract class Entity extends Location implements Metadatable {
             event.setCancelled();
         }
 
-        if (cause != null || !event.call()) {
+        if (cause != null && !event.call()) {
             return;
         }
 
