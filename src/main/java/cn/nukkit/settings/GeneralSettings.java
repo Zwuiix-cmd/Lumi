@@ -41,7 +41,7 @@ public class GeneralSettings extends OkaeriConfig {
 
     @CustomKey("force-resources-allow-client-packs")
     @Comment("Force the player to use own resource packs")
-    private boolean forceResourcesAllowClientPacks = false;
+    private boolean forceResourcesAllowClientPacks = true;
 
     @CustomKey("shutdown-message")
     private String shutdownMessage = "Server closed";
