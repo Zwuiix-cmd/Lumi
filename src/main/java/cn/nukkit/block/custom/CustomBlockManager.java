@@ -161,8 +161,6 @@ public class CustomBlockManager {
         }
         // TODO: adding item to creative
 
-        Item.addCreativeItem(((CustomBlock) blockSample).toItem());
-
         if (properties != null) {
             BlockProperties finalProperties = properties;
             variantGenerations(properties, properties.getNames().toArray(new String[0]))
