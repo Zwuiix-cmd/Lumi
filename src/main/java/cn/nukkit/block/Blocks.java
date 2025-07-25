@@ -745,6 +745,14 @@ public class Blocks {
         list[WAXED_EXPOSED_COPPER_BULB] = BlockWaxedExposedCopperBulb.class; //1036
         list[WAXED_WEATHERED_COPPER_BULB] = BlockWaxedWeatheredCopperBulb.class; //1037
         list[WAXED_OXIDIZED_COPPER_BULB] = BlockWaxedOxidizedCopperBulb.class; //1038
+        list[COPPER_DOOR] = BlockCopperDoor.class; //1039
+        list[EXPOSED_COPPER_DOOR] = BlockExposedCopperDoor.class; //1040
+        list[WEATHERED_COPPER_DOOR] = BlockWeatheredCopperDoor.class; //1041
+        list[OXIDIZED_COPPER_DOOR] = BlockOxidizedCopperDoor.class; //1042
+        list[WAXED_COPPER_DOOR] = BlockWaxedCopperDoor.class; //1043
+        list[WAXED_EXPOSED_COPPER_DOOR] = BlockWaxedExposedCopperDoor.class; //1044
+        list[WAXED_WEATHERED_COPPER_DOOR] = BlockWaxedWeatheredCopperDoor.class; //1045
+        list[WAXED_OXIDIZED_COPPER_DOOR] = BlockWaxedOxidizedCopperDoor.class; //1046
 
         list[WITHER_SKELETON_SKULL] = BlockSkullWitherSkeleton.class; //1220
         list[ZOMBIE_HEAD] = BlockHeadZombie.class; //1221
