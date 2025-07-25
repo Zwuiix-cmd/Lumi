@@ -3,25 +3,20 @@ package cn.nukkit.block;
 import cn.nukkit.block.properties.enums.OxidizationLevel;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockCopperDoor extends BlockCopperDoorBase {
+public class BlockCopperTrapdoor extends BlockCopperTrapdoorBase {
 
-    protected BlockCopperDoor() {
+    protected BlockCopperTrapdoor() {
         super(0);
     }
 
     @Override
     public String getName() {
-        return "Copper Door";
+        return "Copper Trapdoor";
     }
 
     @Override
     public int getId() {
-        return COPPER_DOOR;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
+        return COPPER_TRAPDOOR;
     }
 
     @Override
