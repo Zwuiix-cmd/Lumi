@@ -9,7 +9,11 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockCopperDoorBase extends BlockDoor implements Oxidizable, Waxable {
 
-    protected BlockCopperDoorBase(int meta) {
+    public BlockCopperDoorBase() {
+        this(0);
+    }
+
+    public BlockCopperDoorBase(int meta) {
         super(meta);
     }
 
@@ -35,11 +39,11 @@ public abstract class BlockCopperDoorBase extends BlockDoor implements Oxidizabl
 
     @Override
     public boolean onActivate(@NotNull Item item, Player player) {
-        if (player != null) {
-            if (player.isSneaking()) {
-                return Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player);
-            }
-        }
+       //if (player != null) {
+       //    if (player.isSneaking()) {
+       //        return Waxable.super.onActivate(item, player) || Oxidizable.super.onActivate(item, player);
+       //    }
+       //}
         return super.onActivate(item, player);
     }
 

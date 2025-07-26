@@ -5,8 +5,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class BlockCopperDoor extends BlockCopperDoorBase {
 
-    protected BlockCopperDoor() {
-        super(0);
+    public BlockCopperDoor() {
+        this(0);
+    }
+
+    public BlockCopperDoor(int meta) {
+        super(meta);
     }
 
     @Override
