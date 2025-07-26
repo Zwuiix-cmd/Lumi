@@ -8,8 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockCopperTrapdoorBase extends BlockTrapdoor implements Oxidizable, Waxable {
+    public BlockCopperTrapdoorBase() {
+        this(0);
+    }
 
-    protected BlockCopperTrapdoorBase(int meta) {
+    public BlockCopperTrapdoorBase(int meta) {
         super(meta);
     }
 

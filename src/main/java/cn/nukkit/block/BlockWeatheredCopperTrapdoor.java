@@ -5,8 +5,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class BlockWeatheredCopperTrapdoor extends BlockCopperTrapdoorBase {
 
-    protected BlockWeatheredCopperTrapdoor() {
+    public BlockWeatheredCopperTrapdoor() {
         super(0);
+    }
+
+    public BlockWeatheredCopperTrapdoor(int meta) {
+        super(meta);
     }
 
     @Override
