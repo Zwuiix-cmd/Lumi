@@ -101,24 +101,7 @@ public abstract class EntityWalking extends BaseEntity {
     }
 
     protected boolean trySetTarget(int x, int z) {
-        for(int i = (int) this.y - 10;i <= this.y;i++) {
-            Block block = level.getBlock(x, i, z);
-
-            if(block.isSolid()) {
-                return true;
-            }
-
-            if(this.isDayBurning()) {
-                if(block.isLiquid()) {
-                    return level.isDaytime();
-                }
-
-            } else if(block.isLiquid()) {
-                return false;
-            }
-        }
-
-        return false;
+        return true;
     }
 
     protected boolean checkJump(double dx, double dz) {

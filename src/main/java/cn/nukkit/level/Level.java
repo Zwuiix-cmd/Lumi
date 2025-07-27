@@ -1072,7 +1072,9 @@ public class Level implements ChunkManager, Metadatable {
 
         this.levelCurrentTick++;
 
-        this.unloadChunks();
+        if(currentTick % 200 == 0) {
+            this.unloadChunks(true);
+        }
 
         this.updateQueue.tick(this.levelCurrentTick);
 
