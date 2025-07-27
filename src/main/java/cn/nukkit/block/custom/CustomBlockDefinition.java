@@ -1,8 +1,7 @@
 package cn.nukkit.block.custom;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.custom.container.BlockContainer;
-import cn.nukkit.block.custom.container.BlockStorageContainer;
+import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.block.custom.container.data.*;
 import cn.nukkit.block.custom.properties.*;
 import cn.nukkit.item.customitem.data.ItemCreativeCategory;
@@ -27,71 +26,75 @@ import java.util.function.Consumer;
  * CustomBlockDefinition is used to get the data of the block behavior_pack sent to the client. The methods provided in {@link Builder} control the data sent to the client, if you need to control some of the server-side behavior, please override the methods in {@link Block Block}.
  */
 @Log4j2
-public record CustomBlockDefinition(String identifier, CompoundTag nbt, int legacyId,  Class<? extends BlockContainer> typeOf) {
+public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
+
+    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, String texture) {
+        return builder(customBlock, Materials.builder().any(Materials.RenderMethod.OPAQUE, texture), BlockCreativeCategory.CONSTRUCTION);
+    }
+
+    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, String texture, BlockCreativeCategory blockCreativeCategory) {
+        return builder(customBlock, Materials.builder().any(Materials.RenderMethod.OPAQUE, texture), blockCreativeCategory);
+    }
+
+    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, Materials materials) {
+        return builder(customBlock, materials, BlockCreativeCategory.CONSTRUCTION);
+    }
 
     /**
      * Builder custom block definition.
      *
-     * @param blockContainer the custom block
+     * @param customBlock           the custom block
+     * @param materials             the materials
+     * @param blockCreativeCategory 自定义方块在创造栏的大分类<br>the block creative category
      * @return the custom block definition builder.
      */
-    public static Builder builder(@NotNull BlockContainer blockContainer) {
-        return new Builder(blockContainer);
+    public static CustomBlockDefinition.Builder builder(@NotNull CustomBlock customBlock, @NotNull Materials materials, BlockCreativeCategory blockCreativeCategory) {
+        return new CustomBlockDefinition.Builder(customBlock, materials, blockCreativeCategory);
     }
 
     public static class Builder {
         protected final String identifier;
-        protected final BlockContainer blockContainer;
+        protected final CustomBlock customBlock;
 
         protected CompoundTag nbt = new CompoundTag()
                 .putCompound("components", new CompoundTag());
 
-        protected Builder(BlockContainer blockContainer) {
-            this.identifier = blockContainer.getIdentifier();
-            this.blockContainer = blockContainer;
-            Block b = (Block) blockContainer;
-            CompoundTag components = this.nbt.getCompound("components");
+        protected Builder(CustomBlock customBlock, Materials materials, BlockCreativeCategory blockCreativeCategory) {
+            this.identifier = customBlock.getNamespaceId();
+            this.customBlock = customBlock;
 
-            //设置一些与NK内部对应的方块属性
+            var components = this.nbt.getCompound("components");
+
+            //设置一些与PNX内部对应的方块属性
             components.putCompound("minecraft:friction", new CompoundTag()
-                            .putFloat("value", (float) Math.min(0.9, Math.max(0, 1 - b.getFrictionFactor()))))
+                            .putFloat("value", (float) (1 - Block.DEFAULT_FRICTION_FACTOR)))
                     .putCompound("minecraft:destructible_by_explosion", new CompoundTag()
-                            .putInt("explosion_resistance", (int) b.getResistance()))
+                            .putInt("explosion_resistance", (int) customBlock.getResistance()))
                     .putCompound("minecraft:light_dampening", new CompoundTag()
-                            .putByte("lightLevel", (byte) Block.getBlockLightFilter(blockContainer.getNukkitId())))
+                            .putByte("lightLevel", (byte) customBlock.getLightFilter()))
                     .putCompound("minecraft:light_emission", new CompoundTag()
-                            .putByte("emission", (byte) b.getLightLevel()))
+                            .putByte("emission", (byte) customBlock.getLightLevel()))
                     .putCompound("minecraft:destructible_by_mining", new CompoundTag()
                             .putFloat("value", 99999f));//default server-side mining time calculate
             //设置材质
             components.putCompound("minecraft:material_instances", new CompoundTag()
                     .putCompound("mappings", new CompoundTag())
-                    .putCompound("materials", new CompoundTag()));
-
+                    .putCompound("materials", materials.toCompoundTag()));
             //默认单位立方体方块
             components.putCompound("minecraft:unit_cube", new CompoundTag());
-            //设置默认单位立方体方块的几何模型
-            components.putCompound("minecraft:geometry", new CompoundTag()
-                    .putString("identifier", "minecraft:geometry.full_block")
-                    .putString("culling", "")
-                    .putCompound("bone_visibility", new CompoundTag())
-            );
-
             //设置方块在创造栏的分类
             this.nbt.putCompound("menu_category", new CompoundTag()
-                    .putString("category", CreativeItemCategory.NATURE.name())
-                    .putString("group", ""));
+                    .putString("category", blockCreativeCategory.name().toLowerCase(Locale.ENGLISH))
+                    .putString("group", ItemCreativeGroup.NONE.getGroupName()));
             //molang版本
-            this.nbt.putInt("molangVersion", 9);
+            this.nbt.putInt("molangVersion", 6);
 
             //设置方块的properties
             var propertiesNBT = getPropertiesNBT();
             if (propertiesNBT != null) {
-                nbt.putList("properties", propertiesNBT);
+                propertiesNBT.setName("properties");
+                nbt.putList(propertiesNBT);
             }
-
-            nbt.putCompound("vanilla_block_data", new CompoundTag().putInt("block_id", blockContainer.getNukkitId())
-                    /*.putString("material", "")*/); //todo Figure what is dirt, maybe that corresponds to https://wiki.bedrock.dev/documentation/materials.html
         }
 
         public Builder texture(String texture) {
@@ -346,7 +349,7 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt, int lega
          */
         @Nullable
         private ListTag<CompoundTag> getPropertiesNBT() {
-            if (this.blockContainer instanceof BlockStorageContainer block) {
+            if (this.customBlock instanceof CustomBlock block) {
                 BlockProperties properties = block.getBlockProperties();
                 Set<BlockProperty<?>> propertyTypeSet = properties.getPropertyTypeSet();
                 if (propertyTypeSet.isEmpty()) {
@@ -390,7 +393,7 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt, int lega
         }
 
         public CustomBlockDefinition build() {
-            return new CustomBlockDefinition(this.identifier, this.nbt, this.blockContainer.getNukkitId(), this.blockContainer.getClass());
+            return new CustomBlockDefinition(this.identifier, this.nbt);
         }
     }
 }

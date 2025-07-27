@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.custom.CustomBlockDefinition;
 import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.item.RuntimeItems;
@@ -113,7 +114,7 @@ public class StartGamePacket extends DataPacket {
     public boolean isServerAuthoritativeBlockBreaking;
     public long currentTick;
     public int enchantmentSeed;
-    public Collection<CustomBlockDefinition> blockDefinitions = CustomBlockManager.get().getBlockDefinitions();
+    public Collection<CustomBlockDefinition> blockDefinitions = Block.getCustomBlockDefinitionList();
     public String multiplayerCorrelationId = "";
     public boolean isDisablingPersonas;
     public boolean isDisablingCustomSkins;

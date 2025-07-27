@@ -87,7 +87,7 @@ public class Utils {
         if (id < 0) {
             int blockId = 255 - id;
             if (blockId > CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-                return CustomBlockManager.get().getBlock(blockId) != null;
+                return Block.get(blockId) != null;
             }
             return blockId < Block.MAX_BLOCK_ID && Block.list[blockId] != null;
         } else {

@@ -2,22 +2,14 @@ package cn.nukkit.block.custom;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.block.custom.comparator.AlphabetPaletteComparator;
 import cn.nukkit.block.custom.comparator.HashedPaletteComparator;
-import cn.nukkit.block.custom.container.BlockContainer;
-import cn.nukkit.block.custom.container.BlockContainerFactory;
-import cn.nukkit.block.custom.container.BlockStorageContainer;
-import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.block.custom.properties.BlockProperties;
 import cn.nukkit.block.custom.properties.BlockProperty;
 import cn.nukkit.block.custom.properties.EnumBlockProperty;
 import cn.nukkit.block.custom.properties.exception.InvalidBlockPropertyMetaException;
-import cn.nukkit.item.Item;
+import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
-import cn.nukkit.item.customitem.CustomItemDefinition;
-import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.level.BlockPalette;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
@@ -26,10 +18,10 @@ import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.*;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.cloudburstmc.nbt.*;
 
@@ -47,6 +39,8 @@ public class CustomBlockManager {
     public static final Path BIN_PATH = Paths.get("bin/");
     public static final int LOWEST_CUSTOM_BLOCK_ID = 10000;
 
+    private final Int2ObjectMap<CustomBlockState> legacy2CustomState = new Int2ObjectOpenHashMap<>();
+
     private static CustomBlockManager instance;
 
     public static CustomBlockManager init(Server server) {
@@ -62,9 +56,6 @@ public class CustomBlockManager {
 
     private final Server server;
 
-    private final Int2ObjectMap<CustomBlockDefinition> blockDefinitions = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectMap<CustomBlockState> legacy2CustomState = new Int2ObjectOpenHashMap<>();
-
     private volatile boolean closed = false;
 
     private CustomBlockManager(Server server) {
@@ -78,14 +69,6 @@ public class CustomBlockManager {
                 throw new IllegalStateException("Failed to create BIN_DIRECTORY", e);
             }
         }
-    }
-
-    public void registerCustomBlock(String identifier, int nukkitId, Supplier<BlockContainer> factory) {
-        this.registerCustomBlock(identifier, nukkitId, CustomBlockDefinition.builder(factory.get()).build(), factory);
-    }
-
-    public void registerCustomBlock(String identifier, int nukkitId, CustomBlockDefinition blockDefinition, Supplier<BlockContainer> factory) {
-        this.registerCustomBlock(identifier, nukkitId, null, blockDefinition, meta -> factory.get());
     }
 
     private static void variantGenerations(BlockProperties properties, String[] states, List<Map<String, Serializable>> variants, Map<String, Serializable> temp, int offset) {
@@ -118,19 +101,7 @@ public class CustomBlockManager {
         return variants;
     }
 
-    private static class CustomBlockItem extends ItemCustom {
-        public CustomBlockItem(CustomBlock block) {
-            super(block.getIdentifier(), block.getName());
-            this.block = block;
-        }
-
-        @Override
-        public CustomItemDefinition getDefinition() {
-            return CustomItemDefinition.simpleBuilder(this, CreativeItemCategory.ITEMS).build();
-        }
-    }
-
-    public void registerCustomBlock(String identifier, int nukkitId, BlockProperties properties, CustomBlockDefinition blockDefinition, BlockContainerFactory factory) {
+    public void registerCustomBlock(String identifier, int nukkitId, BlockProperties properties, CustomBlockDefinition blockDefinition, BlockPropertiesHelper factory) {
         if (this.closed) {
             throw new IllegalStateException("Block registry was already closed");
         }
@@ -139,11 +110,9 @@ public class CustomBlockManager {
             throw new IllegalArgumentException("Block ID can not be lower than " + LOWEST_CUSTOM_BLOCK_ID);
         }
 
-        BlockContainer blockSample = factory.create(0);
-        if (blockSample instanceof BlockStorageContainer && properties == null) {
-            properties = ((BlockStorageContainer) blockSample).getBlockProperties();
-            log.warn("Custom block {} was registered using wrong method! Trying to use sample properties!", identifier);
-        }
+        BlockPropertiesHelper blockSample = factory;
+        properties = blockSample.getBlockProperties();
+
 
         if (properties != null && blockDefinition == null) {
             throw new IllegalArgumentException("Block network data can not be empty for block with more permutations: " + identifier);
@@ -153,7 +122,7 @@ public class CustomBlockManager {
         this.legacy2CustomState.put(defaultState.getLegacyId(), defaultState);
 
         // TODO: unsure if this is per state or not
-        this.blockDefinitions.put(defaultState.getLegacyId(), blockDefinition);
+        //this.blockDefinitions.put(defaultState.getLegacyId(), blockDefinition);
 
         int itemId = 255 - nukkitId;
         for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
@@ -184,7 +153,7 @@ public class CustomBlockManager {
         }
     }
 
-    private CustomBlockState createBlockState(String identifier, int legacyId, BlockProperties properties, BlockContainerFactory factory) {
+    private CustomBlockState createBlockState(String identifier, int legacyId, BlockProperties properties, BlockPropertiesHelper block) {
         int meta = legacyId & Block.DATA_MASK;
 
         NbtMapBuilder statesBuilder = NbtMap.builder();
@@ -204,7 +173,7 @@ public class CustomBlockManager {
                 .putCompound("states", statesBuilder.build())
                 .putInt("version", LevelDBConstants.STATE_VERSION)
                 .build();
-        return new CustomBlockState(identifier, legacyId, state, factory);
+        return new CustomBlockState(identifier, legacyId, state, block);
     }
 
     public boolean closeRegistry() throws IOException {
@@ -223,7 +192,7 @@ public class CustomBlockManager {
         boolean result = false;
         ObjectSet<BlockPalette> set = new ObjectArraySet<>();
         for (int protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
-            if (protocol < ProtocolInfo.v1_16_100 || protocol < this.server.getSettings().general().multiversion().minProtocol()) {
+            if (protocol < this.server.getSettings().general().multiversion().minProtocol()) {
                 continue;
             }
 
@@ -256,13 +225,10 @@ public class CustomBlockManager {
     }
 
     private void recreateBlockPalette(BlockPalette palette, List<NbtMap> vanillaPalette) {
-        Map<String, List<NbtMap>> vanillaPaletteList;
+        Map<String, List<NbtMap>> vanillaPaletteList = Map.of();
         if (palette.getProtocol() >= ProtocolInfo.v1_18_30) {
             vanillaPaletteList = new Object2ObjectRBTreeMap<>(HashedPaletteComparator.INSTANCE);
-        } else {
-            vanillaPaletteList = new Object2ObjectRBTreeMap<>(AlphabetPaletteComparator.INSTANCE);
         }
-
         int paletteVersion = -1;
         String lastName = null;
         List<NbtMap> group = new ObjectArrayList<>();
@@ -374,54 +340,8 @@ public class CustomBlockManager {
         return this.getBinPath().resolve("vanilla_palette_" + version + ".nbt");
     }
 
-    public Block getBlock(int legacyId) {
-        CustomBlockState state = this.legacy2CustomState.get(legacyId);
-        if (state == null) {
-            return Block.get(BlockID.INFO_UPDATE);
-        }
-
-        BlockContainer block = state.getFactory().create(legacyId & Block.DATA_MASK);
-        if (block instanceof Block) {
-            return (Block) block;
-        }
-        return null;
-    }
-
-    public Block getBlock(int[] fullState) {
-        return getBlock(fullState[0], fullState[1]);
-    }
-
-    public Block getBlock(int id, int meta) {
-        int legacyId = id << Block.DATA_BITS | meta;
-        CustomBlockState state = this.legacy2CustomState.get(legacyId);
-        if (state == null) {
-            state = this.legacy2CustomState.get(id << Block.DATA_BITS);
-            if (state == null) {
-                return Block.get(BlockID.INFO_UPDATE);
-            }
-        }
-
-        BlockContainer block = state.getFactory().create(meta);
-        if (block instanceof Block) {
-            return (Block) block;
-        }
-        return null;
-    }
-
-    public Class<?> getClassType(int blockId) {
-        CustomBlockDefinition definition = this.blockDefinitions.get(blockId << Block.DATA_BITS);
-        if (definition == null) {
-            return null;
-        }
-        return definition.typeOf();
-    }
-
     private Path getBinPath() {
         return Paths.get(this.server.getDataPath()).resolve(BIN_PATH);
-    }
-
-    public Collection<CustomBlockDefinition> getBlockDefinitions() {
-        return Collections.unmodifiableCollection(this.blockDefinitions.values());
     }
 
     private static int legacyToFullId(int legacyId) {
@@ -440,5 +360,13 @@ public class CustomBlockManager {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to convert NbtMap: " + nbt, e);
         }
+    }
+
+    @Data
+    public class CustomBlockState {
+        private final String identifier;
+        private final int legacyId;
+        private final NbtMap blockState;
+        private final BlockPropertiesHelper block;
     }
 }

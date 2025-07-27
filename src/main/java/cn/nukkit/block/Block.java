@@ -2,15 +2,16 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.custom.CustomBlockDefinition;
 import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.block.custom.comparator.HashedPaletteComparator;
+import cn.nukkit.block.custom.container.CustomBlock;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.*;
 import cn.nukkit.item.customitem.ItemCustomTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
@@ -26,14 +27,17 @@ import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.OK;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static cn.nukkit.utils.Utils.dynamic;
@@ -62,9 +66,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static boolean[] diffusesSkyLight = null;
     public static boolean[] hasMeta = null;
 
+    public static final double DEFAULT_FRICTION_FACTOR = 0.6;
     public AxisAlignedBB boundingBox = null;
     public static final Block[] EMPTY_ARRAY = new Block[0];
     public int layer = 0;
+
+    private static final List<CustomBlockDefinition> CUSTOM_BLOCK_DEFINITIONS = new ArrayList<>();
+    public static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
+    public static final ConcurrentHashMap<String, Integer> CUSTOM_BLOCK_ID_MAP = new ConcurrentHashMap<>();
 
     /**
      * A commonly used block face pattern
@@ -171,7 +180,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
         int fullId = id << DATA_BITS;
@@ -212,7 +221,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta);
         }
 
         Block block;
@@ -250,7 +259,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
         int fullId = id << DATA_BITS;
@@ -280,7 +289,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         int id = fullId << DATA_BITS;
 
         if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
         if (fullId >= fullList.length || fullList[fullId] == null) {
@@ -303,7 +312,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
         if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
         Block block;
@@ -1425,6 +1434,96 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean cloneTo(Position pos) {
         return cloneTo(pos, true);
+    }
+
+    private static int nextBlockId = 10000;
+
+    private final static SortedMap<String, CustomBlock> HASHED_SORTED_CUSTOM_BLOCK = new TreeMap<>(HashedPaletteComparator.INSTANCE);
+
+    /**
+     * 注册自定义方块
+     *
+     * @param blockClassList 传入自定义方块class List
+     */
+    public static OK<?> registerCustomBlock(@NotNull List<Class<? extends CustomBlock>> blockClassList) {
+        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
+            return new OK<>(false, "The server does not have the experiment mode feature enabled.Unable to register custom block!");
+        }
+        for (var clazz : blockClassList) {
+            CustomBlock block;
+            try {
+                var method = clazz.getDeclaredConstructor();
+                method.setAccessible(true);
+                block = method.newInstance();
+                if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(block.getNamespaceId())) {
+                    HASHED_SORTED_CUSTOM_BLOCK.put(block.getNamespaceId(), block);
+                }
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                return new OK<>(false, e);
+            } catch (NoSuchMethodException e) {
+                return new OK<>(false, "Cannot find the parameterless constructor for this custom block:" + clazz.getCanonicalName());
+            }
+        }
+        return new OK<Void>(true);
+    }
+
+    /**
+     * 注册自定义方块
+     *
+     * @param blockNamespaceClassMap 传入自定义方块classMap { key: NamespaceID, value: Class }
+     */
+    public static OK<?> registerCustomBlock(@NotNull Map<String, Class<? extends CustomBlock>> blockNamespaceClassMap) {
+        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
+            return new OK<>(false, "The server does not have the experiment mode feature enabled.Unable to register custom block!");
+        }
+        for (var entry : blockNamespaceClassMap.entrySet()) {
+            if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(entry.getKey())) {
+                try {
+                    var method = entry.getValue().getDeclaredConstructor();
+                    method.setAccessible(true);
+                    var block = method.newInstance();
+                    HASHED_SORTED_CUSTOM_BLOCK.put(entry.getKey(), block);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    return new OK<>(false, e);
+                } catch (NoSuchMethodException e) {
+                    return new OK<>(false, "Cannot find the parameterless constructor for this custom block:" + entry.getValue().getCanonicalName());
+                }
+            }
+        }
+        return new OK<Void>(true);
+    }
+
+    public static void initCustomBlock() {
+        /*if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
+            for (var entry : HASHED_SORTED_CUSTOM_BLOCK.entrySet()) {
+                CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), nextBlockId);//自定义方块标识符->自定义方块id
+                ID_TO_CUSTOM_BLOCK.put(nextBlockId, entry.getValue());//自定义方块id->自定义方块
+                CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
+                ++nextBlockId;
+            }
+            var blocks = ID_TO_CUSTOM_BLOCK.values().stream().toList();
+            var result = BlockStateRegistry.registerCustomBlockState(blocks);//注册方块state
+            if (!result.ok()) {
+                throw new RuntimeException("Register CustomBlock state error, please check all your CustomBlock plugins,contact the plugin author! Error:", result.getError());
+            }
+            for(var block : blocks) {
+                int itemId = 255 - block.getId();
+                for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
+                    mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
+                }
+            }
+            blocks.stream().filter( CustomBlock::shouldBeRegisteredInCreative ).forEach(
+                    b -> Item.addCreativeItem(b.toItem())
+            );//注册创造栏物品
+        }*/
+    }
+
+    public static List<CustomBlockDefinition> getCustomBlockDefinitionList() {
+        return new ArrayList<>(CUSTOM_BLOCK_DEFINITIONS);
+    }
+
+    public static HashMap<Integer, CustomBlock> getCustomBlockMap() {
+        return new HashMap<>(ID_TO_CUSTOM_BLOCK);
     }
 
     /**
