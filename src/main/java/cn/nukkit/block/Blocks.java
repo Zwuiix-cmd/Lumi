@@ -782,11 +782,24 @@ public class Blocks {
         list[RED_SANDSTONE_WALL] = BlockRedSandstoneBlock.class; //1237
         list[RED_NETHER_BRICK_WALL] = BlockRedNetherBrickWall.class; //1238
 
+        list[STRIPPED_PALE_OAK_LOG] = BlockLogStrippedPaleOak.class; //1249
+        list[PALE_OAK_LOG] = BlockLogPaleOak.class; //1250
+        list[PALE_OAK_PLANKS] = BlockPlanksPaleOak.class; //1251
+
+        list[PALE_OAK_SLAB] = BlockSlabPaleOak.class; //1253
+        list[PALE_OAK_DOUBLE_SLAB] = BlockDoubleSlabPaleOak.class; //1254
+        list[PALE_OAK_STAIRS] = BlockStairsPaleOak.class; //1255
+
+        list[STRIPPED_PALE_OAK_WOOD] = BlockWoodStrippedPaleOak.class; //1259
+        list[PALE_OAK_WOOD] = BlockWoodPaleOak.class; //1260
+
+        list[PALE_OAK_LEAVES] = BlockLeavesPaleOak.class; //1262
+
         list[BUSH] = BlockBush.class; //1278
         list[WILDFLOWERS] = BlockWildflowers.class; //1279
         list[FIREFLY_BUSH] = BlockFireflyBush.class; //1280
         list[LEAF_LITTER] = BlockLeafLitter.class; //1281
-
+        list[DRIED_GHAST] = BlockDriedGhast.class; //1282
         list[SHORT_DRY_GRASS] = BlockShortDryGrass.class; //1283
         list[TALL_DRY_GRASS] = BlockTallDryGrass.class; //1284
         list[CACTUS_FLOWER] = BlockCactusFlower.class; //1285
