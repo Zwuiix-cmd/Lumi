@@ -2,10 +2,10 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.item.EntityExpBottle;
 import cn.nukkit.entity.projectile.EntityEnderEye;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.projectile.EntityWindCharge;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
@@ -66,6 +66,11 @@ public abstract class ProjectileItem extends Item {
                     projectile.close();
                     return false;
                 }
+            } else if (projectile instanceof EntityWindCharge) {
+                if (player.getServer().getTick() - player.getLastWindChargeThrowingTick() < 10) {
+                    projectile.close();
+                    return false;
+                }
             }
 
             ProjectileLaunchEvent ev = new ProjectileLaunchEvent((EntityProjectile) projectile);
@@ -80,6 +85,8 @@ public abstract class ProjectileItem extends Item {
                 }
                 if (projectile instanceof EntityEnderPearl || projectile instanceof EntityEnderEye) {
                     player.onThrowEnderPearl();
+                } else if (projectile instanceof EntityWindCharge) {
+                    player.onThrowWindCharge();
                 }
                 projectile.spawnToAll();
                 player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);

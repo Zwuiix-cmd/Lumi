@@ -9,11 +9,6 @@ public class ItemWindCharge extends StringItemProjectileBase {
     }
 
     @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_21_0;
-    }
-
-    @Override
     public String getProjectileEntityType() {
         return "WindCharge";
     }
@@ -21,5 +16,10 @@ public class ItemWindCharge extends StringItemProjectileBase {
     @Override
     public float getThrowForce() {
         return 1.5f;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocolId) {
+        return protocolId >= ProtocolInfo.v1_21_0;
     }
 }

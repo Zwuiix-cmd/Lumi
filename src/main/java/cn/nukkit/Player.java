@@ -343,6 +343,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private int lastEmote;
     private int lastEnderPearl = 20;
+    private int lastWindCharge = 10;
     private int lastChorusFruitTeleport = 20;
     public long lastSkinChange = -1;
     private double lastRightClickTime = 0.0;
@@ -440,6 +441,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void onThrowEnderPearl() {
         this.lastEnderPearl = this.server.getTick();
+    }
+
+    public int getLastWindChargeThrowingTick() {
+        return lastWindCharge;
+    }
+
+    public void onThrowWindCharge() {
+        this.lastWindCharge = this.server.getTick();
     }
 
     public int getLastChorusFruitTeleport() {
