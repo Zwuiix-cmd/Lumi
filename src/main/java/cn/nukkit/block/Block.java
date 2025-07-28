@@ -1590,7 +1590,26 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                     mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
                 }
-                if (block.shouldBeRegisteredInCreative()) Item.addCreativeItem(block.toItem());
+                if (block.shouldBeRegisteredInCreative()) {
+                    Item.addCreativeItem(ProtocolInfo.v1_20_0, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_10, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_30, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_40, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_50, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_60, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_70, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_20_80, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_0, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_20, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_30, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_40, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_50, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_60, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_70, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_80, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_90, block.toItem());
+                    Item.addCreativeItem(ProtocolInfo.v1_21_93, block.toItem());
+                }
             });
         }
     }
