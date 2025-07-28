@@ -37,14 +37,14 @@ import java.util.Map;
 @UtilityClass
 public class CustomBlockUtil {
 
-    public static final Path BIN_PATH = Paths.get("bin/");
+    public static final Path VANILLA_PALETTES_PATH = Paths.get("vanilla_palettes/");
 
-    public static Path getBinPath() {
-        return Paths.get(Server.getInstance().getDataPath()).resolve(BIN_PATH);
+    public static Path getVanillaPalettesPath() {
+        return Paths.get(Server.getInstance().getDataPath()).resolve(VANILLA_PALETTES_PATH);
     }
 
-    public static Path getVanillaPalettePath(int version) {
-        return CustomBlockUtil.getBinPath().resolve("vanilla_palette_" + version + ".nbt");
+    public static Path getVanillaPalettePath(int protocol) {
+        return CustomBlockUtil.getVanillaPalettesPath().resolve("vanilla_palette_" + protocol + ".nbt");
     }
 
     private static void generateVariants(BlockProperties properties, String[] states, List<Map<String, Serializable>> variants, Map<String, Serializable> temp, int offset) {

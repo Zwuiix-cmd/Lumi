@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.customblock.CustomBlockDefinition;
 import cn.nukkit.block.customblock.CustomBlockUtil;
 import cn.nukkit.block.customblock.CustomBlockUtil.CustomBlockState;
+import cn.nukkit.block.customblock.VanillaPaletteUpdater;
 import cn.nukkit.block.customblock.comparator.HashedPaletteComparator;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.customblock.properties.BlockProperties;
@@ -1524,6 +1525,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public static void initCustomBlocks() {
         if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
+            VanillaPaletteUpdater.updateAllProtocols();
+
             for (var entry : HASHED_SORTED_CUSTOM_BLOCK.entrySet()) {
                 final CustomBlock customBlock = entry.getValue();
                 final BlockProperties properties = customBlock.getBlockProperties();
