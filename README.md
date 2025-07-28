@@ -9,9 +9,10 @@ Lumi is a server software based on [Nukkit-MOT](https://github.com/MemoriesOfTim
 ### What's new in Lumi?
 1. Support for 1.20.0 – 1.21.93 version (you can set the minimum protocol in the config)
 2. More vanilla features
-4. Custom enchantments
+3. Custom Blocks support
+4. Custom Enchantments support
 5. Better AntiXray system
-6. Better API (effects, food and etc.)
+6. Better API (effects, food, projectiles and etc.)
 
 ## How to install?
 1. Install java 21 or higher
