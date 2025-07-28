@@ -1591,7 +1591,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
                 int itemId = 255 - id;
-                System.out.println(itemId + ", " + ((Block)block).getItemId() + ", " + block.getName());
                 light[id] = block.getLightLevel();
                 lightFilter[id] = block.getLightFilter();
                 solid[id] = ((Block) block).isSolid();
