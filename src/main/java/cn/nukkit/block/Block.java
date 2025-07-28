@@ -642,6 +642,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public Item[] getDrops(Item item) {
+        if (this instanceof CustomBlock) {
+            return new Item[]{
+                    this.toItem()
+            };
+        }
         if (this.getId() < 0 || this.getId() > list.length) {
             return Item.EMPTY_ARRAY;
         }
