@@ -1543,12 +1543,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     private static List<Map<String, Serializable>> variantGenerations(BlockProperties properties, String[] states) {
         final Map<String, Serializable> temp = new HashMap<>();
-        for(String state : states) {
+        for (String state : states) {
             temp.put(state, 0);//def value
         }
 
         final List<Map<String, Serializable>> variants = new ArrayList<>();
-        if(states.length == 0) {
+        if (states.length == 0) {
             variants.add(temp);
         }
 
@@ -1595,7 +1595,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         private final BlockPropertiesHelper block;
     }
 
-    public static void initCustomBlock() {
+    public static void initCustomBlocks() {
         if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
             for (var entry : HASHED_SORTED_CUSTOM_BLOCK.entrySet()) {
                 final CustomBlock customBlock = entry.getValue();
@@ -1662,14 +1662,13 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 }
             }
 
-            Item.initCreativeItems();
-
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
                 int itemId = 255 - id;
+                System.out.println(itemId + ", " + ((Block)block).getItemId() + ", " + block.getName());
                 for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                     mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
                 }
-                if(block.shouldBeRegisteredInCreative()) Item.addCreativeItem(block.toItem());
+                if (block.shouldBeRegisteredInCreative()) Item.addCreativeItem(block.toItem());
             });
         }
     }

@@ -27,7 +27,6 @@ import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.inventory.CraftingManager;
 import cn.nukkit.inventory.Recipe;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
@@ -385,7 +384,8 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        Block.initCustomBlock();
+        Item.initCreativeItems();
+        Block.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);
