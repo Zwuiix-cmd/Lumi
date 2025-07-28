@@ -123,13 +123,13 @@ public class GsonNBTMapper {
                 String str = number.toString();
                 try {
                     return Integer.parseInt(str);
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     try {
                         return Long.parseLong(str);
-                    } catch(NumberFormatException e1) {
+                    } catch (NumberFormatException e1) {
                         try {
                             return Float.parseFloat(str);
-                        } catch(NumberFormatException e2) {
+                        } catch (NumberFormatException e2) {
                             return Double.parseDouble(str);
                         }
                     }
@@ -163,15 +163,15 @@ public class GsonNBTMapper {
                 try {
                     Integer.parseInt(str);
                     return NbtType.INT;
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     try {
                         Long.parseLong(str);
                         return NbtType.LONG;
-                    } catch(NumberFormatException e1) {
+                    } catch (NumberFormatException e1) {
                         try {
                             Float.parseFloat(str);
                             return NbtType.FLOAT;
-                        } catch(NumberFormatException e2) {
+                        } catch (NumberFormatException e2) {
                             Double.parseDouble(str);
                             return NbtType.DOUBLE;
                         }
