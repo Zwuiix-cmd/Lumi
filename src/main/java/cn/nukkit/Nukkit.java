@@ -50,18 +50,14 @@ public class Nukkit {
      * Server start time
      */
     public final static long START_TIME = System.currentTimeMillis();
-    /**
-     * Console title enabled
-     */
-    public static boolean TITLE = true;
+
     /**
      * Debug logging level
      */
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
-
-        System.setProperty("java.net.preferIPv4Stack" , "true");
+        System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("log4j.skipJansi", "false");
         System.getProperties().putIfAbsent("io.netty.allocator.type", "unpooled"); // Disable memory pooling unless specified
 
@@ -104,10 +100,6 @@ public class Nukkit {
 
         ServerKiller killer = new ServerKiller(10);
         killer.start();
-
-        if (TITLE) {
-            System.out.print("\u001B]0;Server Stopped\u0007");
-        }
 
         System.exit(0);
     }
