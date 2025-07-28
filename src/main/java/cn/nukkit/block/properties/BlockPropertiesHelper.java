@@ -1,10 +1,10 @@
 package cn.nukkit.block.properties;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.custom.properties.BlockProperties;
-import cn.nukkit.block.custom.properties.BlockProperty;
-import cn.nukkit.block.custom.properties.EnumBlockProperty;
-import cn.nukkit.block.custom.properties.RegisteredBlockProperty;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.BlockProperty;
+import cn.nukkit.block.customblock.properties.EnumBlockProperty;
+import cn.nukkit.block.customblock.properties.RegisteredBlockProperty;
 import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
