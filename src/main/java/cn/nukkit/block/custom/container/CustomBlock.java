@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFallableMeta;
 import cn.nukkit.block.BlockMeta;
 import cn.nukkit.block.custom.CustomBlockDefinition;
+import cn.nukkit.block.custom.properties.BlockProperties;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.Item;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,9 @@ public interface CustomBlock extends BlockPropertiesHelper {
      * <p>
      * {@code @Override} this method to set the level of light absorption of the custom block
      */
-    int getLightFilter();
+    default int getLightFilter() {
+        return 0;
+    }
 
     /**
      * 覆写该方法设置自定义方块的发出光的等级
@@ -43,14 +46,6 @@ public interface CustomBlock extends BlockPropertiesHelper {
      * {@code @Override} this method to set the hardness of the custom block, which helps to calculate the break time of the custom block on the server-side (the higher the hardness the longer the break time on the server-side)
      */
     double getHardness();
-
-    /**
-     * 覆写该方法设置自定义方块的命名空间ID
-     * <p>
-     * {@code @Override} this method to set the namespace ID of the custom block
-     */
-    @NotNull
-    String getNamespaceId();
 
     /**
      * 一般不需要被覆写,继承父类会提供
@@ -69,8 +64,6 @@ public interface CustomBlock extends BlockPropertiesHelper {
     /* 下面两个方法需要被手动覆写,请使用接口的定义 */
 
     /**
-     * 该方法必须被覆写为使用接口的定义，请使用
-     * <p>
      * The method must be {@code @Override} to use the definition of the interface, please use the
      * <br>
      * {@code @Override}<br>{@code public int getId() {
@@ -78,12 +71,10 @@ public interface CustomBlock extends BlockPropertiesHelper {
      * } }
      */
     default int getId() {
-        return Block.CUSTOM_BLOCK_ID_MAP.get(getNamespaceId().toLowerCase(Locale.ENGLISH));
+        return Block.CUSTOM_BLOCK_ID_MAP.get(getIdentifier().toLowerCase(Locale.ENGLISH));
     }
 
     /**
-     * 该方法必须被覆写为使用接口的定义，请使用
-     * <p>
      * The method must be {@code @Override} to use the definition of the interface, please use the
      * <br>
      * {@code @Override}<br>{@code public String getName() {
@@ -91,7 +82,7 @@ public interface CustomBlock extends BlockPropertiesHelper {
      * } }
      */
     default String getName() {
-        return this.getNamespaceId().split(":")[1].toLowerCase(Locale.ENGLISH);
+        return this.getIdentifier().split(":")[1].toLowerCase(Locale.ENGLISH);
     }
 
     default Block toCustomBlock() {
@@ -142,5 +133,9 @@ public interface CustomBlock extends BlockPropertiesHelper {
      */
     default boolean shouldBeRegisteredInCreative() {
         return true;
+    }
+
+    default BlockProperties getBlockProperties() {
+        return new BlockProperties();
     }
 }

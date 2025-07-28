@@ -1,8 +1,5 @@
 package cn.nukkit.block.custom.comparator;
 
-
-import org.cloudburstmc.nbt.NbtMap;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 
@@ -21,9 +18,6 @@ public class HashedPaletteComparator implements Comparator<String> {
         return Long.compareUnsigned(hash1, hash2);
     }
 
-    private String getIdentifier(NbtMap state) {
-        return state.getString("name");
-    }
 
     public static long fnv164(byte[] data) {
         long hash = FNV1_64_INIT;

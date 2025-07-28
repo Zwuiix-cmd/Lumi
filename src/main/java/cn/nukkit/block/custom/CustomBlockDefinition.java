@@ -60,7 +60,7 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
                 .putCompound("components", new CompoundTag());
 
         protected Builder(CustomBlock customBlock, Materials materials, BlockCreativeCategory blockCreativeCategory) {
-            this.identifier = customBlock.getNamespaceId();
+            this.identifier = customBlock.getIdentifier();
             this.customBlock = customBlock;
 
             var components = this.nbt.getCompound("components");
@@ -82,12 +82,21 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
                     .putCompound("materials", materials.toCompoundTag()));
             //默认单位立方体方块
             components.putCompound("minecraft:unit_cube", new CompoundTag());
+            components.putCompound("minecraft:geometry", new CompoundTag()
+                    .putString("identifier", "minecraft:geometry.full_block")
+                    .putString("culling", "")
+                    .putCompound("bone_visibility", new CompoundTag())
+            );
             //设置方块在创造栏的分类
             this.nbt.putCompound("menu_category", new CompoundTag()
                     .putString("category", blockCreativeCategory.name().toLowerCase(Locale.ENGLISH))
                     .putString("group", ItemCreativeGroup.NONE.getGroupName()));
+
+
             //molang版本
-            this.nbt.putInt("molangVersion", 6);
+            this.nbt.putInt("molangVersion", 9);
+
+            nbt.putCompound("vanilla_block_data", new CompoundTag().putInt("block_id", customBlock.getId()));
 
             //设置方块的properties
             var propertiesNBT = getPropertiesNBT();
@@ -351,6 +360,9 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
         private ListTag<CompoundTag> getPropertiesNBT() {
             if (this.customBlock instanceof CustomBlock block) {
                 BlockProperties properties = block.getBlockProperties();
+
+                if(properties == null) return null;
+
                 Set<BlockProperty<?>> propertyTypeSet = properties.getPropertyTypeSet();
                 if (propertyTypeSet.isEmpty()) {
                     return null;

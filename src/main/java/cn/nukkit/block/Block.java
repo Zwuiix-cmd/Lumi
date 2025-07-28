@@ -3,9 +3,13 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.custom.CustomBlockDefinition;
-import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.block.custom.comparator.HashedPaletteComparator;
 import cn.nukkit.block.custom.container.CustomBlock;
+import cn.nukkit.block.custom.properties.BlockProperties;
+import cn.nukkit.block.custom.properties.BlockProperty;
+import cn.nukkit.block.custom.properties.EnumBlockProperty;
+import cn.nukkit.block.custom.properties.exception.InvalidBlockPropertyMetaException;
+import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
@@ -14,28 +18,39 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.*;
 import cn.nukkit.item.customitem.ItemCustomTool;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.MovingObjectPosition;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.format.leveldb.BlockStateMapping;
+import cn.nukkit.level.format.leveldb.LevelDBConstants;
+import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.OK;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import cn.nukkit.utils.Utils;
+import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.objects.*;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.cloudburstmc.nbt.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -54,6 +69,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static final int ID_MASK = 0xfff; //max 4095
     public static final int DATA_SIZE = dynamic(1 << DATA_BITS);
     public static final int DATA_MASK = dynamic(DATA_SIZE - 1);
+
+    public static final Path BIN_PATH = Paths.get("bin/");
+    public static final int LOWEST_CUSTOM_BLOCK_ID = 10000;
 
     @SuppressWarnings("rawtypes")
     public static Class[] list = null;
@@ -74,6 +92,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     private static final List<CustomBlockDefinition> CUSTOM_BLOCK_DEFINITIONS = new ArrayList<>();
     public static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
     public static final ConcurrentHashMap<String, Integer> CUSTOM_BLOCK_ID_MAP = new ConcurrentHashMap<>();
+    private static final Int2ObjectMap<CustomBlockState> legacy2CustomState = new Int2ObjectOpenHashMap<>();
 
     /**
      * A commonly used block face pattern
@@ -179,7 +198,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
@@ -220,7 +239,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta);
         }
 
@@ -258,7 +277,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
@@ -288,7 +307,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         int id = fullId << DATA_BITS;
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
@@ -311,7 +330,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
             return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
         }
 
@@ -331,28 +350,28 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static int getBlockLight(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
             return light[0]; // TODO: just temporary
         }
         return light[blockId];
     }
 
     public static int getBlockLightFilter(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
             return lightFilter[0]; // TODO: just temporary
         }
         return lightFilter[blockId];
     }
 
     public static boolean isBlockSolidById(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
             return solid[1]; // TODO: just temporary
         }
         return solid[blockId];
     }
 
     public static boolean isBlockTransparentById(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
             return transparent[1]; // TODO: just temporary
         }
         return transparent[blockId];
@@ -560,8 +579,22 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return BlockColor.VOID_BLOCK_COLOR;
     }
 
+    /**
+     * The method must be {@code @Override} to use the definition of the interface, please use the
+     * <br>
+     * {@code @Override}<br>{@code public String getName() {
+     * return CustomBlock.super.getName();
+     * } }
+     */
     public abstract String getName();
 
+    /**
+     * The method must be {@code @Override} to use the definition of the interface, please use the
+     * <br>
+     * {@code @Override}<br>{@code public String getId() {
+     * return CustomBlock.super.getId();
+     * } }
+     */
     public abstract int getId();
 
     public int getItemId() {
@@ -1436,7 +1469,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return cloneTo(pos, true);
     }
 
-    private static int nextBlockId = 10000;
+    private static int nextBlockId = LOWEST_CUSTOM_BLOCK_ID;
 
     private final static SortedMap<String, CustomBlock> HASHED_SORTED_CUSTOM_BLOCK = new TreeMap<>(HashedPaletteComparator.INSTANCE);
 
@@ -1455,8 +1488,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 var method = clazz.getDeclaredConstructor();
                 method.setAccessible(true);
                 block = method.newInstance();
-                if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(block.getNamespaceId())) {
-                    HASHED_SORTED_CUSTOM_BLOCK.put(block.getNamespaceId(), block);
+                if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(block.getIdentifier())) {
+                    HASHED_SORTED_CUSTOM_BLOCK.put(block.getIdentifier(), block);
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 return new OK<>(false, e);
@@ -1493,30 +1526,288 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return new OK<Void>(true);
     }
 
+    private static void variantGenerations(BlockProperties properties, String[] states, List<Map<String, Serializable>> variants, Map<String, Serializable> temp, int offset) {
+        if (states.length - offset >= 0) {
+            final String currentState = states[states.length - offset];
+
+            properties.getBlockProperty(currentState).forEach((value) -> {
+                temp.put(currentState, value);
+                if(!variants.contains(temp))
+                    variants.add(new HashMap<>(temp));
+                variantGenerations(properties, states, variants, temp, offset + 1);
+            });
+
+            temp.put(currentState, 0);//def value
+        }
+    }
+
+    private static List<Map<String, Serializable>> variantGenerations(BlockProperties properties, String[] states) {
+        final Map<String, Serializable> temp = new HashMap<>();
+        for(String state : states) {
+            temp.put(state, 0);//def value
+        }
+
+        final List<Map<String, Serializable>> variants = new ArrayList<>();
+        if(states.length == 0) {
+            variants.add(temp);
+        }
+
+        variantGenerations(properties, states, variants, temp, 1);
+        return variants;
+    }
+
+    private static Path getVanillaPalettePath(int version) {
+        return Block.getBinPath().resolve("vanilla_palette_" + version + ".nbt");
+    }
+
+    private static Path getBinPath() {
+        return Paths.get(Server.getInstance().getDataPath()).resolve(BIN_PATH);
+    }
+
+    private static CustomBlockState createBlockState(String identifier, int legacyId, BlockProperties properties, BlockPropertiesHelper block) {
+        int meta = legacyId & Block.DATA_MASK;
+
+        NbtMapBuilder statesBuilder = NbtMap.builder();
+        if (properties != null) {
+            for (String propertyName : properties.getNames()) {
+                BlockProperty<?> property = properties.getBlockProperty(propertyName);
+                if (property instanceof EnumBlockProperty) {
+                    statesBuilder.put(property.getPersistenceName(), properties.getPersistenceValue(meta, propertyName));
+                } else {
+                    statesBuilder.put(property.getPersistenceName(), properties.getValue(meta, propertyName));
+                }
+            }
+        }
+
+        NbtMap state = NbtMap.builder()
+                .putString("name", identifier)
+                .putCompound("states", statesBuilder.build())
+                .putInt("version", LevelDBConstants.STATE_VERSION)
+                .build();
+        return new CustomBlockState(identifier, legacyId, state, block);
+    }
+
+    @Data
+    public static class CustomBlockState {
+        private final String identifier;
+        private final int legacyId;
+        private final NbtMap blockState;
+        private final BlockPropertiesHelper block;
+    }
+
     public static void initCustomBlock() {
-        /*if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
+        if (!HASHED_SORTED_CUSTOM_BLOCK.isEmpty()) {
             for (var entry : HASHED_SORTED_CUSTOM_BLOCK.entrySet()) {
-                CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), nextBlockId);//自定义方块标识符->自定义方块id
-                ID_TO_CUSTOM_BLOCK.put(nextBlockId, entry.getValue());//自定义方块id->自定义方块
+                final CustomBlock customBlock = entry.getValue();
+                final BlockProperties properties = customBlock.getBlockProperties();
+
+                final String identifier = customBlock.getIdentifier();
+                final int id = nextBlockId++;
+
+                CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), id);//自定义方块标识符->自定义方块id
+                ID_TO_CUSTOM_BLOCK.put(id, entry.getValue());//自定义方块id->自定义方块
                 CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
-                ++nextBlockId;
+
+                if(properties != null) {
+                    variantGenerations(properties, properties.getNames().toArray(new String[0]))
+                            .forEach(states -> {
+                                int meta = 0;
+
+                                for (String name : states.keySet()) {
+                                    meta = properties.setValue(meta, name, states.get(name));
+                                }
+
+                                CustomBlockState state;
+                                try {
+                                    state = Block.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
+                                } catch (InvalidBlockPropertyMetaException e) {
+                                    log.error(e);
+                                    return; // Nukkit has more states than our block
+                                }
+                                Block.legacy2CustomState.put(state.getLegacyId(), state);
+                            });
+                } else {
+                    CustomBlockState defaultState = Block.createBlockState(identifier, id << Block.DATA_BITS, properties, customBlock);
+                    Block.legacy2CustomState.put(defaultState.getLegacyId(), defaultState);
+                }
             }
-            var blocks = ID_TO_CUSTOM_BLOCK.values().stream().toList();
-            var result = BlockStateRegistry.registerCustomBlockState(blocks);//注册方块state
-            if (!result.ok()) {
-                throw new RuntimeException("Register CustomBlock state error, please check all your CustomBlock plugins,contact the plugin author! Error:", result.getError());
+
+            final BlockPalette storagePalette = GlobalBlockPalette.getPaletteByProtocol(LevelDBConstants.PALETTE_VERSION);
+            final ObjectSet<BlockPalette> set = new ObjectArraySet<>();
+
+            for (int protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
+                if (protocol < Server.getInstance().getSettings().general().multiversion().minProtocol()) {
+                    continue;
+                }
+
+                BlockPalette palette = GlobalBlockPalette.getPaletteByProtocol(protocol);
+                if (set.contains(palette)) {
+                    continue;
+                }
+                set.add(palette);
+
+                if (palette.getProtocol() == storagePalette.getProtocol()) {
+                    Block.recreateBlockPalette(palette, new ObjectArrayList<>(NukkitLegacyMapper.loadBlockPalette()));
+                } else {
+                    Path path = Block.getVanillaPalettePath(palette.getProtocol());
+                    if (!Files.exists(path)) {
+                        log.warn("No vanilla palette found for {}.", Utils.getVersionByProtocol(palette.getProtocol()));
+                        continue;
+                    }
+                    try {
+                        Block.recreateBlockPalette(palette);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
-            for(var block : blocks) {
-                int itemId = 255 - block.getId();
+
+            Item.initCreativeItems();
+
+            ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
+                int itemId = 255 - id;
                 for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                     mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
                 }
-            }
-            blocks.stream().filter( CustomBlock::shouldBeRegisteredInCreative ).forEach(
-                    b -> Item.addCreativeItem(b.toItem())
-            );//注册创造栏物品
-        }*/
+                if(block.shouldBeRegisteredInCreative()) Item.addCreativeItem(block.toItem());
+            });
+        }
     }
+
+    private static List<NbtMap> loadVanillaPalette(int version) throws FileNotFoundException {
+        Path path = Block.getVanillaPalettePath(version);
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException("Missing vanilla palette for version " + version);
+        }
+
+        try (InputStream stream = Files.newInputStream(path)) {
+            return ((NbtMap) NbtUtils.createGZIPReader(stream).readTag()).getList("blocks", NbtType.COMPOUND);
+        } catch (Exception e) {
+            throw new AssertionError("Error while loading vanilla palette", e);
+        }
+    }
+
+    private static int legacyToFullId(int legacyId) {
+        int blockId = legacyId >> Block.DATA_BITS;
+        int meta = legacyId & Block.DATA_MASK;
+        return (blockId << Block.DATA_BITS) | meta;
+    }
+
+    public static CompoundTag convertNbtMap(NbtMap nbt) {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            try (stream; NBTOutputStream nbtOutputStream = NbtUtils.createWriter(stream)) {
+                nbtOutputStream.writeTag(nbt);
+            }
+            return NBTIO.read(stream.toByteArray(), ByteOrder.BIG_ENDIAN, false);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to convert NbtMap: " + nbt, e);
+        }
+    }
+
+
+    private static void recreateBlockPalette(BlockPalette palette) throws IOException {
+        List<NbtMap> vanillaPalette = new ObjectArrayList<>(Block.loadVanillaPalette(palette.getProtocol()));
+        Block.recreateBlockPalette(palette, vanillaPalette);
+    }
+
+    private static void recreateBlockPalette(BlockPalette palette, List<NbtMap> vanillaPalette) {
+        Map<String, List<NbtMap>> vanillaPaletteList = new Object2ObjectRBTreeMap<>(HashedPaletteComparator.INSTANCE);
+
+        int paletteVersion = -1;
+        String lastName = null;
+        List<NbtMap> group = new ObjectArrayList<>();
+        int runtimeId = 0;
+        Int2ObjectMap<NbtMap> runtimeId2State = new Int2ObjectOpenHashMap<>();
+        for (NbtMap state : vanillaPalette) {
+            //删除不属于原版的内容
+            if (state.containsKey("network_id") || state.containsKey("name_hash") || state.containsKey("block_id")) {
+                NbtMapBuilder builder = NbtMapBuilder.from(state);
+                builder.remove("network_id");
+                builder.remove("name_hash");
+                builder.remove("block_id");
+                state = builder.build();
+            }
+
+            int version = state.getInt("version");
+            if (version != paletteVersion) {
+                paletteVersion = version;
+            }
+
+            String name = state.getString("name");
+            if (lastName != null && !name.equals(lastName)) {
+                vanillaPaletteList.put(lastName, group);
+                group = new ObjectArrayList<>();
+            }
+            group.add(state);
+            runtimeId2State.put(runtimeId++, state);
+            lastName = name;
+        }
+        if (lastName != null) {
+            vanillaPaletteList.put(lastName, group);
+        }
+
+        Object2ObjectMap<NbtMap, IntSet> state2Legacy = new Object2ObjectLinkedOpenHashMap<>();
+
+        for (Int2IntMap.Entry entry : palette.getLegacyToRuntimeIdMap().int2IntEntrySet()) {
+            int rid = entry.getIntValue();
+            NbtMap state = runtimeId2State.get(rid);
+            if (state == null) {
+                log.info("Unknown runtime ID {}! protocol={}", rid, palette.getProtocol());
+                continue;
+            }
+            IntSet legacyIds = state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet());
+            legacyIds.add(entry.getIntKey());
+        }
+
+        lastName = null;
+        group = new ObjectArrayList<>();
+        for (CustomBlockState definition : Block.legacy2CustomState.values()) {
+            NbtMap state = definition.getBlockState();
+            if (state.getInt("version") != paletteVersion) {
+                state = state.toBuilder().putInt("version", paletteVersion).build();
+            }
+            state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet()).add(legacyToFullId(definition.getLegacyId()));
+
+            String name = state.getString("name");
+            if (lastName != null && !name.equals(lastName)) {
+                vanillaPaletteList.put(lastName, group);
+                group = new ObjectArrayList<>();
+            }
+            group.add(state);
+            lastName = name;
+        }
+        if (lastName != null) {
+            vanillaPaletteList.put(lastName, group);
+        }
+
+        palette.clearStates();
+        boolean levelDb = palette.getProtocol() == GlobalBlockPalette.getPaletteByProtocol(LevelDBConstants.PALETTE_VERSION).getProtocol(); //防止小版本不相等问题
+        if (levelDb) {
+            BlockStateMapping.get().clearMapping();
+        }
+
+        runtimeId = 0;
+        for (List<NbtMap> states : vanillaPaletteList.values()) {
+            for (NbtMap state : states) {
+                if(!levelDb || !BlockStateMapping.get().containsState(state)) {
+                    if (levelDb) {
+                        BlockStateMapping.get().registerState(runtimeId, state);
+                    }
+
+                    IntSet legacyIds = state2Legacy.get(state);
+                    if (legacyIds != null) {
+                        CompoundTag nukkitState = convertNbtMap(state);
+                        for (Integer fullId : legacyIds) {
+                            palette.registerState(fullId >> Block.DATA_BITS, (fullId & Block.DATA_MASK), runtimeId, nukkitState);
+                        }
+                    }
+                }
+                runtimeId++;
+            }
+        }
+    }
+
 
     public static List<CustomBlockDefinition> getCustomBlockDefinitionList() {
         return new ArrayList<>(CUSTOM_BLOCK_DEFINITIONS);
