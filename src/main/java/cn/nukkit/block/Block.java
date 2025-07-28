@@ -98,13 +98,13 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         if (list == null) {
             list = new Class[MAX_BLOCK_ID];
             fullList = new Block[MAX_BLOCK_ID * (1 << DATA_BITS)];
-            light = new int[MAX_BLOCK_ID];
-            lightFilter = new int[MAX_BLOCK_ID];
-            solid = new boolean[MAX_BLOCK_ID];
-            hardness = new double[MAX_BLOCK_ID];
-            transparent = new boolean[MAX_BLOCK_ID];
-            diffusesSkyLight = new boolean[MAX_BLOCK_ID];
-            hasMeta = new boolean[MAX_BLOCK_ID];
+            light = new int[65536];
+            lightFilter = new int[65536];
+            solid = new boolean[65536];
+            hardness = new double[65536];
+            transparent = new boolean[65536];
+            diffusesSkyLight = new boolean[65536];
+            hasMeta = new boolean[65536];
 
             Blocks.init();
 
@@ -1587,6 +1587,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
                 int itemId = 255 - id;
                 System.out.println(itemId + ", " + ((Block)block).getItemId() + ", " + block.getName());
+                light[id] = block.getLightLevel();
+                lightFilter[id] = block.getLightFilter();
+                solid[id] = ((Block) block).isSolid();
+                hardness[id] = block.getHardness();
+                transparent[id] = ((Block) block).isTransparent();
+                diffusesSkyLight[id] = ((Block) block).diffusesSkyLight();
+                hasMeta[id] = true;
+
                 for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                     mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
                 }
