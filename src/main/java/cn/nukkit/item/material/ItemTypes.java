@@ -1106,6 +1106,7 @@ public final class ItemTypes {
     @Data
     private static class ItemTypeImpl implements ItemType {
         private final String identifier;
+
         private final int legacyId;
     }
 }

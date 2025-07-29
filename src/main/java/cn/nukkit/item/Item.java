@@ -14,6 +14,7 @@ import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.ItemTypes;
+import cn.nukkit.item.material.tags.ItemTags;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
@@ -1839,6 +1840,14 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             }
         }
         return this.type;
+    }
+
+    public Set<cn.nukkit.item.material.tags.ItemTag> getItemTags() {
+        return ItemTags.getTagsSet(this.getIdentifier());
+    }
+
+    public boolean hasItemTag(cn.nukkit.item.material.tags.ItemTag itemTag) {
+        return this.getItemTags().contains(itemTag);
     }
 
     public String getIdentifier() {

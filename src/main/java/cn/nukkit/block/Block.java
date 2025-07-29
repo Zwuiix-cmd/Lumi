@@ -13,6 +13,8 @@ import cn.nukkit.block.customblock.properties.exception.InvalidBlockPropertyMeta
 import cn.nukkit.block.material.BlockType;
 import cn.nukkit.block.material.BlockTypes;
 import cn.nukkit.block.material.CustomBlockType;
+import cn.nukkit.block.material.tags.BlockTag;
+import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
@@ -603,6 +605,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             }
         }
         return this.type;
+    }
+
+    public Set<BlockTag> getBlockTags() {
+        return BlockTags.getTagsSet(this.getIdentifier());
+    }
+
+    public boolean hasBlockTag(BlockTag blockTag) {
+        return this.getBlockTags().contains(blockTag);
     }
 
     public String getIdentifier() {
