@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.inventory.ItemTag;
@@ -11,6 +12,8 @@ import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.material.ItemType;
+import cn.nukkit.item.material.ItemTypes;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
@@ -68,7 +71,8 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
      */
     private static final Pattern ITEM_STRING_PATTERN = Pattern.compile(
             //       1:namespace    2:name           3:damage   4:num-id    5:damage
-            "^(?:(?:([a-z_]\\w*):)?([a-z._]\\w*)(?::(-?\\d+))?|(-?\\d+)(?::(-?\\d+))?)$");
+            "^(?:(?:([a-z_]\\w*):)?([a-z._]\\w*)(?::(-?\\d+))?|(-?\\d+)(?::(-?\\d+))?)$"
+    );
 
     public static final String UNKNOWN_STR = "Unknown";
     public static Class<?>[] list = null;
@@ -78,8 +82,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     private static final HashMap<String, CustomItemDefinition> CUSTOM_ITEM_DEFINITIONS = new HashMap<>();
     private static final HashMap<String, CustomItem> CUSTOM_ITEM_NEED_ADD_CREATIVE = new HashMap<>();
 
-    protected Block block = null;
     protected final int id;
+    protected ItemType type;
+    protected Block block = null;
     protected int meta;
     protected boolean hasMeta = true;
     private byte[] tags = new byte[0];
@@ -100,7 +105,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public Item(int id, Integer meta, int count, String name) {
-        //this.id = id & 0xffff;
         this.id = id;
         if (meta != null && meta >= 0) {
             this.meta = meta & 0xffff;
@@ -1820,6 +1824,27 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public int getId() {
         return id;
+    }
+
+    public ItemType getItemType() {
+        if (this.type == null) {
+            System.out.println("getItemType BLOCK: " + block);
+            if (this.block instanceof CustomBlock customBlock) {
+                this.type = ItemTypes.get(customBlock.getIdentifier());
+                System.out.println("getItemType TYPE: " + type);
+                System.out.println("getItemType CB ident " + customBlock.getIdentifier());
+            } else if (this instanceof StringItem) {
+                this.type = ItemTypes.get(this.getNamespaceId());
+            } else {
+                System.out.println("LEGACY ID");
+                this.type = ItemTypes.getFromLegacy(id);
+            }
+        }
+        return this.type;
+    }
+
+    public String getIdentifier() {
+        return this.getItemType().getIdentifier();
     }
 
     public int getDamage() {
