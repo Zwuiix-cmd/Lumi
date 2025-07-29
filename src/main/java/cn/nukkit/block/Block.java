@@ -596,6 +596,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      */
     public abstract int getId();
 
+    /**
+     * Gets the type of the block.
+     *
+     * @return BlockType
+     */
     public BlockType getBlockType() {
         if (this.type == null) {
             if (this instanceof CustomBlock customBlock) {
@@ -607,14 +612,30 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return this.type;
     }
 
+    /**
+     * Gets all item block.
+     *
+     * @return Set<BlockType>
+     */
     public Set<BlockTag> getBlockTags() {
         return BlockTags.getTagsSet(this.getIdentifier());
     }
 
+    /**
+     * Checks whether the block has a tag.
+     *
+     * @param blockTag BlockTag to check
+     * @return true if there is, otherwise false
+     */
     public boolean hasBlockTag(BlockTag blockTag) {
         return this.getBlockTags().contains(blockTag);
     }
 
+    /**
+     * Gets the block string identifier from the type.
+     *
+     * @return String identifier
+     */
     public String getIdentifier() {
         return this.getBlockType().getIdentifier();
     }

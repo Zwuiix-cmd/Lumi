@@ -1819,6 +1819,11 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return id;
     }
 
+    /**
+     * Gets the type of the item.
+     *
+     * @return ItemType
+     */
     public ItemType getItemType() {
         if (this.type == null) {
             if (this.block instanceof CustomBlock customBlock) {
@@ -1834,14 +1839,30 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         return this.type;
     }
 
+    /**
+     * Gets all item tags.
+     *
+     * @return Set<ItemTag>
+     */
     public Set<ItemTag> getItemTags() {
         return ItemTags.getTagsSet(this.getIdentifier());
     }
 
+    /**
+     * Checks whether the item has a tag.
+     *
+     * @param itemTag ItemTag to check
+     * @return true if there is, otherwise false
+     */
     public boolean hasItemTag(ItemTag itemTag) {
         return this.getItemTags().contains(itemTag);
     }
 
+    /**
+     * Gets the item string identifier from the type.
+     *
+     * @return String identifier
+     */
     public String getIdentifier() {
         return this.getItemType().getIdentifier();
     }
