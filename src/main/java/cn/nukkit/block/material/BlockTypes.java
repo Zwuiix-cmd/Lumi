@@ -3152,6 +3152,7 @@ public final class BlockTypes {
     @Data
     private static class BlockTypeImpl implements BlockType {
         private final String identifier;
+
         private final int legacyId;
     }
 }
