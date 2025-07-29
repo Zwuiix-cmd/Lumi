@@ -4,13 +4,17 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
-import cn.nukkit.inventory.ItemTag;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.material.ItemType;
+import cn.nukkit.item.material.ItemTypes;
+import cn.nukkit.item.material.tags.ItemTag;
+import cn.nukkit.item.material.tags.ItemTags;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
@@ -68,7 +72,8 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
      */
     private static final Pattern ITEM_STRING_PATTERN = Pattern.compile(
             //       1:namespace    2:name           3:damage   4:num-id    5:damage
-            "^(?:(?:([a-z_]\\w*):)?([a-z._]\\w*)(?::(-?\\d+))?|(-?\\d+)(?::(-?\\d+))?)$");
+            "^(?:(?:([a-z_]\\w*):)?([a-z._]\\w*)(?::(-?\\d+))?|(-?\\d+)(?::(-?\\d+))?)$"
+    );
 
     public static final String UNKNOWN_STR = "Unknown";
     public static Class<?>[] list = null;
@@ -78,8 +83,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     private static final HashMap<String, CustomItemDefinition> CUSTOM_ITEM_DEFINITIONS = new HashMap<>();
     private static final HashMap<String, CustomItem> CUSTOM_ITEM_NEED_ADD_CREATIVE = new HashMap<>();
 
-    protected Block block = null;
     protected final int id;
+    protected ItemType type;
+    protected Block block = null;
     protected int meta;
     protected boolean hasMeta = true;
     private byte[] tags = new byte[0];
@@ -100,7 +106,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
     }
 
     public Item(int id, Integer meta, int count, String name) {
-        //this.id = id & 0xffff;
         this.id = id;
         if (meta != null && meta >= 0) {
             this.meta = meta & 0xffff;
@@ -937,14 +942,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         CustomItemDefinition customDef = customItem.getDefinition();
         CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customDef);
         registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
-
-        // 在服务端注册自定义物品的tag
-        if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
-            var tagList = componentTag.getList("item_tags", StringTag.class);
-            if (!tagList.isEmpty()) {
-                ItemTag.registerItemTag(customItem.getNamespaceId(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
-            }
-        }
 
         registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
         registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
@@ -1820,6 +1817,62 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public int getId() {
         return id;
+    }
+
+    /**
+     * Gets the type of the item.
+     *
+     * @return ItemType
+     */
+    public ItemType getItemType() {
+        if (this.type != null) {
+            return this.type;
+        }
+
+        if (this.block instanceof CustomBlock customBlock) {
+            this.type = ItemTypes.get(customBlock.getIdentifier());
+        } else if (this instanceof StringItem) {
+            this.type = ItemTypes.get(this.getNamespaceId());
+        } else {
+            var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
+            var entry = mappings.toRuntime(this.getId(), this.getDamage());
+            this.type = ItemTypes.getFromLegacy(entry.getRuntimeId());
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize item type");
+        }
+
+        return this.type;
+    }
+
+    /**
+     * Gets all item tags.
+     *
+     * @return Set<ItemTag>
+     */
+    public Set<ItemTag> getItemTags() {
+        return ItemTags.getTagsSet(this.getIdentifier());
+    }
+
+    /**
+     * Checks whether the item has a tag.
+     *
+     * @param itemTag ItemTag to check
+     * @return true if there is, otherwise false
+     */
+    public boolean hasItemTag(ItemTag itemTag) {
+        return this.getItemTags().contains(itemTag);
+    }
+
+    /**
+     * Gets the item string identifier from the type.
+     *
+     * @return String identifier
+     */
+    public String getIdentifier() {
+        return this.getItemType().getIdentifier();
     }
 
     public int getDamage() {

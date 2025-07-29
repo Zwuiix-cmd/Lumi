@@ -10,6 +10,11 @@ import cn.nukkit.block.customblock.comparator.HashedPaletteComparator;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.customblock.properties.exception.InvalidBlockPropertyMetaException;
+import cn.nukkit.block.material.BlockType;
+import cn.nukkit.block.material.BlockTypes;
+import cn.nukkit.block.material.CustomBlockType;
+import cn.nukkit.block.material.tags.BlockTag;
+import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
@@ -90,6 +95,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * A commonly used block face pattern
      */
     protected static final int[] FACES2534 = {2, 5, 3, 4};
+
+    private BlockType type;
 
     protected Block() {}
 
@@ -588,6 +595,58 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * } }
      */
     public abstract int getId();
+
+    /**
+     * Gets the type of the block.
+     *
+     * @return BlockType
+     */
+    public BlockType getBlockType() {
+        if (this.type != null) {
+            return this.type;
+        }
+
+        if (this instanceof CustomBlock customBlock) {
+            this.type = BlockTypes.get(customBlock.getIdentifier());
+        } else {
+            this.type = BlockTypes.getFromLegacy(this.getItemId());
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize block type");
+        }
+
+        return this.type;
+    }
+
+    /**
+     * Gets all item block.
+     *
+     * @return Set<BlockType>
+     */
+    public Set<BlockTag> getBlockTags() {
+        return BlockTags.getTagsSet(this.getIdentifier());
+    }
+
+    /**
+     * Checks whether the block has a tag.
+     *
+     * @param blockTag BlockTag to check
+     * @return true if there is, otherwise false
+     */
+    public boolean hasBlockTag(BlockTag blockTag) {
+        return this.getBlockTags().contains(blockTag);
+    }
+
+    /**
+     * Gets the block string identifier from the type.
+     *
+     * @return String identifier
+     */
+    public String getIdentifier() {
+        return this.getBlockType().getIdentifier();
+    }
 
     public int getItemId() {
         int id = getId();
@@ -1537,6 +1596,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), id);//自定义方块标识符->自定义方块id
                 ID_TO_CUSTOM_BLOCK.put(id, entry.getValue());//自定义方块id->自定义方块
                 CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
+
+                BlockTypes.register(new CustomBlockType(entry.getValue()));
 
                 if (properties != null) {
                     CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
