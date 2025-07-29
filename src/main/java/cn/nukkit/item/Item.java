@@ -1833,7 +1833,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             } else if (this instanceof StringItem) {
                 this.type = ItemTypes.get(this.getNamespaceId());
             } else {
-                this.type = ItemTypes.getFromLegacy(id);
+                var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
+                var entry = mappings.toRuntime(this.getId(), this.getDamage());
+                this.type = ItemTypes.getFromLegacy(entry.getRuntimeId());
             }
         }
         return this.type;

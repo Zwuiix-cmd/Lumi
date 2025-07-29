@@ -1,5 +1,6 @@
 package cn.nukkit.block.material;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.block.customblock.CustomBlock;
 import lombok.Data;
 
@@ -11,5 +12,10 @@ public final class CustomBlockType implements BlockType {
     public CustomBlockType(CustomBlock customBlock) {
         this.identifier = customBlock.getIdentifier();
         this.legacyId = customBlock.getId();
+    }
+
+    @Override
+    public Block createBlock() {
+        return Block.get(legacyId);
     }
 }

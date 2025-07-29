@@ -1,6 +1,9 @@
 package cn.nukkit.item.material;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public interface ItemType {
 
@@ -17,6 +20,13 @@ public interface ItemType {
     }
 
     default Item createItem(int count, int meta) {
-        return Item.get(this.getLegacyId(), count, meta);
+        try {
+            var mapping = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
+            var entry = mapping.fromRuntime(this.getLegacyId());
+            int damage = entry.isHasDamage() ? entry.getDamage() : meta;
+            return Item.get(entry.getLegacyId(), damage, count);
+        } catch (IllegalArgumentException e) {
+            return Item.get(Block.AIR);
+        }
     }
 }
