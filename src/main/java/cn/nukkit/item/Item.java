@@ -7,7 +7,6 @@ import cn.nukkit.block.BlockID;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
-import cn.nukkit.inventory.ItemTag;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
@@ -942,14 +941,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         CustomItemDefinition customDef = customItem.getDefinition();
         CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customDef);
         registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
-
-        // 在服务端注册自定义物品的tag
-        if (customDef.getNbt(ProtocolInfo.CURRENT_PROTOCOL).get("components") instanceof CompoundTag componentTag) {
-            var tagList = componentTag.getList("item_tags", StringTag.class);
-            if (!tagList.isEmpty()) {
-                ItemTag.registerItemTag(customItem.getNamespaceId(), tagList.getAll().stream().map(tag -> tag.data).collect(Collectors.toSet()));
-            }
-        }
 
         registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
         registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
