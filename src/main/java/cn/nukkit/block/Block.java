@@ -602,13 +602,21 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return BlockType
      */
     public BlockType getBlockType() {
-        if (this.type == null) {
-            if (this instanceof CustomBlock customBlock) {
-                this.type = BlockTypes.get(customBlock.getIdentifier());
-            } else {
-                this.type = BlockTypes.getFromLegacy(this.getItemId());
-            }
+        if (this.type != null) {
+            return this.type;
         }
+
+        if (this instanceof CustomBlock customBlock) {
+            this.type = BlockTypes.get(customBlock.getIdentifier());
+        } else {
+            this.type = BlockTypes.getFromLegacy(this.getItemId());
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize block type");
+        }
+
         return this.type;
     }
 

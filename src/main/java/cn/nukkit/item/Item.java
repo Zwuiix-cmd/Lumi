@@ -1825,17 +1825,25 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
      * @return ItemType
      */
     public ItemType getItemType() {
-        if (this.type == null) {
-            if (this.block instanceof CustomBlock customBlock) {
-                this.type = ItemTypes.get(customBlock.getIdentifier());
-            } else if (this instanceof StringItem) {
-                this.type = ItemTypes.get(this.getNamespaceId());
-            } else {
-                var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
-                var entry = mappings.toRuntime(this.getId(), this.getDamage());
-                this.type = ItemTypes.getFromLegacy(entry.getRuntimeId());
-            }
+        if (this.type != null) {
+            return this.type;
         }
+
+        if (this.block instanceof CustomBlock customBlock) {
+            this.type = ItemTypes.get(customBlock.getIdentifier());
+        } else if (this instanceof StringItem) {
+            this.type = ItemTypes.get(this.getNamespaceId());
+        } else {
+            var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
+            var entry = mappings.toRuntime(this.getId(), this.getDamage());
+            this.type = ItemTypes.getFromLegacy(entry.getRuntimeId());
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize item type");
+        }
+
         return this.type;
     }
 
