@@ -1828,15 +1828,11 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
 
     public ItemType getItemType() {
         if (this.type == null) {
-            System.out.println("getItemType BLOCK: " + block);
             if (this.block instanceof CustomBlock customBlock) {
                 this.type = ItemTypes.get(customBlock.getIdentifier());
-                System.out.println("getItemType TYPE: " + type);
-                System.out.println("getItemType CB ident " + customBlock.getIdentifier());
             } else if (this instanceof StringItem) {
                 this.type = ItemTypes.get(this.getNamespaceId());
             } else {
-                System.out.println("LEGACY ID");
                 this.type = ItemTypes.getFromLegacy(id);
             }
         }
