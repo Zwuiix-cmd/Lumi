@@ -9,7 +9,7 @@ public interface ItemType {
 
     String getIdentifier();
 
-    int getLegacyId();
+    int getRuntimeId();
 
     default Item createItem() {
         return this.createItem(1);
@@ -22,7 +22,7 @@ public interface ItemType {
     default Item createItem(int count, int meta) {
         try {
             var mapping = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
-            var entry = mapping.fromRuntime(this.getLegacyId());
+            var entry = mapping.fromRuntime(this.getRuntimeId());
             int damage = entry.isHasDamage() ? entry.getDamage() : meta;
             return Item.get(entry.getLegacyId(), damage, count);
         } catch (IllegalArgumentException e) {

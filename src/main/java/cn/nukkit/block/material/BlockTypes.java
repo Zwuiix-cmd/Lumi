@@ -11,7 +11,7 @@ import lombok.Data;
  * This class is generated automatically, do not change it manually.
  */
 public final class BlockTypes {
-    private static final Int2ObjectMap<BlockType> LEGACY_TO_TYPE = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<BlockType> RUNTIME_TO_TYPE = new Int2ObjectOpenHashMap<>();
 
     private static final Object2ObjectMap<String, BlockType> ID_TO_TYPE = new Object2ObjectOpenHashMap<>();
 
@@ -3129,15 +3129,15 @@ public final class BlockTypes {
 
     public static final BlockType ZOMBIE_HEAD = register("minecraft:zombie_head", -966);
 
-    public static BlockType register(String identifier, int legacyId) {
-        return register(new BlockTypeImpl(identifier, legacyId));
+    public static BlockType register(String identifier, int runtimeId) {
+        return register(new BlockTypeImpl(identifier, runtimeId));
     }
 
     public static BlockType register(BlockType blockType) {
         BlockType oldType = ID_TO_TYPE.get(blockType.getIdentifier());
-        LEGACY_TO_TYPE.putIfAbsent(blockType.getLegacyId(), blockType);
+        RUNTIME_TO_TYPE.putIfAbsent(blockType.getRuntimeId(), blockType);
         ID_TO_TYPE.putIfAbsent(blockType.getIdentifier(), blockType);
-        ItemTypes.register(blockType.getIdentifier(), blockType.getLegacyId());
+        ItemTypes.register(blockType.getIdentifier(), blockType.getRuntimeId());
         return oldType != null ? oldType : blockType;
     }
 
@@ -3145,14 +3145,14 @@ public final class BlockTypes {
         return ID_TO_TYPE.get(identifier);
     }
 
-    public static BlockType getFromLegacy(int legacyId) {
-        return LEGACY_TO_TYPE.get(legacyId);
+    public static BlockType getFromRuntime(int runtimeId) {
+        return RUNTIME_TO_TYPE.get(runtimeId);
     }
 
     @Data
     private static class BlockTypeImpl implements BlockType {
         private final String identifier;
 
-        private final int legacyId;
+        private final int runtimeId;
     }
 }
