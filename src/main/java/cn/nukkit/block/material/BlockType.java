@@ -9,12 +9,12 @@ public interface BlockType {
 
     String getIdentifier();
 
-    int getLegacyId();
+    int getRuntimeId();
 
     default Block createBlock() {
         try {
             var mapping = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
-            var entry = mapping.fromRuntime(this.getLegacyId());
+            var entry = mapping.fromRuntime(this.getRuntimeId());
             var block = Block.get(entry.getLegacyId(), entry.getDamage());
             return block instanceof BlockUnknown ? Block.get(Block.AIR) : block;
         } catch (IllegalArgumentException e) {

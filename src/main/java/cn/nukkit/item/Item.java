@@ -11,6 +11,7 @@ import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.material.CustomItemType;
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.ItemTypes;
 import cn.nukkit.item.material.tags.ItemTag;
@@ -47,7 +48,6 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author MagicDroidX
@@ -938,9 +938,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
             return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
         }
+
         CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
-        CustomItemDefinition customDef = customItem.getDefinition();
-        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customDef);
+        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
         registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
 
         registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
@@ -974,6 +974,9 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
         registerCustomItem(customItem, v1_21_90, addCreativeItem, v1_21_90);
         registerCustomItem(customItem, v1_21_93, addCreativeItem, v1_21_93);
         //TODO Multiversion 添加新版本支持时修改这里
+
+        // Registering custom item type
+        ItemTypes.register(new CustomItemType(customItem));
 
         if (addCreativeItem) {
             CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
@@ -1829,14 +1832,14 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             return this.type;
         }
 
-        if (this.block instanceof CustomBlock customBlock) {
+        if (this instanceof StringItem stringItem) {
+            this.type = ItemTypes.get(stringItem.getNamespaceId());
+        } else if (this.block instanceof CustomBlock customBlock) {
             this.type = ItemTypes.get(customBlock.getIdentifier());
-        } else if (this instanceof StringItem) {
-            this.type = ItemTypes.get(this.getNamespaceId());
         } else {
             var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
             var entry = mappings.toRuntime(this.getId(), this.getDamage());
-            this.type = ItemTypes.getFromLegacy(entry.getRuntimeId());
+            this.type = ItemTypes.getFromRuntime(entry.getRuntimeId());
         }
 
         // Throw an exception if for some reason the type cannot be determined.

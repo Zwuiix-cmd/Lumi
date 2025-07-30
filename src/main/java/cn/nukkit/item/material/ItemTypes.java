@@ -10,7 +10,7 @@ import lombok.Data;
  * This class is generated automatically, do not change it manually.
  */
 public final class ItemTypes {
-    private static final Int2ObjectMap<ItemType> LEGACY_TO_TYPE = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<ItemType> RUNTIME_TO_TYPE = new Int2ObjectOpenHashMap<>();
 
     private static final Object2ObjectMap<String, ItemType> ID_TO_TYPE = new Object2ObjectOpenHashMap<>();
 
@@ -1084,13 +1084,13 @@ public final class ItemTypes {
 
     public static final ItemType ZOMBIE_VILLAGER_SPAWN_EGG = register("minecraft:zombie_villager_spawn_egg", 505);
 
-    public static ItemType register(String identifier, int legacyId) {
-        return register(new ItemTypeImpl(identifier, legacyId));
+    public static ItemType register(String identifier, int runtimeId) {
+        return register(new ItemTypeImpl(identifier, runtimeId));
     }
 
     public static ItemType register(ItemType itemType) {
         ItemType oldType = ID_TO_TYPE.get(itemType.getIdentifier());
-        LEGACY_TO_TYPE.putIfAbsent(itemType.getLegacyId(), itemType);
+        RUNTIME_TO_TYPE.putIfAbsent(itemType.getRuntimeId(), itemType);
         ID_TO_TYPE.putIfAbsent(itemType.getIdentifier(), itemType);
         return oldType != null ? oldType : itemType;
     }
@@ -1099,14 +1099,14 @@ public final class ItemTypes {
         return ID_TO_TYPE.get(identifier);
     }
 
-    public static ItemType getFromLegacy(int legacyId) {
-        return LEGACY_TO_TYPE.get(legacyId);
+    public static ItemType getFromRuntime(int runtimeId) {
+        return RUNTIME_TO_TYPE.get(runtimeId);
     }
 
     @Data
     private static class ItemTypeImpl implements ItemType {
         private final String identifier;
 
-        private final int legacyId;
+        private final int runtimeId;
     }
 }

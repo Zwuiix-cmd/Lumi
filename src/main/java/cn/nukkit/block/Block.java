@@ -609,7 +609,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         if (this instanceof CustomBlock customBlock) {
             this.type = BlockTypes.get(customBlock.getIdentifier());
         } else {
-            this.type = BlockTypes.getFromLegacy(this.getItemId());
+            this.type = BlockTypes.getFromRuntime(this.getItemId());
         }
 
         // Throw an exception if for some reason the type cannot be determined.
@@ -1594,10 +1594,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 final int id = nextBlockId++;
 
                 CUSTOM_BLOCK_ID_MAP.put(entry.getKey(), id);//自定义方块标识符->自定义方块id
-                ID_TO_CUSTOM_BLOCK.put(id, entry.getValue());//自定义方块id->自定义方块
-                CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
-
-                BlockTypes.register(new CustomBlockType(entry.getValue()));
+                ID_TO_CUSTOM_BLOCK.put(id, customBlock);//自定义方块id->自定义方块
+                CUSTOM_BLOCK_DEFINITIONS.add(customBlock.getDefinition());//行为包数据
 
                 if (properties != null) {
                     CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
@@ -1663,9 +1661,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 diffusesSkyLight[id] = ((Block) block).diffusesSkyLight();
                 hasMeta[id] = true;
 
+                // Registering custom block item mappings
                 for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
                     mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
                 }
+
+                // Registering custom block type
+                BlockTypes.register(new CustomBlockType(block));
+
                 if (block.shouldBeRegisteredInCreative()) {
                     Item.addCreativeItem(ProtocolInfo.v1_20_0, block.toItem());
                     Item.addCreativeItem(ProtocolInfo.v1_20_10, block.toItem());
