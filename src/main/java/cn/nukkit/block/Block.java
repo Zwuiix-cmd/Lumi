@@ -1547,6 +1547,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                                     meta = properties.setValue(meta, name, states.get(name));
                                 }
 
+                                final int itemId = 255 - id;
+                                for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
+                                    mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
+                                }
+
+
                                 CustomBlockState state;
                                 try {
                                     state = CustomBlockUtil.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
@@ -1593,7 +1599,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             }
 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
-                int itemId = 255 - id;
                 light[id] = block.getLightLevel();
                 lightFilter[id] = block.getLightFilter();
                 solid[id] = ((Block) block).isSolid();
@@ -1602,9 +1607,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 diffusesSkyLight[id] = ((Block) block).diffusesSkyLight();
                 hasMeta[id] = true;
 
-                for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
-                    mapping.registerCustomBlockItem(block.getIdentifier(), itemId, 0);
-                }
                 if (block.shouldBeRegisteredInCreative()) {
                     Item.addCreativeItem(ProtocolInfo.v1_20_0, block.toItem());
                     Item.addCreativeItem(ProtocolInfo.v1_20_10, block.toItem());
