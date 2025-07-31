@@ -1538,34 +1538,29 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 ID_TO_CUSTOM_BLOCK.put(id, entry.getValue());//自定义方块id->自定义方块
                 CUSTOM_BLOCK_DEFINITIONS.add(entry.getValue().getDefinition());//行为包数据
 
-                if (properties != null) {
-                    CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
-                            .forEach(states -> {
-                                int meta = 0;
+                CustomBlockUtil.generateVariants(properties, properties.getNames().toArray(new String[0]))
+                        .forEach(states -> {
+                            int meta = 0;
 
-                                for (String name : states.keySet()) {
-                                    meta = properties.setValue(meta, name, states.get(name));
-                                }
+                            for (String name : states.keySet()) {
+                                meta = properties.setValue(meta, name, states.get(name));
+                            }
 
-                                final int itemId = 255 - id;
-                                for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
-                                    mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
-                                }
+                            final int itemId = 255 - id;
+                            for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
+                                mapping.registerCustomBlockItem(customBlock.getIdentifier(), itemId, meta);
+                            }
 
+                            CustomBlockState state;
+                            try {
+                                state = CustomBlockUtil.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
+                            } catch (InvalidBlockPropertyMetaException e) {
+                                log.error(e);
+                                return; // Nukkit has more states than our block
+                            }
 
-                                CustomBlockState state;
-                                try {
-                                    state = CustomBlockUtil.createBlockState(identifier, (id << Block.DATA_BITS) | meta, properties, customBlock);
-                                } catch (InvalidBlockPropertyMetaException e) {
-                                    log.error(e);
-                                    return; // Nukkit has more states than our block
-                                }
-                                Block.LEGACY_2_CUSTOM_STATE.put(state.getLegacyId(), state);
-                            });
-                } else {
-                    CustomBlockState defaultState = CustomBlockUtil.createBlockState(identifier, id << Block.DATA_BITS, properties, customBlock);
-                    Block.LEGACY_2_CUSTOM_STATE.put(defaultState.getLegacyId(), defaultState);
-                }
+                            Block.LEGACY_2_CUSTOM_STATE.put(state.getLegacyId(), state);
+                        });
             }
 
             final BlockPalette storagePalette = GlobalBlockPalette.getPaletteByProtocol(LevelDBConstants.PALETTE_VERSION);

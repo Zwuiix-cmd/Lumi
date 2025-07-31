@@ -186,25 +186,17 @@ public class CustomBlockUtil {
             legacyIds.add(entry.getIntKey());
         }
 
-        lastName = null;
-        group = new ObjectArrayList<>();
         for (CustomBlockState definition : Block.getLegacy2CustomState().values()) {
             NbtMap state = definition.getBlockState();
+
+            final List<NbtMap> states = vanillaPaletteList.computeIfAbsent(state.getString("name"), (k) -> new ObjectArrayList<>());
+
             if (state.getInt("version") != paletteVersion) {
                 state = state.toBuilder().putInt("version", paletteVersion).build();
             }
-            state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet()).add(convertLegacyToFullId(definition.getLegacyId()));
 
-            String name = state.getString("name");
-            if (lastName != null && !name.equals(lastName)) {
-                vanillaPaletteList.put(lastName, group);
-                group = new ObjectArrayList<>();
-            }
-            group.add(state);
-            lastName = name;
-        }
-        if (lastName != null) {
-            vanillaPaletteList.put(lastName, group);
+            states.add(definition.getBlockState());
+            state2Legacy.computeIfAbsent(state, s -> new IntOpenHashSet()).add(convertLegacyToFullId(definition.getLegacyId()));
         }
 
         palette.clearStates();
