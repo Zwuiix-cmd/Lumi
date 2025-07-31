@@ -191,7 +191,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta != null ? meta : 0);
         }
 
         int fullId = id << DATA_BITS;
@@ -270,7 +270,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(data);
         }
 
         int fullId = id << DATA_BITS;
@@ -300,7 +300,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         int id = fullId << DATA_BITS;
 
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(fullId & DATA_BITS);
         }
 
         if (fullId >= fullList.length || fullList[fullId] == null) {
@@ -323,7 +323,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock();
+            return ID_TO_CUSTOM_BLOCK.get(id).toCustomBlock(meta);
         }
 
         Block block;
