@@ -27,11 +27,12 @@ public class BlockFlowerPot extends BlockFlowable implements BlockEntityHolder<B
     }
 
     protected static boolean canPlaceIntoFlowerPot(int id, int dmg) {
+        //TODO: use block tags
         switch (id) {
             case SAPLING:
             case DEAD_BUSH:
             case DANDELION:
-            case ROSE:
+            case POPPY:
             case RED_MUSHROOM:
             case BROWN_MUSHROOM:
             case CACTUS:
