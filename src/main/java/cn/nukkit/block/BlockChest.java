@@ -91,7 +91,7 @@ public class BlockChest extends BlockTransparentMeta implements Faceable, BlockE
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockEntityChest chest = null;
-        this.setDamage(player != null ? player.getDirection().getHorizontalIndex() : 0);
+        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
 
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag("")
