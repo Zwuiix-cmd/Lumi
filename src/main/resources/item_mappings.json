@@ -9,10 +9,6 @@
     "5": "minecraft:dragon_head",
     "6": "minecraft:piglin_head"
   },
-  "minecraft:tnt": {
-    "protocol": 729,
-    "0": "minecraft:tnt"
-  },
   "minecraft:sponge": {
     "protocol": 729,
     "0": "minecraft:sponge",
@@ -29,10 +25,6 @@
     "protocol": 712,
     "0": "minecraft:dirt",
     "1": "minecraft:coarse_dirt"
-  },
-  "minecraft:yellow_flower": {
-    "protocol": 712,
-    "0": "minecraft:dandelion"
   },
   "minecraft:sand": {
     "protocol": 712,
