@@ -1,10 +1,9 @@
 package cn.nukkit.dispenser;
 
-import cn.nukkit.block.BlockID;
 import cn.nukkit.block.material.BlockType;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.block.material.tags.BlockTag;
-import cn.nukkit.item.ItemID;
+import cn.nukkit.dispenser.impl.*;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.tags.ItemInternalTags;

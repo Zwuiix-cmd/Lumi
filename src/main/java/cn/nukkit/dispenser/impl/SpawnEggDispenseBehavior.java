@@ -1,4 +1,4 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.BlockDispenser;
 import cn.nukkit.entity.Entity;
