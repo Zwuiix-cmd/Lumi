@@ -1,4 +1,4 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockBeehive;
@@ -23,9 +23,9 @@ public class ShearsDispenseBehaviour extends DefaultDispenseBehavior {
                 target.y + 1,
                 target.z + 1
         ))) {
-            if (entity instanceof EntitySheep) {
-                if (!((EntitySheep) entity).isSheared()) {
-                    ((EntitySheep) entity).shear(true);
+            if (entity instanceof EntitySheep sheep) {
+                if (!sheep.isSheared()) {
+                    sheep.shear(true);
                     item.useOn(entity);
                     return item.getDamage() >= item.getMaxDurability() ? null : item;
                 }

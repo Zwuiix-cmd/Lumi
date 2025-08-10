@@ -1,4 +1,4 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDispenser;
@@ -14,9 +14,9 @@ public class FlintAndSteelDispenseBehavior extends DefaultDispenseBehavior {
 
         if (target.getId() == BlockID.AIR) {
             Block down = target.down();
-            if (down.getId() != BlockID.OBSIDIAN || !down.level.createPortal(down, false)) {
+            if (down.getId() != BlockID.OBSIDIAN || !down.getLevel().createPortal(down, false)) {
                 boolean soulFire = down.getId() == Block.SOUL_SAND || down.getId() == Block.SOUL_SOIL;
-                block.level.setBlock(target, Block.get(soulFire ? BlockID.SOUL_FIRE : BlockID.FIRE));
+                block.getLevel().setBlock(target, Block.get(soulFire ? BlockID.SOUL_FIRE : BlockID.FIRE));
             }
             item.useOn(target);
         } else if (target.getId() == BlockID.TNT) {

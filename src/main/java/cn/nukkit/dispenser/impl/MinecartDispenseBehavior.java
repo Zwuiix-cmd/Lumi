@@ -1,4 +1,4 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDispenser;
@@ -21,12 +21,13 @@ public class MinecartDispenseBehavior extends DefaultDispenseBehavior {
 
         if (Rail.isRailBlock(target)) {
             Rail.Orientation type = ((BlockRail) target).getOrientation();
+
             double adjacent = 0.0D;
             if (type.isAscending()) {
                 adjacent = 0.5D;
             }
 
-            Entity minecart = Entity.createEntity(getMinecartId(item),
+            Entity minecart = Entity.createEntity(this.getMinecartId(item),
                     block.level.getChunk(target.getChunkX(), target.getChunkZ()), new CompoundTag("")
                             .putList(new ListTag<>("Pos")
                                     .add(new DoubleTag("", target.getX() + 0.5))
@@ -49,14 +50,11 @@ public class MinecartDispenseBehavior extends DefaultDispenseBehavior {
     }
 
     private String getMinecartId(Item item) {
-        switch (item.getId()) {
-            case ItemID.MINECART_WITH_CHEST:
-                return "MinecartChest";
-            case ItemID.MINECART_WITH_HOPPER:
-                return "MinecartHopper";
-            case ItemID.MINECART_WITH_TNT:
-                return "MinecartTnt";
-        }
-        return "MinecartRideable";
+        return switch (item.getId()) {
+            case ItemID.MINECART_WITH_CHEST -> "MinecartChest";
+            case ItemID.MINECART_WITH_HOPPER -> "MinecartHopper";
+            case ItemID.MINECART_WITH_TNT -> "MinecartTnt";
+            default -> "MinecartRideable";
+        };
     }
 }
