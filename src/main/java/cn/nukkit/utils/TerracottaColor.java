@@ -4,7 +4,6 @@ package cn.nukkit.utils;
  * Terracotta color enum
  */
 public enum TerracottaColor {
-
     BLACK(0, 15, "Black", "Ink Sac", BlockColor.BLACK_TERRACOTA_BLOCK_COLOR),
     RED(1, 14, "Red", "Rose Red", BlockColor.RED_TERRACOTA_BLOCK_COLOR),
     GREEN(2, 13, "Green", "Cactus Green", BlockColor.GREEN_TERRACOTA_BLOCK_COLOR),
@@ -23,11 +22,11 @@ public enum TerracottaColor {
     WHITE(15, 0, "White", "Bone Meal", BlockColor.WHITE_TERRACOTA_BLOCK_COLOR);
 
 
-    private int dyeColorMeta;
-    private int terracottaColorMeta;
-    private String colorName;
-    private String dyeName;
-    private BlockColor blockColor;
+    private final int dyeColorMeta;
+    private final int terracottaColorMeta;
+    private final String colorName;
+    private final String dyeName;
+    private final BlockColor blockColor;
 
 
     private final static TerracottaColor[] BY_TERRACOTA_DATA;
