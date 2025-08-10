@@ -18,10 +18,10 @@ import java.util.Map;
 public final class DispenseBehaviorRegister {
 
     private static final Map<String, DispenseBehavior> BEHAVIORS = new HashMap<>();
-    private static final DispenseBehavior DISPENSE_BEHAVIOR = new DefaultDispenseBehavior();
+    private static final DispenseBehavior DEFAULT_BEHAVIOR = new DefaultDispenseBehavior();
 
     public static DispenseBehavior getBehavior(String id) {
-        return BEHAVIORS.getOrDefault(id, DISPENSE_BEHAVIOR);
+        return BEHAVIORS.getOrDefault(id, DEFAULT_BEHAVIOR);
     }
 
     public static void registerBehavior(String itemId, DispenseBehavior behavior) {
