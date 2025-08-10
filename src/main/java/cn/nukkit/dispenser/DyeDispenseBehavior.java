@@ -3,7 +3,7 @@ package cn.nukkit.dispenser;
 import cn.nukkit.block.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 public class DyeDispenseBehavior extends DefaultDispenseBehavior {
 

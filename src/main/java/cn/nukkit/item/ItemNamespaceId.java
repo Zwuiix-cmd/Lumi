@@ -5,6 +5,12 @@ package cn.nukkit.item;
  */
 public interface ItemNamespaceId {
 
+    String LAPIS_LAZULI = "minecraft:lapis_lazuli";
+    String BONE_MEAL = "minecraft:bone_meal";
+    String COCOA_BEANS = "minecraft:cocoa_beans";
+    String INK_SAC = "minecraft:ink_sac";
+    String GLOW_INK_SAC = "minecraft:glow_ink_sac";
+
     String COPPER_INGOT = "minecraft:copper_ingot";
 
     String ECHO_SHARD = "minecraft:echo_shard";

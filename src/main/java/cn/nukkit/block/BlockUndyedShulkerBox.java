@@ -7,7 +7,7 @@ import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockUndyedShulkerBox extends BlockShulkerBox implements BlockEntityHolder<BlockEntityShulkerBox> {

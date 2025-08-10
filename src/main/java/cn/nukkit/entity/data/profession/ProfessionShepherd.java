@@ -3,6 +3,7 @@ package cn.nukkit.entity.data.profession;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
@@ -62,7 +63,7 @@ public class ProfessionShepherd extends Profession {
                         .setTier(3)
                         .setTraderExp(2)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.EMERALD, 0, 3), Item.get(Item.BED, ItemDye.BLUE))
+                .add(RecipeBuildUtils.of(Item.get(Item.EMERALD, 0, 3), Item.get(Item.BED, DyeColor.BLUE.getWoolData()))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(3)

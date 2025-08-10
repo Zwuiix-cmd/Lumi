@@ -3,7 +3,7 @@ package cn.nukkit.item.randomitem;
 import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.item.data.DyeColor;
 
 import static cn.nukkit.item.randomitem.RandomItem.*;
 

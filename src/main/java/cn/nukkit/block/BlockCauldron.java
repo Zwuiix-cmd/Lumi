@@ -183,7 +183,7 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
                     player.getInventory().setItemInHand(item);
                 }
 
-                BlockColor color = new ItemDye(item.getDamage()).getDyeColor().getColor();
+                BlockColor color = new ItemDye(item.getDamage()).getDyeColor().getBlockColor();
                 if (!cauldron.isCustomColor()) {
                     cauldron.setCustomColor(color);
                 } else {
