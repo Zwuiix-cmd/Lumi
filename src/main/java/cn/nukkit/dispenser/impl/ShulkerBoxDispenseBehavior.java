@@ -17,7 +17,7 @@ public class ShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
         Block shulkerBox = Block.get(BlockID.SHULKER_BOX);
         Block target = block.getSide(face);
 
-        this.success = block.level.getCollidingEntities(shulkerBox.getBoundingBox()).length == 0;
+        this.success = block.getLevel().getCollidingEntities(shulkerBox.getBoundingBox()).length == 0;
 
         if (this.success) {
             BlockFace shulkerBoxFace = target.down().getId() == BlockID.AIR ? face : BlockFace.UP;
@@ -37,9 +37,9 @@ public class ShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
                 }
             }
 
-            BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
-            block.level.updateComparatorOutputLevel(target);
-            block.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, target.add(0.5, 0.5, 0.5), VanillaVibrationTypes.BLOCK_PLACE));
+            BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.getLevel().getChunk(target.getChunkX(), target.getChunkZ()), nbt);
+            block.getLevel().updateComparatorOutputLevel(target);
+            block.getLevel().getVibrationManager().callVibrationEvent(new VibrationEvent(this, target.add(0.5, 0.5, 0.5), VanillaVibrationTypes.BLOCK_PLACE));
         }
 
         return null;
