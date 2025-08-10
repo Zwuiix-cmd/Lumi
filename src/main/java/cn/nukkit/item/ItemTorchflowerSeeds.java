@@ -7,7 +7,7 @@ public class ItemTorchflowerSeeds extends StringItemBase {
 
     public ItemTorchflowerSeeds() {
         super(TORCHFLOWER_SEEDS, "Torchflower Seeds");
-        block = Block.get(TORCHFLOWER_CROP);
+        block = Block.get(Block.TORCHFLOWER_CROP);
     }
 
     @Override

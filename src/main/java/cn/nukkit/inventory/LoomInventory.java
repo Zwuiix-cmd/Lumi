@@ -3,6 +3,7 @@ package cn.nukkit.inventory;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -15,7 +16,7 @@ public class LoomInventory extends FakeBlockUIComponent {
 
     private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.BANNER, ItemID.DYE, ItemID.BANNER_PATTERN});
 
-    private static final ObjectSet<String> ITEMS_NAMESPACE = new ObjectOpenHashSet<>(new String[]{Item.FLOW_BANNER_PATTERN, Item.GUSTER_BANNER_PATTERN});
+    private static final ObjectSet<String> ITEMS_NAMESPACE = new ObjectOpenHashSet<>(new String[]{ItemNamespaceId.FLOW_BANNER_PATTERN, ItemNamespaceId.GUSTER_BANNER_PATTERN});
 
     public LoomInventory(PlayerUIInventory playerUI, Position position) {
         super(playerUI, InventoryType.LOOM, OFFSET, position);

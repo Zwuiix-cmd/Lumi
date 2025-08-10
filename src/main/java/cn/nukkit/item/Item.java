@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * Nukkit Project
  */
 @Log4j2
-public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, ProtocolInfo {
+public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static final Item AIR_ITEM = new ItemBlock(Block.get(BlockID.AIR), null, 0);
 
