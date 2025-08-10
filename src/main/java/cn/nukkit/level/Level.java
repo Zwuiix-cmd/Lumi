@@ -2753,11 +2753,11 @@ public class Level implements ChunkManager, Metadatable {
                         return null;
                     }
                 }
-            } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+            } else if (item.getBlock() instanceof BlockSkull && item.getDamage() == 1) {
                 if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
                     Block first, second;
 
-                    if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL && second.toItem().getDamage() == 1))) {
+                    if (!(((first = block.getSide(BlockFace.EAST)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)) instanceof BlockSkull && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)) instanceof BlockSkull && second.toItem().getDamage() == 1))) {
                         return null;
                     }
 
