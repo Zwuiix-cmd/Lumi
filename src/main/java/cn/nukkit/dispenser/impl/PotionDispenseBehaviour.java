@@ -1,11 +1,10 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockDispenser;
 import cn.nukkit.entity.effect.PotionType;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemPotion;
 import cn.nukkit.math.BlockFace;
 
 public class PotionDispenseBehaviour extends DefaultDispenseBehavior {

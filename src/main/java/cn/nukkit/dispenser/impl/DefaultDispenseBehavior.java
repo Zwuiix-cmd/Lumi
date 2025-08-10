@@ -1,6 +1,7 @@
-package cn.nukkit.dispenser;
+package cn.nukkit.dispenser.impl;
 
 import cn.nukkit.block.BlockDispenser;
+import cn.nukkit.dispenser.DispenseBehavior;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Axis;
