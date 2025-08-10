@@ -268,7 +268,6 @@ public class Item implements Cloneable, BlockID, ItemID, ItemNamespaceId, Protoc
             list[POISONOUS_POTATO] = ItemPotatoPoisonous.class; //394
             list[EMPTY_MAP] = ItemEmptyMap.class; //395
             list[GOLDEN_CARROT] = ItemCarrotGolden.class; //396
-            list[SKULL] = ItemSkull.class; //397
             list[CARROT_ON_A_STICK] = ItemCarrotOnAStick.class; //398
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400

@@ -2,6 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Difficulty;
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
@@ -9,7 +10,6 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemSkull;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
@@ -169,7 +169,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
             if (killer instanceof EntityCreeper) {
                 if (((EntityCreeper) killer).isPowered()) {
-                    drops.add(Item.get(Item.SKULL, ItemSkull.CREEPER_HEAD, 1));
+                    drops.add(Item.get(255 - Block.CREEPER_HEAD, 0, 1));
                 }
             }
         }

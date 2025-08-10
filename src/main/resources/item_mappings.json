@@ -1,14 +1,4 @@
 {
-  "minecraft:skull": {
-    "protocol": 748,
-    "0": "minecraft:skeleton_skull",
-    "1": "minecraft:wither_skeleton_skull",
-    "2": "minecraft:zombie_head",
-    "3": "minecraft:player_head",
-    "4": "minecraft:creeper_head",
-    "5": "minecraft:dragon_head",
-    "6": "minecraft:piglin_head"
-  },
   "minecraft:sponge": {
     "protocol": 729,
     "0": "minecraft:sponge",
