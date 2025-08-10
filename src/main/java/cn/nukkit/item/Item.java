@@ -222,7 +222,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[GLOWSTONE_DUST] = ItemGlowstoneDust.class; //348
             list[RAW_FISH] = ItemFish.class; //349
             list[COOKED_FISH] = ItemFishCooked.class; //350
-            list[DYE] = ItemDye.class; //351
             list[BONE] = ItemBone.class; //352
             list[SUGAR] = ItemSugar.class; //353
             list[CAKE] = ItemCake.class; //354
@@ -408,6 +407,22 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 }
             }
 
+            registerNamespacedIdItem(ItemDyeBlack.class);
+            registerNamespacedIdItem(ItemDyeBlue.class);
+            registerNamespacedIdItem(ItemDyeBrown.class);
+            registerNamespacedIdItem(ItemDyeCyan.class);
+            registerNamespacedIdItem(ItemDyeGray.class);
+            registerNamespacedIdItem(ItemDyeGreen.class);
+            registerNamespacedIdItem(ItemDyeLightBlue.class);
+            registerNamespacedIdItem(ItemDyeLightGray.class);
+            registerNamespacedIdItem(ItemDyeLime.class);
+            registerNamespacedIdItem(ItemDyeMagenta.class);
+            registerNamespacedIdItem(ItemDyeOrange.class);
+            registerNamespacedIdItem(ItemDyePink.class);
+            registerNamespacedIdItem(ItemDyePurple.class);
+            registerNamespacedIdItem(ItemDyeRed.class);
+            registerNamespacedIdItem(ItemDyeWhite.class);
+            registerNamespacedIdItem(ItemDyeYellow.class);
             registerNamespacedIdItem(ItemLapisLazuli.class);
             registerNamespacedIdItem(ItemBoneMeal.class);
             registerNamespacedIdItem(ItemCocoaBeans.class);

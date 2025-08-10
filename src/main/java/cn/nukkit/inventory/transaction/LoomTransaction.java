@@ -7,6 +7,7 @@ import cn.nukkit.inventory.LoomInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.LoomItemAction;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemNamespaceId;
 
@@ -47,7 +48,7 @@ public class LoomTransaction extends InventoryTransaction {
         LoomInventory loomInventory = (LoomInventory) inventory;
         Item banner = loomInventory.getBanner();
         Item dye = loomInventory.getDye();
-        if (banner.getId() != Item.BANNER || dye.getId() != Item.DYE || banner.getDamage() != outputItem.getDamage()) {
+        if (banner.getId() != Item.BANNER || !(dye instanceof ItemDye) || banner.getDamage() != outputItem.getDamage()) {
             return false;
         }
 

@@ -187,9 +187,9 @@ public class EntityWolf extends EntityTameableMob {
 
                 return true;
             }
-        } else if (item.getId() == Item.DYE) {
+        } else if (item instanceof ItemDye dye) {
             if (this.hasOwner() && player.equals(this.getOwner())) {
-                this.setCollarColor(((ItemDye) item).getDyeColor());
+                this.setCollarColor(dye.getDyeColor());
                 return true;
             }
         } else if (this.isBreedingItem(item)) {

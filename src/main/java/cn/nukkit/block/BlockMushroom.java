@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.generator.object.mushroom.BigMushroom;
@@ -51,7 +52,7 @@ public abstract class BlockMushroom extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
+        if (item instanceof ItemDye dye && dye.getDyeColor() == DyeColor.WHITE) {
             if (player != null && !player.isCreative()) {
                 item.count--;
             }

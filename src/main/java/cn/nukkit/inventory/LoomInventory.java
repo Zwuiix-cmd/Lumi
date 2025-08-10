@@ -14,9 +14,30 @@ public class LoomInventory extends FakeBlockUIComponent {
 
     public static final int OFFSET = 9;
 
-    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.BANNER, ItemID.DYE, ItemID.BANNER_PATTERN});
+    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.BANNER, ItemID.BANNER_PATTERN});
 
-    private static final ObjectSet<String> ITEMS_NAMESPACE = new ObjectOpenHashSet<>(new String[]{ItemNamespaceId.FLOW_BANNER_PATTERN, ItemNamespaceId.GUSTER_BANNER_PATTERN});
+    private static final ObjectSet<String> ITEMS_NAMESPACE = new ObjectOpenHashSet<>(new String[]{
+            ItemNamespaceId.BLACK_DYE,
+            ItemNamespaceId.BLUE_DYE,
+            ItemNamespaceId.BROWN_DYE,
+            ItemNamespaceId.CYAN_DYE,
+            ItemNamespaceId.DYE,
+            ItemNamespaceId.GRAY_DYE,
+            ItemNamespaceId.GREEN_DYE,
+            ItemNamespaceId.LIGHT_BLUE_DYE,
+            ItemNamespaceId.LIGHT_GRAY_DYE,
+            ItemNamespaceId.LIME_DYE,
+            ItemNamespaceId.MAGENTA_DYE,
+            ItemNamespaceId.ORANGE_DYE,
+            ItemNamespaceId.PINK_DYE,
+            ItemNamespaceId.PURPLE_DYE,
+            ItemNamespaceId.RED_DYE,
+            ItemNamespaceId.UNDYED_SHULKER_BOX,
+            ItemNamespaceId.WHITE_DYE,
+            ItemNamespaceId.YELLOW_DYE,
+            ItemNamespaceId.FLOW_BANNER_PATTERN,
+            ItemNamespaceId.GUSTER_BANNER_PATTERN
+    });
 
     public LoomInventory(PlayerUIInventory playerUI, Position position) {
         super(playerUI, InventoryType.LOOM, OFFSET, position);

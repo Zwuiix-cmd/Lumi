@@ -1,34 +1,35 @@
 package cn.nukkit.item;
 
 import cn.nukkit.item.data.DyeColor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemDye extends Item {
+public abstract class ItemDye extends StringItemBase {
 
-    public ItemDye() {
-        this(0, 1);
+    public ItemDye(@NotNull String namespaceId, @Nullable String name) {
+        super(namespaceId, name);
     }
 
-    public ItemDye(Integer meta) {
-        this(meta, 1);
-    }
+    public abstract DyeColor getDyeColor();
 
-    public ItemDye(DyeColor dyeColor) {
-        this(dyeColor.getDyeData(), 1);
-    }
-
-    public ItemDye(DyeColor dyeColor, int amount) {
-        this(dyeColor.getDyeData(), amount);
-    }
-
-    public ItemDye(Integer meta, int amount) {
-        super(DYE, meta, amount, meta >= 0 && meta <= 20 ? DyeColor.getByDyeData(meta).getDyeName() : UNKNOWN_STR);
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByDyeData(meta);
-    }
-
-    public void setDyeColor(DyeColor dyeColor) {
-        this.setDamage(dyeColor.getDyeData());
+    public static ItemDye getByColor(DyeColor dyeColor) {
+        return switch (dyeColor) {
+            case BLACK -> new ItemDyeBlack();
+            case RED -> new ItemDyeRed();
+            case GREEN -> new ItemDyeGreen();
+            case BROWN -> new ItemDyeBrown();
+            case BLUE -> new ItemDyeBlue();
+            case PURPLE -> new ItemDyePurple();
+            case CYAN -> new ItemDyeCyan();
+            case LIGHT_GRAY -> new ItemDyeLightGray();
+            case GRAY -> new ItemDyeGray();
+            case PINK -> new ItemDyePink();
+            case LIME -> new ItemDyeLime();
+            case YELLOW -> new ItemDyeYellow();
+            case LIGHT_BLUE -> new ItemDyeLightBlue();
+            case MAGENTA -> new ItemDyeMagenta();
+            case ORANGE -> new ItemDyeOrange();
+            case WHITE -> new ItemDyeWhite();
+        };
     }
 }

@@ -27,6 +27,15 @@ public class ProfessionShepherd extends Profession {
         rodEnchantment.setLevel(random.nextInt(3) + 1);
         rod.addEnchantment(rodEnchantment);
 
+        Item dye1 = ItemDye.getByColor(DyeColor.getByDyeData(random.nextInt(5)));
+        dye1.setCount(12);
+
+        Item dye2 = ItemDye.getByColor(DyeColor.getByDyeData(5 + random.nextInt(5)));
+        dye2.setCount(12);
+
+        Item dye3 = ItemDye.getByColor(DyeColor.getByDyeData(10 + random.nextInt(6)));
+        dye3.setCount(12);
+
         recipes.add(RecipeBuildUtils.of(Item.get(Item.WOOL, random.nextInt(16), 18), Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
@@ -39,7 +48,7 @@ public class ProfessionShepherd extends Profession {
                         .setTier(1)
                         .setTraderExp(2)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.DYE, random.nextInt(5), 12), Item.get(Item.EMERALD))
+                .add(RecipeBuildUtils.of(dye1, Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(2)
@@ -57,7 +66,7 @@ public class ProfessionShepherd extends Profession {
                         .setTier(2)
                         .setTraderExp(2)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.DYE, 5 + random.nextInt(5), 12), Item.get(Item.EMERALD))
+                .add(RecipeBuildUtils.of(dye2, Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(3)
@@ -69,7 +78,7 @@ public class ProfessionShepherd extends Profession {
                         .setTier(3)
                         .setTraderExp(2)
                         .build())
-                .add(RecipeBuildUtils.of(Item.get(Item.DYE, 10 + random.nextInt(6), 12), Item.get(Item.EMERALD))
+                .add(RecipeBuildUtils.of(dye3, Item.get(Item.EMERALD))
                         .setMaxUses(16)
                         .setRewardExp((byte) 1)
                         .setTier(4)

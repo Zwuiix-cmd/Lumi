@@ -83,8 +83,8 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.DYE) {
-            this.setColor(((ItemDye) item).getDyeColor().getWoolData());
+        if (item instanceof ItemDye dye) {
+            this.setColor(dye.getDyeColor().getWoolData());
             return true;
         } else if (item.getId() == Item.WHEAT && !this.isBaby() && !this.isInLoveCooldown()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());

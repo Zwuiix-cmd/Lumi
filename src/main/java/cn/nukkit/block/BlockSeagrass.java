@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
@@ -89,7 +90,7 @@ public class BlockSeagrass extends BlockFlowable {
     
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (getDamage() == 0 && item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
+        if (this.getDamage() == 0 && item instanceof ItemDye dye && dye.getDyeColor() == DyeColor.WHITE) {
             Block up = this.up();
             int damage;
             if (up instanceof BlockWater && ((damage = up.getDamage()) == 0 || damage == 8)) {

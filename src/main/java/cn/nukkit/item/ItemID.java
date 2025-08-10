@@ -121,7 +121,7 @@ public interface ItemID {
     int GLOWSTONE_DUST = 348;
     int RAW_FISH = 349;
     int COOKED_FISH = 350;
-    int DYE = 351;
+//    int DYE = 351;
     int BONE = 352;
     int SUGAR = 353;
     int CAKE = 354;
