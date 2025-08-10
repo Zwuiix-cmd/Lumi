@@ -167,8 +167,8 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
                 drops.add(Item.get(Utils.rand(500, 511), 0, 1));
             }
 
-            if (killer instanceof EntityCreeper) {
-                if (((EntityCreeper) killer).isPowered()) {
+            if (killer instanceof EntityCreeper creeper) {
+                if(creeper.isPowered()) {
                     drops.add(Item.get(255 - Block.CREEPER_HEAD, 0, 1));
                 }
             }
