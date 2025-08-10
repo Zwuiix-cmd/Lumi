@@ -6,7 +6,6 @@ import cn.nukkit.block.material.tags.BlockTag;
 import cn.nukkit.dispenser.impl.*;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.material.ItemType;
-import cn.nukkit.item.material.tags.ItemInternalTags;
 import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 
@@ -18,31 +17,31 @@ import java.util.Map;
  */
 public final class DispenseBehaviorRegister {
 
-    private static final Map<String, DispenseBehavior> behaviors = new HashMap<>();
-    private static DispenseBehavior defaultBehavior = new DefaultDispenseBehavior();
+    private static final Map<String, DispenseBehavior> BEHAVIORS = new HashMap<>();
+    private static final DispenseBehavior DISPENSE_BEHAVIOR = new DefaultDispenseBehavior();
+
+    public static DispenseBehavior getBehavior(String id) {
+        return BEHAVIORS.getOrDefault(id, DISPENSE_BEHAVIOR);
+    }
 
     public static void registerBehavior(String itemId, DispenseBehavior behavior) {
-        behaviors.put(itemId, behavior);
+        BEHAVIORS.put(itemId, behavior);
     }
 
     public static void registerBehaviorByItemTag(ItemTag tag, DispenseBehavior behavior) {
-        for(ItemType type : tag.getItemTypes()) {
+        for (ItemType type : tag.getItemTypes()) {
             registerBehavior(type.getIdentifier(), behavior);
         }
     }
 
     public static void registerBehaviorByBlockTag(BlockTag tag, DispenseBehavior behavior) {
-        for(BlockType type : tag.getBlockTypes()) {
+        for (BlockType type : tag.getBlockTypes()) {
             registerBehavior(type.getIdentifier(), behavior);
         }
     }
 
-    public static DispenseBehavior getBehavior(String id) {
-        return behaviors.getOrDefault(id, defaultBehavior);
-    }
-
     public static void removeDispenseBehavior(String id) {
-        behaviors.remove(id);
+        BEHAVIORS.remove(id);
     }
 
     public static void init() {
@@ -68,8 +67,8 @@ public final class DispenseBehaviorRegister {
         registerBehavior(ItemNamespaceId.AXOLOTL_BUCKET, new BucketDispenseBehavior());
         registerBehavior(ItemNamespaceId.POWDER_SNOW_BUCKET, new BucketDispenseBehavior());
         registerBehavior(ItemNamespaceId.TADPOLE_BUCKET, new BucketDispenseBehavior());
+        registerBehavior(ItemNamespaceId.BONE_MEAL, new BoneMealDispenseBehavior());
 
-        registerBehaviorByItemTag(ItemInternalTags.DYE, new DyeDispenseBehavior());
         registerBehaviorByItemTag(ItemTags.SPAWN_EGG, new SpawnEggDispenseBehavior());
         registerBehavior(ItemNamespaceId.FIREWORK_ROCKET, new FireworksDispenseBehavior());
         registerBehavior(ItemNamespaceId.FLINT_AND_STEEL, new FlintAndSteelDispenseBehavior());
@@ -80,58 +79,13 @@ public final class DispenseBehaviorRegister {
         registerBehavior(ItemNamespaceId.FIRE_CHARGE, new FireChargeDispenseBehavior());
         registerBehavior(ItemNamespaceId.SHEARS, new ShearsDispenseBehaviour());
         registerBehavior(ItemNamespaceId.POTION, new PotionDispenseBehaviour());
-        registerBehavior(ItemNamespaceId.ARROW, new ProjectileDispenseBehavior("Arrow") {
-            @Override
-            protected double getMotion() {
-                return super.getMotion() * 1.5;
-            }
-        });
-        registerBehavior(ItemNamespaceId.EGG, new ProjectileDispenseBehavior("Egg"));
-        registerBehavior(ItemNamespaceId.SNOWBALL, new ProjectileDispenseBehavior("Snowball"));
-        registerBehavior(ItemNamespaceId.EXPERIENCE_BOTTLE, new ProjectileDispenseBehavior("ThrownExpBottle") {
-            @Override
-            protected float getAccuracy() {
-                return super.getAccuracy() * 0.5f;
-            }
-
-            @Override
-            protected double getMotion() {
-                return super.getMotion() * 1.25;
-            }
-        });
-        registerBehavior(ItemNamespaceId.SPLASH_POTION, new ProjectileDispenseBehavior("ThrownPotion") {
-            @Override
-            protected float getAccuracy() {
-                return super.getAccuracy() * 0.5f;
-            }
-
-            @Override
-            protected double getMotion() {
-                return super.getMotion() * 1.25;
-            }
-        });
-        registerBehavior(ItemNamespaceId.LINGERING_POTION, new ProjectileDispenseBehavior("LingeringPotion") {
-            @Override
-            protected float getAccuracy() {
-                return super.getAccuracy() * 0.5f;
-            }
-
-            @Override
-            protected double getMotion() {
-                return super.getMotion() * 1.25;
-            }
-        });
-        registerBehavior(ItemNamespaceId.TRIDENT, new ProjectileDispenseBehavior("ThrownTrident") {
-            @Override
-            protected float getAccuracy() {
-                return super.getAccuracy() * 0.5f;
-            }
-
-            @Override
-            protected double getMotion() {
-                return super.getMotion() * 1.25;
-            }
-        });
+        registerBehavior(ItemNamespaceId.ARROW, new ArrowDispenseBehavior());
+        registerBehavior(ItemNamespaceId.EGG, new EggDispenseBehavior());
+        registerBehavior(ItemNamespaceId.SNOWBALL, new SnowballDispenseBehavior());
+        registerBehavior(ItemNamespaceId.EXPERIENCE_BOTTLE, new ThrownExpBottleDispenseBehavior());
+        registerBehavior(ItemNamespaceId.SPLASH_POTION, new ThrownPotionDispenseBehavior());
+        registerBehavior(ItemNamespaceId.LINGERING_POTION, new LingeringPotionDispenseBehavior());
+        registerBehavior(ItemNamespaceId.TRIDENT, new ThrownPotionDispenseBehavior());
 
         registerBehavior(ItemNamespaceId.ACACIA_CHEST_BOAT, new ChestBoatDispenseBehavior());
         registerBehavior(ItemNamespaceId.DARK_OAK_CHEST_BOAT, new ChestBoatDispenseBehavior());

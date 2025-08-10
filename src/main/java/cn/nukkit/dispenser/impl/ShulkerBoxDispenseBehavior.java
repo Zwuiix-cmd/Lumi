@@ -39,7 +39,7 @@ public class ShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
 
             BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
             block.level.updateComparatorOutputLevel(target);
-            block.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, target.add(0.5, 0.5 , 0.5), VanillaVibrationTypes.BLOCK_PLACE));
+            block.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, target.add(0.5, 0.5, 0.5), VanillaVibrationTypes.BLOCK_PLACE));
         }
 
         return null;

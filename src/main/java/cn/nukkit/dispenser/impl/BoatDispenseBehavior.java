@@ -15,20 +15,19 @@ public class BoatDispenseBehavior extends DefaultDispenseBehavior {
 
     @Override
     public Item dispense(BlockDispenser block, BlockFace face, Item item) {
-        Vector3 pos = block.getSide(face).multiply(1.125);
+        Vector3 position = block.getSide(face).multiply(1.125);
 
         Block target = block.getSide(face);
 
         if (target instanceof BlockWater) {
-            pos.y += 1;
+            position.y += 1;
         } else if (target.getId() != BlockID.AIR || !(target.down() instanceof BlockWater)) {
             return super.dispense(block, face, item);
         }
 
-        pos = target.getLocation().setYaw(face.getHorizontalAngle());
+        position = target.getLocation().setYaw(face.getHorizontalAngle());
 
-        this.spawnBoatEntity(block.level, pos, item);
-
+        this.spawnBoatEntity(block.getLevel(), position, item);
         return null;
     }
 

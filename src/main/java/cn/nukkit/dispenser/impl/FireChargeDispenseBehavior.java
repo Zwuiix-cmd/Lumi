@@ -15,13 +15,13 @@ public class FireChargeDispenseBehavior extends DefaultDispenseBehavior {
 
         Entity projectile = Entity.createEntity("SmallFireBall", block.level.getChunk(dispensePos.getChunkX(), dispensePos.getChunkZ()), Entity.getDefaultNBT(dispensePos));
 
-        if (!(projectile instanceof EntityProjectile)) {
+        if (!(projectile instanceof EntityProjectile entity)) {
             return super.dispense(block, face, item);
         }
 
         projectile.setMotion(new Vector3(face.getXOffset(), face.getYOffset() + 0.1f, face.getZOffset()).normalize().multiply(1.3));
-        ((EntityProjectile) projectile).inaccurate(6f);
-        ((EntityProjectile) projectile).updateRotation();
+        entity.inaccurate(6f);
+        entity.updateRotation();
 
         projectile.spawnToAll();
         return null;

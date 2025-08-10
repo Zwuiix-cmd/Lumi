@@ -24,12 +24,10 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
     public Item dispense(BlockDispenser source, BlockFace face, Item item) {
         Vector3 dispensePos = source.getDispensePosition();
 
-        CompoundTag nbt = Entity.getDefaultNBT(dispensePos);
-        this.correctNBT(nbt, item);
-
+        CompoundTag nbt = this.correctNBT(Entity.getDefaultNBT(dispensePos), item);
         Entity projectile = Entity.createEntity(entityType, source.level.getChunk(dispensePos.getChunkX(), dispensePos.getChunkZ()), nbt);
 
-        if (!(projectile instanceof EntityProjectile)) {
+        if (!(projectile instanceof EntityProjectile entity)) {
             return super.dispense(source, face, item);
         }
 
@@ -37,10 +35,10 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
                 .normalize();
 
         projectile.setMotion(motion);
-        ((EntityProjectile) projectile).inaccurate(getAccuracy());
+        entity.inaccurate(getAccuracy());
         projectile.setMotion(projectile.getMotion().multiply(getMotion()));
 
-        ((EntityProjectile) projectile).updateRotation();
+        entity.updateRotation();
 
         if (projectile instanceof EntityThrownTrident thrownTrident) {
             item.setDamage(item.getDamage() + 1);
@@ -64,15 +62,16 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
      *
      * @param nbt tag
      */
-    protected void correctNBT(CompoundTag nbt) {
-        this.correctNBT(nbt, null);
+    protected CompoundTag correctNBT(CompoundTag nbt) {
+        return this.correctNBT(nbt, null);
     }
 
-    protected void correctNBT(CompoundTag nbt, Item item) {
+    protected CompoundTag correctNBT(CompoundTag nbt, Item item) {
         if (item != null) {
             if (item.getId() == Item.SPLASH_POTION || item.getId() == Item.LINGERING_POTION) {
                 nbt.putInt("PotionId", item.getDamage());
             }
         }
+        return nbt;
     }
 }

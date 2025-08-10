@@ -30,8 +30,8 @@ public class UndyedShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
                 }
             }
 
-            block.level.setBlock(target, Block.get(BlockID.UNDYED_SHULKER_BOX, 0), true);
-            BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
+            block.getLevel().setBlock(target, Block.get(BlockID.UNDYED_SHULKER_BOX, 0), true);
+            BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.getLevel().getChunk(target.getChunkX(), target.getChunkZ()), nbt);
             return null;
         }
 
