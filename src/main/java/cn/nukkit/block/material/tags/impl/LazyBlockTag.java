@@ -43,7 +43,7 @@ public class LazyBlockTag implements BlockTag {
             }
         }
 
-        return blockTypes;
+        return Collections.unmodifiableSet(blockTypes);
     }
 
     @Override

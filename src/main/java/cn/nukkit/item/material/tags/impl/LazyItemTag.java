@@ -43,7 +43,7 @@ public class LazyItemTag implements ItemTag {
             }
         }
 
-        return itemTypes;
+        return Collections.unmodifiableSet(itemTypes);
     }
 
     public Set<ItemType> getItemTypes() {
