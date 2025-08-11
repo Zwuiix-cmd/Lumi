@@ -88,7 +88,6 @@ public interface ItemID {
     int COOKED_PORKCHOP = 320;
     int PAINTING = 321;
     int GOLDEN_APPLE = 322;
-    int SIGN = 323;
     int WOODEN_DOOR = 324;
     int BUCKET = 325;
     // 326 - 327 not yet in Minecraft
@@ -214,7 +213,6 @@ public interface ItemID {
     int RAW_MUTTON = 423;
     int MUTTONRAW = 423;
     int COOKED_MUTTON = 424;
-    int ARMOR_STAND = 425;
     int END_CRYSTAL = 426;
     int SPRUCE_DOOR = 427;
     int BIRCH_DOOR = 428;
@@ -264,11 +262,6 @@ public interface ItemID {
     int TURTLE_HELMET = 469;
     int PHANTOM_MEMBRANE = 470;
     int CROSSBOW = 471;
-    int SPRUCE_SIGN = 472;
-    int BIRCH_SIGN = 473;
-    int JUNGLE_SIGN = 474;
-    int ACACIA_SIGN = 475;
-    int DARKOAK_SIGN = 476;
     int SWEET_BERRIES = 477;
     // 478 - 497 not yet in Minecraft
     int CAMERA = 498;
@@ -328,8 +321,6 @@ public interface ItemID {
     int NETHERITE_LEGGINGS = 750;
     int NETHERITE_BOOTS = 751;
     int NETHERITE_SCRAP = 752;
-    int CRIMSON_SIGN = 753;
-    int WARPED_SIGN = 754;
     int CRIMSON_DOOR = 755;
     int WARPED_DOOR = 756;
     int WARPED_FUNGUS_ON_A_STICK = 757;
@@ -345,8 +336,4 @@ public interface ItemID {
     int SOUL_CAMPFIRE = 801;
 
     int GLOW_ITEM_FRAME = 850;
-
-    int MANGROVE_SIGN = 1005;
-    int BAMBOO_SIGN = 1006;
-    int CHERRY_SIGN = 1007;
 }

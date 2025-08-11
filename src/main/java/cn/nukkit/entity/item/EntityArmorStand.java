@@ -14,6 +14,7 @@ import cn.nukkit.inventory.EntityEquipmentInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArmor;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
@@ -275,7 +276,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
 
                     boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
                     if (drop) {
-                        this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
+                        this.level.dropItem(this, Item.fromString(ItemNamespaceId.ARMOR_STAND));
                     }
                     if (this.equipmentInventory != null) {
                         if (drop) {
