@@ -639,7 +639,7 @@ public class BinaryStream {
         if (id != null) {
             item = Item.get(id, damage, cnt, nbt);
         } else {
-            item = Item.get(stringId);
+            item = Item.fromString(stringId);
             item.setDamage(damage);
             item.setCount(cnt);
             item.setCompoundTag(nbt);
@@ -796,7 +796,7 @@ public class BinaryStream {
                     int originMeta = compoundTag.getInt(MV_ORIGIN_META);
                     Item item;
                     if (originID == ItemID.STRING_IDENTIFIED_ITEM && compoundTag.contains(MV_ORIGIN_NAMESPACE)) {
-                        item = Item.get(compoundTag.getString(MV_ORIGIN_NAMESPACE));
+                        item = Item.fromString(compoundTag.getString(MV_ORIGIN_NAMESPACE));
                         item.setDamage(originMeta);
                         item.setCount(cnt);
                     } else {
@@ -818,7 +818,7 @@ public class BinaryStream {
         if (id != null) {
             item = Item.get(id, damage, cnt, nbt);
         } else {
-            item = Item.get(stringId);
+            item = Item.fromString(stringId);
             item.setDamage(damage);
             item.setCount(cnt);
             item.setCompoundTag(nbt);
