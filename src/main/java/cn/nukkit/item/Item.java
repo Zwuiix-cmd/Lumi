@@ -1028,6 +1028,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
+    public static void addItemToCustomItems(String namespace, Item item) {
+        CUSTOM_ITEMS.put(namespace, () -> item);
+    }
+
     public static void deleteCustomItem(String namespaceId) {
         if (CUSTOM_ITEMS.containsKey(namespaceId)) {
             Item customItem = fromString(namespaceId);
