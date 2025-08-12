@@ -1,17 +1,20 @@
-package cn.nukkit.entity.effect;
+package cn.nukkit.registry;
 
+import cn.nukkit.entity.effect.PotionType;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class PotionRegistry {
+public class PotionRegistry implements IRegistry<String, PotionType, PotionType> {
+
     private static final Object2ObjectOpenHashMap<String, PotionType> REGISTRY = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectOpenHashMap<Integer, PotionType> ID_2_POTION = new Object2ObjectOpenHashMap<>();
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
-    public static void init() {
+    @Override
+    public void init() {
         if (isLoad.getAndSet(true)) return;
         register(PotionType.WATER);
         register(PotionType.MUNDANE);
@@ -62,31 +65,46 @@ public class PotionRegistry {
         register(PotionType.INFESTED);
     }
 
-    public static PotionType get(String key) {
-        return REGISTRY.get(key);
-    }
-
-    public static PotionType get(int id) {
-        return ID_2_POTION.get(id);
-    }
-
-    public static Map<String, PotionType> getPotions() {
-        return Collections.unmodifiableMap(REGISTRY);
-    }
-
-    public static Map<Integer, PotionType> getPotionId2TypeMap() {
-        return Collections.unmodifiableMap(ID_2_POTION);
-    }
-
-    public static void register(String key, PotionType value) {
+    @Override
+    public void register(String key, PotionType value) {
         if (REGISTRY.putIfAbsent(key, value) == null) {
             ID_2_POTION.put(value.id(), value);
         } else {
-            throw new RuntimeException("This potion has already been registered with the identifier: " + key);
+            throw new RegisterException("This potion has already been registered with the identifier: " + key);
         }
     }
 
-    private static void register(PotionType value) {
+    private void register(PotionType value) {
         register(value.stringId(), value);
+    }
+
+    @Override
+    public PotionType get(String key) {
+        return REGISTRY.get(key);
+    }
+
+    public PotionType get(int id) {
+        return ID_2_POTION.get(id);
+    }
+
+    public Map<String, PotionType> getPotions() {
+        return Collections.unmodifiableMap(REGISTRY);
+    }
+
+    public Map<Integer, PotionType> getPotionId2TypeMap() {
+        return Collections.unmodifiableMap(ID_2_POTION);
+    }
+
+    @Override
+    public void trim() {
+        REGISTRY.trim();
+    }
+
+    @Override
+    public void reload() {
+        isLoad.set(false);
+        REGISTRY.clear();
+        ID_2_POTION.clear();
+        init();
     }
 }

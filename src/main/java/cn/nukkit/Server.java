@@ -11,8 +11,8 @@ import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.data.profession.Profession;
 import cn.nukkit.entity.data.property.EntityProperty;
-import cn.nukkit.entity.effect.EffectRegistry;
-import cn.nukkit.entity.effect.PotionRegistry;
+import cn.nukkit.entity.effect.Effect;
+import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
@@ -71,6 +71,7 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.*;
 import cn.nukkit.plugin.service.NKServiceManager;
 import cn.nukkit.plugin.service.ServiceManager;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
 import cn.nukkit.resourcepacks.loader.ZippedResourcePackLoader;
@@ -321,11 +322,10 @@ public class Server {
 
         log.info("\u00A7b-- \u00A7dLumi \u00A7b--");
 
-        EffectRegistry.init();
-        PotionRegistry.init();
-
         this.consoleSender = new ConsoleCommandSender();
-        this.commandMap = new SimpleCommandMap(this);
+
+        Registries.EFFECT.init();
+        Registries.POTION.init();
 
         registerEntities();
         registerProfessions();
@@ -340,6 +340,8 @@ public class Server {
         Attribute.init();
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
+
+        this.commandMap = new SimpleCommandMap(this);
 
         // Convert legacy data before plugins get the chance to mess with it
         try {

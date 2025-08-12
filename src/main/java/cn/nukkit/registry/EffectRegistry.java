@@ -1,5 +1,6 @@
-package cn.nukkit.entity.effect;
+package cn.nukkit.registry;
 
+import cn.nukkit.entity.effect.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.sunlan.fastreflection.FastConstructor;
 
@@ -7,23 +8,14 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EffectRegistry {
+public class EffectRegistry implements IRegistry<EffectType, Effect, Class<? extends Effect>> {
     private static final Object2ObjectOpenHashMap<EffectType, FastConstructor<? extends Effect>> CACHE_CONSTRUCTORS = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectOpenHashMap<String, EffectType> STRING_ID_2_TYPE = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectOpenHashMap<Integer, EffectType> INT_ID_2_TYPE = new Object2ObjectOpenHashMap<>();
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
-    public static Effect get(EffectType key) {
-        try {
-            FastConstructor<? extends Effect> fastConstructor = CACHE_CONSTRUCTORS.get(key);
-            if (fastConstructor == null) return null;
-            return (Effect) fastConstructor.invoke();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void init() {
+    @Override
+    public void init() {
         if (isLoad.getAndSet(true)) return;
         register(EffectType.SPEED, EffectSpeed.class);
         register(EffectType.SLOWNESS, EffectSlowness.class);
@@ -57,35 +49,65 @@ public class EffectRegistry {
         register(EffectType.DARKNESS, EffectDarkness.class);
     }
 
-    public static EffectType getType(String stringId) {
-        return STRING_ID_2_TYPE.get(stringId);
-    }
-
-    public static EffectType getType(Integer id) {
-        return INT_ID_2_TYPE.get(id);
-    }
-
-    public static Map<String, EffectType> getEffectStringId2TypeMap() {
-        return Collections.unmodifiableMap(STRING_ID_2_TYPE);
-    }
-
-    public static Map<Integer, EffectType> getEffectId2TypeMap() {
-        return Collections.unmodifiableMap(INT_ID_2_TYPE);
-    }
-
-    public static void register(EffectType type, Class<? extends Effect> effect) {
+    @Override
+    public void register(EffectType type, Class<? extends Effect> effect) {
         try {
-            FastConstructor<? extends Effect> c = FastConstructor.create(effect.getConstructor());
-            if (CACHE_CONSTRUCTORS.putIfAbsent(type, c) == null) {
+            FastConstructor<? extends Effect> constructor = FastConstructor.create(effect.getConstructor());
+            if (CACHE_CONSTRUCTORS.putIfAbsent(type, constructor) == null) {
                 STRING_ID_2_TYPE.put(type.stringId(), type);
                 if (type.id() != null) {
                     INT_ID_2_TYPE.put(type.id(), type);
                 }
             } else {
-                throw new RuntimeException("This effect has already been registered with the identifier: " + type);
+                throw new RegisterException("This effect has already been registered with the identifier: " + type);
             }
+        } catch (NoSuchMethodException e) {
+            throw new RegisterException(e);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Effect get(EffectType key) {
+        try {
+            FastConstructor<? extends Effect> fastConstructor = CACHE_CONSTRUCTORS.get(key);
+            if (fastConstructor == null) {
+                return null;
+            }
+            return (Effect) fastConstructor.invoke();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public EffectType getType(String stringId) {
+        return STRING_ID_2_TYPE.get(stringId);
+    }
+
+    public EffectType getType(Integer id) {
+        return INT_ID_2_TYPE.get(id);
+    }
+
+    public Map<String, EffectType> getEffectStringId2TypeMap() {
+        return Collections.unmodifiableMap(STRING_ID_2_TYPE);
+    }
+
+    public Map<Integer, EffectType> getEffectId2TypeMap() {
+        return Collections.unmodifiableMap(INT_ID_2_TYPE);
+    }
+
+    @Override
+    public void trim() {
+        CACHE_CONSTRUCTORS.trim();
+    }
+
+    @Override
+    public void reload() {
+        isLoad.set(false);
+        INT_ID_2_TYPE.clear();
+        STRING_ID_2_TYPE.clear();
+        CACHE_CONSTRUCTORS.clear();
+        init();
     }
 }
