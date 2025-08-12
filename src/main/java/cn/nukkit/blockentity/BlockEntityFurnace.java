@@ -303,7 +303,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
                 cookTime++;
                 if (cookTime >= readyAt) {
                     Item result = smelt.getResult();
-                    Item newProduct = Item.fromString(result.getNamespaceId(ProtocolInfo.CURRENT_PROTOCOL) + ":" + result.getDamage());
+                    Item newProduct = Item.get(result.getNamespaceId(ProtocolInfo.CURRENT_PROTOCOL) + ":" + result.getDamage());
                     newProduct.setCount(product.getCount() + 1);
                     product = newProduct;
 
