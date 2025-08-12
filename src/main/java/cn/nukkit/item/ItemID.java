@@ -327,8 +327,7 @@ public interface ItemID {
     int CHAIN = 758;
     int RECORD_PIGSTEP = 759;
     int NETHER_SPROUTS = 760;
-
-    int AMETHYST_SHARD = 771;
+    
     int SPYGLASS = 772;
     int RECORD_OTHERSIDE = 773;
 

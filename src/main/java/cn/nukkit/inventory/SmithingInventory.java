@@ -51,7 +51,7 @@ public class SmithingInventory extends FakeBlockUIComponent {
             Item.AIR,
             //材料 Material
             Item.IRON_INGOT, Item.GOLD_INGOT, Item.EMERALD, Item.REDSTONE, Item.NETHER_QUARTZ,
-            ItemID.NETHERITE_INGOT, ItemID.AMETHYST_SHARD,
+            ItemID.NETHERITE_INGOT,
             //工具与护甲 Tools and Armor
             ItemID.DIAMOND_SWORD, ItemID.DIAMOND_SHOVEL, ItemID.DIAMOND_PICKAXE, ItemID.DIAMOND_AXE,
             ItemID.DIAMOND_HOE, ItemID.DIAMOND_HELMET, ItemID.DIAMOND_CHESTPLATE, ItemID.DIAMOND_LEGGINGS, ItemID.DIAMOND_BOOTS,
@@ -62,6 +62,7 @@ public class SmithingInventory extends FakeBlockUIComponent {
     private static final ObjectSet<String> ITEMS_NAMESPACE = new ObjectOpenHashSet<>(new String[]{
             //材料 Material
             ItemNamespaceId.COPPER_INGOT,
+            ItemNamespaceId.AMETHYST_SHARD,
             //模板 Template
             ItemNamespaceId.NETHERITE_UPGRADE_SMITHING_TEMPLATE, ItemNamespaceId.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE, ItemNamespaceId.DUNE_ARMOR_TRIM_SMITHING_TEMPLATE,
             ItemNamespaceId.COAST_ARMOR_TRIM_SMITHING_TEMPLATE, ItemNamespaceId.WILD_ARMOR_TRIM_SMITHING_TEMPLATE, ItemNamespaceId.WARD_ARMOR_TRIM_SMITHING_TEMPLATE,
