@@ -1103,7 +1103,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class<?> c;
+            Class<?> clazz;
             if (id < 255 - Block.MAX_BLOCK_ID) {
                 var customBlockItem = Block.get(255 - id).toItem();
                 customBlockItem.setCount(count);
@@ -1112,13 +1112,13 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 return customBlockItem;
             } else if (id < 0) {
                 int blockId = 255 - id;
-                c = Block.list[blockId];
+                clazz = Block.list[blockId];
             } else {
-                c = list[id];
+                clazz = list[id];
             }
-            Item item;
 
-            if (c == null) {
+            Item item;
+            if (clazz == null) {
                 item = new Item(id, meta, count);
             } else if (id < 256 && id != 166) {
                 if (meta >= 0) {
@@ -1127,7 +1127,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                     item = new ItemBlock(Block.get(id), meta, count);
                 }
             } else {
-                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
+                item = (Item) clazz.getConstructor(Integer.class, int.class).newInstance(meta, count);
             }
 
             if (tags.length != 0) {
@@ -1154,17 +1154,19 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static Item get(String id, Integer meta, int count, byte[] tags) {
         id = id.toLowerCase();
-        if(!id.contains(":")) id = "minecraft:" + id;
+        if (!id.contains(":")) id = "minecraft:" + id;
 
-        Item item = NAMESPACED_ID_ITEM.getOrDefault(id, CUSTOM_ITEMS.getOrDefault(id, () -> Item.AIR_ITEM)).get();
-        if(meta != null) item.setDamage(meta);
+        Item item = NAMESPACED_ID_ITEM.getOrDefault(id, CUSTOM_ITEMS.getOrDefault(id, Item.AIR_ITEM::clone)).get();
+        if (meta != null) {
+            item.setDamage(meta);
+        }
         item.setCount(count);
 
         if (tags.length != 0) {
             item.setCompoundTag(tags);
         }
 
-        return item;
+        return item.clone();
     }
 
     @Deprecated
@@ -1250,10 +1252,18 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return get(id, meta.orElse(0));
     }
 
+    @Deprecated
+    public static Item[] fromStringMultiple(String str) {
+        String[] b = str.split(",");
+        Item[] items = new Item[b.length - 1];
+        for (int i = 0; i < b.length; i++) {
+            items[i] = fromString(b[i]);
+        }
+        return items;
+    }
+
     private String idConvertToName() {
-        if (this.name != null) {
-            return this.name;
-        } else {
+        if (this.name == null) {
             var path = this.getNamespaceId().split(":")[1];
             StringBuilder result = new StringBuilder();
             String[] parts = path.split("_");
@@ -1263,8 +1273,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 }
             }
             this.name = result.toString().trim().intern();
-            return name;
         }
+        return this.name;
     }
 
     public static Item fromJson(Map<String, Object> data) {
@@ -1298,16 +1308,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     public static Item fromJsonOld(Map<String, Object> data) {
         String nbt = (String) data.getOrDefault("nbt_hex", "");
         return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
-    }
-
-    @Deprecated
-    public static Item[] fromStringMultiple(String str) {
-        String[] b = str.split(",");
-        Item[] items = new Item[b.length - 1];
-        for (int i = 0; i < b.length; i++) {
-            items[i] = fromString(b[i]);
-        }
-        return items;
     }
 
     public Item setCompoundTag(CompoundTag tag) {
