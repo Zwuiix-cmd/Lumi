@@ -1136,6 +1136,34 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
+    public static Item get(String id) {
+        return get(id, 0);
+    }
+
+    public static Item get(String id, Integer meta) {
+        return get(id, meta, 1);
+    }
+
+    public static Item get(String id, Integer meta, int count) {
+        return get(id, meta, count, new byte[0]);
+    }
+
+    public static Item get(String id, Integer meta, int count, byte[] tags) {
+        id = id.toLowerCase();
+        if(!id.contains(":")) id = "minecraft:" + id;
+
+        Item item = NAMESPACED_ID_ITEM.getOrDefault(id, CUSTOM_ITEMS.getOrDefault(id, () -> Item.AIR_ITEM)).get();
+        if(meta != null) item.setDamage(meta);
+        item.setCount(count);
+
+        if (tags.length != 0) {
+            item.setCompoundTag(tags);
+        }
+
+        return item;
+    }
+
+    @Deprecated
     public static Item fromString(String str) {
         String normalized = str.trim().replace(' ', '_').toLowerCase(Locale.ROOT);
         Matcher matcher = ITEM_STRING_PATTERN.matcher(normalized);
@@ -1268,6 +1296,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
     }
 
+    @Deprecated
     public static Item[] fromStringMultiple(String str) {
         String[] b = str.split(",");
         Item[] items = new Item[b.length - 1];
