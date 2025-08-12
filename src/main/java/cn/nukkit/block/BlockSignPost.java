@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemSign;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
@@ -133,7 +134,7 @@ public class BlockSignPost extends BlockSignBase implements Faceable, BlockEntit
 
     @Override
     public Item toItem() {
-        return new ItemSign();
+        return Item.get(ItemNamespaceId.OAK_SIGN);
     }
 
     @Override

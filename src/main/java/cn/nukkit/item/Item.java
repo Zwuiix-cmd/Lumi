@@ -197,7 +197,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[COOKED_PORKCHOP] = ItemPorkchopCooked.class; //320
             list[PAINTING] = ItemPainting.class; //321
             list[GOLDEN_APPLE] = ItemAppleGold.class; //322
-            list[SIGN] = ItemSign.class; //323
             list[WOODEN_DOOR] = ItemDoorWood.class; //324
             list[BUCKET] = ItemBucket.class; //325
             list[MINECART] = ItemMinecart.class; //328
@@ -294,7 +293,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[PRISMARINE_CRYSTALS] = ItemPrismarineCrystals.class; //422
             list[RAW_MUTTON] = ItemMuttonRaw.class; //423
             list[COOKED_MUTTON] = ItemMuttonCooked.class; //424
-            list[ARMOR_STAND] = ItemArmorStand.class; //425
             list[END_CRYSTAL] = ItemEndCrystal.class; //426
             list[SPRUCE_DOOR] = ItemDoorSpruce.class; //427
             list[BIRCH_DOOR] = ItemDoorBirch.class; //428
@@ -328,11 +326,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
             list[PHANTOM_MEMBRANE] = ItemPhantomMembrane.class; //470
             list[CROSSBOW] = ItemCrossbow.class; //471
-            list[SPRUCE_SIGN] = ItemSpruceSign.class; //472
-            list[BIRCH_SIGN] = ItemBirchSign.class; //473
-            list[JUNGLE_SIGN] = ItemJungleSign.class; //474
-            list[ACACIA_SIGN] = ItemAcaciaSign.class; //475
-            list[DARKOAK_SIGN] = ItemDarkOakSign.class; //476
             list[SWEET_BERRIES] = ItemSweetBerries.class; //477
             list[RECORD_11] = ItemRecord11.class; //510
             list[RECORD_CAT] = ItemRecordCat.class; //501
@@ -379,8 +372,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHERITE_LEGGINGS] = ItemLeggingsNetherite.class; //750
             list[NETHERITE_BOOTS] = ItemBootsNetherite.class; //751
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
-            list[CRIMSON_SIGN] = ItemCrimsonSign.class; //753
-            list[WARPED_SIGN] = ItemWarpedSign.class; //754
             list[CRIMSON_DOOR] = ItemDoorCrimson.class; //755
             list[WARPED_DOOR] = ItemDoorWarped.class; //756
             list[WARPED_FUNGUS_ON_A_STICK] = ItemWarpedFungusOnAStick.class; //757
@@ -388,7 +379,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
             list[NETHER_SPROUTS] = ItemNetherSprouts.class; //760
 
-            list[AMETHYST_SHARD] = ItemAmethystShard.class; //771
             list[SPYGLASS] = ItemSpyglass.class; //772
             list[RECORD_OTHERSIDE] = ItemRecordOtherside.class; //773
 
@@ -396,16 +386,26 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
             list[GLOW_ITEM_FRAME] = ItemItemFrameGlow.class; //850
 
-            list[MANGROVE_SIGN] = ItemMangroveSign.class; //1005
-            list[BAMBOO_SIGN] = ItemBambooSign.class; //1006
-            list[CHERRY_SIGN] = ItemCherrySign.class; //1007
+
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
                     list[i] = Block.list[i];
                 }
             }
-
+            registerNamespacedIdItem(ItemArmorStand.class);
+            registerNamespacedIdItem(ItemAcaciaSign.class);
+            registerNamespacedIdItem(ItemOakSign.class);
+            registerNamespacedIdItem(ItemBirchSign.class);
+            registerNamespacedIdItem(ItemJungleSign.class);
+            registerNamespacedIdItem(ItemSpruceSign.class);
+            registerNamespacedIdItem(ItemDarkOakSign.class);
+            registerNamespacedIdItem(ItemCrimsonSign.class);
+            registerNamespacedIdItem(ItemWarpedSign.class);
+            registerNamespacedIdItem(ItemMangroveSign.class);
+            registerNamespacedIdItem(ItemBambooSign.class);
+            registerNamespacedIdItem(ItemCherrySign.class);
+            registerNamespacedIdItem(ItemAmethystShard.class);
             registerNamespacedIdItem(ItemDyeBlack.class);
             registerNamespacedIdItem(ItemDyeBlue.class);
             registerNamespacedIdItem(ItemDyeBrown.class);
@@ -1169,6 +1169,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return item.clone();
     }
 
+    /**
+     * Deprecated. Use Item.get() instead
+     */
     @Deprecated
     public static Item fromString(String str) {
         String normalized = str.trim().replace(' ', '_').toLowerCase(Locale.ROOT);
