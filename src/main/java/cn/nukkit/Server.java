@@ -341,6 +341,8 @@ public class Server {
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
 
+        Registries.FUEL.init();
+
         this.commandMap = new SimpleCommandMap(this);
 
         // Convert legacy data before plugins get the chance to mess with it

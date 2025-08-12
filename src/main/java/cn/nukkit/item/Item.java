@@ -6,7 +6,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
@@ -25,6 +24,7 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemData;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemGroup;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.*;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
@@ -1966,14 +1966,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return 64;
     }
 
-    final public Short getFuelTime() {
-        if (!Fuel.duration.containsKey(id)) {
-            return null;
-        }
-        if (this.id != BUCKET || this.meta == 10) {
-            return Fuel.duration.get(this.id);
-        }
-        return null;
+    final public Integer getFuelTime() {
+        return Registries.FUEL.get(getNamespaceId());
     }
 
     public boolean useOn(Entity entity) {

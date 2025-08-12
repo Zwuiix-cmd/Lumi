@@ -12,6 +12,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.registry.Registries;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -285,7 +286,7 @@ public class BlockEntityHopper extends BlockEntitySpawnableContainer implements 
                                 pushedItem = true;
                             }
                         }
-                    } else if (Fuel.duration.containsKey(itemToAdd.getId())) {
+                    } else if (Registries.FUEL.hasBurningTime(itemToAdd.getIdentifier())) {
                         Item fuel = targetInv.getFuel();
                         if (fuel.isNull()) {
                             event = new InventoryMoveItemEvent(this.inventory, targetInv, this, itemToAdd, InventoryMoveItemEvent.Action.SLOT_CHANGE);

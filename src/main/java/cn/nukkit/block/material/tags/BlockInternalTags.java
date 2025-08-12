@@ -1,11 +1,16 @@
 package cn.nukkit.block.material.tags;
 
+import cn.nukkit.block.material.BlockType;
 import cn.nukkit.block.material.BlockTypes;
 import cn.nukkit.block.material.tags.impl.SimpleBlockTag;
 import cn.nukkit.command.selector.args.impl.L;
+import cn.nukkit.item.material.ItemTypes;
+import cn.nukkit.item.material.tags.ItemTag;
+import cn.nukkit.item.material.tags.ItemTags;
+import cn.nukkit.item.material.tags.impl.SimpleItemTag;
 
 public interface BlockInternalTags {
-    BlockTag VIBRATION_DAMPER = BlockTags.register("lumi:vibration_damper", new SimpleBlockTag(
+    BlockTag WOOL = BlockTags.register("lumi:wool", new SimpleBlockTag(
             BlockTypes.WHITE_WOOL,
             BlockTypes.BLACK_WOOL,
             BlockTypes.BLUE_WOOL,
@@ -21,7 +26,10 @@ public interface BlockInternalTags {
             BlockTypes.PINK_WOOL,
             BlockTypes.PURPLE_WOOL,
             BlockTypes.RED_WOOL,
-            BlockTypes.YELLOW_WOOL,
+            BlockTypes.YELLOW_WOOL
+    ));
+
+    BlockTag CARPET = BlockTags.register("lumi:carpet", new SimpleBlockTag(
             BlockTypes.CARPET,
             BlockTypes.WHITE_CARPET,
             BlockTypes.BLACK_CARPET,
@@ -40,6 +48,10 @@ public interface BlockInternalTags {
             BlockTypes.RED_CARPET,
             BlockTypes.YELLOW_CARPET
     ));
+
+    BlockTag VIBRATION_DAMPER = BlockTags.register("lumi:vibration_damper",
+            WOOL.copyWith(CARPET.getBlockTypes().toArray(new BlockType[0]))
+    );
 
     BlockTag JUNGLE = BlockTags.register("lumi:jungle", new SimpleBlockTag(
             BlockTypes.JUNGLE_WOOD,
@@ -110,4 +122,30 @@ public interface BlockInternalTags {
     BlockTag SHULKER_BOX = BlockTags.register("lumi:shulker_box",
             DYED_SHULKER_BOX.copyWith(BlockTypes.UNDYED_SHULKER_BOX)
     );
+
+    BlockTag WOODEN_DOOR = BlockTags.register("lumi:wooden_door", new SimpleBlockTag(
+            BlockTypes.ACACIA_DOOR,
+            BlockTypes.WOODEN_DOOR,
+            BlockTypes.BIRCH_DOOR,
+            BlockTypes.CRIMSON_DOOR,
+            BlockTypes.DARK_OAK_DOOR,
+            BlockTypes.JUNGLE_DOOR,
+            BlockTypes.SPRUCE_DOOR,
+            BlockTypes.WARPED_DOOR,
+            BlockTypes.MANGROVE_DOOR,
+            BlockTypes.CHERRY_DOOR,
+            BlockTypes.PALE_OAK_DOOR
+    ));
+
+    BlockTag SAPLING = BlockTags.register("lumi:sapling", new SimpleBlockTag(
+            BlockTypes.ACACIA_SAPLING,
+            BlockTypes.OAK_SAPLING,
+            BlockTypes.BIRCH_SAPLING,
+            BlockTypes.DARK_OAK_SAPLING,
+            BlockTypes.JUNGLE_SAPLING,
+            BlockTypes.SPRUCE_SAPLING,
+            BlockTypes.MANGROVE_PROPAGULE,
+            BlockTypes.CHERRY_SAPLING,
+            BlockTypes.PALE_OAK_SAPLING
+    ));
 }
