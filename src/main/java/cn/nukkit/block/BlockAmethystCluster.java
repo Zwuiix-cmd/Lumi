@@ -49,8 +49,7 @@ public class BlockAmethystCluster extends BlockAmethystBud {
     @Override
     public Item[] getDrops(Item item) {
         if (!item.isPickaxe()) {
-            Item shard = Item.fromString(ItemNamespaceId.AMETHYST_SHARD);
-            shard.setCount(2);
+            Item shard = Item.get(ItemNamespaceId.AMETHYST_SHARD, 0, 2);
             return new Item[]{shard};
         }
 
@@ -77,8 +76,7 @@ public class BlockAmethystCluster extends BlockAmethystBud {
             }
         }
 
-        Item shard = Item.fromString(ItemNamespaceId.AMETHYST_SHARD);
-        shard.setCount(amount);
+        Item shard = Item.get(ItemNamespaceId.AMETHYST_SHARD, 0, amount);
         return new Item[]{shard};
     }
 

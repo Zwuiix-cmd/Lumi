@@ -276,7 +276,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
 
                     boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
                     if (drop) {
-                        this.level.dropItem(this, Item.fromString(ItemNamespaceId.ARMOR_STAND));
+                        this.level.dropItem(this, Item.get(ItemNamespaceId.ARMOR_STAND));
                     }
                     if (this.equipmentInventory != null) {
                         if (drop) {

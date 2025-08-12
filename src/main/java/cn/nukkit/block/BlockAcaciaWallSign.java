@@ -26,7 +26,7 @@ public class BlockAcaciaWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.ACACIA_SIGN);
+        return Item.get(ItemNamespaceId.ACACIA_SIGN);
     }
 
     @Override

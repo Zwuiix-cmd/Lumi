@@ -134,7 +134,7 @@ public class BlockSignPost extends BlockSignBase implements Faceable, BlockEntit
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.OAK_SIGN);
+        return Item.get(ItemNamespaceId.OAK_SIGN);
     }
 
     @Override

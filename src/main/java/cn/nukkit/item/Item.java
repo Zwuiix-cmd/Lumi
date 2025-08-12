@@ -1169,6 +1169,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return item.clone();
     }
 
+    /**
+     * Deprecated. Use Item.get() instead
+     */
     @Deprecated
     public static Item fromString(String str) {
         String normalized = str.trim().replace(' ', '_').toLowerCase(Locale.ROOT);
