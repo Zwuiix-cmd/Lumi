@@ -2382,7 +2382,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<? extends Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canBreak = true;
                                 break;
@@ -2677,7 +2677,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canPlace = true;
                                 break;

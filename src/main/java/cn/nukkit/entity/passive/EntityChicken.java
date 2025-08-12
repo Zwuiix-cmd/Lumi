@@ -103,8 +103,8 @@ public class EntityChicken extends EntityWalkingAnimal implements EntityClimateV
 
     private Item getEgg() {
         if (Server.getInstance().getSettings().features().enableNewChickenEggsLaying()) {
-            if (getVariant() == Variant.COLD) return Item.fromString(ItemNamespaceId.BLUE_EGG);
-            if (getVariant() == Variant.WARM) return Item.fromString(ItemNamespaceId.BROWN_EGG);
+            if (getVariant() == Variant.COLD) return Item.get(ItemNamespaceId.BLUE_EGG);
+            if (getVariant() == Variant.WARM) return Item.get(ItemNamespaceId.BROWN_EGG);
         }
         return Item.get(Item.EGG, 0, 1);
     }
