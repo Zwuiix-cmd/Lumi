@@ -6,7 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockWater;
-import cn.nukkit.blockentity.BlockEntityPistonArm;
+import cn.nukkit.blockentity.impl.BlockEntityPistonArm;
 import cn.nukkit.entity.custom.CustomEntity;
 import cn.nukkit.entity.custom.EntityDefinition;
 import cn.nukkit.entity.custom.EntityManager;
