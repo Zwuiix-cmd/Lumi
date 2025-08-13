@@ -21,22 +21,12 @@ public class FuelRegistry implements IRegistry<String, Integer, Integer> {
         register(ItemNamespaceId.BLAZE_ROD, 2400);
         register(ItemNamespaceId.COAL, 1600);
         register(ItemNamespaceId.CHARCOAL, 1600);
-        registerByItemTag(ItemTags.BOAT, 1200);
         register(ItemNamespaceId.BAMBOO_MOSAIC, 300);
         register(ItemNamespaceId.BAMBOO_MOSAIC_SLAB, 300);
         register(ItemNamespaceId.BAMBOO_MOSAIC_STAIRS, 300);
         register(ItemNamespaceId.CHISELED_BOOKSHELF, 300);
         register(ItemNamespaceId.BAMBOO_BLOCK, 300);
         register(ItemNamespaceId.STRIPPED_BAMBOO_BLOCK, 300);
-        registerByItemTag(ItemTags.LOGS_THAT_BURN, 300);
-        registerByItemTag(ItemTags.PLANKS, 300);
-        registerByItemTag(ItemTags.WOODEN_SLABS, 300);
-        //WOODEN STAIRS TAG (300)
-        //WOODEN PRESSURE PLATE TAG (300)
-        //WOODEN BUTTON TAG (300)
-        //WOODEN TRAPDOOR TAG (300)
-        //WOODEN FENCE GATE TAG (300)
-        //WOODEN FENCE TAG (300)
         register(ItemNamespaceId.MANGROVE_ROOTS, 300);
         register(ItemNamespaceId.CRAFTING_TABLE, 300);
         register(ItemNamespaceId.CARTOGRAPHY_TABLE, 300);
@@ -56,15 +46,12 @@ public class FuelRegistry implements IRegistry<String, Integer, Integer> {
         register(ItemNamespaceId.CROSSBOW, 200);
         register(ItemNamespaceId.BOW, 200);
         register(ItemNamespaceId.FISHING_ROD, 300);
-        registerByBlockTag(BlockInternalTags.WOODEN_DOOR, 200);
-        registerByItemTag(ItemTags.SIGN, 200);
         register(ItemNamespaceId.WOODEN_PICKAXE, 200);
         register(ItemNamespaceId.WOODEN_SHOVEL, 200);
         register(ItemNamespaceId.WOODEN_HOE, 200);
         register(ItemNamespaceId.WOODEN_AXE, 200);
         register(ItemNamespaceId.WOODEN_SWORD, 200);
         register(ItemNamespaceId.BOWL, 200);
-        registerByBlockTag(BlockInternalTags.SAPLING, 100);
         register(ItemNamespaceId.STICK, 100);
         register(ItemNamespaceId.DEADBUSH, 100);
         register(ItemNamespaceId.AZALEA, 100);
@@ -74,6 +61,19 @@ public class FuelRegistry implements IRegistry<String, Integer, Integer> {
         register(ItemNamespaceId.TALL_DRY_GRASS, 100);
         register(ItemNamespaceId.BAMBOO, 50);
         register(ItemNamespaceId.SCAFFOLDING, 50);
+        registerByItemTag(ItemTags.BOAT, 1200);
+        registerByItemTag(ItemTags.LOGS_THAT_BURN, 300);
+        registerByItemTag(ItemTags.PLANKS, 300);
+        registerByItemTag(ItemTags.WOODEN_SLABS, 300);
+        registerByItemTag(ItemTags.SIGN, 200);
+        registerByBlockTag(BlockInternalTags.WOODEN_STAIRS, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_PRESSURE_PLATE, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_BUTTON, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_TRAPDOOR, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_FENCE, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_FENCE_GATE, 300);
+        registerByBlockTag(BlockInternalTags.WOODEN_DOOR, 200);
+        registerByBlockTag(BlockInternalTags.SAPLING, 100);
     }
 
     @Override

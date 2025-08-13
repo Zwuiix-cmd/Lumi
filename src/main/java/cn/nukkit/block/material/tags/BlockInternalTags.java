@@ -3,11 +3,6 @@ package cn.nukkit.block.material.tags;
 import cn.nukkit.block.material.BlockType;
 import cn.nukkit.block.material.BlockTypes;
 import cn.nukkit.block.material.tags.impl.SimpleBlockTag;
-import cn.nukkit.command.selector.args.impl.L;
-import cn.nukkit.item.material.ItemTypes;
-import cn.nukkit.item.material.tags.ItemTag;
-import cn.nukkit.item.material.tags.ItemTags;
-import cn.nukkit.item.material.tags.impl.SimpleItemTag;
 
 public interface BlockInternalTags {
     BlockTag WOOL = BlockTags.register("lumi:wool", new SimpleBlockTag(
@@ -135,6 +130,90 @@ public interface BlockInternalTags {
             BlockTypes.MANGROVE_DOOR,
             BlockTypes.CHERRY_DOOR,
             BlockTypes.PALE_OAK_DOOR
+    ));
+
+    BlockTag WOODEN_STAIRS = BlockTags.register("lumi:wooden_stairs", new SimpleBlockTag(
+            BlockTypes.ACACIA_STAIRS,
+            BlockTypes.OAK_STAIRS,
+            BlockTypes.BIRCH_STAIRS,
+            BlockTypes.CRIMSON_STAIRS,
+            BlockTypes.DARK_OAK_STAIRS,
+            BlockTypes.JUNGLE_STAIRS,
+            BlockTypes.SPRUCE_STAIRS,
+            BlockTypes.WARPED_STAIRS,
+            BlockTypes.MANGROVE_STAIRS,
+            BlockTypes.CHERRY_STAIRS,
+            BlockTypes.PALE_OAK_STAIRS
+    ));
+
+    BlockTag WOODEN_PRESSURE_PLATE = BlockTags.register("lumi:wooden_pressure_plate", new SimpleBlockTag(
+            BlockTypes.ACACIA_PRESSURE_PLATE,
+            BlockTypes.WOODEN_PRESSURE_PLATE,
+            BlockTypes.BIRCH_PRESSURE_PLATE,
+            BlockTypes.CRIMSON_PRESSURE_PLATE,
+            BlockTypes.DARK_OAK_PRESSURE_PLATE,
+            BlockTypes.JUNGLE_PRESSURE_PLATE,
+            BlockTypes.SPRUCE_PRESSURE_PLATE,
+            BlockTypes.WARPED_PRESSURE_PLATE,
+            BlockTypes.MANGROVE_PRESSURE_PLATE,
+            BlockTypes.CHERRY_PRESSURE_PLATE,
+            BlockTypes.PALE_OAK_PRESSURE_PLATE
+    ));
+
+    BlockTag WOODEN_BUTTON = BlockTags.register("lumi:wooden_button", new SimpleBlockTag(
+            BlockTypes.ACACIA_BUTTON,
+            BlockTypes.WOODEN_BUTTON,
+            BlockTypes.BIRCH_BUTTON,
+            BlockTypes.CRIMSON_BUTTON,
+            BlockTypes.DARK_OAK_BUTTON,
+            BlockTypes.JUNGLE_BUTTON,
+            BlockTypes.SPRUCE_BUTTON,
+            BlockTypes.WARPED_BUTTON,
+            BlockTypes.MANGROVE_BUTTON,
+            BlockTypes.CHERRY_BUTTON,
+            BlockTypes.PALE_OAK_BUTTON
+    ));
+
+    BlockTag WOODEN_TRAPDOOR = BlockTags.register("lumi:wooden_trapdoor", new SimpleBlockTag(
+            BlockTypes.ACACIA_TRAPDOOR,
+            BlockTypes.TRAPDOOR,
+            BlockTypes.BIRCH_TRAPDOOR,
+            BlockTypes.CRIMSON_TRAPDOOR,
+            BlockTypes.DARK_OAK_TRAPDOOR,
+            BlockTypes.JUNGLE_TRAPDOOR,
+            BlockTypes.SPRUCE_TRAPDOOR,
+            BlockTypes.WARPED_TRAPDOOR,
+            BlockTypes.MANGROVE_TRAPDOOR,
+            BlockTypes.CHERRY_TRAPDOOR,
+            BlockTypes.PALE_OAK_TRAPDOOR
+    ));
+
+    BlockTag WOODEN_FENCE = BlockTags.register("lumi:wooden_fence", new SimpleBlockTag(
+            BlockTypes.ACACIA_FENCE,
+            BlockTypes.FENCE,
+            BlockTypes.BIRCH_FENCE,
+            BlockTypes.CRIMSON_FENCE,
+            BlockTypes.DARK_OAK_FENCE,
+            BlockTypes.JUNGLE_FENCE,
+            BlockTypes.SPRUCE_FENCE,
+            BlockTypes.WARPED_FENCE,
+            BlockTypes.MANGROVE_FENCE,
+            BlockTypes.CHERRY_FENCE,
+            BlockTypes.PALE_OAK_FENCE
+    ));
+
+    BlockTag WOODEN_FENCE_GATE = BlockTags.register("lumi:wooden_fence_gate", new SimpleBlockTag(
+            BlockTypes.ACACIA_FENCE_GATE,
+            BlockTypes.FENCE_GATE,
+            BlockTypes.BIRCH_FENCE_GATE,
+            BlockTypes.CRIMSON_FENCE_GATE,
+            BlockTypes.DARK_OAK_FENCE_GATE,
+            BlockTypes.JUNGLE_FENCE_GATE,
+            BlockTypes.SPRUCE_FENCE_GATE,
+            BlockTypes.WARPED_FENCE_GATE,
+            BlockTypes.MANGROVE_FENCE_GATE,
+            BlockTypes.CHERRY_FENCE_GATE,
+            BlockTypes.PALE_OAK_FENCE_GATE
     ));
 
     BlockTag SAPLING = BlockTags.register("lumi:sapling", new SimpleBlockTag(
