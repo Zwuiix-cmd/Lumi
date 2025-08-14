@@ -2,6 +2,7 @@ package cn.nukkit.item.enchantment.damage;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntitySmite;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
  * @author MagicDroidX
@@ -10,7 +11,7 @@ import cn.nukkit.entity.EntitySmite;
 public class EnchantmentDamageSmite extends EnchantmentDamage {
 
     public EnchantmentDamageSmite() {
-        super(ID_DAMAGE_SMITE, "undead", Rarity.UNCOMMON, TYPE.SMITE);
+        super(ID_DAMAGE_SMITE, "undead", EnchantmentRarity.UNCOMMON, TYPE.SMITE);
     }
 
     @Override

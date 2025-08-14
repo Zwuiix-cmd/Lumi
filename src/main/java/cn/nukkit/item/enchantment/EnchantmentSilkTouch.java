@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
 public class EnchantmentSilkTouch extends Enchantment {
 
     public EnchantmentSilkTouch() {
-        super(ID_SILK_TOUCH, "untouching", Rarity.VERY_RARE, EnchantmentType.DIGGER);
+        super(ID_SILK_TOUCH, "untouching", EnchantmentRarity.VERY_RARE, EnchantmentType.DIGGER);
     }
 
     @Override

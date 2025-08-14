@@ -1,6 +1,7 @@
 package cn.nukkit.item.enchantment.bow;
 
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
  * @author MagicDroidX
@@ -8,7 +9,7 @@ import cn.nukkit.item.enchantment.Enchantment;
  */
 public class EnchantmentBowFlame extends EnchantmentBow {
     public EnchantmentBowFlame() {
-        super(Enchantment.ID_BOW_FLAME, "arrowFire", Rarity.RARE);
+        super(Enchantment.ID_BOW_FLAME, "arrowFire", EnchantmentRarity.RARE);
     }
 
     @Override

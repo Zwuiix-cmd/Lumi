@@ -2,6 +2,7 @@ package cn.nukkit.item.enchantment.protection;
 
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.enchantment.EnchantmentType;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
  * @author MagicDroidX
@@ -19,7 +20,7 @@ public abstract class EnchantmentProtection extends Enchantment {
 
     protected final TYPE protectionType;
 
-    protected EnchantmentProtection(int id, String name, Rarity rarity, EnchantmentProtection.TYPE type) {
+    protected EnchantmentProtection(int id, String name, EnchantmentRarity rarity, EnchantmentProtection.TYPE type) {
         super(id, name, rarity, EnchantmentType.ARMOR);
         this.protectionType = type;
         if (protectionType == TYPE.FALL) {

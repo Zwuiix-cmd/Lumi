@@ -2,6 +2,7 @@ package cn.nukkit.item.enchantment.loot;
 
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.enchantment.EnchantmentType;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
  * @author MagicDroidX
@@ -9,7 +10,7 @@ import cn.nukkit.item.enchantment.EnchantmentType;
  */
 public abstract class EnchantmentLoot extends Enchantment {
 
-    protected EnchantmentLoot(int id, String name, Rarity rarity, EnchantmentType type) {
+    protected EnchantmentLoot(int id, String name, EnchantmentRarity rarity, EnchantmentType type) {
         super(id, name, rarity, type);
     }
 

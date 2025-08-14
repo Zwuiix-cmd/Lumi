@@ -7,7 +7,7 @@ package cn.nukkit.item.enchantment;
 public class EnchantmentLure extends Enchantment {
 
     public EnchantmentLure() {
-        super(ID_LURE, "fishingSpeed", Rarity.RARE, EnchantmentType.FISHING_ROD);
+        super(ID_LURE, "fishingSpeed", EnchantmentRarity.RARE, EnchantmentType.FISHING_ROD);
     }
 
     @Override

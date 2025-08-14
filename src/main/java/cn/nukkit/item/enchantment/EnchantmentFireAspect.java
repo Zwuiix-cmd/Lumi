@@ -12,7 +12,7 @@ import cn.nukkit.event.entity.EntityCombustByEntityEvent;
 public class EnchantmentFireAspect extends Enchantment {
 
     public EnchantmentFireAspect() {
-        super(ID_FIRE_ASPECT, "fire", Rarity.RARE, EnchantmentType.SWORD);
+        super(ID_FIRE_ASPECT, "fire", EnchantmentRarity.RARE, EnchantmentType.SWORD);
     }
 
     @Override

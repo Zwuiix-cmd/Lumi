@@ -3,6 +3,7 @@ package cn.nukkit.item.enchantment.damage;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.enchantment.EnchantmentType;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
  * @author MagicDroidX
@@ -16,7 +17,7 @@ public abstract class EnchantmentDamage extends Enchantment {
         ARTHROPODS
     }
 
-    protected EnchantmentDamage(int id, String name, Rarity rarity, TYPE type) {
+    protected EnchantmentDamage(int id, String name, EnchantmentRarity rarity, TYPE type) {
         super(id, name, rarity, EnchantmentType.SWORD);
     }
 

@@ -6,7 +6,7 @@ package cn.nukkit.item.enchantment;
 public class EnchantmentMending extends Enchantment {
 
     public EnchantmentMending() {
-        super(ID_MENDING, "mending", Rarity.RARE, EnchantmentType.BREAKABLE);
+        super(ID_MENDING, "mending", EnchantmentRarity.RARE, EnchantmentType.BREAKABLE);
     }
 
     @Override

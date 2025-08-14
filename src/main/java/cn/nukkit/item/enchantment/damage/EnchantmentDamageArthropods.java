@@ -5,6 +5,7 @@ import cn.nukkit.entity.EntityArthropod;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.entity.EntityEffectUpdateEvent;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -14,7 +15,7 @@ import cn.nukkit.utils.Utils;
 public class EnchantmentDamageArthropods extends EnchantmentDamage {
 
     public EnchantmentDamageArthropods() {
-        super(ID_DAMAGE_ARTHROPODS, "arthropods", Rarity.UNCOMMON, TYPE.SMITE);
+        super(ID_DAMAGE_ARTHROPODS, "arthropods", EnchantmentRarity.UNCOMMON, TYPE.SMITE);
     }
 
     @Override

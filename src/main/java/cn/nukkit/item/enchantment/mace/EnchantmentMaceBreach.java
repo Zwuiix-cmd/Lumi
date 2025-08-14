@@ -1,12 +1,13 @@
 package cn.nukkit.item.enchantment.mace;
 
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 import cn.nukkit.item.enchantment.damage.EnchantmentDamage;
 
 public class EnchantmentMaceBreach extends EnchantmentMace {
 
     public EnchantmentMaceBreach() {
-        super(Enchantment.ID_BREACH, "heavy_weapon.breach", Enchantment.Rarity.RARE);
+        super(Enchantment.ID_BREACH, "heavy_weapon.breach", EnchantmentRarity.RARE);
     }
 
     @Override

@@ -2,12 +2,13 @@ package cn.nukkit.item.enchantment.mace;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.enchantment.EnchantmentRarity;
 import cn.nukkit.item.enchantment.damage.EnchantmentDamage;
 
 public class EnchantmentMaceDensity extends EnchantmentMace {
 
     public EnchantmentMaceDensity() {
-        super(Enchantment.ID_DENSITY, "heavy_weapon.density", Rarity.UNCOMMON);
+        super(Enchantment.ID_DENSITY, "heavy_weapon.density", EnchantmentRarity.UNCOMMON);
     }
 
     @Override
