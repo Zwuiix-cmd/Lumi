@@ -9,12 +9,16 @@ import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class FuelRegistry implements IRegistry<String, Integer, Integer> {
 
     private static final Object2ObjectOpenHashMap<String, Integer> ID_TO_BURNING_TIME = new Object2ObjectOpenHashMap<>();
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         register(ItemNamespaceId.LAVA_BUCKET, 20000);
         register(ItemNamespaceId.COAL_BLOCK, 16000);
         register(ItemNamespaceId.DRIED_KELP_BLOCK, 4000);
@@ -109,6 +113,7 @@ public class FuelRegistry implements IRegistry<String, Integer, Integer> {
 
     @Override
     public void reload() {
+        isLoad.set(false);
         ID_TO_BURNING_TIME.clear();
         init();
     }

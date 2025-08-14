@@ -11,13 +11,17 @@ import cn.nukkit.entity.projectile.*;
 import cn.nukkit.entity.weather.EntityLightning;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class EntityRegistry implements IRegistry<String, Class<? extends Entity>, Class<? extends Entity>> {
 
-    private static final Object2ObjectOpenHashMap<String, Class<? extends Entity>> knownEntities = new Object2ObjectOpenHashMap<>();
-    private static final Object2ObjectOpenHashMap<String, String> shortNames = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectOpenHashMap<String, Class<? extends Entity>> KNOWN_ENTITIES = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectOpenHashMap<String, String> SHORT_NAMES = new Object2ObjectOpenHashMap<>();
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         //Items
         register("Item", EntityItem.class);
         register("Painting", EntityPainting.class);
@@ -154,20 +158,20 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
         }
         try {
             int networkId = value.getField("NETWORK_ID").getInt(null);
-            knownEntities.put(String.valueOf(networkId), value);
+            KNOWN_ENTITIES.put(String.valueOf(networkId), value);
         } catch (Exception e) {
             if (!force) {
                 throw new RegisterException("Failed to register " + key, e);
             }
         }
 
-        knownEntities.put(key, value);
-        shortNames.put(value.getSimpleName(), key);
+        KNOWN_ENTITIES.put(key, value);
+        SHORT_NAMES.put(value.getSimpleName(), key);
     }
 
     @Override
     public Class<? extends Entity> get(String key) {
-        return knownEntities.get(key);
+        return KNOWN_ENTITIES.get(key);
     }
 
     public String getSaveId(Entity entity) {
@@ -175,11 +179,11 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
             EntityDefinition entityDefinition = ((CustomEntity) entity).getEntityDefinition();
             return entityDefinition == null ? "" : entityDefinition.getIdentifier();
         }
-        return shortNames.getOrDefault(entity.getClass().getSimpleName(), "");
+        return SHORT_NAMES.getOrDefault(entity.getClass().getSimpleName(), "");
     }
 
     public boolean isRegistered(String name) {
-        return knownEntities.containsKey(name);
+        return KNOWN_ENTITIES.containsKey(name);
     }
 
     @Override
@@ -187,8 +191,9 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
 
     @Override
     public void reload() {
-        knownEntities.clear();
-        shortNames.clear();
+        isLoad.set(false);
+        KNOWN_ENTITIES.clear();
+        SHORT_NAMES.clear();
         init();
     }
 }

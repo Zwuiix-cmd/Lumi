@@ -6,12 +6,16 @@ import cn.nukkit.blockentity.impl.*;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class BlockEntityRegistry implements IRegistry<String, Class<? extends BlockEntity>, Class<? extends BlockEntity>> {
 
-    private static final BiMap<String, Class<? extends BlockEntity>> knownBlockEntities = HashBiMap.create(30);
+    private static final BiMap<String, Class<? extends BlockEntity>> KNOWN_BLOCK_ENTITIES = HashBiMap.create(30);
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         register(BlockEntityID.FURNACE, BlockEntityFurnace.class);
         register(BlockEntityID.BLAST_FURNACE, BlockEntityBlastFurnace.class);
         register(BlockEntityID.SMOKER, BlockEntitySmoker.class);
@@ -62,20 +66,20 @@ public class BlockEntityRegistry implements IRegistry<String, Class<? extends Bl
             throw new RegisterException("Tried to register null as BlockEntity with identifier:  " + key);
         }
 
-        knownBlockEntities.put(key, value);
+        KNOWN_BLOCK_ENTITIES.put(key, value);
     }
 
     @Override
     public Class<? extends BlockEntity> get(String key) {
-        return knownBlockEntities.get(key);
+        return KNOWN_BLOCK_ENTITIES.get(key);
     }
 
     public String getSaveId(Class<? extends BlockEntity> blockEntity) {
-        return knownBlockEntities.inverse().get(blockEntity);
+        return KNOWN_BLOCK_ENTITIES.inverse().get(blockEntity);
     }
 
     public boolean isRegistered(String key) {
-        return knownBlockEntities.containsKey(key);
+        return KNOWN_BLOCK_ENTITIES.containsKey(key);
     }
 
     @Override
@@ -83,7 +87,8 @@ public class BlockEntityRegistry implements IRegistry<String, Class<? extends Bl
 
     @Override
     public void reload() {
-        knownBlockEntities.clear();
+        isLoad.set(false);
+        KNOWN_BLOCK_ENTITIES.clear();
         init();
     }
 }

@@ -11,13 +11,17 @@ import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class DispenseBehaviorRegistry implements IRegistry<String, DispenseBehavior, DispenseBehavior> {
 
     private static final Object2ObjectOpenHashMap<String, DispenseBehavior> BEHAVIORS = new Object2ObjectOpenHashMap<>();
     private static final DispenseBehavior DEFAULT_BEHAVIOR = new DefaultDispenseBehavior();
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         register(ItemNamespaceId.OAK_BOAT, new BoatDispenseBehavior());
         register(ItemNamespaceId.SPRUCE_BOAT, new BoatDispenseBehavior());
         register(ItemNamespaceId.BIRCH_BOAT, new BoatDispenseBehavior());
@@ -109,6 +113,7 @@ public class DispenseBehaviorRegistry implements IRegistry<String, DispenseBehav
 
     @Override
     public void reload() {
+        isLoad.set(false);
         BEHAVIORS.clear();
         init();
     }
