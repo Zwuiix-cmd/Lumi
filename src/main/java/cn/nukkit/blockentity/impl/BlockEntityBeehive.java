@@ -16,6 +16,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.registry.Registries;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,7 +138,7 @@ public class BlockEntityBeehive extends BlockEntity {
 
     public Occupant addOccupant(Entity entity, int ticksLeftToStay, boolean hasNectar, boolean playSound) {
         entity.saveNBT();
-        Occupant occupant = new Occupant(ticksLeftToStay, entity.getSaveId(), entity.namedTag.clone());
+        Occupant occupant = new Occupant(ticksLeftToStay, Registries.ENTITY.getSaveId(entity), entity.namedTag.clone());
         if (!addOccupant(occupant)) {
             return null;
         }
