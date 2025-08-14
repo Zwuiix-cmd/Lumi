@@ -8,6 +8,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
  * Nukkit Project
  */
 public class EnchantmentBowFlame extends EnchantmentBow {
+
     public EnchantmentBowFlame() {
         super(Enchantment.ID_BOW_FLAME, "arrowFire", EnchantmentRarity.RARE);
     }

@@ -12,7 +12,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionAll extends EnchantmentProtection {
 
     public EnchantmentProtectionAll() {
-        super(Enchantment.ID_PROTECTION_ALL, "all", EnchantmentRarity.COMMON, TYPE.ALL);
+        super(Enchantment.ID_PROTECTION_ALL, "all", EnchantmentRarity.COMMON, Type.ALL);
     }
 
     @Override
@@ -33,11 +33,9 @@ public class EnchantmentProtectionAll extends EnchantmentProtection {
     @Override
     public float getProtectionFactor(EntityDamageEvent e) {
         DamageCause cause = e.getCause();
-
         if (level <= 0 || cause == DamageCause.VOID || cause == DamageCause.CUSTOM || cause == DamageCause.MAGIC || cause == DamageCause.HUNGER) {
             return 0;
         }
-
         return (float) (getLevel() * getTypeModifier());
     }
 }

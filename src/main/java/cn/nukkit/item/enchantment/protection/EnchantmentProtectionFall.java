@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionFall extends EnchantmentProtection {
 
     public EnchantmentProtectionFall() {
-        super(ID_PROTECTION_FALL, "fall", EnchantmentRarity.UNCOMMON, TYPE.FALL);
+        super(ID_PROTECTION_FALL, "fall", EnchantmentRarity.UNCOMMON, Type.FALL);
     }
 
     @Override
@@ -32,11 +32,9 @@ public class EnchantmentProtectionFall extends EnchantmentProtection {
     @Override
     public float getProtectionFactor(EntityDamageEvent e) {
         DamageCause cause = e.getCause();
-
         if (level <= 0 || (cause != DamageCause.FALL)) {
             return 0;
         }
-
         return (float) (getLevel() * getTypeModifier());
     }
 }

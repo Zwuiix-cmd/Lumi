@@ -30,7 +30,6 @@ public class EnchantmentTridentImpaling extends EnchantmentTrident {
         if (entity.isInsideOfWater() || (entity.getLevel().isRaining() && entity.canSeeSky())) {
             return 2.5 * getLevel();
         }
-
         return 0;
     }
 }

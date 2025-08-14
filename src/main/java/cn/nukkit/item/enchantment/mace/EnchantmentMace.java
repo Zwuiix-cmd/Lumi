@@ -1,9 +1,10 @@
 package cn.nukkit.item.enchantment.mace;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemMace;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.enchantment.EnchantmentType;
 import cn.nukkit.item.enchantment.EnchantmentRarity;
+import cn.nukkit.item.enchantment.EnchantmentType;
 
 public abstract class EnchantmentMace extends Enchantment {
 
@@ -13,6 +14,6 @@ public abstract class EnchantmentMace extends Enchantment {
 
     @Override
     public boolean canEnchant(Item item) {
-        return item.getNamespaceId().equals("minecraft:mace");
+        return item instanceof ItemMace;
     }
 }

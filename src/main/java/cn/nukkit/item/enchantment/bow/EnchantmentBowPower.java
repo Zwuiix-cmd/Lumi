@@ -14,6 +14,11 @@ public class EnchantmentBowPower extends EnchantmentBow {
     }
 
     @Override
+    public int getMaxLevel() {
+        return 5;
+    }
+
+    @Override
     public int getMinEnchantAbility(int level) {
         return 1 + (level - 1) * 10;
     }
@@ -21,10 +26,5 @@ public class EnchantmentBowPower extends EnchantmentBow {
     @Override
     public int getMaxEnchantAbility(int level) {
         return this.getMinEnchantAbility(level) + 15;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 5;
     }
 }

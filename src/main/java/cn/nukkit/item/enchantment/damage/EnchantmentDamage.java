@@ -4,21 +4,35 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.enchantment.EnchantmentType;
 import cn.nukkit.item.enchantment.EnchantmentRarity;
+import lombok.Getter;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@Getter
 public abstract class EnchantmentDamage extends Enchantment {
 
-    public enum TYPE {
-        ALL,
-        SMITE,
-        ARTHROPODS
+    protected Type damageType;
+
+    protected EnchantmentDamage(int id, String name, EnchantmentRarity rarity, Type type) {
+        super(id, name, rarity, EnchantmentType.SWORD);
+        this.damageType = type;
     }
 
-    protected EnchantmentDamage(int id, String name, EnchantmentRarity rarity, TYPE type) {
-        super(id, name, rarity, EnchantmentType.SWORD);
+    @Override
+    public String getName() {
+        return "%enchantment.damage." + this.name;
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return 5;
+    }
+
+    @Override
+    public boolean isMajor() {
+        return true;
     }
 
     @Override
@@ -31,18 +45,9 @@ public abstract class EnchantmentDamage extends Enchantment {
         return item.isAxe() || super.canEnchant(item);
     }
 
-    @Override
-    public int getMaxLevel() {
-        return 5;
-    }
-
-    @Override
-    public String getName() {
-        return "%enchantment.damage." + this.name;
-    }
-
-    @Override
-    public boolean isMajor() {
-        return true;
+    public enum Type {
+        ALL,
+        SMITE,
+        ARTHROPODS
     }
 }

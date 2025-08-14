@@ -10,7 +10,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentDamageAll extends EnchantmentDamage {
 
     public EnchantmentDamageAll() {
-        super(ID_DAMAGE_ALL, "all", EnchantmentRarity.COMMON, TYPE.ALL);
+        super(ID_DAMAGE_ALL, "all", EnchantmentRarity.COMMON, Type.ALL);
     }
 
     @Override

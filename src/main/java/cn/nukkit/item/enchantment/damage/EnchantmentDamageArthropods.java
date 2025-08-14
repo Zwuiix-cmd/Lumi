@@ -15,7 +15,7 @@ import cn.nukkit.utils.Utils;
 public class EnchantmentDamageArthropods extends EnchantmentDamage {
 
     public EnchantmentDamageArthropods() {
-        super(ID_DAMAGE_ARTHROPODS, "arthropods", EnchantmentRarity.UNCOMMON, TYPE.SMITE);
+        super(ID_DAMAGE_ARTHROPODS, "arthropods", EnchantmentRarity.UNCOMMON, Type.SMITE);
     }
 
     @Override
@@ -41,7 +41,9 @@ public class EnchantmentDamageArthropods extends EnchantmentDamage {
     public void doPostAttack(Entity attacker, Entity entity) {
         if (entity instanceof EntityArthropod) {
             entity.addEffect(
-                    Effect.get(EffectType.SLOWNESS).setDuration(20 + Utils.random.nextInt(10 * this.level)).setAmplifier(3),
+                    Effect.get(EffectType.SLOWNESS)
+                            .setDuration(20 + Utils.random.nextInt(10 * this.level))
+                            .setAmplifier(3),
                     EntityEffectUpdateEvent.Cause.ATTACK
             );
         }

@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionProjectile extends EnchantmentProtection {
 
     public EnchantmentProtectionProjectile() {
-        super(ID_PROTECTION_PROJECTILE, "projectile", EnchantmentRarity.UNCOMMON, TYPE.PROJECTILE);
+        super(ID_PROTECTION_PROJECTILE, "projectile", EnchantmentRarity.UNCOMMON, Type.PROJECTILE);
     }
 
     @Override
@@ -32,11 +32,9 @@ public class EnchantmentProtectionProjectile extends EnchantmentProtection {
     @Override
     public float getProtectionFactor(EntityDamageEvent e) {
         DamageCause cause = e.getCause();
-
         if (level <= 0 || (cause != DamageCause.PROJECTILE)) {
             return 0;
         }
-
         return (float) (getLevel() * getTypeModifier());
     }
 }

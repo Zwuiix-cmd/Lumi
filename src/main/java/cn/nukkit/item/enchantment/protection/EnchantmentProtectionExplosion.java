@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionExplosion extends EnchantmentProtection {
 
     public EnchantmentProtectionExplosion() {
-        super(ID_PROTECTION_EXPLOSION, "explosion", EnchantmentRarity.RARE, TYPE.EXPLOSION);
+        super(ID_PROTECTION_EXPLOSION, "explosion", EnchantmentRarity.RARE, Type.EXPLOSION);
     }
 
     @Override
@@ -32,11 +32,9 @@ public class EnchantmentProtectionExplosion extends EnchantmentProtection {
     @Override
     public float getProtectionFactor(EntityDamageEvent e) {
         DamageCause cause = e.getCause();
-
         if (level <= 0 || (cause != DamageCause.ENTITY_EXPLOSION && cause != DamageCause.BLOCK_EXPLOSION)) {
             return 0;
         }
-
         return (float) (getLevel() * getTypeModifier());
     }
 }

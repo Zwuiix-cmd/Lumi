@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentDamageSmite extends EnchantmentDamage {
 
     public EnchantmentDamageSmite() {
-        super(ID_DAMAGE_SMITE, "undead", EnchantmentRarity.UNCOMMON, TYPE.SMITE);
+        super(ID_DAMAGE_SMITE, "undead", EnchantmentRarity.UNCOMMON, Type.SMITE);
     }
 
     @Override
@@ -27,9 +27,8 @@ public class EnchantmentDamageSmite extends EnchantmentDamage {
     @Override
     public double getDamageBonus(Entity entity, Entity attacker) {
         if (entity instanceof EntitySmite) {
-            return getLevel() * 2.5;
+            return this.getLevel() * 2.5;
         }
-
         return 0;
     }
 }
