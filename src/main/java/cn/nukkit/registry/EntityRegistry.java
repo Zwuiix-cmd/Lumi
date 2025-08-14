@@ -9,14 +9,12 @@ import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
 import cn.nukkit.entity.weather.EntityLightning;
-
-import java.util.HashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class EntityRegistry implements IRegistry<String, Class<? extends Entity>, Class<? extends Entity>> {
 
-    private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
-    private static final Map<String, String> shortNames = new HashMap<>();
+    private static final Object2ObjectOpenHashMap<String, Class<? extends Entity>> knownEntities = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectOpenHashMap<String, String> shortNames = new Object2ObjectOpenHashMap<>();
 
     @Override
     public void init() {
