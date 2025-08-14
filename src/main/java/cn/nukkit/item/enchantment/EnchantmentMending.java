@@ -5,7 +5,7 @@ package cn.nukkit.item.enchantment;
  */
 public class EnchantmentMending extends Enchantment {
 
-    protected EnchantmentMending() {
+    public EnchantmentMending() {
         super(ID_MENDING, "mending", Rarity.RARE, EnchantmentType.BREAKABLE);
     }
 
@@ -26,6 +26,6 @@ public class EnchantmentMending extends Enchantment {
 
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != ID_BOW_INFINITY;
+        return super.checkCompatibility(enchantment) && enchantment.getId() != ID_BOW_INFINITY;
     }
 }

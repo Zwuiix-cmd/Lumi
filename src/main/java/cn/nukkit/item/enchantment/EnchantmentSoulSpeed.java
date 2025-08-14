@@ -2,7 +2,7 @@ package cn.nukkit.item.enchantment;
 
 public class EnchantmentSoulSpeed extends Enchantment {
 
-    protected EnchantmentSoulSpeed() {
+    public EnchantmentSoulSpeed() {
         super(ID_SOUL_SPEED, "soul_speed", Rarity.VERY_RARE, EnchantmentType.ARMOR_FEET);
     }
 

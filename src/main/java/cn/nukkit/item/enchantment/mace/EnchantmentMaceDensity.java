@@ -36,6 +36,6 @@ public class EnchantmentMaceDensity extends EnchantmentMace {
 
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != Enchantment.ID_DENSITY && !(enchantment instanceof EnchantmentDamage);
+        return super.checkCompatibility(enchantment) && enchantment.getId() != Enchantment.ID_DENSITY && !(enchantment instanceof EnchantmentDamage);
     }
 }

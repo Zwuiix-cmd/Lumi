@@ -25,6 +25,6 @@ public class EnchantmentCrossbowPiercing extends EnchantmentCrossbow {
 
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != ID_CROSSBOW_MULTISHOT;
+        return super.checkCompatibility(enchantment) && enchantment.getId() != ID_CROSSBOW_MULTISHOT;
     }
 }

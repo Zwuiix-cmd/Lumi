@@ -6,7 +6,7 @@ package cn.nukkit.item.enchantment;
  */
 public class EnchantmentWaterWorker extends Enchantment {
 
-    protected EnchantmentWaterWorker() {
+    public EnchantmentWaterWorker() {
         super(ID_WATER_WORKER, "waterWorker", Rarity.RARE, EnchantmentType.ARMOR_HEAD);
     }
 

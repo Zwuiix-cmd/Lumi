@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class EnchantmentDurability extends Enchantment {
 
-    protected EnchantmentDurability() {
+    public EnchantmentDurability() {
         super(ID_DURABILITY, "durability", Rarity.UNCOMMON, EnchantmentType.BREAKABLE);
     }
 

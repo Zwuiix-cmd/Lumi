@@ -30,6 +30,6 @@ public abstract class EnchantmentLoot extends Enchantment {
 
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != Enchantment.ID_SILK_TOUCH;
+        return super.checkCompatibility(enchantment) && enchantment.getId() != Enchantment.ID_SILK_TOUCH;
     }
 }

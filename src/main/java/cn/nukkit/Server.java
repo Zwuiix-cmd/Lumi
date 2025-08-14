@@ -328,9 +328,9 @@ public class Server {
         Registries.ENTITY.init();
         registerProfessions();
         Registries.BLOCK_ENTITY.init();
+        Registries.ENCHANTMENT.init();
 
         Block.init();
-        Enchantment.init();
         GlobalBlockPalette.init();
         RuntimeItems.init();
         Item.init();

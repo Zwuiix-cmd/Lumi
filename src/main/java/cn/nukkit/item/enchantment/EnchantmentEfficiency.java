@@ -8,7 +8,7 @@ import cn.nukkit.item.Item;
  */
 public class EnchantmentEfficiency extends Enchantment {
 
-    protected EnchantmentEfficiency() {
+    public EnchantmentEfficiency() {
         super(ID_EFFICIENCY, "digging", Rarity.COMMON, EnchantmentType.DIGGER);
     }
 
