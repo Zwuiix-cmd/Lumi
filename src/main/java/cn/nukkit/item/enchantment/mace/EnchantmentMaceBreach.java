@@ -7,7 +7,7 @@ import cn.nukkit.item.enchantment.damage.EnchantmentDamage;
 public class EnchantmentMaceBreach extends EnchantmentMace {
 
     public EnchantmentMaceBreach() {
-        super(Enchantment.ID_BREACH, "heavy_weapon.breach", EnchantmentRarity.RARE);
+        super(ID_BREACH, NAME_BREACH, "heavy_weapon.breach", EnchantmentRarity.RARE);
     }
 
     @Override

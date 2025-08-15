@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionFall extends EnchantmentProtection {
 
     public EnchantmentProtectionFall() {
-        super(ID_PROTECTION_FALL, "fall", EnchantmentRarity.UNCOMMON, Type.FALL);
+        super(ID_PROTECTION_FALL, NAME_PROTECTION_FALL, "fall", EnchantmentRarity.UNCOMMON, Type.FALL);
     }
 
     @Override

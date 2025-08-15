@@ -1,10 +1,8 @@
 package cn.nukkit.item.enchantment;
 
-import static cn.nukkit.utils.Utils.dynamic;
-
 public interface EnchantmentID {
 
-    int CUSTOM_ENCHANTMENT_ID = dynamic(256);
+    int CUSTOM_ENCHANTMENT_ID = 256;
 
     int ID_PROTECTION_ALL = 0;
     int ID_PROTECTION_FIRE = 1;

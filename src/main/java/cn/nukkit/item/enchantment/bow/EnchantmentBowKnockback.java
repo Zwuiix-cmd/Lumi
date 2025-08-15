@@ -1,6 +1,5 @@
 package cn.nukkit.item.enchantment.bow;
 
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.enchantment.EnchantmentRarity;
 
 /**
@@ -10,7 +9,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentBowKnockback extends EnchantmentBow {
 
     public EnchantmentBowKnockback() {
-        super(Enchantment.ID_BOW_KNOCKBACK, "arrowKnockback", EnchantmentRarity.RARE);
+        super(ID_BOW_KNOCKBACK, NAME_BOW_KNOCKBACK, "arrowKnockback", EnchantmentRarity.RARE);
     }
 
     @Override

@@ -48,55 +48,62 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
     @Override
     public void init() {
         if (isLoad.getAndSet(true)) return;
-        register(new Identifier("minecraft", Enchantment.NAME_PROTECTION_ALL), new EnchantmentProtectionAll());
-        register(new Identifier("minecraft", Enchantment.NAME_PROTECTION_FIRE), new EnchantmentProtectionFire());
-        register(new Identifier("minecraft", Enchantment.NAME_PROTECTION_FALL), new EnchantmentProtectionFall());
-        register(new Identifier("minecraft", Enchantment.NAME_PROTECTION_EXPLOSION), new EnchantmentProtectionExplosion());
-        register(new Identifier("minecraft", Enchantment.NAME_PROTECTION_PROJECTILE), new EnchantmentProtectionProjectile());
-        register(new Identifier("minecraft", Enchantment.NAME_THORNS), new EnchantmentThorns());
-        register(new Identifier("minecraft", Enchantment.NAME_WATER_BREATHING), new EnchantmentWaterBreath());
-        register(new Identifier("minecraft", Enchantment.NAME_WATER_WORKER), new EnchantmentWaterWorker());
-        register(new Identifier("minecraft", Enchantment.NAME_WATER_WALKER), new EnchantmentWaterWalker());
-        register(new Identifier("minecraft", Enchantment.NAME_DAMAGE_ALL), new EnchantmentDamageAll());
-        register(new Identifier("minecraft", Enchantment.NAME_DAMAGE_SMITE), new EnchantmentDamageSmite());
-        register(new Identifier("minecraft", Enchantment.NAME_DAMAGE_ARTHROPODS), new EnchantmentDamageArthropods());
-        register(new Identifier("minecraft", Enchantment.NAME_KNOCKBACK), new EnchantmentKnockback());
-        register(new Identifier("minecraft", Enchantment.NAME_FIRE_ASPECT), new EnchantmentFireAspect());
-        register(new Identifier("minecraft", Enchantment.NAME_LOOTING), new EnchantmentLootWeapon());
-        register(new Identifier("minecraft", Enchantment.NAME_EFFICIENCY), new EnchantmentEfficiency());
-        register(new Identifier("minecraft", Enchantment.NAME_SILK_TOUCH), new EnchantmentSilkTouch());
-        register(new Identifier("minecraft", Enchantment.NAME_DURABILITY), new EnchantmentDurability());
-        register(new Identifier("minecraft", Enchantment.NAME_FORTUNE_DIGGING), new EnchantmentLootDigging());
-        register(new Identifier("minecraft", Enchantment.NAME_BOW_POWER), new EnchantmentBowPower());
-        register(new Identifier("minecraft", Enchantment.NAME_BOW_KNOCKBACK), new EnchantmentBowKnockback());
-        register(new Identifier("minecraft", Enchantment.NAME_BOW_FLAME), new EnchantmentBowFlame());
-        register(new Identifier("minecraft", Enchantment.NAME_BOW_INFINITY), new EnchantmentBowInfinity());
-        register(new Identifier("minecraft", Enchantment.NAME_FORTUNE_FISHING), new EnchantmentLootFishing());
-        register(new Identifier("minecraft", Enchantment.NAME_LURE), new EnchantmentLure());
-        register(new Identifier("minecraft", Enchantment.NAME_FROST_WALKER), new EnchantmentFrostWalker());
-        register(new Identifier("minecraft", Enchantment.NAME_MENDING), new EnchantmentMending());
-        register(new Identifier("minecraft", Enchantment.NAME_BINDING_CURSE), new EnchantmentBindingCurse());
-        register(new Identifier("minecraft", Enchantment.NAME_VANISHING_CURSE), new EnchantmentVanishingCurse());
-        register(new Identifier("minecraft", Enchantment.NAME_TRIDENT_IMPALING), new EnchantmentTridentImpaling());
-        register(new Identifier("minecraft", Enchantment.NAME_TRIDENT_LOYALTY), new EnchantmentTridentLoyalty());
-        register(new Identifier("minecraft", Enchantment.NAME_TRIDENT_RIPTIDE), new EnchantmentTridentRiptide());
-        register(new Identifier("minecraft", Enchantment.NAME_TRIDENT_CHANNELING), new EnchantmentTridentChanneling());
-        register(new Identifier("minecraft", Enchantment.NAME_CROSSBOW_MULTISHOT), new EnchantmentCrossbowMultishot());
-        register(new Identifier("minecraft", Enchantment.NAME_CROSSBOW_PIERCING), new EnchantmentCrossbowPiercing());
-        register(new Identifier("minecraft", Enchantment.NAME_CROSSBOW_QUICK_CHARGE), new EnchantmentCrossbowQuickCharge());
-        register(new Identifier("minecraft", Enchantment.NAME_SOUL_SPEED), new EnchantmentSoulSpeed());
-        register(new Identifier("minecraft", Enchantment.NAME_SWIFT_SNEAK), new EnchantmentSwiftSneak());
-        register(new Identifier("minecraft", Enchantment.NAME_WIND_BURST), new EnchantmentMaceWindBurst());
-        register(new Identifier("minecraft", Enchantment.NAME_DENSITY), new EnchantmentMaceDensity());
-        register(new Identifier("minecraft", Enchantment.NAME_BREACH), new EnchantmentMaceBreach());
+        register(new EnchantmentProtectionAll());
+        register(new EnchantmentProtectionFire());
+        register(new EnchantmentProtectionFall());
+        register(new EnchantmentProtectionExplosion());
+        register(new EnchantmentProtectionProjectile());
+        register(new EnchantmentThorns());
+        register(new EnchantmentWaterBreath());
+        register(new EnchantmentWaterWorker());
+        register(new EnchantmentWaterWalker());
+        register(new EnchantmentDamageAll());
+        register(new EnchantmentDamageSmite());
+        register(new EnchantmentDamageArthropods());
+        register(new EnchantmentKnockback());
+        register(new EnchantmentFireAspect());
+        register(new EnchantmentLootWeapon());
+        register(new EnchantmentEfficiency());
+        register(new EnchantmentSilkTouch());
+        register(new EnchantmentDurability());
+        register(new EnchantmentLootDigging());
+        register(new EnchantmentBowPower());
+        register(new EnchantmentBowKnockback());
+        register(new EnchantmentBowFlame());
+        register(new EnchantmentBowInfinity());
+        register(new EnchantmentLootFishing());
+        register(new EnchantmentLure());
+        register(new EnchantmentFrostWalker());
+        register(new EnchantmentMending());
+        register(new EnchantmentBindingCurse());
+        register(new EnchantmentVanishingCurse());
+        register(new EnchantmentTridentImpaling());
+        register(new EnchantmentTridentLoyalty());
+        register(new EnchantmentTridentRiptide());
+        register(new EnchantmentTridentChanneling());
+        register(new EnchantmentCrossbowMultishot());
+        register(new EnchantmentCrossbowPiercing());
+        register(new EnchantmentCrossbowQuickCharge());
+        register(new EnchantmentSoulSpeed());
+        register(new EnchantmentSwiftSneak());
+        register(new EnchantmentMaceWindBurst());
+        register(new EnchantmentMaceDensity());
+        register(new EnchantmentMaceBreach());
+    }
+
+    public void register(Enchantment enchantment) {
+        register(enchantment.getIdentifier(), enchantment);
     }
 
     @Override
     public void register(Identifier id, Enchantment enchantment) {
-        if (enchantment.getId() != Enchantment.CUSTOM_ENCHANTMENT_ID) {
-            ID_TO_ENCHANTMENT.put(enchantment.getId(), enchantment);
+        if (IDENTIFIER_TO_ENCHANTMENT.put(id, enchantment) == null) {
+            if (enchantment.getId() != EnchantmentID.CUSTOM_ENCHANTMENT_ID) {
+                ID_TO_ENCHANTMENT.put(enchantment.getId(), enchantment);
+            }
+        } else {
+            throw new RegisterException("Duplicate enchantment id " + id);
         }
-        IDENTIFIER_TO_ENCHANTMENT.put(id, enchantment);
     }
 
     public void registerCustom(Enchantment enchantment) {
@@ -188,6 +195,7 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
 
     @Override
     public void reload() {
+        isLoad.set(false);
         ID_TO_ENCHANTMENT.clear();
         IDENTIFIER_TO_ENCHANTMENT.clear();
         init();

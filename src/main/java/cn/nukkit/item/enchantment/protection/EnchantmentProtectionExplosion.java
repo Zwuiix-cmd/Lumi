@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionExplosion extends EnchantmentProtection {
 
     public EnchantmentProtectionExplosion() {
-        super(ID_PROTECTION_EXPLOSION, "explosion", EnchantmentRarity.RARE, Type.EXPLOSION);
+        super(ID_PROTECTION_EXPLOSION, NAME_PROTECTION_EXPLOSION, "explosion", EnchantmentRarity.RARE, Type.EXPLOSION);
     }
 
     @Override

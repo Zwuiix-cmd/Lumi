@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionFire extends EnchantmentProtection {
 
     public EnchantmentProtectionFire() {
-        super(ID_PROTECTION_FIRE, "fire", EnchantmentRarity.UNCOMMON, Type.FIRE);
+        super(ID_PROTECTION_FIRE, NAME_PROTECTION_FIRE, "fire", EnchantmentRarity.UNCOMMON, Type.FIRE);
     }
 
     @Override

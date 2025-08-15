@@ -11,7 +11,7 @@ import cn.nukkit.item.enchantment.EnchantmentRarity;
 public class EnchantmentProtectionProjectile extends EnchantmentProtection {
 
     public EnchantmentProtectionProjectile() {
-        super(ID_PROTECTION_PROJECTILE, "projectile", EnchantmentRarity.UNCOMMON, Type.PROJECTILE);
+        super(ID_PROTECTION_PROJECTILE, NAME_PROTECTION_PROJECTILE, "projectile", EnchantmentRarity.UNCOMMON, Type.PROJECTILE);
     }
 
     @Override

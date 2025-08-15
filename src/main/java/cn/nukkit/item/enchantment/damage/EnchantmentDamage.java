@@ -2,8 +2,9 @@ package cn.nukkit.item.enchantment.damage;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.enchantment.EnchantmentType;
 import cn.nukkit.item.enchantment.EnchantmentRarity;
+import cn.nukkit.item.enchantment.EnchantmentType;
+import cn.nukkit.utils.Identifier;
 import lombok.Getter;
 
 /**
@@ -15,8 +16,13 @@ public abstract class EnchantmentDamage extends Enchantment {
 
     protected Type damageType;
 
-    protected EnchantmentDamage(int id, String name, EnchantmentRarity rarity, Type type) {
-        super(id, name, rarity, EnchantmentType.SWORD);
+    protected EnchantmentDamage(int id, String identifier, String name, EnchantmentRarity rarity, Type type) {
+        super(id, identifier, name, rarity, EnchantmentType.SWORD);
+        this.damageType = type;
+    }
+
+    protected EnchantmentDamage(int id, Identifier identifier, String name, EnchantmentRarity rarity, Type type) {
+        super(id, identifier, name, rarity, EnchantmentType.SWORD);
         this.damageType = type;
     }
 

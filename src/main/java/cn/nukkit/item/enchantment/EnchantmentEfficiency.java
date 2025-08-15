@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
 public class EnchantmentEfficiency extends Enchantment {
 
     public EnchantmentEfficiency() {
-        super(ID_EFFICIENCY, "digging", EnchantmentRarity.COMMON, EnchantmentType.DIGGER);
+        super(ID_EFFICIENCY, NAME_EFFICIENCY, "digging", EnchantmentRarity.COMMON, EnchantmentType.DIGGER);
     }
 
     @Override

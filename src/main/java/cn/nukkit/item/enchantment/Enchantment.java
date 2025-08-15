@@ -7,44 +7,43 @@ import cn.nukkit.item.Item;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.OK;
-import cn.nukkit.utils.TextFormat;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * @author MagicDroidX
- * Nukkit Project
- */
 public abstract class Enchantment implements Cloneable, EnchantmentID {
 
     public static final Enchantment[] EMPTY_ARRAY = new Enchantment[0];
 
-    private final int id;
-
-    @Nullable
+    protected final int id;
     protected final Identifier identifier;
     protected final String name;
-
     protected final EnchantmentRarity rarity;
-    protected EnchantmentType type;
+    protected final EnchantmentType type;
     protected int level = 1;
 
-    protected Enchantment(int id, String name, EnchantmentRarity rarity, EnchantmentType type) {
-        this.id = id;
-        this.identifier = null;
-        this.name = name;
-        this.rarity = rarity;
-        this.type = type;
+    protected Enchantment(String identifier, String name, EnchantmentRarity rarity, @NotNull EnchantmentType type) {
+        this(CUSTOM_ENCHANTMENT_ID, identifier, name, rarity, type);
     }
 
-    protected Enchantment(@NotNull Identifier identifier, String name, EnchantmentRarity rarity, @NotNull EnchantmentType type) {
-        this.id = CUSTOM_ENCHANTMENT_ID;
-        this.identifier = identifier;
-        this.name = name;
+    protected Enchantment(Identifier identifier, String name, EnchantmentRarity rarity, @NotNull EnchantmentType type) {
+        this(CUSTOM_ENCHANTMENT_ID, identifier, name, rarity, type);
+    }
+
+    protected Enchantment(int id, String identifier, String name, EnchantmentRarity rarity, EnchantmentType type) {
+        this(id, Identifier.isValid(identifier) ?
+                        new Identifier(identifier) :
+                        new Identifier(Identifier.DEFAULT_NAMESPACE, identifier),
+                name, rarity, type);
+    }
+
+    protected Enchantment(int id, Identifier identifier, String name, EnchantmentRarity rarity, @NotNull EnchantmentType type) {
+        this.id = id;
+        this.identifier = Objects.requireNonNull(identifier, "Identifier cannot be null");
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
         this.rarity = rarity;
         this.type = type;
     }
@@ -61,29 +60,28 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
         }
     }
 
-    @Nullable
+    public int getId() {
+        return id;
+    }
+
     public Identifier getIdentifier() {
         return identifier;
     }
 
     public String getName() {
-        if (this.identifier == null) {
+        if (this.id != CUSTOM_ENCHANTMENT_ID) {
             return "%enchantment." + this.name;
         } else {
             return this.name;
         }
     }
 
-    public int getId() {
-        return id;
+    public String getOriginalName() {
+        return this.name;
     }
 
     public EnchantmentRarity getRarity() {
-        return this.rarity;
-    }
-
-    public String getLore() {
-        return TextFormat.GRAY + this.getName() + " " + Enchantment.getLevelString(this.getLevel());
+        return rarity;
     }
 
     public int getLevel() {
@@ -161,10 +159,6 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
         return this != enchantment;
     }
 
-    public String getOriginalName() {
-        return this.name;
-    }
-
     public boolean canEnchant(Item item) {
         return this.type.canEnchantItem(item);
     }
@@ -175,37 +169,6 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
 
     public boolean isTreasure() {
         return false;
-    }
-
-    @Deprecated
-    public static Enchantment getEnchantment(int id) {
-        return get(id).clone();
-    }
-
-    @Deprecated
-    public static Enchantment getEnchantment(@NotNull Identifier id) {
-        return Registries.ENCHANTMENT.get(id);
-    }
-
-    @Deprecated
-    public static OK<?> register(Enchantment enchantment, boolean registerItem) {
-        Registries.ENCHANTMENT.registerCustom(enchantment, registerItem);
-        return OK.TRUE;
-    }
-
-    @Deprecated
-    public static Enchantment[] getEnchantments() {
-        return Registries.ENCHANTMENT.getIdentifierToEnchantment().values().toArray(EMPTY_ARRAY);
-    }
-
-    @Deprecated
-    public static Collection<Enchantment> getRegisteredEnchantments() {
-        return Registries.ENCHANTMENT.getIdentifierToEnchantment().values();
-    }
-
-    @Deprecated
-    public static Map<String, Integer> getEnchantmentName2IDMap() {
-        return Registries.ENCHANTMENT.getIdentifierToEnchantment().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().getId()));
     }
 
     @Override
@@ -231,5 +194,54 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
             case 10 -> "X";
             default -> "∞";
         };
+    }
+
+    /**
+     * @deprecated Use the method Enchantment#get
+     */
+    @Deprecated
+    public static Enchantment getEnchantment(int id) {
+        return get(id).clone();
+    }
+
+    /**
+     * @deprecated Use the method Enchantment#get
+     */
+    @Deprecated
+    public static Enchantment getEnchantment(@NotNull Identifier id) {
+        return Registries.ENCHANTMENT.get(id);
+    }
+
+    /**
+     * @deprecated Use the Registries.ENCHANTMENT.registerCustom()
+     */
+    @Deprecated
+    public static OK<?> register(Enchantment enchantment, boolean registerItem) {
+        Registries.ENCHANTMENT.registerCustom(enchantment, registerItem);
+        return OK.TRUE;
+    }
+
+    /**
+     * @deprecated Use the Registries.ENCHANTMENT.getIdentifierToEnchantment()
+     */
+    @Deprecated
+    public static Enchantment[] getEnchantments() {
+        return Registries.ENCHANTMENT.getIdentifierToEnchantment().values().toArray(EMPTY_ARRAY);
+    }
+
+    /**
+     * @deprecated Use the Registries.ENCHANTMENT.getIdentifierToEnchantment()
+     */
+    @Deprecated
+    public static Collection<Enchantment> getRegisteredEnchantments() {
+        return Registries.ENCHANTMENT.getIdentifierToEnchantment().values();
+    }
+
+    /**
+     * @deprecated Use the Registries.ENCHANTMENT.getIdentifierToEnchantment()
+     */
+    @Deprecated
+    public static Map<String, Integer> getEnchantmentName2IDMap() {
+        return Registries.ENCHANTMENT.getIdentifierToEnchantment().entrySet().stream().collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().getId()));
     }
 }

@@ -1,8 +1,9 @@
 package cn.nukkit.item.enchantment.protection;
 
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.enchantment.EnchantmentType;
 import cn.nukkit.item.enchantment.EnchantmentRarity;
+import cn.nukkit.item.enchantment.EnchantmentType;
+import cn.nukkit.utils.Identifier;
 import lombok.Getter;
 
 /**
@@ -14,12 +15,18 @@ public abstract class EnchantmentProtection extends Enchantment {
 
     protected final Type protectionType;
 
-    protected EnchantmentProtection(int id, String name, EnchantmentRarity rarity, Type type) {
-        super(id, name, rarity, EnchantmentType.ARMOR);
+    protected EnchantmentProtection(int id, String identifier, String name, EnchantmentRarity rarity, Type type) {
+        super(id, identifier, name, rarity, type == Type.FALL ?
+                EnchantmentType.ARMOR_FEET :
+                EnchantmentType.ARMOR);
         this.protectionType = type;
-        if (protectionType == Type.FALL) {
-            this.type = EnchantmentType.ARMOR_FEET;
-        }
+    }
+
+    protected EnchantmentProtection(int id, Identifier identifier, String name, EnchantmentRarity rarity, Type type) {
+        super(id, identifier, name, rarity, type == Type.FALL ?
+                EnchantmentType.ARMOR_FEET :
+                EnchantmentType.ARMOR);
+        this.protectionType = type;
     }
 
     @Override

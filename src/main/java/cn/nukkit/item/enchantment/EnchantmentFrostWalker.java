@@ -3,7 +3,7 @@ package cn.nukkit.item.enchantment;
 public class EnchantmentFrostWalker extends Enchantment {
 
     public EnchantmentFrostWalker() {
-        super(ID_FROST_WALKER, "frostwalker", EnchantmentRarity.RARE, EnchantmentType.ARMOR_FEET);
+        super(ID_FROST_WALKER, NAME_FROST_WALKER, "frostwalker", EnchantmentRarity.RARE, EnchantmentType.ARMOR_FEET);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class EnchantmentFrostWalker extends Enchantment {
 
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.getId() != ID_WATER_WALKER;
+        return super.checkCompatibility(enchantment) && !(enchantment instanceof EnchantmentWaterWorker);
     }
 }

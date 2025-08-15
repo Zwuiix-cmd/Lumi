@@ -15,7 +15,7 @@ import cn.nukkit.utils.Utils;
 public class EnchantmentDamageArthropods extends EnchantmentDamage {
 
     public EnchantmentDamageArthropods() {
-        super(ID_DAMAGE_ARTHROPODS, "arthropods", EnchantmentRarity.UNCOMMON, Type.SMITE);
+        super(ID_DAMAGE_ARTHROPODS, NAME_DAMAGE_ARTHROPODS, "arthropods", EnchantmentRarity.UNCOMMON, Type.SMITE);
     }
 
     @Override

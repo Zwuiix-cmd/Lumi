@@ -1,7 +1,6 @@
 package cn.nukkit.command.data;
 
 import cn.nukkit.Server;
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.network.protocol.UpdateSoftEnumPacket;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.CameraPresetManager;
@@ -25,7 +24,10 @@ public class CommandEnum {
             .keySet()
             .stream()
             .toList());
-    public static final CommandEnum ENUM_ENCHANTMENT = new CommandEnum("enchantmentName", () -> Enchantment.getEnchantmentName2IDMap().keySet().stream()
+    public static final CommandEnum ENUM_ENCHANTMENT = new CommandEnum("enchantmentName", () -> Registries.ENCHANTMENT.getIdentifierToEnchantment()
+            .keySet()
+            .stream()
+            .map(Identifier::toString)
             .map(name -> name.startsWith(Identifier.DEFAULT_NAMESPACE) ? name.substring(10) : name)
             .toList());
     public static final CommandEnum ENUM_BLOCK = new CommandEnum("Block", Collections.emptyList());
