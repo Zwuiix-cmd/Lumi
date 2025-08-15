@@ -1881,12 +1881,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         } else {
             var mappings = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
             var entry = mappings.toRuntime(this.getId(), this.getDamage());
-            this.type = ItemTypes.getFromRuntime(entry.getRuntimeId());
+            this.type = ItemTypes.get(entry.getIdentifier());
         }
 
         // Throw an exception if for some reason the type cannot be determined.
         if (this.type == null) {
-            throw new IllegalStateException("Failed to initialize item type");
+            throw new IllegalStateException("Failed to initialize item type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
         }
 
         return this.type;

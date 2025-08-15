@@ -322,6 +322,7 @@ public class Server {
 
         this.consoleSender = new ConsoleCommandSender();
 
+        Registries.BLOCK_TO_ITEM.init();
         Registries.EFFECT.init();
         Registries.POTION.init();
 
