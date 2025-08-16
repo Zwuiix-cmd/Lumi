@@ -4,6 +4,8 @@ import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.blockentity.*;
+import cn.nukkit.bossbar.BossBarColor;
+import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;

@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.bossbar;
 
 public enum BossBarColor {
 
