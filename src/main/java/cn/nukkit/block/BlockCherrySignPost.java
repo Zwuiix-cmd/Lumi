@@ -1,8 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemCherrySign;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockCherrySignPost extends BlockSignPost {
     public BlockCherrySignPost() {
@@ -30,7 +30,7 @@ public class BlockCherrySignPost extends BlockSignPost {
 
     @Override
     public Item toItem() {
-        return new ItemCherrySign();
+        return Item.get(ItemNamespaceId.CHERRY_SIGN);
     }
 
     @Override

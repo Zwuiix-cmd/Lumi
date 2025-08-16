@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
@@ -283,6 +284,10 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
             item.count--;
         }
         return true;
+    }
+
+    public Item toItem() {
+        return new ItemBlock(this, 0, 1);
     }
 
     @Override

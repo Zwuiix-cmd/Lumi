@@ -152,7 +152,7 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2)));
 
             if (Utils.rand(1, 100) <= 11) {
-                drops.add(Item.fromString(ItemNamespaceId.COPPER_INGOT));
+                drops.add(Item.get(ItemNamespaceId.COPPER_INGOT));
             }
 
             if (tool != null && Utils.rand(1, 4) == 1) {
