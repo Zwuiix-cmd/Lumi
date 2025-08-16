@@ -81,6 +81,8 @@ import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
 import cn.nukkit.scoreboard.scorer.PlayerScorer;
 import cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 import cn.nukkit.utils.*;
+import cn.nukkit.utils.compression.SnappyCompression;
+import cn.nukkit.utils.compression.Zlib;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -101,7 +103,6 @@ import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;

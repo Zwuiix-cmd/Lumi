@@ -83,6 +83,7 @@ import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.converter.LegacyPropertiesConverter;
 import cn.nukkit.settings.initializer.ServerSettingsConfigInitializer;
 import cn.nukkit.utils.*;
+import cn.nukkit.utils.compression.Zlib;
 import cn.nukkit.utils.spawner.EntitySpawnerTask;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
