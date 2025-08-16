@@ -1,4 +1,6 @@
-package cn.nukkit.utils;
+package cn.nukkit.level;
+
+import cn.nukkit.utils.ServerException;
 
 /**
  * LevelException

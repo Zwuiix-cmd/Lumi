@@ -2,8 +2,10 @@ package cn.nukkit.level.format.leveldb;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.LevelException;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;

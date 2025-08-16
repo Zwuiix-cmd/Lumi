@@ -1,4 +1,6 @@
-package cn.nukkit.utils;
+package cn.nukkit.plugin;
+
+import cn.nukkit.utils.ServerException;
 
 /**
  * PluginException
