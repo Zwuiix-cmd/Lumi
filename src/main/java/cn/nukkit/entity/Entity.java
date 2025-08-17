@@ -44,7 +44,7 @@ import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.network.protocol.types.PropertySyncData;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.registry.Registries;
-import cn.nukkit.utils.ChunkException;
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;

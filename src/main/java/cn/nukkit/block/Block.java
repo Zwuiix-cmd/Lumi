@@ -37,7 +37,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.registry.Registries;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.utils.OK;
 import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;

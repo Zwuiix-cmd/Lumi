@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.api.NonComputationAtomic;
 import cn.nukkit.block.*;
 import cn.nukkit.block.customblock.CustomBlock;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -52,6 +53,7 @@ import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
+import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.level.vibration.VibrationManager;
@@ -173,7 +175,11 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.AZALEA] = true;
         randomTickBlocks[Block.FLOWERING_AZALEA] = true;
 
+        randomTickBlocks[Block.MANGROVE_PROPAGULE] = true;
+        randomTickBlocks[Block.MANGROVE_LEAVES] = true;
+
         randomTickBlocks[Block.CHERRY_SAPLING] = true;
+        randomTickBlocks[Block.CHERRY_LEAVES] = true;
 
         randomTickBlocks[Block.COPPER_BLOCK] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
