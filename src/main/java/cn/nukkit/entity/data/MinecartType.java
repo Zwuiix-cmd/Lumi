@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.entity.data;
 
 import java.util.HashMap;
 import java.util.Map;
