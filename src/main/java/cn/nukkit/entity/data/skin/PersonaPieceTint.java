@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.entity.data.skin;
 
 import com.google.common.collect.ImmutableList;
 import lombok.ToString;

@@ -1,5 +1,6 @@
-package cn.nukkit.utils;
+package cn.nukkit.entity.data.skin;
 
+import cn.nukkit.utils.SerializedImage;
 import lombok.ToString;
 
 /**
