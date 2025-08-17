@@ -440,11 +440,12 @@ public class Server {
                         this.loadLevel(fs.getName());
                     }
                 }
-                EnumLevel.initLevels();
             } catch (Exception e) {
                 this.getLogger().error("Unable to load levels", e);
             }
         }
+
+        EnumLevel.initLevels();
 
         if (loadPlugins) {
             this.enablePlugins(PluginLoadOrder.POSTWORLD);
