@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.entity.util;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
