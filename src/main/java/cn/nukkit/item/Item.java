@@ -74,8 +74,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     );
 
     public static final String UNKNOWN_STR = "Unknown";
-    public static Class<?>[] list = null;
-    public static final Map<String, Supplier<Item>> NAMESPACED_ID_ITEM = new HashMap<>();
+
 
     protected final int id;
     protected ItemType type;
@@ -116,58 +115,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public boolean canBeActivated() {
         return false;
-    }
-
-    public static void init() {
-        if (list == null) {
-            list = new Class[65535];
-
-            for (int i = 0; i < 256; ++i) {
-                if (Block.list[i] != null) {
-                    list[i] = Block.list[i];
-                }
-            }
-
-            // 添加原版物品到NAMESPACED_ID_ITEM
-            // Add vanilla items to NAMESPACED_ID_ITEM
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
-            for (Object2IntMap.Entry<String> entity : mapping.getName2RuntimeId().object2IntEntrySet()) {
-                try {
-                    RuntimeItemMapping.LegacyEntry legacyEntry = mapping.fromRuntime(entity.getIntValue());
-                    int id = legacyEntry.getLegacyId();
-                    int damage = 0;
-                    if (legacyEntry.isHasDamage()) {
-                        damage = legacyEntry.getDamage();
-                    }
-                    Item item = Item.get(id, damage);
-                    if (item.getId() != 0 && !NAMESPACED_ID_ITEM.containsKey(entity.getKey())) {
-                        NAMESPACED_ID_ITEM.put(entity.getKey(), () -> item);
-                    }
-                } catch (Exception ignored) {
-
-                }
-            }
-        }
-
-    }
-
-    @SneakyThrows
-    public static void registerNamespacedIdItem(@NotNull Class<? extends StringItem> item) {
-        Constructor<? extends StringItem> declaredConstructor = item.getDeclaredConstructor();
-        var Item = declaredConstructor.newInstance();
-        registerNamespacedIdItem(Item.getNamespaceId(), stringItemSupplier(declaredConstructor));
-    }
-
-    public static void registerNamespacedIdItem(@NotNull String namespacedId, @NotNull Constructor<? extends Item> constructor) {
-        Preconditions.checkNotNull(namespacedId, "namespacedId is null");
-        Preconditions.checkNotNull(constructor, "constructor is null");
-        NAMESPACED_ID_ITEM.put(namespacedId.toLowerCase(Locale.ROOT), itemSupplier(constructor));
-    }
-
-    public static void registerNamespacedIdItem(@NotNull String namespacedId, @NotNull Supplier<Item> constructor) {
-        Preconditions.checkNotNull(namespacedId, "namespacedId is null");
-        Preconditions.checkNotNull(constructor, "constructor is null");
-        NAMESPACED_ID_ITEM.put(namespacedId.toLowerCase(Locale.ROOT), constructor);
     }
 
     @NotNull
@@ -237,7 +184,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
 //        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
 //        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
-        registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
+        //registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
 
         registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
         registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
@@ -378,7 +325,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 int blockId = 255 - id;
                 clazz = Block.list[blockId];
             } else {
-                clazz = list[id];
+                clazz = Registries.ITEM_LEGACY.get(id);
             }
 
             Item item;
@@ -469,7 +416,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 return Item.AIR_ITEM.clone();
             }
 
-            Supplier<Item> constructor = NAMESPACED_ID_ITEM.get(namespacedId);
+            Supplier<Item> constructor = Registries.ITEM.getSupplier(namespacedId);
             if (constructor != null) {
                 try {
                     Item item = constructor.get();

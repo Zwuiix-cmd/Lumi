@@ -1,12 +1,25 @@
 package cn.nukkit.registry;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.*;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
-public class ItemLegacyRegistry implements IRegistry<Integer, Class<? extends Item>, Class<? extends Item>>, BlockID, ItemID {
+//TODO: remove legacy items at all
+public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>>, BlockID, ItemID {
+    private static final Int2ObjectOpenHashMap<Class<?>> LEGACY_ITEMS = new Int2ObjectOpenHashMap<>();
+    public static int HIGHEST_LEGACY_ITEM_ID = 0;
 
     @Override
     public void init() {
+        for (int i = 0; i < 256; ++i) {
+            if (Block.list[i] != null) {
+                register(i, Block.list[i]);
+            }
+        }
+
         register(LADDER, ItemLadder.class); //65
         register(RAIL, ItemRail.class); //66
         register(CACTUS, ItemCactus.class); //81
@@ -261,16 +274,35 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<? extends It
         register(SOUL_CAMPFIRE, ItemCampfireSoul.class); //801
         register(GLOW_ITEM_FRAME, ItemItemFrameGlow.class); //850
 
+        // Add vanilla items to NAMESPACED_ID_ITEM
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL);
+        for (Object2IntMap.Entry<String> entity : mapping.getName2RuntimeId().object2IntEntrySet()) {
+            try {
+                RuntimeItemMapping.LegacyEntry legacyEntry = mapping.fromRuntime(entity.getIntValue());
+                int id = legacyEntry.getLegacyId();
+                int damage = 0;
+                if (legacyEntry.isHasDamage()) {
+                    damage = legacyEntry.getDamage();
+                }
+                Item item = Item.get(id, damage);
+                if (item.getId() != 0 && !Registries.ITEM.isItemRegistered(entity.getKey())) {
+                    Registries.ITEM.register(entity.getKey(), () -> item);
+                }
+            } catch (Exception ignored) {
+
+            }
+        }
     }
 
     @Override
-    public void register(Integer key, Class<? extends Item> value) {
-
+    public void register(Integer key, Class<?> value) {
+        LEGACY_ITEMS.put(key, value);
+        if(key > HIGHEST_LEGACY_ITEM_ID) HIGHEST_LEGACY_ITEM_ID = key;
     }
 
     @Override
-    public Class<? extends Item> get(Integer key) {
-        return null;
+    public Class<?> get(Integer key) {
+        return LEGACY_ITEMS.get(key);
     }
 
     @Override

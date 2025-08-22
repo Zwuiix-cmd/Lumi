@@ -33,9 +33,9 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
         if (isLoad.getAndSet(true)) return;
 
         for (Integer protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
-            try (InputStream stream = CreativeItemRegistry.class.getClassLoader().getResourceAsStream("creative_items_" + protocol + ".json")) {
+            try (InputStream stream = CreativeItemRegistry.class.getClassLoader().getResourceAsStream("gamedata/creative_items/creative_items_" + protocol + ".json")) {
                 if (stream == null) {
-                    return;
+                    continue;
                 }
 
                 if (protocol >= ProtocolInfo.v1_21_60) {
@@ -44,7 +44,7 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
                     this.initOldItems(stream, protocol);
                 }
             } catch (Exception e) {
-                throw new RuntimeException("Failed to load creative_items_" + protocol + ".json");
+                throw new RuntimeException("Failed to load gamedata/creative_items/creative_items_" + protocol + ".json");
             }
         }
     }

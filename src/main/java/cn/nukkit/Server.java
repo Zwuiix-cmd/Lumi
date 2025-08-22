@@ -333,7 +333,8 @@ public class Server {
         Block.init();
         GlobalBlockPalette.init();
         RuntimeItems.init();
-        Item.init();
+        Registries.ITEM_LEGACY.init();
+        Registries.ITEM.init();
         EnumBiome.values();
         Attribute.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);

@@ -48,7 +48,6 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(COPPER_CHESTPLATE, ItemChestplateCopper::new);
         register(COPPER_HELMET, ItemHelmetCopper::new);
         register(COPPER_HOE, ItemHoeCopper::new);
-        register(COPPER_INGOT, ItemCopperIngot::new);
         register(COPPER_INGOT, ItemIngotCopper::new);
         register(COPPER_LEGGINGS, ItemLeggingsCopper::new);
         register(COPPER_NUGGET, ItemNuggetCopper::new);
@@ -138,9 +137,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
 
     @Override
     public void register(String id, Supplier<Item> value) {
-        if (NAMESPACED_ID_ITEM.putIfAbsent(id, value) != null) {
-            throw new RegisterException("This item has already been registered with the identifier: " + id);
-        }
+        NAMESPACED_ID_ITEM.put(id, value);
     }
 
     @Override
@@ -150,6 +147,14 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
             return Item.AIR_ITEM;
         }
         return supplier.get();
+    }
+
+    public Supplier<Item> getSupplier(String id) {
+        return NAMESPACED_ID_ITEM.get(id);
+    }
+
+    public boolean isItemRegistered(String id) {
+        return NAMESPACED_ID_ITEM.containsKey(id);
     }
 
     @Override

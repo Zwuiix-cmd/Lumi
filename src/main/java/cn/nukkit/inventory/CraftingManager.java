@@ -119,7 +119,7 @@ public class CraftingManager {
     @SuppressWarnings("unchecked")
     public CraftingManager() {
         MainLogger.getLogger().debug("Loading recipes...");
-        this.registerMultiRecipe(new RepairItemRecipe());
+        /*this.registerMultiRecipe(new RepairItemRecipe());
         this.registerMultiRecipe(new BookCloningRecipe());
         this.registerMultiRecipe(new MapCloningRecipe());
         this.registerMultiRecipe(new MapUpgradingRecipe());
@@ -127,7 +127,7 @@ public class CraftingManager {
         this.registerMultiRecipe(new BannerAddPatternRecipe());
         this.registerMultiRecipe(new BannerDuplicateRecipe());
         this.registerMultiRecipe(new FireworkRecipe());
-        this.registerMultiRecipe(new DecoratedPotRecipe());
+        this.registerMultiRecipe(new DecoratedPotRecipe());*
 
         ConfigSection recipes_649_config = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes649.json")).getRootSection();
         ConfigSection recipes_419_config = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes419.json")).getRootSection();
@@ -340,7 +340,7 @@ public class CraftingManager {
         }
 
         this.rebuildPacket();
-        MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");
+        MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");*/
     }
 
     private void loadRecipes(int protocol, ConfigSection configSection, Config furnaceXpConfig) {
