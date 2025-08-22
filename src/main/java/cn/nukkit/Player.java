@@ -80,6 +80,7 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
@@ -1611,7 +1612,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.protocol < ProtocolInfo.v1_16_0) {
                 InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
                 inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(Item.EMPTY_ARRAY);
+                inventoryContentPacket.slots = Registries.CREATIVE_ITEM.get(this.protocol).getItems().toArray(Item.EMPTY_ARRAY);
                 this.dataPacket(inventoryContentPacket);
             }
         }

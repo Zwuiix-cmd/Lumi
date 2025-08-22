@@ -386,7 +386,7 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        Item.initCreativeItems();
+        Registries.CREATIVE_ITEM.init();
         Block.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);

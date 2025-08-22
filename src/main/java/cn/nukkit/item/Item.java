@@ -231,12 +231,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             return new OK<>(false, e);
         }
 
-        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
-            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
-        }
+//        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
+//            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
+//        }
 
-        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
-        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
+//        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
+//        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
         registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
 
         registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
@@ -276,7 +276,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         ItemTypes.register(new CustomItemType(customItem));
 
         if (addCreativeItem) {
-            CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
+//            CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
         }
 
         return new OK<Void>(true);
@@ -285,70 +285,72 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private static void registerCustomItem(CustomItem item, int protocol, boolean addCreativeItem, int... creativeProtocols) {
         if (RuntimeItems.getMapping(protocol).registerCustomItem(item) && addCreativeItem) {
             for (int creativeProtocol : creativeProtocols) {
-                addCreativeItem(creativeProtocol, (Item) item, item.getDefinition().getCreativeCategory(), item.getDefinition().getCreativeGroup());
+//                addCreativeItem(creativeProtocol, (Item) item, item.getDefinition().getCreativeCategory(), item.getDefinition().getCreativeGroup());
             }
         }
     }
 
     public static void addItemToCustomItems(String namespace, Item item) {
-        CUSTOM_ITEMS.put(namespace, () -> item);
+//        CUSTOM_ITEMS.put(namespace, () -> item);
     }
 
     public static void deleteCustomItem(String namespaceId) {
-        if (CUSTOM_ITEMS.containsKey(namespaceId)) {
-            Item customItem = fromString(namespaceId);
-            CUSTOM_ITEMS.remove(namespaceId);
-            CUSTOM_ITEM_DEFINITIONS.remove(namespaceId);
-            CUSTOM_ITEM_NEED_ADD_CREATIVE.remove(namespaceId);
-
-            deleteCustomItem(customItem, v1_16_100, v1_16_0);
-            deleteCustomItem(customItem, v1_17_0, v1_17_0);
-            deleteCustomItem(customItem, v1_17_10, v1_17_10, v1_17_30, v1_17_40);
-            deleteCustomItem(customItem, v1_18_0, v1_18_0);
-            deleteCustomItem(customItem, v1_18_10, v1_18_10);
-            deleteCustomItem(customItem, v1_18_30, v1_18_30);
-            deleteCustomItem(customItem, v1_19_0, v1_19_0);
-            deleteCustomItem(customItem, v1_19_10, v1_19_10, v1_19_20);
-            deleteCustomItem(customItem, v1_19_50, v1_19_50);
-            deleteCustomItem(customItem, v1_19_60, v1_19_60);
-            deleteCustomItem(customItem, v1_19_70, v1_19_70);
-            deleteCustomItem(customItem, v1_19_80, v1_19_80);
-            deleteCustomItem(customItem, v1_20_0, v1_20_0);
-            deleteCustomItem(customItem, v1_20_10, v1_20_10);
-            deleteCustomItem(customItem, v1_20_30, v1_20_30);
-            deleteCustomItem(customItem, v1_20_40, v1_20_40);
-            deleteCustomItem(customItem, v1_20_50, v1_20_50);
-            deleteCustomItem(customItem, v1_20_60, v1_20_60);
-            deleteCustomItem(customItem, v1_20_70, v1_20_70);
-            deleteCustomItem(customItem, v1_20_80, v1_20_80);
-            deleteCustomItem(customItem, v1_21_0, v1_21_0);
-            deleteCustomItem(customItem, v1_21_20, v1_21_20);
-            deleteCustomItem(customItem, v1_21_30, v1_21_30);
-            deleteCustomItem(customItem, v1_21_40, v1_21_40);
-            deleteCustomItem(customItem, v1_21_50, v1_21_50);
-            deleteCustomItem(customItem, v1_21_60, v1_21_60);
-            deleteCustomItem(customItem, v1_21_70, v1_21_70);
-            deleteCustomItem(customItem, v1_21_80, v1_21_80);
-            deleteCustomItem(customItem, v1_21_90, v1_21_90);
-            deleteCustomItem(customItem, v1_21_93, v1_21_93);
-            deleteCustomItem(customItem, v1_21_100, v1_21_100);
-            //TODO Multiversion 添加新版本支持时修改这里
-        }
+//        if (CUSTOM_ITEMS.containsKey(namespaceId)) {
+//            Item customItem = fromString(namespaceId);
+//            CUSTOM_ITEMS.remove(namespaceId);
+//            CUSTOM_ITEM_DEFINITIONS.remove(namespaceId);
+//            CUSTOM_ITEM_NEED_ADD_CREATIVE.remove(namespaceId);
+//
+//            deleteCustomItem(customItem, v1_16_100, v1_16_0);
+//            deleteCustomItem(customItem, v1_17_0, v1_17_0);
+//            deleteCustomItem(customItem, v1_17_10, v1_17_10, v1_17_30, v1_17_40);
+//            deleteCustomItem(customItem, v1_18_0, v1_18_0);
+//            deleteCustomItem(customItem, v1_18_10, v1_18_10);
+//            deleteCustomItem(customItem, v1_18_30, v1_18_30);
+//            deleteCustomItem(customItem, v1_19_0, v1_19_0);
+//            deleteCustomItem(customItem, v1_19_10, v1_19_10, v1_19_20);
+//            deleteCustomItem(customItem, v1_19_50, v1_19_50);
+//            deleteCustomItem(customItem, v1_19_60, v1_19_60);
+//            deleteCustomItem(customItem, v1_19_70, v1_19_70);
+//            deleteCustomItem(customItem, v1_19_80, v1_19_80);
+//            deleteCustomItem(customItem, v1_20_0, v1_20_0);
+//            deleteCustomItem(customItem, v1_20_10, v1_20_10);
+//            deleteCustomItem(customItem, v1_20_30, v1_20_30);
+//            deleteCustomItem(customItem, v1_20_40, v1_20_40);
+//            deleteCustomItem(customItem, v1_20_50, v1_20_50);
+//            deleteCustomItem(customItem, v1_20_60, v1_20_60);
+//            deleteCustomItem(customItem, v1_20_70, v1_20_70);
+//            deleteCustomItem(customItem, v1_20_80, v1_20_80);
+//            deleteCustomItem(customItem, v1_21_0, v1_21_0);
+//            deleteCustomItem(customItem, v1_21_20, v1_21_20);
+//            deleteCustomItem(customItem, v1_21_30, v1_21_30);
+//            deleteCustomItem(customItem, v1_21_40, v1_21_40);
+//            deleteCustomItem(customItem, v1_21_50, v1_21_50);
+//            deleteCustomItem(customItem, v1_21_60, v1_21_60);
+//            deleteCustomItem(customItem, v1_21_70, v1_21_70);
+//            deleteCustomItem(customItem, v1_21_80, v1_21_80);
+//            deleteCustomItem(customItem, v1_21_90, v1_21_90);
+//            deleteCustomItem(customItem, v1_21_93, v1_21_93);
+//            deleteCustomItem(customItem, v1_21_100, v1_21_100);
+//            //TODO Multiversion 添加新版本支持时修改这里
+//        }
     }
 
     private static void deleteCustomItem(Item item, int protocol, int... creativeProtocols) {
         RuntimeItems.getMapping(protocol).deleteCustomItem((CustomItem) item);
         for (int creativeProtocol : creativeProtocols) {
-            removeCreativeItem(creativeProtocol, item);
+//            removeCreativeItem(creativeProtocol, item);
         }
     }
 
     public static HashMap<String, Supplier<? extends Item>> getCustomItems() {
-        return new HashMap<>(CUSTOM_ITEMS);
+//        return new HashMap<>(CUSTOM_ITEMS);
+        return new HashMap<>();
     }
 
     public static HashMap<String, CustomItemDefinition> getCustomItemDefinition() {
-        return new HashMap<>(CUSTOM_ITEM_DEFINITIONS);
+//        return new HashMap<>(CUSTOM_ITEM_DEFINITIONS);
+        return new HashMap<>();
     }
 
     public static Item get(int id) {
@@ -1567,6 +1569,4 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         LOCK_IN_SLOT,
         LOCK_IN_INVENTORY
     }
-
-
 }

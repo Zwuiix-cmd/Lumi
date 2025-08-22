@@ -1,13 +1,9 @@
 package cn.nukkit.registry;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.item.*;
-import cn.nukkit.item.ItemNamespaceId;
-import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 

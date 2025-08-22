@@ -3,6 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemData;
 import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemGroup;
+import cn.nukkit.registry.CreativeItemRegistry.CreativeItems;
 import lombok.ToString;
 
 @ToString
@@ -13,7 +14,7 @@ public class CreativeContentPacket extends DataPacket {
     @Deprecated
     public Item[] entries;
 
-    public Item.CreativeItems creativeItems;
+    public CreativeItems creativeItems;
 
     @Override
     public byte pid() {
@@ -30,7 +31,7 @@ public class CreativeContentPacket extends DataPacket {
 
         if (this.creativeItems == null) {
             if (this.entries != null) {
-                this.creativeItems = new Item.CreativeItems();
+                this.creativeItems = new CreativeItems();
                 for (Item item : this.entries) {
                     this.creativeItems.add(item);
                 }
@@ -46,7 +47,7 @@ public class CreativeContentPacket extends DataPacket {
         if (this.protocol >= ProtocolInfo.v1_21_60) {
             this.putArray(this.creativeItems.getGroups(), this::writeGroup);
         }
-        this.putArray(this.creativeItems.getCreativeItemDatas(), this::writeItem);
+        this.putArray(this.creativeItems.getCreativeItemData(), this::writeItem);
     }
 
     private void writeGroup(CreativeItemGroup group) {
