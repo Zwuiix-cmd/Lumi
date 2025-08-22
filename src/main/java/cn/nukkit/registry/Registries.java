@@ -4,6 +4,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Registries {
+    public static final ItemRegistry ITEM = new ItemRegistry();
+    public static final ItemLegacyRegistry ITEM_LEGACY = new ItemLegacyRegistry();
     public static final BlockToItemRegistry BLOCK_TO_ITEM = new BlockToItemRegistry();
     public static final EnchantmentRegistry ENCHANTMENT = new EnchantmentRegistry();
     public static final EffectRegistry EFFECT = new EffectRegistry();
