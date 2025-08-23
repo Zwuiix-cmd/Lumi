@@ -1,5 +1,6 @@
 package cn.nukkit.registry;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.RuntimeItemMapping;
@@ -28,39 +29,76 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
 
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
+    private static final List<Integer> CREATIVE_ITEMS_PROTOCOLS = List.of(
+            ProtocolInfo.v1_17_0,
+            ProtocolInfo.v1_17_10,
+            ProtocolInfo.v1_17_30,
+            ProtocolInfo.v1_17_40,
+            ProtocolInfo.v1_18_0,
+            ProtocolInfo.v1_18_10,
+            ProtocolInfo.v1_18_30,
+            ProtocolInfo.v1_19_0,
+            ProtocolInfo.v1_19_20,
+            ProtocolInfo.v1_19_50,
+            ProtocolInfo.v1_19_60,
+            ProtocolInfo.v1_19_70,
+            ProtocolInfo.v1_19_80,
+            ProtocolInfo.v1_20_0,
+            ProtocolInfo.v1_20_10,
+            ProtocolInfo.v1_20_30,
+            ProtocolInfo.v1_20_40,
+            ProtocolInfo.v1_20_50,
+            ProtocolInfo.v1_20_60,
+            ProtocolInfo.v1_20_70,
+            ProtocolInfo.v1_20_80,
+            ProtocolInfo.v1_21_0,
+            ProtocolInfo.v1_21_20,
+            ProtocolInfo.v1_21_30,
+            ProtocolInfo.v1_21_40,
+            ProtocolInfo.v1_21_50,
+            ProtocolInfo.v1_21_60,
+            ProtocolInfo.v1_21_70,
+            ProtocolInfo.v1_21_80,
+            ProtocolInfo.v1_21_90,
+            ProtocolInfo.v1_21_93,
+            ProtocolInfo.v1_21_100
+    );
+
     @Override
     public void init() {
         if (isLoad.getAndSet(true)) return;
 
-        for (Integer protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
-            try (InputStream stream = CreativeItemRegistry.class.getClassLoader().getResourceAsStream("gamedata/creative_items/creative_items_" + protocol + ".json")) {
+        CREATIVE_ITEMS_PROTOCOLS.forEach(protocol -> {
+            if (!Server.getInstance().isVersionSupported(protocol)) {
+                return;
+            }
+            try (InputStream stream = CreativeItemRegistry.class.getClassLoader()
+                    .getResourceAsStream("gamedata/creative_items/creative_items_" + protocol + ".json")) {
                 if (stream == null) {
-                    continue;
+                    return;
                 }
 
+                JsonObject root = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
                 if (protocol >= ProtocolInfo.v1_21_60) {
-                    this.initNewItems(stream, protocol);
-                } else {
-                    this.initOldItems(stream, protocol);
+                    this.initNewItems(root, protocol);
                 }
+                this.initOldItems(root, protocol);
+
             } catch (Exception e) {
-                throw new RuntimeException("Failed to load gamedata/creative_items/creative_items_" + protocol + ".json");
+                throw new RuntimeException("Failed to load gamedata/creative_items/creative_items_" + protocol + ".json", e);
             }
-        }
+        });
     }
 
-    private void initNewItems(InputStream stream, int protocol) {
+    private void initNewItems(JsonObject object, int protocol) {
         RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
 
-        JsonArray groups = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject().get("groups").getAsJsonArray();
+        JsonArray groups = object.getAsJsonObject().get("groups").getAsJsonArray();
         if (groups.isEmpty()) {
             throw new RuntimeException("Creative groups empty");
         }
 
         int creativeGroupId = 0;
-
-        CreativeItems creativeItems = new CreativeItems();
-
         for (JsonElement element : groups.asList()) {
             JsonObject group = element.getAsJsonObject();
 
@@ -77,56 +115,69 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
                     icon
             );
 
-            creativeItems.addGroup(creativeGroup);
+            this.register(protocol, creativeGroup);
         }
-
-        this.register(protocol, creativeItems);
     }
 
-    private void initOldItems(InputStream stream, int protocol) {
-        JsonArray items = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject().getAsJsonArray("items");
+    private void initOldItems(JsonObject object, int protocol) {
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+
+        JsonArray items = object.getAsJsonArray("items");
 
         int creativeGroupId = 0;
-
-        CreativeItems creativeItems = new CreativeItems();
-
         for (JsonElement element : items) {
-            try {
-                JsonObject item = element.getAsJsonObject();
+            JsonObject item = element.getAsJsonObject();
 
-                byte[] nbtBytes = new byte[0];
-                if (item.has("nbt_b64")) {
-                    nbtBytes = Base64.getDecoder().decode(item.get("nbt_b64").getAsString());
-                } else if (item.has("nbt_hex")) {
-                    nbtBytes = Utils.parseHexBinary(item.get("nbt_hex").getAsString());
-                }
-
-                String id = item.get("id").getAsString();
-                int damage = item.has("damage") ? item.get("damage").getAsInt() : 0;
-                int count = item.has("count") ? item.get("count").getAsInt() : 1;
-
-                if (!Utils.hasItemOrBlock(id)) {
-                    continue;
-                }
-
-                Item icon = Item.get(id, damage);
-                icon.setCount(count);
-                icon.setCompoundTag(nbtBytes);
-
-                CreativeItemGroup creativeGroup = new CreativeItemGroup(creativeGroupId++, CreativeItemCategory.ITEMS, "", icon);
-
-                creativeItems.addGroup(creativeGroup);
-            } catch (Exception e) {
-                throw new RuntimeException("Creative groups empty");
+            String id = item.get("id").getAsString();
+            if (!Utils.hasItemOrBlock(id)) {
+                continue;
             }
 
-            this.register(protocol, creativeItems);
+            byte[] nbtBytes;
+            if (item.has("nbt_b64")) {
+                nbtBytes = Base64.getDecoder().decode(item.get("nbt_b64").getAsString());
+            } else if (item.has("nbt_hex")) {
+                nbtBytes = Utils.parseHexBinary(item.get("nbt_hex").getAsString());
+            } else {
+                nbtBytes = new byte[0];
+            }
+
+            int damage = item.has("damage") ? item.get("damage").getAsInt() : 0;
+            int count = item.has("count") ? item.get("count").getAsInt() : 1;
+
+            Item icon = Item.get(id, damage);
+            icon.setCount(count);
+            icon.setCompoundTag(nbtBytes);
+
+            CreativeItemGroup creativeGroup = new CreativeItemGroup(
+                    creativeGroupId++, CreativeItemCategory.ITEMS, "", icon
+            );
+            this.register(protocol, creativeGroup);
+
+            // Try to parse the same item through mapping
+            Item mappedIcon = mapping.parseCreativeItem(item, true, protocol);
+            if (mappedIcon != null && !Item.UNKNOWN_STR.equals(mappedIcon.getName())) {
+                CreativeItemGroup targetGroup = null;
+                if (protocol >= ProtocolInfo.v1_21_60 && item.has("groupId")) {
+                    targetGroup = this.get(protocol).getGroups()
+                            .get(item.get("groupId").getAsInt());
+                }
+                this.register(protocol, mappedIcon, targetGroup);
+            }
         }
     }
 
     @Override
     public void register(Integer protocol, CreativeItems creativeItems) {
         CREATIVE_ITEMS.put(protocol, creativeItems);
+    }
+
+    public void register(Integer protocol, CreativeItemGroup group) {
+        CREATIVE_ITEMS.computeIfAbsent(protocol, p -> new CreativeItems()).addGroup(group);
+    }
+
+    public void register(Integer protocol, Item icon, CreativeItemGroup group) {
+        CREATIVE_ITEMS.computeIfAbsent(protocol, p -> new CreativeItems()).add(icon, group);
     }
 
     public void register(Integer protocol, Item icon) {

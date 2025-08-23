@@ -1216,6 +1216,12 @@ public class Server {
         };
     }
 
+    public boolean isVersionSupported(int protocol) {
+        int minProtocol = settings.general().multiversion().minProtocol();
+        int maxProtocol = settings.general().multiversion().maxProtocol();
+        return (minProtocol == 0 || protocol >= minProtocol) && (maxProtocol == -1 || protocol <= maxProtocol);
+    }
+
     public MainLogger getLogger() {
         return MainLogger.getLogger();
     }
