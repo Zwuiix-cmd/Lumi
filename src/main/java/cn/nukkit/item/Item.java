@@ -8,9 +8,7 @@ import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.customitem.CustomItem;
-import cn.nukkit.item.customitem.CustomItemDefinition;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.item.material.CustomItemType;
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.ItemTypes;
 import cn.nukkit.item.material.tags.ItemTag;
@@ -21,27 +19,14 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemCategory;
-import cn.nukkit.network.protocol.types.inventory.creative.CreativeItemGroup;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.*;
-import com.google.common.base.Preconditions;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -85,6 +70,21 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private CompoundTag cachedNBT = null;
     public int count;
     protected String name;
+
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
+        return Registries.ITEM.registerCustomItem(itemClassList);
+    }
+
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
+        return Registries.ITEM.registerCustomItem(clazz);
+    }
+
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
+        return Registries.ITEM.registerCustomItem(clazz, addCreativeItem);
+    }
 
     public Item(int id) {
         this(id, 0, 1, UNKNOWN_STR);
@@ -137,167 +137,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 throw new UnsupportedOperationException(e);
             }
         };
-    }
-
-    public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
-        for (Class<? extends CustomItem> itemClass : itemClassList) {
-            OK<?> result = registerCustomItem(itemClass);
-            if (!result.ok()) {
-                return result;
-            }
-        }
-        return new OK<>(true);
-    }
-
-    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
-        return registerCustomItem(clazz, true);
-    }
-
-    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
-            Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
-            return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
-        }
-
-        CustomItem customItem;
-        Supplier<Item> supplier;
-
-        try {
-            var method = clazz.getDeclaredConstructor();
-            method.setAccessible(true);
-            customItem = method.newInstance();
-            supplier = () -> {
-                try {
-                    return (Item) method.newInstance();
-                } catch (ReflectiveOperationException e) {
-                    throw new UnsupportedOperationException(e);
-                }
-            };
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            return new OK<>(false, e);
-        }
-
-//        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
-//            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
-//        }
-
-//        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
-//        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
-        //registerNamespacedIdItem(customItem.getNamespaceId(), supplier);
-
-        registerCustomItem(customItem, v1_16_100, addCreativeItem, v1_16_0);
-        registerCustomItem(customItem, v1_17_0, addCreativeItem, v1_17_0);
-        registerCustomItem(customItem, v1_17_10, addCreativeItem, v1_17_10, v1_17_30, v1_17_40);
-        registerCustomItem(customItem, v1_18_0, addCreativeItem, v1_18_0);
-        registerCustomItem(customItem, v1_18_10, addCreativeItem, v1_18_10);
-        registerCustomItem(customItem, v1_18_30, addCreativeItem, v1_18_30);
-        registerCustomItem(customItem, v1_19_0, addCreativeItem, v1_19_0);
-        registerCustomItem(customItem, v1_19_10, addCreativeItem, v1_19_10, v1_19_20);
-        registerCustomItem(customItem, v1_19_50, addCreativeItem, v1_19_50);
-        registerCustomItem(customItem, v1_19_60, addCreativeItem, v1_19_60);
-        registerCustomItem(customItem, v1_19_70, addCreativeItem, v1_19_70);
-        registerCustomItem(customItem, v1_19_80, addCreativeItem, v1_19_80);
-        registerCustomItem(customItem, v1_20_0, addCreativeItem, v1_20_0);
-        registerCustomItem(customItem, v1_20_10, addCreativeItem, v1_20_10);
-        registerCustomItem(customItem, v1_20_30, addCreativeItem, v1_20_30);
-        registerCustomItem(customItem, v1_20_40, addCreativeItem, v1_20_40);
-        registerCustomItem(customItem, v1_20_50, addCreativeItem, v1_20_50);
-        registerCustomItem(customItem, v1_20_60, addCreativeItem, v1_20_60);
-        registerCustomItem(customItem, v1_20_70, addCreativeItem, v1_20_70);
-        registerCustomItem(customItem, v1_20_80, addCreativeItem, v1_20_80);
-        registerCustomItem(customItem, v1_21_0, addCreativeItem, v1_21_0);
-        registerCustomItem(customItem, v1_21_20, addCreativeItem, v1_21_20);
-        registerCustomItem(customItem, v1_21_30, addCreativeItem, v1_21_30);
-        registerCustomItem(customItem, v1_21_40, addCreativeItem, v1_21_40);
-        registerCustomItem(customItem, v1_21_50, addCreativeItem, v1_21_50);
-        registerCustomItem(customItem, v1_21_60, addCreativeItem, v1_21_60);
-        registerCustomItem(customItem, v1_21_70, addCreativeItem, v1_21_70);
-        registerCustomItem(customItem, v1_21_80, addCreativeItem, v1_21_80);
-        registerCustomItem(customItem, v1_21_90, addCreativeItem, v1_21_90);
-        registerCustomItem(customItem, v1_21_93, addCreativeItem, v1_21_93);
-        registerCustomItem(customItem, v1_21_100, addCreativeItem, v1_21_100);
-        //TODO Multiversion 添加新版本支持时修改这里
-
-        // Registering custom item type
-        ItemTypes.register(new CustomItemType(customItem));
-
-        if (addCreativeItem) {
-//            CUSTOM_ITEM_NEED_ADD_CREATIVE.put(customItem.getNamespaceId(), customItem);
-        }
-
-        return new OK<Void>(true);
-    }
-
-    private static void registerCustomItem(CustomItem item, int protocol, boolean addCreativeItem, int... creativeProtocols) {
-        if (RuntimeItems.getMapping(protocol).registerCustomItem(item) && addCreativeItem) {
-            for (int creativeProtocol : creativeProtocols) {
-//                addCreativeItem(creativeProtocol, (Item) item, item.getDefinition().getCreativeCategory(), item.getDefinition().getCreativeGroup());
-            }
-        }
-    }
-
-    public static void addItemToCustomItems(String namespace, Item item) {
-//        CUSTOM_ITEMS.put(namespace, () -> item);
-    }
-
-    public static void deleteCustomItem(String namespaceId) {
-//        if (CUSTOM_ITEMS.containsKey(namespaceId)) {
-//            Item customItem = fromString(namespaceId);
-//            CUSTOM_ITEMS.remove(namespaceId);
-//            CUSTOM_ITEM_DEFINITIONS.remove(namespaceId);
-//            CUSTOM_ITEM_NEED_ADD_CREATIVE.remove(namespaceId);
-//
-//            deleteCustomItem(customItem, v1_16_100, v1_16_0);
-//            deleteCustomItem(customItem, v1_17_0, v1_17_0);
-//            deleteCustomItem(customItem, v1_17_10, v1_17_10, v1_17_30, v1_17_40);
-//            deleteCustomItem(customItem, v1_18_0, v1_18_0);
-//            deleteCustomItem(customItem, v1_18_10, v1_18_10);
-//            deleteCustomItem(customItem, v1_18_30, v1_18_30);
-//            deleteCustomItem(customItem, v1_19_0, v1_19_0);
-//            deleteCustomItem(customItem, v1_19_10, v1_19_10, v1_19_20);
-//            deleteCustomItem(customItem, v1_19_50, v1_19_50);
-//            deleteCustomItem(customItem, v1_19_60, v1_19_60);
-//            deleteCustomItem(customItem, v1_19_70, v1_19_70);
-//            deleteCustomItem(customItem, v1_19_80, v1_19_80);
-//            deleteCustomItem(customItem, v1_20_0, v1_20_0);
-//            deleteCustomItem(customItem, v1_20_10, v1_20_10);
-//            deleteCustomItem(customItem, v1_20_30, v1_20_30);
-//            deleteCustomItem(customItem, v1_20_40, v1_20_40);
-//            deleteCustomItem(customItem, v1_20_50, v1_20_50);
-//            deleteCustomItem(customItem, v1_20_60, v1_20_60);
-//            deleteCustomItem(customItem, v1_20_70, v1_20_70);
-//            deleteCustomItem(customItem, v1_20_80, v1_20_80);
-//            deleteCustomItem(customItem, v1_21_0, v1_21_0);
-//            deleteCustomItem(customItem, v1_21_20, v1_21_20);
-//            deleteCustomItem(customItem, v1_21_30, v1_21_30);
-//            deleteCustomItem(customItem, v1_21_40, v1_21_40);
-//            deleteCustomItem(customItem, v1_21_50, v1_21_50);
-//            deleteCustomItem(customItem, v1_21_60, v1_21_60);
-//            deleteCustomItem(customItem, v1_21_70, v1_21_70);
-//            deleteCustomItem(customItem, v1_21_80, v1_21_80);
-//            deleteCustomItem(customItem, v1_21_90, v1_21_90);
-//            deleteCustomItem(customItem, v1_21_93, v1_21_93);
-//            deleteCustomItem(customItem, v1_21_100, v1_21_100);
-//            //TODO Multiversion 添加新版本支持时修改这里
-//        }
-    }
-
-    private static void deleteCustomItem(Item item, int protocol, int... creativeProtocols) {
-        RuntimeItems.getMapping(protocol).deleteCustomItem((CustomItem) item);
-        for (int creativeProtocol : creativeProtocols) {
-//            removeCreativeItem(creativeProtocol, item);
-        }
-    }
-
-    public static HashMap<String, Supplier<? extends Item>> getCustomItems() {
-//        return new HashMap<>(CUSTOM_ITEMS);
-        return new HashMap<>();
-    }
-
-    public static HashMap<String, CustomItemDefinition> getCustomItemDefinition() {
-//        return new HashMap<>(CUSTOM_ITEM_DEFINITIONS);
-        return new HashMap<>();
     }
 
     public static Item get(int id) {

@@ -2816,7 +2816,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
                 if (this.protocol >= ProtocolInfo.v1_21_60) {
                     Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
+                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Registries.ITEM.getCustomItemDefinition().entrySet();
                     List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
                     entries.addAll(vanillaItems);
                     if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
@@ -2837,8 +2837,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     itemComponentPacket.setEntries(entries);
                 } else {
-                    if (this.server.getSettings().features().enableExperimentMode() && !Item.getCustomItemDefinition().isEmpty()) {
-                        HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
+                    if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
+                        HashMap<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
                         List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
                         int i = 0;
                         for (var entry : itemDefinition.entrySet()) {

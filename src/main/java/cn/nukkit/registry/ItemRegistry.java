@@ -1,9 +1,18 @@
 package cn.nukkit.registry;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.*;
+import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.customitem.CustomItemDefinition;
+import cn.nukkit.item.material.CustomItemType;
+import cn.nukkit.item.material.ItemTypes;
+import cn.nukkit.utils.OK;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -157,6 +166,98 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         return NAMESPACED_ID_ITEM.containsKey(id);
     }
 
+    public OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
+        for (Class<? extends CustomItem> itemClass : itemClassList) {
+            OK<?> result = registerCustomItem(itemClass);
+            if (!result.ok()) {
+                return result;
+            }
+        }
+        return new OK<>(true);
+    }
+
+    public OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
+        return registerCustomItem(clazz, true);
+    }
+
+    public OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
+        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
+            Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
+            return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
+        }
+
+        CustomItem customItem;
+        Supplier<Item> supplier;
+
+        try {
+            var method = clazz.getDeclaredConstructor();
+            method.setAccessible(true);
+            customItem = method.newInstance();
+            supplier = () -> {
+                try {
+                    return (Item) method.newInstance();
+                } catch (ReflectiveOperationException e) {
+                    throw new UnsupportedOperationException(e);
+                }
+            };
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            return new OK<>(false, e);
+        }
+
+        if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
+            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
+        }
+
+        CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
+        CUSTOM_ITEM_DEFINITIONS.put(customItem.getNamespaceId(), customItem.getDefinition());
+        register(customItem.getNamespaceId(), supplier);
+
+        CreativeItemRegistry.CREATIVE_ITEMS_PROTOCOLS.forEach(protocol -> {
+            registerCustomItem(customItem, protocol, addCreativeItem);
+        });
+
+        // Registering custom item type
+        ItemTypes.register(new CustomItemType(customItem));
+
+        return new OK<Void>(true);
+    }
+
+    public void addItemToCustomItems(String namespace, Item item) {
+        CUSTOM_ITEMS.put(namespace, () -> item);
+    }
+
+    public void deleteCustomItem(String namespaceId) {
+        if (CUSTOM_ITEMS.containsKey(namespaceId)) {
+            Item customItem = Item.get(namespaceId);
+            CUSTOM_ITEMS.remove(namespaceId);
+            CUSTOM_ITEM_DEFINITIONS.remove(namespaceId);
+
+            CreativeItemRegistry.CREATIVE_ITEMS_PROTOCOLS.forEach(protocol -> {
+                deleteCustomItem(customItem, protocol);
+            });
+        }
+    }
+
+    private void registerCustomItem(CustomItem item, int protocol, boolean addCreativeItem) {
+        if (RuntimeItems.getMapping(protocol).registerCustomItem(item) && addCreativeItem) {
+            Registries.CREATIVE_ITEM.register(protocol, (Item) item, item.getDefinition().getCreativeCategory(), item.getDefinition().getCreativeGroup());
+        }
+    }
+
+    private void deleteCustomItem(Item item, int protocol) {
+        RuntimeItems.getMapping(protocol).deleteCustomItem((CustomItem) item);
+        Registries.CREATIVE_ITEM.remove(protocol, item);
+    }
+
+    public HashMap<String, Supplier<? extends Item>> getCustomItems() {
+        return new HashMap<>(CUSTOM_ITEMS);
+    }
+
+    public HashMap<String, CustomItemDefinition> getCustomItemDefinition() {
+        return new HashMap<>(CUSTOM_ITEM_DEFINITIONS);
+    }
+
     @Override
     public void trim() {
         NAMESPACED_ID_ITEM.trim();
@@ -166,7 +267,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
     public void reload() {
         isLoad.set(false);
         NAMESPACED_ID_ITEM.clear();
-//        CUSTOM_ITEM_DEFINITIONS.clear();
+        CUSTOM_ITEM_DEFINITIONS.clear();
         init();
     }
 }

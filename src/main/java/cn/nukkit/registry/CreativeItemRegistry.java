@@ -29,7 +29,7 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
 
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
-    private static final List<Integer> CREATIVE_ITEMS_PROTOCOLS = List.of(
+    public static final List<Integer> CREATIVE_ITEMS_PROTOCOLS = List.of(
             ProtocolInfo.v1_20_0,
             ProtocolInfo.v1_20_10,
             ProtocolInfo.v1_20_30,
@@ -165,6 +165,10 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
 
     public void register(Integer protocol, Item icon, CreativeItemGroup group) {
         CREATIVE_ITEMS.computeIfAbsent(protocol, p -> new CreativeItems()).add(icon, group);
+    }
+
+    public void register(Integer protocol, Item icon, CreativeItemCategory category, String group) {
+        CREATIVE_ITEMS.computeIfAbsent(protocol, p -> new CreativeItems()).add(icon, category, group);
     }
 
     public void register(Integer protocol, Item icon) {

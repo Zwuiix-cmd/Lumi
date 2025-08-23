@@ -242,7 +242,7 @@ public class RuntimeItemMapping {
         this.generatePalette();
     }
 
-    synchronized boolean registerCustomItem(CustomItem customItem) {
+    public synchronized boolean registerCustomItem(CustomItem customItem) {
         int runtimeId = CustomItemDefinition.getRuntimeId(customItem.getDefinition().identifier());
         String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
@@ -266,7 +266,7 @@ public class RuntimeItemMapping {
         return true;
     }
 
-    synchronized void deleteCustomItem(CustomItem customItem) {
+    public synchronized void deleteCustomItem(CustomItem customItem) {
         String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().getSettings().features().enableExperimentMode() && !this.customItems.contains(namespaceId)) {
             return;

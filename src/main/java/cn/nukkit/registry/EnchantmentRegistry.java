@@ -163,7 +163,7 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
             try {
                 @SuppressWarnings("unchecked")
                 Class<? extends CustomItem> clazz = (Class<? extends CustomItem>) new DynamicClassLoader().defineClass("cn.nukkit.item.customitem." + className, classWriter.toByteArray());
-                Item.registerCustomItem(clazz).assertOK();
+                Registries.ITEM.registerCustomItem(clazz).assertOK();
             } catch (AssertionError e) {
                 throw new RuntimeException(e);
             }
