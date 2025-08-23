@@ -1671,26 +1671,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 BlockTypes.register(new CustomBlockType(block));
 
                 if (block.shouldBeRegisteredInCreative()) {
-                    // TODO: refactor this
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_0, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_10, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_30, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_40, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_50, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_60, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_70, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_20_80, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_0, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_20, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_30, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_40, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_50, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_60, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_70, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_80, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_90, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_93, block.toItem());
-                    Registries.CREATIVE_ITEM.register(ProtocolInfo.v1_21_100, block.toItem());
+                    Registries.CREATIVE_ITEM.register(block.toItem());
                 }
             });
         }

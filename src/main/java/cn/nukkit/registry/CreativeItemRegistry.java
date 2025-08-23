@@ -30,19 +30,6 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     private static final List<Integer> CREATIVE_ITEMS_PROTOCOLS = List.of(
-            ProtocolInfo.v1_17_0,
-            ProtocolInfo.v1_17_10,
-            ProtocolInfo.v1_17_30,
-            ProtocolInfo.v1_17_40,
-            ProtocolInfo.v1_18_0,
-            ProtocolInfo.v1_18_10,
-            ProtocolInfo.v1_18_30,
-            ProtocolInfo.v1_19_0,
-            ProtocolInfo.v1_19_20,
-            ProtocolInfo.v1_19_50,
-            ProtocolInfo.v1_19_60,
-            ProtocolInfo.v1_19_70,
-            ProtocolInfo.v1_19_80,
             ProtocolInfo.v1_20_0,
             ProtocolInfo.v1_20_10,
             ProtocolInfo.v1_20_30,
@@ -184,9 +171,37 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
         CREATIVE_ITEMS.computeIfAbsent(protocol, p -> new CreativeItems()).add(icon);
     }
 
+    public void register(CreativeItemGroup group) {
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(group));
+    }
+
+    public void register(Item icon, CreativeItemGroup group) {
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(icon, group));
+    }
+
+    public void register(Item icon) {
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(icon));
+    }
+
+    public void remove(Integer protocol, Item icon) {
+        CreativeItems creativeItems = CREATIVE_ITEMS.get(protocol);
+        if (creativeItems != null) {
+            creativeItems.getItems().remove(icon);
+            creativeItems.getContents().remove(icon);
+        }
+    }
+
+    public void remove(Item icon) {
+        CREATIVE_ITEMS.keySet().forEach(protocol -> remove(protocol, icon));
+    }
+
     @Override
     public CreativeItems get(Integer protocol) {
         return CREATIVE_ITEMS.get(protocol);
+    }
+
+    public Map<Integer,CreativeItems> getCreativeItems() {
+        return Collections.unmodifiableMap(CREATIVE_ITEMS);
     }
 
     public boolean isCreativeItem(int protocol, Item item) {
