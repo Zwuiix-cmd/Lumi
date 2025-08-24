@@ -70,21 +70,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     public int count;
     protected String name;
 
-    @Deprecated
-    public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
-        return Registries.ITEM.registerCustom(itemClassList);
-    }
-
-    @Deprecated
-    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
-        return Registries.ITEM.registerCustom(clazz);
-    }
-
-    @Deprecated
-    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        return Registries.ITEM.registerCustom(clazz, addCreativeItem);
-    }
-
     public Item(int id) {
         this(id, 0, 1, UNKNOWN_STR);
     }
@@ -106,36 +91,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
         this.count = count;
         this.name = name;
-    }
-
-    public boolean hasMeta() {
-        return hasMeta;
-    }
-
-    public boolean canBeActivated() {
-        return false;
-    }
-
-    @NotNull
-    private static Supplier<Item> itemSupplier(@NotNull Constructor<? extends Item> constructor) {
-        return () -> {
-            try {
-                return constructor.newInstance();
-            } catch (ReflectiveOperationException e) {
-                throw new UnsupportedOperationException(e);
-            }
-        };
-    }
-
-    @NotNull
-    private static Supplier<Item> stringItemSupplier(@NotNull Constructor<? extends StringItem> constructor) {
-        return () -> {
-            try {
-                return (Item) constructor.newInstance();
-            } catch (ReflectiveOperationException e) {
-                throw new UnsupportedOperationException(e);
-            }
-        };
     }
 
     public static Item get(int id) {
@@ -314,6 +269,21 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return items;
     }
 
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
+        return Registries.ITEM.registerCustom(itemClassList);
+    }
+
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
+        return Registries.ITEM.registerCustom(clazz);
+    }
+
+    @Deprecated
+    public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
+        return Registries.ITEM.registerCustom(clazz, addCreativeItem);
+    }
+
     private String idConvertToName() {
         if (this.name == null) {
             var path = this.getNamespaceId().split(":")[1];
@@ -357,9 +327,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return item;
     }
 
-    public static Item fromJsonOld(Map<String, Object> data) {
-        String nbt = (String) data.getOrDefault("nbt_hex", "");
-        return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
+    public boolean hasMeta() {
+        return hasMeta;
+    }
+
+    public boolean canBeActivated() {
+        return false;
     }
 
     public Item setCompoundTag(CompoundTag tag) {
