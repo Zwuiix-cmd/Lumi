@@ -2838,7 +2838,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     itemComponentPacket.setEntries(entries);
                 } else {
                     if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
-                        HashMap<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
+                        Map<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
                         List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
                         int i = 0;
                         for (var entry : itemDefinition.entrySet()) {

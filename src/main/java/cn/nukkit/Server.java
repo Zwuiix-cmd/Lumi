@@ -335,6 +335,7 @@ public class Server {
         RuntimeItems.init();
         Registries.ITEM_LEGACY.init();
         Registries.ITEM.init();
+        Registries.CREATIVE_ITEM.init();
         EnumBiome.values();
         Attribute.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
@@ -367,7 +368,6 @@ public class Server {
 
         this.pluginManager = new PluginManager(this, this.commandMap);
         this.pluginManager.subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this.consoleSender);
-
         this.pluginManager.registerInterface(JavaPluginLoader.class);
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
@@ -387,7 +387,6 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        Registries.CREATIVE_ITEM.init();
         Block.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);

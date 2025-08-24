@@ -1,6 +1,5 @@
 package cn.nukkit.registry;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.item.customitem.CustomItem;
 import cn.nukkit.item.enchantment.*;
 import cn.nukkit.item.enchantment.bow.EnchantmentBowFlame;
@@ -163,7 +162,7 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
             try {
                 @SuppressWarnings("unchecked")
                 Class<? extends CustomItem> clazz = (Class<? extends CustomItem>) new DynamicClassLoader().defineClass("cn.nukkit.item.customitem." + className, classWriter.toByteArray());
-                Registries.ITEM.registerCustomItem(clazz).assertOK();
+                Registries.ITEM.registerCustom(clazz).assertOK();
             } catch (AssertionError e) {
                 throw new RuntimeException(e);
             }

@@ -176,15 +176,15 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
     }
 
     public void register(CreativeItemGroup group) {
-        CREATIVE_ITEMS.keySet().forEach(protocol -> register(group));
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(protocol, group));
     }
 
     public void register(Item icon, CreativeItemGroup group) {
-        CREATIVE_ITEMS.keySet().forEach(protocol -> register(icon, group));
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(protocol, icon, group));
     }
 
     public void register(Item icon) {
-        CREATIVE_ITEMS.keySet().forEach(protocol -> register(icon));
+        CREATIVE_ITEMS.keySet().forEach(protocol -> register(protocol, icon));
     }
 
     public void remove(Integer protocol, Item icon) {

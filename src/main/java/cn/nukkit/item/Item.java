@@ -60,7 +60,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static final String UNKNOWN_STR = "Unknown";
 
-
     protected final int id;
     protected ItemType type;
     protected Block block = null;
@@ -73,17 +72,17 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
-        return Registries.ITEM.registerCustomItem(itemClassList);
+        return Registries.ITEM.registerCustom(itemClassList);
     }
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
-        return Registries.ITEM.registerCustomItem(clazz);
+        return Registries.ITEM.registerCustom(clazz);
     }
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        return Registries.ITEM.registerCustomItem(clazz, addCreativeItem);
+        return Registries.ITEM.registerCustom(clazz, addCreativeItem);
     }
 
     public Item(int id) {
