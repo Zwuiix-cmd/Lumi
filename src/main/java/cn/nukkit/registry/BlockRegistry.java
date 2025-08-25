@@ -1020,6 +1020,26 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         LIST[key] = value;
     }
 
+    public void registerCustom(@NotNull Class<? extends CustomBlock> clazz) {
+        if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
+            throw new RegisterException("The server does not have the experiment mode feature enabled.Unable to register custom block!");
+        }
+
+        CustomBlock block;
+        try {
+            var method = clazz.getDeclaredConstructor();
+            method.setAccessible(true);
+            block = method.newInstance();
+            if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(block.getIdentifier())) {
+                HASHED_SORTED_CUSTOM_BLOCK.put(block.getIdentifier(), block);
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RegisterException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RegisterException("Cannot find the parameterless constructor for this custom block:" + clazz.getCanonicalName());
+        }
+    }
+
     public void registerCustom(@NotNull List<Class<? extends CustomBlock>> blockClassList) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
             throw new RegisterException("The server does not have the experiment mode feature enabled.Unable to register custom block!");
