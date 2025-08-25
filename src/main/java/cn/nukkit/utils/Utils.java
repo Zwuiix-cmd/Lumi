@@ -89,7 +89,7 @@ public class Utils {
             if (blockId > Block.LOWEST_CUSTOM_BLOCK_ID) {
                 return Block.get(blockId) != null;
             }
-            return blockId < Block.MAX_BLOCK_ID && Block.list[blockId] != null;
+            return blockId < Block.MAX_BLOCK_ID && Registries.BLOCK.getClass(blockId) != null;
         } else {
             return id < ItemLegacyRegistry.HIGHEST_LEGACY_ITEM_ID && Registries.ITEM_LEGACY.get(id) != null;
         }

@@ -12,6 +12,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.registry.Registries;
 
 import java.util.Arrays;
 import java.util.List;
@@ -146,7 +147,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         //Check every block from our y coord to the top of the world
         for (int y = getFloorY() + 1; y <= this.level.getMaxBlockY(); y++) {
             int testBlockId = level.getBlockIdAt(chunk, getFloorX(), y, getFloorZ());
-            if (!Block.transparent[testBlockId]) {
+            if (!Registries.BLOCK.isTransparent(testBlockId)) {
                 //There is no sky access
                 return false;
             }

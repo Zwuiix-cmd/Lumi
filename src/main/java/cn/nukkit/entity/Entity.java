@@ -1716,13 +1716,13 @@ public abstract class Entity extends Location implements Metadatable {
         double diffY = y - j;
         double diffZ = z - k;
 
-        if (!Block.transparent[this.level.getBlockIdAt(i, j, k)]) {
-            boolean flag = Block.transparent[this.level.getBlockIdAt(i - 1, j, k)];
-            boolean flag1 = Block.transparent[this.level.getBlockIdAt(i + 1, j, k)];
-            boolean flag2 = Block.transparent[this.level.getBlockIdAt(i, j - 1, k)];
-            boolean flag3 = Block.transparent[this.level.getBlockIdAt(i, j + 1, k)];
-            boolean flag4 = Block.transparent[this.level.getBlockIdAt(i, j, k - 1)];
-            boolean flag5 = Block.transparent[this.level.getBlockIdAt(i, j, k + 1)];
+        if (!Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i, j, k))) {
+            boolean flag = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i - 1, j, k));
+            boolean flag1 = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i + 1, j, k));
+            boolean flag2 = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i, j - 1, k));
+            boolean flag3 = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i, j + 1, k));
+            boolean flag4 = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i, j, k - 1));
+            boolean flag5 = Registries.BLOCK.isTransparent(this.level.getBlockIdAt(i, j, k + 1));
 
             int direction = -1;
             double limit = 9999;

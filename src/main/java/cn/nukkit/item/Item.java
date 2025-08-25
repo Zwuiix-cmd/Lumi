@@ -116,7 +116,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 return customBlockItem;
             } else if (id < 0) {
                 int blockId = 255 - id;
-                clazz = Block.list[blockId];
+                clazz = Registries.BLOCK.getClass(blockId);
             } else {
                 clazz = Registries.ITEM_LEGACY.get(id);
             }

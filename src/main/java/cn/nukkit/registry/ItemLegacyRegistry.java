@@ -15,8 +15,8 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>
     @Override
     public void init() {
         for (int i = 0; i < 256; ++i) {
-            if (Block.list[i] != null) {
-                register(i, Block.list[i]);
+            if (Registries.BLOCK.getClass(i) != null) {
+                register(i, Registries.BLOCK.getClass(i));
             }
         }
 

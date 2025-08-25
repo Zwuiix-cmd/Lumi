@@ -330,7 +330,7 @@ public class Server {
         Registries.BLOCK_ENTITY.init();
         Registries.ENCHANTMENT.init();
 
-        Block.init();
+        Registries.BLOCK.init();
         GlobalBlockPalette.init();
         RuntimeItems.init();
         Registries.ITEM_LEGACY.init();
@@ -387,7 +387,7 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        Block.initCustomBlocks();
+        Registries.BLOCK.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);
