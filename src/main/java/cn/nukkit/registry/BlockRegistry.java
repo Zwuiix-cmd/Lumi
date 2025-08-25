@@ -34,19 +34,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends Block>>, BlockID {
 
-    private static final Class<? extends Block>[] list = new Class[Block.MAX_BLOCK_ID];
-    private static final Block[] fullList = new Block[Block.MAX_BLOCK_ID * (1 << Block.DATA_BITS)];
-    private static final int[] light = new int[65536];
-    private static final int[] lightFilter = new int[65536];
-    private static final boolean[] solid = new boolean[65536];
-    private static final double[] hardness = new double[65536];
-    private static final boolean[] transparent = new boolean[65536];
-    private static final boolean[] diffusesSkyLight = new boolean[65536];
-    private static final boolean[] hasMeta = new boolean[65536];
+    private static Class<? extends Block>[] LIST = new Class[Block.MAX_BLOCK_ID];
+    private static Block[] FULL_LIST = new Block[Block.MAX_BLOCK_ID * (1 << Block.DATA_BITS)];
+    private static int[] LIGHT = new int[65536];
+    private static int[] LIGHT_FILTER = new int[65536];
+    private static boolean[] SOLID = new boolean[65536];
+    private static boolean[] TRANSPARENT = new boolean[65536];
+    private static boolean[] DIFFUSES_SKY_LIGHT = new boolean[65536];
 
     private static final List<CustomBlockDefinition> CUSTOM_BLOCK_DEFINITIONS = new ArrayList<>();
     private static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
@@ -55,8 +54,11 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
     private final static BlockUnknown BLOCK_UNKNOWN = new BlockUnknown(Block.MAX_BLOCK_ID, 0);
 
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
+
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         register(AIR, BlockAir.class); //0
         register(STONE, BlockStone.class); //1
         register(GRASS, BlockGrass.class); //2
@@ -856,7 +858,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
         IntStream idStream = IntStream.range(0, Block.MAX_BLOCK_ID);
         idStream.parallel().forEach(id -> {
-            Class<?> c = list[id];
+            Class<?> c = LIST[id];
             if (c != null) {
                 Block block;
                 try {
@@ -877,50 +879,48 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                                 Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
                                 b = BLOCK_UNKNOWN;
                             }
-                            fullList[fullId] = b;
+                            FULL_LIST[fullId] = b;
                         }
-                        hasMeta[id] = true;
                     } catch (NoSuchMethodException ignore) {
                         for (int data = 0; data < Block.DATA_SIZE; ++data) {
                             int fullId = (id << Block.DATA_BITS) | data;
-                            fullList[fullId] = block;
+                            FULL_LIST[fullId] = block;
                         }
                     }
                 } catch (Exception e) {
                     Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
                     for (int data = 0; data < Block.DATA_SIZE; ++data) {
-                        fullList[(id << Block.DATA_BITS) | data] = BLOCK_UNKNOWN;
+                        FULL_LIST[(id << Block.DATA_BITS) | data] = BLOCK_UNKNOWN;
                     }
                     return;
                 }
 
-                solid[id] = block.isSolid();
-                transparent[id] = block.isTransparent();
-                diffusesSkyLight[id] = block.diffusesSkyLight();
-                hardness[id] = block.getHardness();
-                light[id] = block.getLightLevel();
+                SOLID[id] = block.isSolid();
+                TRANSPARENT[id] = block.isTransparent();
+                DIFFUSES_SKY_LIGHT[id] = block.diffusesSkyLight();
+                LIGHT[id] = block.getLightLevel();
 
                 if (block.isSolid()) {
                     if (block.isTransparent()) {
                         if (block instanceof BlockLiquid || block instanceof BlockIce) {
-                            lightFilter[id] = 2;
+                            LIGHT_FILTER[id] = 2;
                         } else {
-                            lightFilter[id] = 1;
+                            LIGHT_FILTER[id] = 1;
                         }
                     } else if (block instanceof BlockSlime) {
-                        lightFilter[id] = 1;
+                        LIGHT_FILTER[id] = 1;
                     } else if (id == CAULDRON_BLOCK) {
-                        lightFilter[id] = 3;
+                        LIGHT_FILTER[id] = 3;
                     } else {
-                        lightFilter[id] = 15;
+                        LIGHT_FILTER[id] = 15;
                     }
                 } else {
-                    lightFilter[id] = 1;
+                    LIGHT_FILTER[id] = 1;
                 }
             } else {
-                lightFilter[id] = 1;
+                LIGHT_FILTER[id] = 1;
                 for (int data = 0; data < Block.DATA_SIZE; ++data) {
-                    fullList[(id << Block.DATA_BITS) | data] = BLOCK_UNKNOWN;
+                    FULL_LIST[(id << Block.DATA_BITS) | data] = BLOCK_UNKNOWN;
                 }
             }
         });
@@ -998,13 +998,11 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
             }
 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
-                light[id] = block.getLightLevel();
-                lightFilter[id] = block.getLightFilter();
-                solid[id] = ((Block) block).isSolid();
-                hardness[id] = block.getHardness();
-                transparent[id] = ((Block) block).isTransparent();
-                diffusesSkyLight[id] = ((Block) block).diffusesSkyLight();
-                hasMeta[id] = true;
+                LIGHT[id] = block.getLightLevel();
+                LIGHT_FILTER[id] = block.getLightFilter();
+                SOLID[id] = ((Block) block).isSolid();
+                TRANSPARENT[id] = ((Block) block).isTransparent();
+                DIFFUSES_SKY_LIGHT[id] = ((Block) block).diffusesSkyLight();
 
                 // Registering custom block type
                 BlockTypes.register(new CustomBlockType(block));
@@ -1019,7 +1017,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
     @Override
     public void register(Integer key, Class<? extends Block> value) {
-        list[key] = value;
+        LIST[key] = value;
     }
 
     private static int nextBlockId = Block.LOWEST_CUSTOM_BLOCK_ID;
@@ -1081,11 +1079,11 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
     @Override
     public Block get(Integer key) {
-        return fullList[key];
+        return FULL_LIST[key];
     }
 
     public Class<? extends Block> getClass(int key) {
-        return list[key];
+        return LIST[key];
     }
 
     public CustomBlock getCustom(int key) {
@@ -1097,31 +1095,31 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
     }
 
     public int getLight(int blockId) {
-        return light[blockId];
+        return LIGHT[blockId];
     }
 
     public int getLightFilter(int blockId) {
-        return lightFilter[blockId];
+        return LIGHT_FILTER[blockId];
     }
 
     public boolean isSolid(int blockId) {
-        return solid[blockId];
+        return SOLID[blockId];
     }
 
     public boolean isTransparent(int blockId) {
-        return transparent[blockId];
+        return TRANSPARENT[blockId];
     }
 
     public boolean isDiffusesSkyLight(int blockId) {
-        return diffusesSkyLight[blockId];
+        return DIFFUSES_SKY_LIGHT[blockId];
     }
 
     public int getListSize() {
-        return list.length;
+        return LIST.length;
     }
 
     public int getFullListSize() {
-        return fullList.length;
+        return FULL_LIST.length;
     }
 
     public List<CustomBlockDefinition> getCustomBlockDefinitionList() {
@@ -1139,6 +1137,20 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
     @Override
     public void reload() {
+        isLoad.set(false);
+        LIST = new Class[Block.MAX_BLOCK_ID];
+        FULL_LIST = new Block[Block.MAX_BLOCK_ID * (1 << Block.DATA_BITS)];
+        LIGHT = new int[65536];
+        LIGHT_FILTER = new int[65536];
+        SOLID = new boolean[65536];
+        TRANSPARENT = new boolean[65536];
+        DIFFUSES_SKY_LIGHT = new boolean[65536];
 
+        CUSTOM_BLOCK_DEFINITIONS.clear();
+        ID_TO_CUSTOM_BLOCK.clear();
+        CUSTOM_BLOCK_ID_MAP.clear();
+        LEGACY_2_CUSTOM_STATE.clear();
+
+        init();
     }
 }

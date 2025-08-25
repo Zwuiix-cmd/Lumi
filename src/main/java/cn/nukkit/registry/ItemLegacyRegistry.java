@@ -1,19 +1,24 @@
 package cn.nukkit.registry;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 //TODO: remove legacy items at all
 public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>>, BlockID, ItemID {
     private static final Int2ObjectOpenHashMap<Class<?>> LEGACY_ITEMS = new Int2ObjectOpenHashMap<>();
     public static int HIGHEST_LEGACY_ITEM_ID = 0;
 
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
+
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
+
         for (int i = 0; i < 256; ++i) {
             if (Registries.BLOCK.getClass(i) != null) {
                 register(i, Registries.BLOCK.getClass(i));
@@ -307,12 +312,14 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>
 
     @Override
     public void trim() {
-
+        LEGACY_ITEMS.trim();
     }
 
     @Override
     public void reload() {
-
+        isLoad.set(false);
+        LEGACY_ITEMS.clear();
+        init();
     }
 
 
