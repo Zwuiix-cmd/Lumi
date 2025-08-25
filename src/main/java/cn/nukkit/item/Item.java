@@ -271,17 +271,32 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull List<Class<? extends CustomItem>> itemClassList) {
-        return Registries.ITEM.registerCustom(itemClassList);
+        try {
+            Registries.ITEM.registerCustom(itemClassList);
+            return OK.TRUE;
+        } catch (Exception e) {
+            return new OK<>(false, e);
+        }
     }
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz) {
-        return Registries.ITEM.registerCustom(clazz);
+        try {
+            Registries.ITEM.registerCustom(clazz);
+            return OK.TRUE;
+        } catch (Exception e) {
+            return new OK<>(false, e);
+        }
     }
 
     @Deprecated
     public static OK<?> registerCustomItem(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
-        return Registries.ITEM.registerCustom(clazz, addCreativeItem);
+        try {
+            Registries.ITEM.registerCustom(clazz, addCreativeItem);
+            return OK.TRUE;
+        } catch (Exception e) {
+            return new OK<>(false, e);
+        }
     }
 
     private String idConvertToName() {

@@ -9,6 +9,8 @@ import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FuelRegistry implements IRegistry<String, Integer, Integer> {
@@ -100,6 +102,10 @@ public class FuelRegistry implements IRegistry<String, Integer, Integer> {
     @Override
     public Integer get(String key) {
         return ID_TO_BURNING_TIME.get(key);
+    }
+
+    public Map<String, Integer> getIdToBurningTime() {
+        return Collections.unmodifiableMap(ID_TO_BURNING_TIME);
     }
 
     public boolean hasBurningTime(String key) {

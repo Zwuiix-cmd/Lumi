@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Supplier<Item>> {
 
-    private static final Object2ObjectOpenHashMap<String, Supplier<Item>> NAMESPACED_ID_ITEM = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectOpenHashMap<String, Supplier<Item>> NAMESPACE_ID_ITEMS = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectOpenHashMap<String, Supplier<Item>> CUSTOM_ITEMS = new Object2ObjectOpenHashMap<>();
     private static final Object2ObjectOpenHashMap<String, CustomItemDefinition> CUSTOM_ITEM_DEFINITIONS = new Object2ObjectOpenHashMap<>();
 
@@ -147,44 +147,22 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
 
     @Override
     public void register(String id, Supplier<Item> value) {
-        NAMESPACED_ID_ITEM.put(id, value);
+        NAMESPACE_ID_ITEMS.put(id, value);
     }
 
-    @Override
-    public Item get(String id) {
-        Supplier<Item> supplier = NAMESPACED_ID_ITEM.get(id);
-        if (supplier == null) {
-            return Item.AIR_ITEM;
-        }
-        return supplier.get();
-    }
-
-    public Supplier<Item> getSupplier(String id) {
-        return NAMESPACED_ID_ITEM.get(id);
-    }
-
-    public boolean isItemRegistered(String id) {
-        return NAMESPACED_ID_ITEM.containsKey(id);
-    }
-
-    public OK<?> registerCustom(@NotNull List<Class<? extends CustomItem>> itemClassList) {
+    public void registerCustom(@NotNull List<Class<? extends CustomItem>> itemClassList) {
         for (Class<? extends CustomItem> itemClass : itemClassList) {
-            OK<?> result = registerCustom(itemClass);
-            if (!result.ok()) {
-                return result;
-            }
+            registerCustom(itemClass);
         }
-        return new OK<>(true);
     }
 
-    public OK<?> registerCustom(@NotNull Class<? extends CustomItem> clazz) {
-        return registerCustom(clazz, true);
+    public void registerCustom(@NotNull Class<? extends CustomItem> clazz) {
+        registerCustom(clazz, true);
     }
 
-    public OK<?> registerCustom(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
+    public void registerCustom(@NotNull Class<? extends CustomItem> clazz, boolean addCreativeItem) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
-            Server.getInstance().getLogger().warning("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
-            return new OK<>(false, "The server does not have the experiment mode feature enabled. Unable to register the custom item!");
+            throw new RegisterException("The server does not have the experiment mode feature enabled. Unable to register the custom item!");
         }
 
         CustomItem customItem;
@@ -201,13 +179,12 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
                     throw new UnsupportedOperationException(e);
                 }
             };
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            return new OK<>(false, e);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RegisterException(e);
         }
 
         if (CUSTOM_ITEMS.containsKey(customItem.getNamespaceId())) {
-            return new OK<>(false, "The custom item with the namespace ID \"" + customItem.getNamespaceId() + "\" is already registered!");
+            throw new RegisterException("The custom item with the namespace ID '" + customItem.getNamespaceId() + "' is already registered!");
         }
 
         CUSTOM_ITEMS.put(customItem.getNamespaceId(), supplier);
@@ -221,8 +198,6 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
 
         // Registering custom item type
         ItemTypes.register(new CustomItemType(customItem));
-
-        return new OK<Void>(true);
     }
 
     private void registerCustom(CustomItem item, int protocol, boolean addCreativeItem) {
@@ -252,6 +227,23 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         Registries.CREATIVE_ITEM.remove(protocol, item);
     }
 
+    @Override
+    public Item get(String id) {
+        Supplier<Item> supplier = NAMESPACE_ID_ITEMS.get(id);
+        if (supplier == null) {
+            return Item.AIR_ITEM;
+        }
+        return supplier.get();
+    }
+
+    public Supplier<Item> getSupplier(String id) {
+        return NAMESPACE_ID_ITEMS.get(id);
+    }
+
+    public Map<String, Supplier<Item>> getNamespaceIdItems() {
+        return Collections.unmodifiableMap(NAMESPACE_ID_ITEMS);
+    }
+
     public Map<String, Supplier<? extends Item>> getCustomItems() {
         return Collections.unmodifiableMap(CUSTOM_ITEMS);
     }
@@ -260,15 +252,19 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         return Collections.unmodifiableMap(CUSTOM_ITEM_DEFINITIONS);
     }
 
+    public boolean isItemRegistered(String id) {
+        return NAMESPACE_ID_ITEMS.containsKey(id);
+    }
+
     @Override
     public void trim() {
-        NAMESPACED_ID_ITEM.trim();
+        NAMESPACE_ID_ITEMS.trim();
     }
 
     @Override
     public void reload() {
         isLoad.set(false);
-        NAMESPACED_ID_ITEM.clear();
+        NAMESPACE_ID_ITEMS.clear();
         CUSTOM_ITEM_DEFINITIONS.clear();
         init();
     }

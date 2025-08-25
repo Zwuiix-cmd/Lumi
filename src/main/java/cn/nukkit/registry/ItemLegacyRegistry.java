@@ -302,7 +302,7 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>
     @Override
     public void register(Integer key, Class<?> value) {
         LEGACY_ITEMS.put(key, value);
-        if(key > HIGHEST_LEGACY_ITEM_ID) HIGHEST_LEGACY_ITEM_ID = key;
+        if (key > HIGHEST_LEGACY_ITEM_ID) HIGHEST_LEGACY_ITEM_ID = key;
     }
 
     @Override
@@ -321,6 +321,4 @@ public class ItemLegacyRegistry implements IRegistry<Integer, Class<?>, Class<?>
         LEGACY_ITEMS.clear();
         init();
     }
-
-
 }

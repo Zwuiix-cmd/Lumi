@@ -19,7 +19,6 @@ import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.utils.OK;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -51,9 +50,10 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
     private static final Int2ObjectMap<CustomBlock> ID_TO_CUSTOM_BLOCK = new Int2ObjectOpenHashMap<>();
     private static final ConcurrentHashMap<String, Integer> CUSTOM_BLOCK_ID_MAP = new ConcurrentHashMap<>();
     private static final Map<String, List<CustomBlockUtil.CustomBlockState>> LEGACY_2_CUSTOM_STATE = new HashMap<>();
-
+    private final static SortedMap<String, CustomBlock> HASHED_SORTED_CUSTOM_BLOCK = new TreeMap<>(HashedPaletteComparator.INSTANCE);
     private final static BlockUnknown BLOCK_UNKNOWN = new BlockUnknown(Block.MAX_BLOCK_ID, 0);
 
+    private static int nextBlockId = Block.LOWEST_CUSTOM_BLOCK_ID;
     private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
@@ -1020,18 +1020,9 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         LIST[key] = value;
     }
 
-    private static int nextBlockId = Block.LOWEST_CUSTOM_BLOCK_ID;
-
-    private final static SortedMap<String, CustomBlock> HASHED_SORTED_CUSTOM_BLOCK = new TreeMap<>(HashedPaletteComparator.INSTANCE);
-
-    /**
-     * 注册自定义方块
-     *
-     * @param blockClassList 传入自定义方块class List
-     */
-    public static OK<?> registerCustomBlock(@NotNull List<Class<? extends CustomBlock>> blockClassList) {
+    public void registerCustom(@NotNull List<Class<? extends CustomBlock>> blockClassList) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
-            return new OK<>(false, "The server does not have the experiment mode feature enabled.Unable to register custom block!");
+            throw new RegisterException("The server does not have the experiment mode feature enabled.Unable to register custom block!");
         }
         for (var clazz : blockClassList) {
             CustomBlock block;
@@ -1043,22 +1034,16 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                     HASHED_SORTED_CUSTOM_BLOCK.put(block.getIdentifier(), block);
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                return new OK<>(false, e);
+                throw new RegisterException(e);
             } catch (NoSuchMethodException e) {
-                return new OK<>(false, "Cannot find the parameterless constructor for this custom block:" + clazz.getCanonicalName());
+                throw new RegisterException("Cannot find the parameterless constructor for this custom block:" + clazz.getCanonicalName());
             }
         }
-        return new OK<Void>(true);
     }
 
-    /**
-     * 注册自定义方块
-     *
-     * @param blockNamespaceClassMap 传入自定义方块classMap { key: NamespaceID, value: Class }
-     */
-    public static OK<?> registerCustomBlock(@NotNull Map<String, Class<? extends CustomBlock>> blockNamespaceClassMap) {
+    public void registerCustom(@NotNull Map<String, Class<? extends CustomBlock>> blockNamespaceClassMap) {
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
-            return new OK<>(false, "The server does not have the experiment mode feature enabled.Unable to register custom block!");
+            throw new RegisterException("The server does not have the experiment mode feature enabled.Unable to register custom block!");
         }
         for (var entry : blockNamespaceClassMap.entrySet()) {
             if (!HASHED_SORTED_CUSTOM_BLOCK.containsKey(entry.getKey())) {
@@ -1068,13 +1053,12 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
                     var block = method.newInstance();
                     HASHED_SORTED_CUSTOM_BLOCK.put(entry.getKey(), block);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    return new OK<>(false, e);
+                    throw new RegisterException(e);
                 } catch (NoSuchMethodException e) {
-                    return new OK<>(false, "Cannot find the parameterless constructor for this custom block:" + entry.getValue().getCanonicalName());
+                    throw new RegisterException("Cannot find the parameterless constructor for this custom block:" + entry.getValue().getCanonicalName());
                 }
             }
         }
-        return new OK<Void>(true);
     }
 
     @Override

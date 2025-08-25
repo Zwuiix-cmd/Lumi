@@ -11,6 +11,8 @@ import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DispenseBehaviorRegistry implements IRegistry<String, DispenseBehavior, DispenseBehavior> {
@@ -104,6 +106,10 @@ public class DispenseBehaviorRegistry implements IRegistry<String, DispenseBehav
 
     public DispenseBehavior getDefault() {
         return DEFAULT_BEHAVIOR;
+    }
+
+    public Map<String, DispenseBehavior> getBehaviors() {
+        return Collections.unmodifiableMap(BEHAVIORS);
     }
 
     @Override

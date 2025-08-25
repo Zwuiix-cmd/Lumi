@@ -11,6 +11,8 @@ import cn.nukkit.entity.projectile.*;
 import cn.nukkit.entity.weather.EntityLightning;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityRegistry implements IRegistry<String, Class<? extends Entity>, Class<? extends Entity>> {
@@ -175,11 +177,19 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
     }
 
     public String getSaveId(Entity entity) {
-        if(entity instanceof CustomEntity) {
+        if (entity instanceof CustomEntity) {
             EntityDefinition entityDefinition = ((CustomEntity) entity).getEntityDefinition();
             return entityDefinition == null ? "" : entityDefinition.getIdentifier();
         }
         return SHORT_NAMES.getOrDefault(entity.getClass().getSimpleName(), "");
+    }
+
+    public Map<String, Class<? extends Entity>> getKnownEntities() {
+        return Collections.unmodifiableMap(KNOWN_ENTITIES);
+    }
+
+    public Map<String, String> getShortNames() {
+        return Collections.unmodifiableMap(SHORT_NAMES);
     }
 
     public boolean isRegistered(String name) {
@@ -187,7 +197,8 @@ public class EntityRegistry implements IRegistry<String, Class<? extends Entity>
     }
 
     @Override
-    public void trim() {}
+    public void trim() {
+    }
 
     @Override
     public void reload() {

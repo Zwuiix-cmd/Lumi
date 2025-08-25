@@ -6,6 +6,8 @@ import cn.nukkit.blockentity.impl.*;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BlockEntityRegistry implements IRegistry<String, Class<? extends BlockEntity>, Class<? extends BlockEntity>> {
@@ -78,12 +80,17 @@ public class BlockEntityRegistry implements IRegistry<String, Class<? extends Bl
         return KNOWN_BLOCK_ENTITIES.inverse().get(blockEntity);
     }
 
+    public Map<String, Class<? extends BlockEntity>> getKnownBlockEntities() {
+        return Collections.unmodifiableMap(KNOWN_BLOCK_ENTITIES);
+    }
+
     public boolean isRegistered(String key) {
         return KNOWN_BLOCK_ENTITIES.containsKey(key);
     }
 
     @Override
-    public void trim() {}
+    public void trim() {
+    }
 
     @Override
     public void reload() {

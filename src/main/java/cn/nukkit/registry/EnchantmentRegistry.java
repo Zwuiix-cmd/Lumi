@@ -90,10 +90,6 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
         register(new EnchantmentMaceBreach());
     }
 
-    public void register(Enchantment enchantment) {
-        register(enchantment.getIdentifier(), enchantment);
-    }
-
     @Override
     public void register(Identifier id, Enchantment enchantment) {
         if (IDENTIFIER_TO_ENCHANTMENT.put(id, enchantment) == null) {
@@ -103,6 +99,10 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
         } else {
             throw new RegisterException("Duplicate enchantment id " + id);
         }
+    }
+
+    private void register(Enchantment enchantment) {
+        register(enchantment.getIdentifier(), enchantment);
     }
 
     public void registerCustom(Enchantment enchantment) {
@@ -162,7 +162,7 @@ public class EnchantmentRegistry implements IRegistry<Identifier, Enchantment, E
             try {
                 @SuppressWarnings("unchecked")
                 Class<? extends CustomItem> clazz = (Class<? extends CustomItem>) new DynamicClassLoader().defineClass("cn.nukkit.item.customitem." + className, classWriter.toByteArray());
-                Registries.ITEM.registerCustom(clazz).assertOK();
+                Registries.ITEM.registerCustom(clazz);
             } catch (AssertionError e) {
                 throw new RuntimeException(e);
             }
