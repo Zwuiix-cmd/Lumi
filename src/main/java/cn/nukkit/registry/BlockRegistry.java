@@ -847,11 +847,29 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(RED_SANDSTONE_WALL, BlockRedSandstoneBlock.class); //1237
         register(RED_NETHER_BRICK_WALL, BlockRedNetherBrickWall.class); //1238
 
+        register(PALE_OAK_BUTTON, BlockButtonPaleOak.class); //1244
+        register(PALE_OAK_DOOR, BlockDoorPaleOak.class); //1245
+        register(PALE_OAK_FENCE, BlockFencePaleOak.class); //1246
+        register(PALE_OAK_FENCE_GATE, BlockFenceGatePaleOak.class); //1247
+
+        register(STRIPPED_PALE_OAK_LOG, BlockLogStrippedPaleOak.class); //1249
+        register(PALE_OAK_LOG, BlockLogPaleOak.class); //1250
+        register(PALE_OAK_PLANKS, BlockPlanksPaleOak.class); //1251
+        register(PALE_OAK_PRESSURE_PLATE, BlockPressurePlatePaleOak.class); //1252
+        register(PALE_OAK_SLAB, BlockSlabPaleOak.class); //1253
+        register(PALE_OAK_DOUBLE_SLAB, BlockDoubleSlabPaleOak.class); //1254
+        register(PALE_OAK_STAIRS, BlockStairsPaleOak.class); //1255
+
+        register(STRIPPED_PALE_OAK_WOOD, BlockWoodStrippedPaleOak.class); //1259
+        register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
+
+        register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
+
         register(BUSH, BlockBush.class); //1278
         register(WILDFLOWERS, BlockWildflowers.class); //1279
         register(FIREFLY_BUSH, BlockFireflyBush.class); //1280
         register(LEAF_LITTER, BlockLeafLitter.class); //1281
-
+        register(DRIED_GHAST, BlockDriedGhast.class); //1282
         register(SHORT_DRY_GRASS, BlockShortDryGrass.class); //1283
         register(TALL_DRY_GRASS, BlockTallDryGrass.class); //1284
         register(CACTUS_FLOWER, BlockCactusFlower.class); //1285
