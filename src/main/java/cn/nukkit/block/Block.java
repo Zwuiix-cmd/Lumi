@@ -1,21 +1,20 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
-import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.block.customblock.CustomBlock;
+import cn.nukkit.block.material.BlockType;
+import cn.nukkit.block.material.BlockTypes;
+import cn.nukkit.block.material.tags.BlockTag;
+import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.*;
 import cn.nukkit.item.customitem.ItemCustomTool;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.MovingObjectPosition;
-import cn.nukkit.level.Position;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.math.AxisAlignedBB;
@@ -25,15 +24,13 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.Plugin;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.registry.Registries;
+import cn.nukkit.block.data.BlockColor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static cn.nukkit.utils.Utils.dynamic;
@@ -50,18 +47,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static final int ID_MASK = 0xfff; //max 4095
     public static final int DATA_SIZE = dynamic(1 << DATA_BITS);
     public static final int DATA_MASK = dynamic(DATA_SIZE - 1);
+    public static final int LOWEST_CUSTOM_BLOCK_ID = 10000;
 
-    @SuppressWarnings("rawtypes")
-    public static Class[] list = null;
-    public static Block[] fullList = null;
-    public static int[] light = null;
-    public static int[] lightFilter = null;
-    public static boolean[] solid = null;
-    public static double[] hardness = null;
-    public static boolean[] transparent = null;
-    public static boolean[] diffusesSkyLight = null;
-    public static boolean[] hasMeta = null;
-
+    public static final double DEFAULT_FRICTION_FACTOR = 0.6;
     public AxisAlignedBB boundingBox = null;
     public static final Block[] EMPTY_ARRAY = new Block[0];
     public int layer = 0;
@@ -71,95 +59,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      */
     protected static final int[] FACES2534 = {2, 5, 3, 4};
 
+    private BlockType type;
+
     protected Block() {}
-
-    public static void init() {
-        final BlockUnknown BLOCK_UNKNOWN = new BlockUnknown(Block.MAX_BLOCK_ID, 0);
-
-        if (list == null) {
-            list = new Class[MAX_BLOCK_ID];
-            fullList = new Block[MAX_BLOCK_ID * (1 << DATA_BITS)];
-            light = new int[MAX_BLOCK_ID];
-            lightFilter = new int[MAX_BLOCK_ID];
-            solid = new boolean[MAX_BLOCK_ID];
-            hardness = new double[MAX_BLOCK_ID];
-            transparent = new boolean[MAX_BLOCK_ID];
-            diffusesSkyLight = new boolean[MAX_BLOCK_ID];
-            hasMeta = new boolean[MAX_BLOCK_ID];
-
-            Blocks.init();
-
-            for (int id = 0; id < MAX_BLOCK_ID; id++) {
-                Class<?> c = list[id];
-                if (c != null) {
-                    Block block;
-                    try {
-                        block = (Block) c.getDeclaredConstructor().newInstance();
-                        try {
-                            @SuppressWarnings("rawtypes")
-                            Constructor constructor = c.getDeclaredConstructor(int.class);
-                            constructor.setAccessible(true);
-                            for (int data = 0; data < (1 << DATA_BITS); ++data) {
-                                int fullId = (id << DATA_BITS) | data;
-                                Block b;
-                                try {
-                                    b = (Block) constructor.newInstance(data);
-                                    if (b.getDamage() != data) {
-                                        b = BLOCK_UNKNOWN;
-                                    }
-                                } catch (Exception e) {
-                                    Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
-                                    b = BLOCK_UNKNOWN;
-                                }
-                                fullList[fullId] = b;
-                            }
-                            hasMeta[id] = true;
-                        } catch (NoSuchMethodException ignore) {
-                            for (int data = 0; data < DATA_SIZE; ++data) {
-                                int fullId = (id << DATA_BITS) | data;
-                                fullList[fullId] = block;
-                            }
-                        }
-                    } catch (Exception e) {
-                        Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
-                        for (int data = 0; data < DATA_SIZE; ++data) {
-                            fullList[(id << DATA_BITS) | data] = BLOCK_UNKNOWN;
-                        }
-                        return;
-                    }
-
-                    solid[id] = block.isSolid();
-                    transparent[id] = block.isTransparent();
-                    diffusesSkyLight[id] = block.diffusesSkyLight();
-                    hardness[id] = block.getHardness();
-                    light[id] = block.getLightLevel();
-
-                    if (block.isSolid()) {
-                        if (block.isTransparent()) {
-                            if (block instanceof BlockLiquid || block instanceof BlockIce) {
-                                lightFilter[id] = 2;
-                            } else {
-                                lightFilter[id] = 1;
-                            }
-                        } else if (block instanceof BlockSlime) {
-                            lightFilter[id] = 1;
-                        } else if (id == CAULDRON_BLOCK) {
-                            lightFilter[id] = 3;
-                        } else {
-                            lightFilter[id] = 15;
-                        }
-                    } else {
-                        lightFilter[id] = 1;
-                    }
-                } else {
-                    lightFilter[id] = 1;
-                    for (int data = 0; data < DATA_SIZE; ++data) {
-                        fullList[(id << DATA_BITS) | data] = BLOCK_UNKNOWN;
-                    }
-                }
-            }
-        }
-    }
 
     public static Block get(int id) {
         return get(id, null);
@@ -170,8 +72,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getCustom(id).toCustomBlock(meta != null ? meta : 0);
         }
 
         int fullId = id << DATA_BITS;
@@ -179,26 +81,26 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             int iMeta = meta;
             if (iMeta <= DATA_SIZE) {
                 fullId = fullId | meta;
-                if (fullId >= fullList.length || fullList[fullId] == null) {
+                if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                     log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, iMeta);
                     return new BlockUnknown(id, iMeta);
                 }
-                return fullList[fullId].clone();
+                return Registries.BLOCK.get(fullId).clone();
             } else {
-                if (fullId >= fullList.length || fullList[fullId] == null) {
+                if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                     log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, iMeta);
                     return new BlockUnknown(id, iMeta);
                 }
-                Block block = fullList[fullId].clone();
+                Block block = Registries.BLOCK.get(fullId).clone();
                 block.setDamage(iMeta);
                 return block;
             }
         } else {
-            if (fullId >= fullList.length || fullList[fullId] == null) {
+            if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, 0);
                 return new BlockUnknown(id, 0);
             }
-            return fullList[fullId].clone();
+            return Registries.BLOCK.get(fullId).clone();
         }
     }
 
@@ -211,27 +113,27 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
         }
 
         Block block;
         int fullId = id << DATA_BITS;
         if (meta != null && meta > DATA_SIZE) {
-            if (fullId >= fullList.length || fullList[fullId] == null) {
+            if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
                 return new BlockUnknown(id, meta);
             }
-            block = fullList[fullId].clone();
+            block = Registries.BLOCK.get(fullId).clone();
             block.setDamage(meta);
         } else {
             meta = meta == null ? 0 : meta;
             fullId = fullId | meta;
-            if (fullId >= fullList.length || fullList[fullId] == null) {
+            if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
                 return new BlockUnknown(id, meta);
             }
-            block = fullList[fullId].clone();
+            block = Registries.BLOCK.get(fullId).clone();
         }
 
         if (pos != null) {
@@ -249,24 +151,24 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getCustom(id).toCustomBlock(data);
         }
 
         int fullId = id << DATA_BITS;
-        if (fullId >= fullList.length) {
+        if (fullId >= Registries.BLOCK.getFullListSize()) {
             log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, data);
             return new BlockUnknown(id, data);
         }
         if (data < DATA_SIZE) {
             fullId = fullId | data;
-            if (fullList[fullId] == null) {
+            if (Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, data);
                 return new BlockUnknown(id, data);
             }
-            return fullList[fullId].clone();
+            return Registries.BLOCK.get(fullId).clone();
         } else {
-            Block block = fullList[fullId].clone();
+            Block block = Registries.BLOCK.get(fullId).clone();
             block.setDamage(data);
             return block;
         }
@@ -279,16 +181,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         int id = fullId << DATA_BITS;
 
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
         }
 
-        if (fullId >= fullList.length || fullList[fullId] == null) {
+        if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
             int meta = fullId & DATA_BITS;
             log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
             return new BlockUnknown(id, meta);
         }
-        Block block = fullList[fullId].clone();
+        Block block = Registries.BLOCK.get(fullId).clone();
         block.x = x;
         block.y = y;
         block.z = z;
@@ -302,15 +204,15 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
-        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return CustomBlockManager.get().getBlock(id, 0);
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
         }
 
         Block block;
         if (meta <= DATA_SIZE) {
-            block = fullList[id << DATA_BITS | meta].clone();
+            block = Registries.BLOCK.get(id << DATA_BITS | meta).clone();
         } else {
-            block = fullList[id << DATA_BITS].clone();
+            block = Registries.BLOCK.get(id << DATA_BITS).clone();
             block.setDamage(meta);
         }
         block.x = x;
@@ -322,31 +224,31 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static int getBlockLight(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return light[0]; // TODO: just temporary
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getLight(0); // TODO: just temporary
         }
-        return light[blockId];
+        return Registries.BLOCK.getLight(blockId);
     }
 
     public static int getBlockLightFilter(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return lightFilter[0]; // TODO: just temporary
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.getLightFilter(0); // TODO: just temporary
         }
-        return lightFilter[blockId];
+        return Registries.BLOCK.getLightFilter(blockId);
     }
 
     public static boolean isBlockSolidById(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return solid[1]; // TODO: just temporary
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.isSolid(1); // TODO: just temporary
         }
-        return solid[blockId];
+        return Registries.BLOCK.isSolid(blockId);
     }
 
     public static boolean isBlockTransparentById(int blockId) {
-        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-            return transparent[1]; // TODO: just temporary
+        if (blockId >= LOWEST_CUSTOM_BLOCK_ID) {
+            return Registries.BLOCK.isTransparent(1); // TODO: just temporary
         }
-        return transparent[blockId];
+        return Registries.BLOCK.isTransparent(blockId);
     }
 
     public static Block fromFullId(int fullId) {
@@ -551,9 +453,77 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return BlockColor.VOID_BLOCK_COLOR;
     }
 
+    /**
+     * The method must be {@code @Override} to use the definition of the interface, please use the
+     * <br>
+     * {@code @Override}<br>{@code public String getName() {
+     * return CustomBlock.super.getName();
+     * } }
+     */
     public abstract String getName();
 
+    /**
+     * The method must be {@code @Override} to use the definition of the interface, please use the
+     * <br>
+     * {@code @Override}<br>{@code public String getId() {
+     * return CustomBlock.super.getId();
+     * } }
+     */
     public abstract int getId();
+
+    /**
+     * Gets the type of the block.
+     *
+     * @return BlockType
+     */
+    public BlockType getBlockType() {
+        if (this.type != null) {
+            return this.type;
+        }
+
+        if (this instanceof CustomBlock customBlock) {
+            this.type = BlockTypes.get(customBlock.getIdentifier());
+        } else if (this.isAir()) {
+            this.type = BlockTypes.AIR;
+        } else {
+            this.type = BlockTypes.get(Registries.BLOCK_TO_ITEM.get(this.getId(), this.getDamage()));
+        }
+
+        // Throw an exception if for some reason the type cannot be determined.
+        if (this.type == null) {
+            throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
+        }
+
+        return this.type;
+    }
+
+    /**
+     * Gets all item block.
+     *
+     * @return Set<BlockType>
+     */
+    public Set<BlockTag> getBlockTags() {
+        return BlockTags.getTagsSet(this.getIdentifier());
+    }
+
+    /**
+     * Checks whether the block has a tag.
+     *
+     * @param blockTag BlockTag to check
+     * @return true if there is, otherwise false
+     */
+    public boolean hasBlockTag(BlockTag blockTag) {
+        return this.getBlockTags().contains(blockTag);
+    }
+
+    /**
+     * Gets the block string identifier from the type.
+     *
+     * @return String identifier
+     */
+    public String getIdentifier() {
+        return this.getBlockType().getIdentifier();
+    }
 
     public int getItemId() {
         int id = getId();
@@ -609,7 +579,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public Item[] getDrops(Item item) {
-        if (this.getId() < 0 || this.getId() > list.length) {
+        if (this instanceof CustomBlock) {
+            return new Item[]{
+                    this.toItem()
+            };
+        }
+        if (this.getId() < 0 || this.getId() > Registries.BLOCK.getListSize()) {
             return Item.EMPTY_ARRAY;
         }
 

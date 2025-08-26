@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.level.Sound;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockDoorBamboo extends BlockDoorWood {
 
@@ -27,7 +27,7 @@ public class BlockDoorBamboo extends BlockDoorWood {
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.BAMBOO_DOOR);
+        return Item.get(ItemNamespaceId.BAMBOO_DOOR);
     }
 
     @Override

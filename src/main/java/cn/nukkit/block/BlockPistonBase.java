@@ -3,19 +3,22 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityChest;
-import cn.nukkit.blockentity.BlockEntityMovingBlock;
-import cn.nukkit.blockentity.BlockEntityPistonArm;
+import cn.nukkit.blockentity.impl.BlockEntityChest;
+import cn.nukkit.blockentity.impl.BlockEntityMovingBlock;
+import cn.nukkit.blockentity.impl.BlockEntityPistonArm;
 import cn.nukkit.event.block.BlockPistonEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
+import cn.nukkit.level.vibration.VanillaVibrationTypes;
+import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
@@ -264,6 +267,13 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
         BlockEntityPistonArm blockEntity = (BlockEntityPistonArm) this.level.getBlockEntity(this);
         blockEntity.move(extending, attached);
+        if (extending) {
+            this.getLevel().addSound(this, Sound.TILE_PISTON_OUT);
+            this.getLevel().getVibrationManager().callVibrationEvent(new VibrationEvent(this, this.add(0.5, 0.5, 0.5), VanillaVibrationTypes.PISTON_EXTEND));
+        } else {
+            this.getLevel().addSound(this, Sound.TILE_PISTON_IN);
+            this.getLevel().getVibrationManager().callVibrationEvent(new VibrationEvent(this, this.add(0.5, 0.5, 0.5), VanillaVibrationTypes.PISTON_CONTRACT));
+        }
         return true;
     }
 

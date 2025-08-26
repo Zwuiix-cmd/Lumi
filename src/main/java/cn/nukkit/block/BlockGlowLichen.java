@@ -1,15 +1,15 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.custom.properties.BlockProperties;
-import cn.nukkit.block.custom.properties.IntBlockProperty;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.IntBlockProperty;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 import java.util.EnumSet;
 import java.util.Set;

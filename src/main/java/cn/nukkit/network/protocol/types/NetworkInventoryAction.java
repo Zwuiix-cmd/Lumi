@@ -5,6 +5,7 @@ import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemLapisLazuli;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;
@@ -62,7 +63,7 @@ public class NetworkInventoryAction {
 
     public int sourceType;
     public int windowId;
-    public long unknown;
+    public long flags;
     public int inventorySlot;
     public Item oldItem;
     public Item newItem;
@@ -76,7 +77,7 @@ public class NetworkInventoryAction {
                 this.windowId = packet.getVarInt();
                 break;
             case SOURCE_WORLD:
-                this.unknown = packet.getUnsignedVarInt();
+                this.flags = packet.getUnsignedVarInt();
                 break;
             case SOURCE_CREATIVE:
                 break;
@@ -128,7 +129,7 @@ public class NetworkInventoryAction {
                 packet.putVarInt(this.windowId);
                 break;
             case SOURCE_WORLD:
-                packet.putUnsignedVarInt(this.unknown);
+                packet.putUnsignedVarInt(this.flags);
                 break;
             case SOURCE_CREATIVE:
                 break;
@@ -231,6 +232,22 @@ public class NetworkInventoryAction {
                             }
                             this.windowId = Player.SMITHING_WINDOW_ID;
                             this.inventorySlot = 2;
+                            break;
+                        case GrindstoneInventory.GRINDSTONE_EQUIPMENT_UI_SLOT:
+                            if (!(player.getWindowById(Player.GRINDSTONE_WINDOW_ID) instanceof GrindstoneInventory)) {
+                                player.getServer().getLogger().debug(player.getName() + " does not have grindstone window open");
+                                return null;
+                            }
+                            this.windowId = Player.GRINDSTONE_WINDOW_ID;
+                            this.inventorySlot = 0;
+                            break;
+                        case GrindstoneInventory.GRINDSTONE_INGREDIENT_UI_SLOT:
+                            if (!(player.getWindowById(Player.GRINDSTONE_WINDOW_ID) instanceof GrindstoneInventory)) {
+                                player.getServer().getLogger().debug(player.getName() + " does not have grindstone window open");
+                                return null;
+                            }
+                            this.windowId = Player.GRINDSTONE_WINDOW_ID;
+                            this.inventorySlot = 1;
                             break;
                         //124:4 -> 500:0
                         case TradeInventory.TRADE_INPUT1_UI_SLOT:
@@ -337,6 +354,13 @@ public class NetworkInventoryAction {
                             case SOURCE_TYPE_ANVIL_RESULT:
                                 return new SmithingItemAction(this.oldItem, this.newItem, this.inventorySlot);
                         }
+                    } else if (player.getWindowById(Player.GRINDSTONE_WINDOW_ID) instanceof GrindstoneInventory) {
+                        switch (this.windowId) {
+                            case SOURCE_TYPE_ANVIL_INPUT:
+                            case SOURCE_TYPE_ANVIL_MATERIAL:
+                            case SOURCE_TYPE_ANVIL_RESULT:
+                                return new GrindstoneItemAction(this.oldItem, this.newItem, this.windowId);
+                        }
                     } else {
                         player.getServer().getLogger().debug("Player " + player.getName() + " has no open anvil or smithing inventory");
                         return null;
@@ -377,7 +401,7 @@ public class NetworkInventoryAction {
                                     // Outputs should only be in slot 0
                                     return null;
                                 }
-                                if (Item.get(ItemID.DYE, 4).equals(this.newItem, true, false)) {
+                                if (new ItemLapisLazuli().equals(this.newItem, true, false)) {
                                     this.inventorySlot = 2; // Fake slot to store used material
                                     if (this.newItem.getCount() < 1 || this.newItem.getCount() > 3) {
                                         // Invalid material
@@ -386,8 +410,7 @@ public class NetworkInventoryAction {
                                     Item material = enchant.getItem(1);
                                     // Material to take away.
                                     int toRemove = this.newItem.getCount();
-                                    if (material.getId() != ItemID.DYE && material.getDamage() != 4 &&
-                                            material.getCount() < toRemove) {
+                                    if (!(material instanceof ItemLapisLazuli) && material.getCount() < toRemove) {
                                         // Invalid material or not enough
                                         return null;
                                     }
@@ -395,7 +418,7 @@ public class NetworkInventoryAction {
                                     Item toEnchant = enchant.getItem(0);
                                     Item material = enchant.getItem(1);
                                     if (toEnchant.equals(this.newItem, true, true) &&
-                                            (material.getId() == ItemID.DYE && material.getDamage() == 4 || player.isCreative())) {
+                                            (material instanceof ItemLapisLazuli || player.isCreative())) {
                                         this.inventorySlot = 3; // Fake slot to store the resultant item
 
                                         //TODO: Check (old) item has valid enchantments

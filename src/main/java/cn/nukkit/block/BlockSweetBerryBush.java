@@ -7,7 +7,7 @@ import cn.nukkit.event.block.BlockHarvestEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemSweetBerries;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -15,8 +15,8 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.MathHelper;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.data.DyeColor;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;
@@ -70,7 +70,7 @@ public class BlockSweetBerryBush extends BlockFlowable {
     public boolean onActivate(@Nonnull Item item, Player player) {
         int age = MathHelper.clamp(this.getDamage(), 0, 3);
 
-        if (age < 3 && item.getId() == ItemID.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
+        if (age < 3 && item instanceof ItemDye dye && dye.getDyeColor() == DyeColor.WHITE) {
             BlockSweetBerryBush block = (BlockSweetBerryBush) this.clone();
             block.setDamage(block.getDamage() + 1);
             if (block.getDamage() > 3) {

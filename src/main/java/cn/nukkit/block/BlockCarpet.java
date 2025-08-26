@@ -6,8 +6,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created on 2015/11/24 by xtypr.
@@ -93,7 +93,7 @@ public class BlockCarpet extends BlockFlowable {
 
     @Override
     public BlockColor getColor() {
-        return DyeColor.getByWoolData(getDamage()).getColor();
+        return DyeColor.getByWoolData(getDamage()).getBlockColor();
     }
 
     public DyeColor getDyeColor() {

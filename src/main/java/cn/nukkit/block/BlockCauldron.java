@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityCauldron;
+import cn.nukkit.blockentity.impl.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.item.*;
@@ -14,7 +14,6 @@ import cn.nukkit.math.MathHelper;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
@@ -173,30 +172,31 @@ public class BlockCauldron extends BlockSolidMeta implements BlockEntityHolder<B
                     }
                 }
                 break;
-            case Item.DYE:
-                if (isEmpty() || cauldron.hasPotion()) {
-                    break;
-                }
-
-                if (player.isSurvival() || player.isAdventure()) {
-                    item.setCount(item.getCount() - 1);
-                    player.getInventory().setItemInHand(item);
-                }
-
-                BlockColor color = new ItemDye(item.getDamage()).getDyeColor().getColor();
-                if (!cauldron.isCustomColor()) {
-                    cauldron.setCustomColor(color);
-                } else {
-                    BlockColor current = cauldron.getCustomColor();
-                    BlockColor mixed = new BlockColor(
-                            current.getRed() + (color.getRed() - current.getRed()) / 2,
-                            current.getGreen() + (color.getGreen() - current.getGreen()) / 2,
-                            current.getBlue() + (color.getBlue() - current.getBlue()) / 2
-                    );
-                    cauldron.setCustomColor(mixed);
-                }
-                this.level.addSoundToViewers(this, Sound.CAULDRON_ADDDYE);
-                break;
+//            TODO fix
+//            case Item.DYE:
+//                if (isEmpty() || cauldron.hasPotion()) {
+//                    break;
+//                }
+//
+//                if (player.isSurvival() || player.isAdventure()) {
+//                    item.setCount(item.getCount() - 1);
+//                    player.getInventory().setItemInHand(item);
+//                }
+//
+//                BlockColor color = DyeColor.getByDyeData(item.getDamage()).getBlockColor();
+//                if (!cauldron.isCustomColor()) {
+//                    cauldron.setCustomColor(color);
+//                } else {
+//                    BlockColor current = cauldron.getCustomColor();
+//                    BlockColor mixed = new BlockColor(
+//                            current.getRed() + (color.getRed() - current.getRed()) / 2,
+//                            current.getGreen() + (color.getGreen() - current.getGreen()) / 2,
+//                            current.getBlue() + (color.getBlue() - current.getBlue()) / 2
+//                    );
+//                    cauldron.setCustomColor(mixed);
+//                }
+//                this.level.addSoundToViewers(this, Sound.CAULDRON_ADDDYE);
+//                break;
             case Item.LEATHER_CAP:
             case Item.LEATHER_TUNIC:
             case Item.LEATHER_PANTS:

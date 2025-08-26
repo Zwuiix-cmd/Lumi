@@ -1,5 +1,6 @@
 package cn.nukkit.item.enchantment;
 
+import cn.nukkit.block.BlockSkull;
 import cn.nukkit.item.*;
 
 /**
@@ -20,9 +21,7 @@ public enum EnchantmentType {
     BOW,
     WEARABLE,
     TRIDENT,
-
     CROSSBOW,
-
     MACE;
 
     public boolean canEnchantItem(Item item) {
@@ -37,37 +36,24 @@ public enum EnchantmentType {
                 return true;
             }
 
-            switch (this) {
-                case ARMOR_HEAD:
-                    return item.isHelmet();
-                case ARMOR_TORSO:
-                    return item.isChestplate();
-                case ARMOR_LEGS:
-                    return item.isLeggings();
-                case ARMOR_FEET:
-                    return item.isBoots();
-                default:
-                    return false;
-            }
+            return switch (this) {
+                case ARMOR_HEAD -> item.isHelmet();
+                case ARMOR_TORSO -> item.isChestplate();
+                case ARMOR_LEGS -> item.isLeggings();
+                case ARMOR_FEET -> item.isBoots();
+                default -> false;
+            };
         } else {
-            switch (this) {
-                case SWORD:
-                    return item.isSword();
-                case DIGGER:
-                    return item.isPickaxe() || item.isShovel() || item.isAxe() || item.isHoe();
-                case BOW:
-                    return item instanceof ItemBow;
-                case FISHING_ROD:
-                    return item instanceof ItemFishingRod;
-                case WEARABLE:
-                    return item instanceof ItemSkull;
-                case TRIDENT:
-                    return item instanceof ItemTrident;
-                case CROSSBOW:
-                    return item instanceof ItemCrossbow;
-                default:
-                    return false;
-            }
+            return switch (this) {
+                case SWORD -> item.isSword();
+                case DIGGER -> item.isPickaxe() || item.isShovel() || item.isAxe() || item.isHoe();
+                case BOW -> item instanceof ItemBow;
+                case FISHING_ROD -> item instanceof ItemFishingRod;
+                case WEARABLE -> item.getBlock() instanceof BlockSkull;
+                case TRIDENT -> item instanceof ItemTrident;
+                case CROSSBOW -> item instanceof ItemCrossbow;
+                default -> false;
+            };
         }
     }
 }

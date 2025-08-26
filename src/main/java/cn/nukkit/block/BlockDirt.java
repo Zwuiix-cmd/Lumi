@@ -2,11 +2,14 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.effect.PotionType;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBoneMeal;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.generator.object.ObjectTallGrass;
 import cn.nukkit.level.particle.BoneMealParticle;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 /**
  * @author MagicDroidX
@@ -75,7 +78,7 @@ public class BlockDirt extends BlockSolidMeta {
                 }
                 return true;
             }
-        } else if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+        } else if (item instanceof ItemBoneMeal) {
             Block up = this.up();
             if (up instanceof BlockWater) {
                 if (player != null && !player.isCreative()) {

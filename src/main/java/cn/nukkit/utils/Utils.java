@@ -3,7 +3,6 @@ package cn.nukkit.utils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
@@ -12,12 +11,13 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.registry.ItemLegacyRegistry;
+import cn.nukkit.registry.Registries;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -80,18 +80,18 @@ public class Utils {
     }
 
     public static boolean hasItemOrBlock(String id) {
-        return Item.NAMESPACED_ID_ITEM.containsKey(id.toLowerCase(Locale.ROOT));
+        return Registries.ITEM.isItemRegistered(id.toLowerCase(Locale.ROOT));
     }
 
     public static boolean hasItemOrBlock(int id) {
         if (id < 0) {
             int blockId = 255 - id;
-            if (blockId > CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
-                return CustomBlockManager.get().getBlock(blockId) != null;
+            if (blockId > Block.LOWEST_CUSTOM_BLOCK_ID) {
+                return Block.get(blockId) != null;
             }
-            return blockId < Block.MAX_BLOCK_ID && Block.list[blockId] != null;
+            return blockId < Block.MAX_BLOCK_ID && Registries.BLOCK.getClass(blockId) != null;
         } else {
-            return id < Item.list.length && Item.list[id] != null;
+            return id < ItemLegacyRegistry.HIGHEST_LEGACY_ITEM_ID && Registries.ITEM_LEGACY.get(id) != null;
         }
     }
 
@@ -494,6 +494,7 @@ public class Utils {
             case ProtocolInfo.v1_21_80 -> "1.21.80";
             case ProtocolInfo.v1_21_90 -> "1.21.90";
             case ProtocolInfo.v1_21_93 -> "1.21.93";
+            case ProtocolInfo.v1_21_100 -> "1.21.100";
             //TODO Multiversion 添加新版本支持时修改这里
             default -> throw new IllegalStateException("Invalid protocol: " + protocol);
         };
@@ -507,40 +508,24 @@ public class Utils {
      * @return operating system/device name
      */
     public static String getOS(Player player) {
-        switch(player.getLoginChainData().getDeviceOS()) {
-            case 1:
-                return "Android";
-            case 2:
-                return "iOS";
-            case 3:
-                return "macOS";
-            case 4:
-                return "Fire";
-            case 5:
-                return "Gear VR";
-            case 6:
-                return "HoloLens";
-            case 7:
-                return "Windows";
-            case 8:
-                return "Windows x86";
-            case 9:
-                return "Dedicated";
-            case 10:
-                return "tvOS";
-            case 11:
-                return "PlayStation";
-            case 12:
-                return "Switch";
-            case 13:
-                return "Xbox";
-            case 14:
-                return "Windows Phone";
-            case 15:
-                return "Linux";
-            default:
-                return "Unknown";
-        }
+        return switch (player.getLoginChainData().getDeviceOS()) {
+            case 1 -> "Android";
+            case 2 -> "iOS";
+            case 3 -> "macOS";
+            case 4 -> "Fire";
+            case 5 -> "Gear VR";
+            case 6 -> "HoloLens";
+            case 7 -> "Windows";
+            case 8 -> "Windows x86";
+            case 9 -> "Dedicated";
+            case 10 -> "tvOS";
+            case 11 -> "PlayStation";
+            case 12 -> "Switch";
+            case 13 -> "Xbox";
+            case 14 -> "Windows Phone";
+            case 15 -> "Linux";
+            default -> "Unknown";
+        };
     }
 
     public static <T> T sumObjectsAndGet(Class<? extends T> clazz1, Class<? extends T> clazz2) {

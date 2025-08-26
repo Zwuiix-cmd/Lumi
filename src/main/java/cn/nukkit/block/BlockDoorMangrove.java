@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemNamespaceId;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockDoorMangrove extends BlockDoorWood {
 
@@ -26,7 +26,7 @@ public class BlockDoorMangrove extends BlockDoorWood {
 
     @Override
     public Item toItem() {
-        return Item.fromString(ItemNamespaceId.MANGROVE_DOOR);
+        return Item.get(ItemNamespaceId.MANGROVE_DOOR);
     }
 
     @Override

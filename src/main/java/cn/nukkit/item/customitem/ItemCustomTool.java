@@ -3,6 +3,7 @@ package cn.nukkit.item.customitem;
 import cn.nukkit.item.*;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.registry.Registries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,12 +15,12 @@ public abstract class ItemCustomTool extends StringItemToolBase implements ItemD
     private final String textureName;
 
     public ItemCustomTool(@NotNull String id, @Nullable String name) {
-        super(id, StringItem.notEmpty(name));
+        super(id, StringItem.checkNotEmpty(name));
         this.textureName = name;
     }
 
     public ItemCustomTool(@NotNull String id, @Nullable String name, @NotNull String textureName) {
-        super(id, StringItem.notEmpty(name));
+        super(id, StringItem.checkNotEmpty(name));
         this.textureName = textureName;
     }
 
@@ -35,7 +36,7 @@ public abstract class ItemCustomTool extends StringItemToolBase implements ItemD
 
     @Nullable
     public final Integer getSpeed() {
-        var nbt = Item.getCustomItemDefinition().get(this.getNamespaceId()).getNbt(ProtocolInfo.CURRENT_PROTOCOL);
+        var nbt = Registries.ITEM.getCustomItemDefinition().get(this.getNamespaceId()).getNbt(ProtocolInfo.CURRENT_PROTOCOL);
         if (nbt == null || !nbt.getCompound("components").contains("minecraft:digger")) return null;
         return nbt.getCompound("components")
                 .getCompound("minecraft:digger")

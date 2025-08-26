@@ -3,11 +3,11 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -156,7 +156,7 @@ public class BlockDoublePlant extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+        if (item instanceof ItemBoneMeal) {
             int type = this.getDamage() & 0x07;
             if (type == SUNFLOWER || type == LILAC || type == ROSE_BUSH || type == PEONY) { // Flower
                 if (player != null && !player.isCreative()) {

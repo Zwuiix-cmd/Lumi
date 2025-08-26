@@ -7,7 +7,6 @@ import cn.nukkit.event.*;
 import cn.nukkit.permission.Permissible;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
 import io.netty.util.internal.ConcurrentSet;
 import lombok.extern.log4j.Log4j2;
@@ -87,6 +86,7 @@ public class PluginManager {
         }
         PluginDescription description = new PluginDescription(info);
         plugin.init(pluginLoader, this.getClass().getClassLoader(), server, description, new File("Lumi"), file);
+        plugin.onLoad();
         plugins.put(description.getName(), plugin);
         enablePlugin(plugin);
     }

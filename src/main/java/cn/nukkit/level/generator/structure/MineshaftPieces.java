@@ -24,13 +24,14 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.plugin.InternalPlugin;
+import cn.nukkit.registry.Registries;
 import com.google.common.collect.Lists;
 
 import java.util.List;
 
 public final class MineshaftPieces {
-    private static final BlockState OAK_PLANKS = new BlockState(Block.PLANKS, BlockPlanks.OAK);
-    private static final BlockState DARK_OAK_PLANKS = new BlockState(Block.PLANKS, BlockPlanks.DARK_OAK);
+    private static final BlockState OAK_PLANKS = new BlockState(Block.OAK_PLANKS);
+    private static final BlockState DARK_OAK_PLANKS = new BlockState(Block.DARK_OAK_PLANKS);
     private static final BlockState OAK_FENCE = new BlockState(Block.FENCE, BlockFence.FENCE_OAK);
     private static final BlockState DARK_OAK_FENCE = new BlockState(Block.FENCE, BlockFence.FENCE_DARK_OAK);
     private static final BlockState COBWEB = new BlockState(Block.COBWEB);
@@ -424,7 +425,7 @@ public final class MineshaftPieces {
                 for (int z = 0; z <= z1; ++z) {
                     final BlockState block = getBlock(level, 1, -1, z, boundingBox);
                     final int id = level.getBlockIdAt(getWorldX(1, z), getWorldY(-1), getWorldZ(1, z));
-                    if (!block.equals(BlockState.AIR) && Block.solid[id] && !Block.transparent[id]) {
+                    if (!block.equals(BlockState.AIR) && Registries.BLOCK.isSolid(id) && !Registries.BLOCK.isTransparent(id)) {
                         maybeGenerateBlock(level, boundingBox, random, isInterior(level, 1, 0, z, boundingBox) ? 70 : 90, 1, 0, z, RAIL__NS);
                     }
                 }

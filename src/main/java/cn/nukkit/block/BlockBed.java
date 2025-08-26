@@ -2,11 +2,14 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityBed;
+import cn.nukkit.blockentity.impl.BlockEntityBed;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBed;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.GameRule;
@@ -273,7 +276,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable, BlockEnt
 
     @Override
     public BlockColor getColor() {
-        return this.getDyeColor().getColor();
+        return this.getDyeColor().getBlockColor();
     }
 
     public DyeColor getDyeColor() {

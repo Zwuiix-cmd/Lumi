@@ -2,17 +2,19 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityMusic;
+import cn.nukkit.blockentity.impl.BlockEntityMusic;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
+import cn.nukkit.level.vibration.VanillaVibrationTypes;
+import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.BlockEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -224,6 +226,8 @@ public class BlockNoteblock extends BlockSolid implements BlockEntityHolder<Bloc
 
     public void emitSound() {
         if (this.up().getId() != AIR) return;
+
+        this.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, this.add(0.5, 0.5, 0.5).clone(), VanillaVibrationTypes.BLOCK_CHANGE));
 
         Instrument instrument = this.getInstrument();
 

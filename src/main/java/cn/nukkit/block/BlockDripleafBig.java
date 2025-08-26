@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.custom.properties.BlockProperties;
-import cn.nukkit.block.custom.properties.BlockProperty;
-import cn.nukkit.block.custom.properties.BooleanBlockProperty;
-import cn.nukkit.block.custom.properties.EnumBlockProperty;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.BlockProperty;
+import cn.nukkit.block.customblock.properties.BooleanBlockProperty;
+import cn.nukkit.block.customblock.properties.EnumBlockProperty;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.VanillaProperties;
 import cn.nukkit.block.properties.enums.DripleafTilt;
@@ -14,7 +14,7 @@ import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.Sound;
@@ -22,7 +22,7 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 
 public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesHelper, Faceable {
 
@@ -164,7 +164,7 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
+        if (!(item instanceof ItemBoneMeal)) {
             return false;
         }
 

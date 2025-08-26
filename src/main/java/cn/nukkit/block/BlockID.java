@@ -12,9 +12,9 @@ public interface BlockID {
     int COBBLESTONE = 4;
     int COBBLE = 4;
     int PLANK = 5;
+    @Deprecated
     int PLANKS = 5;
-    int WOODEN_PLANK = 5;
-    int WOODEN_PLANKS = 5;
+    int OAK_PLANKS = 5;
     int SAPLING = 6;
     int SAPLINGS = 6;
     int BEDROCK = 7;
@@ -53,9 +53,8 @@ public interface BlockID {
     int WOOL = 35;
     int DANDELION = 37;
     int POPPY = 38;
-    int ROSE = 38;
-    int FLOWER = 38;
-    int RED_FLOWER = 38;
+    @Deprecated
+    int RED_FLOWER = POPPY;
     int BROWN_MUSHROOM = 39;
     int RED_MUSHROOM = 40;
     int GOLD_BLOCK = 41;
@@ -765,6 +764,13 @@ public interface BlockID {
     int CALIBRATED_SCULK_SENSOR = 835;
     int SNIFFER_EGG = 851;
     int PITCHER_PLANT = 867;
+
+    int SPRUCE_PLANKS = 994;
+    int BIRCH_PLANKS = 995;
+    int JUNGLE_PLANKS = 996;
+    int ACACIA_PLANKS = 997;
+    int DARK_OAK_PLANKS = 998;
+
     int TUFF_SLAB = 999;
     int TUFF_DOUBLE_SLAB = 1000;
     int TUFF_STAIRS = 1001;
@@ -821,6 +827,17 @@ public interface BlockID {
     int WAXED_EXPOSED_COPPER_TRAPDOOR = 1052;
     int WAXED_WEATHERED_COPPER_TRAPDOOR = 1053;
     int WAXED_OXIDIZED_COPPER_TRAPDOOR = 1054;
+
+    int BLUE_ORCHID = 1085;
+    int ALLIUM = 1086;
+    int AZURE_BLUET = 1087;
+    int RED_TULIP = 1088;
+    int ORANGE_TULIP = 1089;
+    int WHITE_TULIP = 1090;
+    int PINK_TULIP = 1091;
+    int OXEYE_DAISY = 1092;
+    int CORNFLOWER = 1093;
+    int LILY_OF_THE_VALLEY = 1094;
 
     int WITHER_SKELETON_SKULL = 1220;
     int ZOMBIE_HEAD = 1221;

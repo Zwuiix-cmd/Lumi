@@ -2,7 +2,13 @@ package cn.nukkit;
 
 import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
+import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.blockentity.*;
+import cn.nukkit.blockentity.impl.BlockEntityCampfire;
+import cn.nukkit.blockentity.impl.BlockEntityItemFrame;
+import cn.nukkit.blockentity.impl.BlockEntitySign;
+import cn.nukkit.bossbar.BossBarColor;
+import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
@@ -11,6 +17,7 @@ import cn.nukkit.command.utils.RawText;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.EntityProperty;
+import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityWalkingMob;
@@ -19,6 +26,7 @@ import cn.nukkit.entity.passive.EntityVillager;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.entity.util.BlockIterator;
 import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -54,6 +62,8 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
+import cn.nukkit.level.vibration.VanillaVibrationTypes;
+import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
@@ -70,15 +80,17 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
 import cn.nukkit.scoreboard.scoreboard.IScoreboard;
 import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
 import cn.nukkit.scoreboard.scorer.PlayerScorer;
-import cn.nukkit.settings.GeneralSettings;
 import cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 import cn.nukkit.utils.*;
+import cn.nukkit.utils.compression.SnappyCompression;
+import cn.nukkit.utils.compression.Zlib;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -104,6 +116,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -153,9 +166,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int ANVIL_WINDOW_ID = 2;
     public static final int ENCHANT_WINDOW_ID = 3;
     public static final int BEACON_WINDOW_ID = 4;
-    public static final int LOOM_WINDOW_ID = 2;
-    public static final int GRINDSTONE_WINDOW_ID = 5;
+    public static final int LOOM_WINDOW_ID = 5;
     public static final int SMITHING_WINDOW_ID = 6;
+    public static final int GRINDSTONE_WINDOW_ID = 7;
     /**
      * @since 649 1.20.60
      * 自1.20.60开始，需要发送ContainerOpenPacket给玩家才能正常打开讲台上的书
@@ -164,7 +177,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int LECTERN_WINDOW_ID = 7;
 
     // 后续创建的窗口应该从此数值开始
-    public static final int MINIMUM_OTHER_WINDOW_ID = Utils.dynamic(8);
+    public static final int MINIMUM_OTHER_WINDOW_ID = Utils.dynamic(10);
 
     public static final int RESOURCE_PACK_CHUNK_SIZE = 8 * 1024; // 8KB
 
@@ -209,6 +222,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected LoomTransaction loomTransaction;
     protected SmithingTransaction smithingTransaction;
     protected TradingTransaction tradingTransaction;
+    protected GrindstoneTransaction grindstoneTransaction;
 
     protected long randomClientId;
 
@@ -342,7 +356,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean shouldLogin = false;
 
     private int lastEmote;
-    private int lastEnderPearl = 20;
+    private int lastEnderPearlThrow = 20;
+    private int lastWindChargeThrow = 10;
     private int lastChorusFruitTeleport = 20;
     public long lastSkinChange = -1;
     private double lastRightClickTime = 0.0;
@@ -435,11 +450,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int getLastEnderPearlThrowingTick() {
-        return lastEnderPearl;
+        return lastEnderPearlThrow;
     }
 
-    public void onThrowEnderPearl() {
-        this.lastEnderPearl = this.server.getTick();
+    public void setLastEnderPearlThrowingTick() {
+        this.lastEnderPearlThrow = this.server.getTick();
+    }
+
+    public int getLastWindChargeThrowingTick() {
+        return lastWindChargeThrow;
+    }
+
+    public void setLastWindChargeThrowingTick() {
+        this.lastWindChargeThrow = this.server.getTick();
     }
 
     public int getLastChorusFruitTeleport() {
@@ -1589,7 +1612,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.protocol < ProtocolInfo.v1_16_0) {
                 InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
                 inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(Item.EMPTY_ARRAY);
+                inventoryContentPacket.slots = Registries.CREATIVE_ITEM.get(this.protocol).getItems().toArray(Item.EMPTY_ARRAY);
                 this.dataPacket(inventoryContentPacket);
             }
         }
@@ -2036,8 +2059,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.collisionBlocks = null;
 
             if (!to.equals(moveEvent.getTo())) { // If plugins modify the destination
+                if (this.getGamemode() != Player.SPECTATOR)
+                    this.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, moveEvent.getTo().clone(), VanillaVibrationTypes.TELEPORT));
                 this.teleport(moveEvent.getTo(), null);
             } else {
+                if (this.getGamemode() != Player.SPECTATOR && (lastX != to.x || lastY != to.y || lastX != to.z)) {
+                    if (this.isOnGround() && this.isGliding()) {
+                        this.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, this, VanillaVibrationTypes.ELYTRA_GLIDE));
+                    } else if (this.isOnGround() && !(this.getSide(BlockFace.DOWN).getLevelBlock().hasBlockTag(BlockInternalTags.VIBRATION_DAMPER)) && !this.isSneaking()) {
+                        this.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, this, VanillaVibrationTypes.STEP));
+                    } else if (this.isSwimming()) {
+                        this.level.getVibrationManager().callVibrationEvent(new VibrationEvent(this, this.getLocation().clone(), VanillaVibrationTypes.SWIM));
+                    }
+                }
                 this.broadcastMovement();
             }
         } else {
@@ -2782,13 +2816,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
                 if (this.protocol >= ProtocolInfo.v1_21_60) {
                     Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
+                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Registries.ITEM.getCustomItemDefinition().entrySet();
                     List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
                     entries.addAll(vanillaItems);
                     if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
                         for (Entry<String, CustomItemDefinition> entry : itemDefinitions) {
                             try {
-                                Item item = Item.fromString(entry.getKey());
+                                Item item = Item.get(entry.getKey());
                                 entries.add(new ItemComponentPacket.ItemDefinition(
                                         entry.getKey(),
                                         item.getNetworkId(this.protocol),
@@ -2803,13 +2837,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     itemComponentPacket.setEntries(entries);
                 } else {
-                    if (this.server.getSettings().features().enableExperimentMode() && !Item.getCustomItemDefinition().isEmpty()) {
-                        HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
+                    if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
+                        Map<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
                         List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
                         int i = 0;
                         for (var entry : itemDefinition.entrySet()) {
                             try {
-                                Item item = Item.fromString(entry.getKey());
+                                Item item = Item.get(entry.getKey());
                                 entries.add(new ItemComponentPacket.ItemDefinition(
                                         entry.getKey(),
                                         item.getNetworkId(this.protocol),
@@ -4189,7 +4223,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 if (transactionPacket.isCraftingPart) {
-                    if (LoomTransaction.checkForItemPart(actions)) {
+                    if (LoomTransaction.isIn(actions)) {
                         if (this.loomTransaction == null) {
                             this.loomTransaction = new LoomTransaction(this, actions);
                         } else {
@@ -4238,7 +4272,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     return;
                 } else if (this.protocol >= ProtocolInfo.v1_16_0 && transactionPacket.isRepairItemPart) {
                     Sound sound = null;
-                    if (SmithingTransaction.checkForItemPart(actions)) {
+                    if (SmithingTransaction.isIn(actions)) {
                         if (this.smithingTransaction == null) {
                             this.smithingTransaction = new SmithingTransaction(this, actions);
                         } else {
@@ -4254,6 +4288,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             } finally {
                                 this.smithingTransaction = null;
                             }
+                        }
+                    } else if (GrindstoneTransaction.isIn(actions)) {
+                        if (this.grindstoneTransaction == null) {
+                            this.grindstoneTransaction = new GrindstoneTransaction(this, actions);
+                        } else {
+                            for (InventoryAction action : actions) {
+                                this.grindstoneTransaction.addAction(action);
+                            }
+                        }
+                        if (this.grindstoneTransaction.canExecute()) {
+                            if (this.grindstoneTransaction.execute()) {
+                                Collection<Player> players = level.getChunkPlayers(getChunkX(), getChunkZ()).values();
+                                players.remove(this);
+                                if (!players.isEmpty()) {
+                                    level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BLOCK_GRINDSTONE_USE);
+                                }
+                            }
+                            this.grindstoneTransaction = null;
                         }
                     } else {
                         if (this.repairItemTransaction == null) {
@@ -4348,7 +4400,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.repairItemTransaction = null;
                     }
                 } else if (this.protocol >= ProtocolInfo.v1_16_0 && this.smithingTransaction != null) {
-                    if (SmithingTransaction.checkForItemPart(actions)) {
+                    if (SmithingTransaction.isIn(actions)) {
                         for (InventoryAction action : actions) {
                             this.smithingTransaction.addAction(action);
                         }
@@ -4358,6 +4410,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.removeAllWindows(false);
                         this.needSendInventory = true;
                         this.smithingTransaction = null;
+                    }
+                } else if (this.grindstoneTransaction != null) {
+                    if (GrindstoneTransaction.isIn(actions)) {
+                        for (InventoryAction action : actions) {
+                            this.grindstoneTransaction.addAction(action);
+                        }
+                        return;
+                    } else {
+                        this.server.getLogger().debug("Got unexpected normal inventory action with incomplete repair item transaction from " + this.username + ", refusing to execute repair item " + transactionPacket.toString());
+                        this.removeAllWindows(false);
+                        this.needSendInventory = true;
+                        this.repairItemTransaction = null;
                     }
                 }
 
@@ -7244,6 +7308,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
             if (protocol >= ProtocolInfo.v1_21_80) {
                 experiments.add(new ExperimentData("experimental_graphics", true));
+            }
+            if(protocol >= ProtocolInfo.v1_21_100) {
+                experiments.add(new ExperimentData("y_2025_drop_3", true));
             }
         }
         return experiments;

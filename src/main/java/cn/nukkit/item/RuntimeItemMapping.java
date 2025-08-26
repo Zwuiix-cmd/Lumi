@@ -11,6 +11,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ItemComponentPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import com.google.gson.JsonArray;
@@ -32,6 +33,7 @@ import java.io.InputStreamReader;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 
 @Log4j2
@@ -139,8 +141,50 @@ public class RuntimeItemMapping {
         this.generatePalette();
     }
 
-    Object2IntMap<String> getName2RuntimeId() {
+    public Object2IntMap<String> getName2RuntimeId() {
         return name2RuntimeId;
+    }
+
+    @NotNull
+    public Item getItemByNamespaceId(@NotNull String namespaceId, int amount) {
+        Supplier<Item> constructor = Registries.ITEM.getSupplier(namespaceId.toLowerCase(Locale.ENGLISH));
+        if (constructor != null) {
+            try {
+                Item item = constructor.get();
+                item.setCount(amount);
+                return item;
+            } catch (Exception e) {
+                log.warn("Could not create a new instance of {} using the namespaced id {}", constructor, namespaceId, e);
+            }
+        }
+
+        int legacyFullId;
+        try {
+            legacyFullId = getLegacyFullId(
+                    getNetworkIdByNamespaceId(namespaceId)
+                            .orElseThrow(() -> new IllegalArgumentException("The network id of \"" + namespaceId + "\" is unknown"))
+            );
+        } catch (IllegalArgumentException e) {
+            log.debug("Found an unknown item {}", namespaceId, e);
+            Item item = new StringItemUnknown(namespaceId);
+            item.setCount(amount);
+            return item;
+        }
+
+        int id = RuntimeItems.getId(legacyFullId);
+        int data = 0;
+        if (RuntimeItems.hasData(legacyFullId)) {
+            data = RuntimeItems.getData(legacyFullId);
+        }
+        return Item.get(id, data, amount);
+    }
+
+    public int getLegacyFullId(int networkId) {
+        LegacyEntry legacyEntry = runtime2Legacy.get(networkId);
+        if (legacyEntry == null) {
+            throw new IllegalArgumentException("Unknown network mapping " + networkId);
+        }
+        return legacyEntry.getFullID();
     }
 
     public void registerItem(String identifier, int runtimeId, int legacyId, int damage) {
@@ -171,7 +215,34 @@ public class RuntimeItemMapping {
         }
     }
 
-    synchronized boolean registerCustomItem(CustomItem customItem) {
+    public void registerCustomBlockItem(String identifier, int legacyId, int damage) {
+        int fullId = this.getFullId(legacyId, damage);
+        LegacyEntry legacyEntry = new LegacyEntry(legacyId, false, damage);
+
+        if (Nukkit.DEBUG > 1) {
+            if (this.runtime2Legacy.containsKey(legacyId)) {
+                log.warn("RuntimeItemMapping: Registering " + identifier + " but runtime id " + legacyId + " is already used");
+            }
+        }
+
+        this.customItems.add(identifier);
+
+        this.runtimeId2Name.put(legacyId, identifier);
+        this.name2RuntimeId.put(identifier, legacyId);
+
+        this.runtime2Legacy.put(legacyId, legacyEntry);
+        this.identifier2Legacy.put(identifier, legacyEntry);
+        if (this.legacy2Runtime.containsKey(fullId)) {
+            log.debug("RuntimeItemMapping contains duplicated legacy item state runtimeId=" + legacyId + " identifier=" + identifier);
+        } else {
+            RuntimeEntry runtimeEntry = new RuntimeEntry(identifier, legacyId, false, true);
+            this.legacy2Runtime.put(fullId, runtimeEntry);
+            this.itemPaletteEntries.add(runtimeEntry);
+        }
+        this.generatePalette();
+    }
+
+    public synchronized boolean registerCustomItem(CustomItem customItem) {
         int runtimeId = CustomItemDefinition.getRuntimeId(customItem.getDefinition().identifier());
         String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().getSettings().features().enableExperimentMode()) {
@@ -195,7 +266,7 @@ public class RuntimeItemMapping {
         return true;
     }
 
-    synchronized void deleteCustomItem(CustomItem customItem) {
+    public synchronized void deleteCustomItem(CustomItem customItem) {
         String namespaceId = customItem.getDefinition().identifier();
         if (!Server.getInstance().getSettings().features().enableExperimentMode() && !this.customItems.contains(namespaceId)) {
             return;
@@ -290,7 +361,7 @@ public class RuntimeItemMapping {
             if ("minecraft:raw_iron".equalsIgnoreCase(identifier)) {
                 int test = 1;
             }
-            if (networkId.isEmpty() || !Item.NAMESPACED_ID_ITEM.containsKey(identifier)) {
+            if (networkId.isEmpty() || !Registries.ITEM.isItemRegistered(identifier)) {
                 if (!ignoreUnknown) {
                     throw new IllegalStateException("Can not find legacyEntry for " + identifier);
                 }
@@ -338,7 +409,7 @@ public class RuntimeItemMapping {
         if (legacyEntry != null) {
             return Item.get(legacyId, damage, count, nbtBytes);
         } else {
-            Item item = Item.fromString(identifier);
+            Item item = Item.get(identifier);
             item.setDamage(damage);
             item.setCount(count);
             item.setCompoundTag(nbtBytes);
@@ -420,6 +491,10 @@ public class RuntimeItemMapping {
 
         public int getDamage() {
             return this.hasDamage ? this.damage : 0;
+        }
+
+        public int getFullID() {
+            return RuntimeItems.getFullId(legacyId, damage);
         }
     }
 

@@ -1,8 +1,8 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.Server;
-import cn.nukkit.block.custom.CustomBlockDefinition;
-import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.customblock.CustomBlockDefinition;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -10,6 +10,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.types.ExperimentData;
 import cn.nukkit.network.protocol.types.NetworkPermissions;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -113,7 +114,7 @@ public class StartGamePacket extends DataPacket {
     public boolean isServerAuthoritativeBlockBreaking;
     public long currentTick;
     public int enchantmentSeed;
-    public Collection<CustomBlockDefinition> blockDefinitions = CustomBlockManager.get().getBlockDefinitions();
+    public Collection<CustomBlockDefinition> blockDefinitions = Registries.BLOCK.getCustomBlockDefinitionList();
     public String multiplayerCorrelationId = "";
     public boolean isDisablingPersonas;
     public boolean isDisablingCustomSkins;
@@ -163,6 +164,10 @@ public class StartGamePacket extends DataPacket {
      * @since v685
      */
     public String scenarioId = "";
+    /**
+     * @since v827
+     */
+    public boolean tickDeathSystemsEnabled;
 
     @Override
     public void decode() {
@@ -375,6 +380,9 @@ public class StartGamePacket extends DataPacket {
                                 this.putBoolean(this.blockNetworkIdsHashed);
                                 if (protocol >= ProtocolInfo.v1_20_0_23) {
                                     this.putBoolean(this.networkPermissions.isServerAuthSounds());
+                                    if(protocol >= ProtocolInfo.v1_21_100) {
+                                        this.putBoolean(this.tickDeathSystemsEnabled);
+                                    }
                                 }
                             }
                         }

@@ -1,9 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemCrimsonSign;
-import cn.nukkit.item.ItemMangroveSign;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockMangroveWallSign extends BlockWallSign {
 
@@ -32,7 +31,7 @@ public class BlockMangroveWallSign extends BlockWallSign {
 
     @Override
     public Item toItem() {
-        return new ItemMangroveSign();
+        return Item.get(ItemNamespaceId.MANGROVE_SIGN);
     }
 
     @Override

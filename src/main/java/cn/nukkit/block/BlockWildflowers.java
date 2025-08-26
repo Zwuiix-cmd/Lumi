@@ -1,15 +1,16 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.custom.properties.BlockProperties;
-import cn.nukkit.block.custom.properties.IntBlockProperty;
+import cn.nukkit.block.customblock.properties.BlockProperties;
+import cn.nukkit.block.customblock.properties.IntBlockProperty;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.VanillaProperties;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +90,7 @@ public class BlockWildflowers extends BlockFlowable implements Faceable, BlockPr
 
     @Override
     public boolean onActivate(@NotNull Item item, @Nullable Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
+        if (item instanceof ItemBoneMeal) {
             if (this.getPropertyValue(GROWTH) < 3) {
                 setPropertyValue(GROWTH, this.getPropertyValue(GROWTH) + 1);
                 getLevel().setBlock(this, this);

@@ -2,9 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityChest;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityPiglin;
+import cn.nukkit.blockentity.impl.BlockEntityChest;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -16,8 +14,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -27,8 +25,6 @@ import java.util.Map;
  * Nukkit Project
  */
 public class BlockChest extends BlockTransparentMeta implements Faceable, BlockEntityHolder<BlockEntityChest> {
-
-    private static final int[] faces = {2, 5, 3, 4};
 
     public BlockChest() {
         this(0);
@@ -93,7 +89,7 @@ public class BlockChest extends BlockTransparentMeta implements Faceable, BlockE
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockEntityChest chest = null;
-        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
 
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag("")

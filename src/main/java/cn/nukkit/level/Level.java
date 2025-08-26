@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.api.NonComputationAtomic;
 import cn.nukkit.block.*;
+import cn.nukkit.block.customblock.CustomBlock;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -51,6 +53,11 @@ import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
+import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.vibration.VanillaVibrationTypes;
+import cn.nukkit.level.vibration.VibrationEvent;
+import cn.nukkit.level.vibration.VibrationManager;
+import cn.nukkit.level.vibration.VibrationManagerImpl;
 import cn.nukkit.math.*;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.metadata.BlockMetadataStore;
@@ -61,6 +68,7 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.utils.*;
@@ -168,7 +176,11 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.AZALEA] = true;
         randomTickBlocks[Block.FLOWERING_AZALEA] = true;
 
+        randomTickBlocks[Block.MANGROVE_PROPAGULE] = true;
+        randomTickBlocks[Block.MANGROVE_LEAVES] = true;
+
         randomTickBlocks[Block.CHERRY_SAPLING] = true;
+        randomTickBlocks[Block.CHERRY_LEAVES] = true;
 
         randomTickBlocks[Block.COPPER_BLOCK] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
@@ -270,6 +282,9 @@ public class Level implements ChunkManager, Metadatable {
     private final Long2ObjectOpenHashMap<Boolean> chunkGenerationQueue = new Long2ObjectOpenHashMap<>();
     private final int chunkGenerationQueueSize;
     private final int chunkPopulationQueueSize;
+
+    @Getter
+    private final VibrationManager vibrationManager = new VibrationManagerImpl(this);
 
     private boolean autoSave;
     private boolean autoCompaction;
@@ -2063,7 +2078,7 @@ public class Level implements ChunkManager, Metadatable {
             int z = Hash.hashBlockZ(node);
 
             int id = this.getBlockIdAt(x, y, z);
-            int lightFilter = id >= Block.MAX_BLOCK_ID ? 15 : Block.lightFilter[id];
+            int lightFilter = id >= Block.MAX_BLOCK_ID ? 15 : Registries.BLOCK.getLightFilter(id);
             int lightLevel = this.getBlockLightAt(x, y, z) - lightFilter;
 
             if (lightLevel >= 1) {
@@ -2126,7 +2141,7 @@ public class Level implements ChunkManager, Metadatable {
 
     @Override
     public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
-        this.setBlock(x, y, z, layer, Block.fullList[fullId], false, false);
+        this.setBlock(x, y, z, layer, Registries.BLOCK.get(fullId), false, false);
     }
 
     public boolean isAntiXrayEnabled() {
@@ -2374,7 +2389,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<? extends Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canBreak = true;
                                 break;
@@ -2387,7 +2402,15 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
 
-            double breakTime = target.calculateBreakTime(item, player);
+            double breakTime = target.calculateBreakTimeNotInAir(item, player);
+            //对于自定义方块，由于用户可以自由设置客户端侧的挖掘时间，拿服务端硬度计算出来的挖掘时间来判断是否为fastBreak是不准确的。
+            if (target instanceof CustomBlock customBlock) {
+                var comp = customBlock.getDefinition().nbt().getCompound("components");
+                if (comp.containsCompound("minecraft:destructible_by_mining")) {
+                    var clientBreakTime = comp.getCompound("minecraft:destructible_by_mining").getFloat("value");
+                    breakTime = Math.min(breakTime, clientBreakTime);
+                }
+            }
 
             if (player.isCreative() && breakTime > 0.15) {
                 breakTime = 0.15;
@@ -2468,6 +2491,8 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         target.onBreak(item, player);
+
+        this.getVibrationManager().callVibrationEvent(new VibrationEvent(player, target.add(0.5, 0.5, 0.5), VanillaVibrationTypes.BLOCK_DESTROY));
 
         item.useOn(target);
         if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
@@ -2659,7 +2684,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (tag instanceof ListTag) {
                     for (Tag v : ((ListTag<Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
-                            Item entry = Item.fromString(((StringTag) v).data);
+                            Item entry = Item.get(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlockUnsafe() != null && entry.getBlockUnsafe().getId() == target.getId()) {
                                 canPlace = true;
                                 break;
@@ -2735,11 +2760,11 @@ public class Level implements ChunkManager, Metadatable {
                         return null;
                     }
                 }
-            } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+            } else if (item.getBlock() instanceof BlockSkull && item.getDamage() == 1) {
                 if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
                     Block first, second;
 
-                    if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL && second.toItem().getDamage() == 1))) {
+                    if (!(((first = block.getSide(BlockFace.EAST)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)) instanceof BlockSkull && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)) instanceof BlockSkull && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)) instanceof BlockSkull && second.toItem().getDamage() == 1))) {
                         return null;
                     }
 
@@ -2820,6 +2845,7 @@ public class Level implements ChunkManager, Metadatable {
         if (item.getCount() <= 0) {
             item = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
         }
+        this.getVibrationManager().callVibrationEvent(new VibrationEvent(player, block.add(0.5, 0.5, 0.5), VanillaVibrationTypes.BLOCK_PLACE));
         return item;
     }
 
@@ -5015,7 +5041,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_21_93) {
+        if (protocol >= ProtocolInfo.v1_21_100) {
+            return ProtocolInfo.v1_21_100;
+        } else if (protocol >= ProtocolInfo.v1_21_93) {
             return ProtocolInfo.v1_21_93;
         } else if (protocol >= ProtocolInfo.v1_21_90) {
             return ProtocolInfo.v1_21_90;
@@ -5136,7 +5164,8 @@ public class Level implements ChunkManager, Metadatable {
         if (chunk == ProtocolInfo.v1_21_70)
             if (player >= ProtocolInfo.v1_21_70_24) if (player < ProtocolInfo.v1_21_80) return true;
         if (chunk == ProtocolInfo.v1_21_80) if (player < ProtocolInfo.v1_21_90) return true;
-        if (chunk >= ProtocolInfo.v1_21_90) if (player >= ProtocolInfo.v1_21_90) return true;
+        if (chunk >= ProtocolInfo.v1_21_90) if (player < ProtocolInfo.v1_21_100) return true;
+        if(chunk >= ProtocolInfo.v1_21_100) return true;
         return false; //TODO Multiversion  Remember to update when block palette changes
     }
 

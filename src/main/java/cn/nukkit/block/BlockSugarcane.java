@@ -4,12 +4,13 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.ItemSugarcane;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 
 /**
  * Created by Pub4Game on 09.01.2016.
@@ -46,7 +47,7 @@ public class BlockSugarcane extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { // Bone meal
+        if (item instanceof ItemBoneMeal) {
             int count = 1;
 
             for (int i = 1; i <= 2; i++) {
