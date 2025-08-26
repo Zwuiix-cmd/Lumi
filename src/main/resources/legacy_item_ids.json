@@ -1,4 +1,13 @@
 {
+  "minecraft:stripped_pale_oak_log": -994,
+  "minecraft:pale_oak_log": -995,
+  "minecraft:pale_oak_planks": -996,
+  "minecraft:pale_oak_slab": -998,
+  "minecraft:pale_oak_stairs": -1000,
+  "minecraft:stripped_pale_oak_wood": -1004,
+  "minecraft:pale_oak_wood": -1005,
+  "minecraft:pale_oak_leaves": -1007,
+  "minecraft:dried_ghast": -1027,
   "minecraft:wither_skeleton_skull": -965,
   "minecraft:zombie_head": -966,
   "minecraft:player_head": -967,
