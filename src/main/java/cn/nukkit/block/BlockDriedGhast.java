@@ -1,9 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.Faceable;
 
 public class BlockDriedGhast extends BlockTransparentMeta implements Faceable {
     private static final int CARDINAL_DIRECTION_MASK = 0b0000_0000_0000_0011;
