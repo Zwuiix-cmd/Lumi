@@ -1,4 +1,9 @@
 {
+  "minecraft:pale_oak_button": -989,
+  "minecraft:pale_oak_fence": -991,
+  "minecraft:pale_oak_fence_gate": -992,
+  "minecraft:pale_oak_pressure_plate": -997,
+  "minecraft:pale_oak_trapdoor": -1002,
   "minecraft:stripped_pale_oak_log": -994,
   "minecraft:pale_oak_log": -995,
   "minecraft:pale_oak_planks": -996,

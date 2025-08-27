@@ -860,6 +860,8 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_DOUBLE_SLAB, BlockDoubleSlabPaleOak.class); //1254
         register(PALE_OAK_STAIRS, BlockStairsPaleOak.class); //1255
 
+        register(PALE_OAK_TRAPDOOR, BlockTrapdoorPaleOak.class); //1257
+
         register(STRIPPED_PALE_OAK_WOOD, BlockWoodStrippedPaleOak.class); //1259
         register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
 
