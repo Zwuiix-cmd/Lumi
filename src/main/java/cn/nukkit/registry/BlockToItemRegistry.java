@@ -87,7 +87,10 @@ public class BlockToItemRegistry implements IRegistry<String, String, String> {
         if (mapping != null) {
             return BLOCK_TO_ITEM.get(mapping.getOrDefault(damage, identifier));
         }
-        return BLOCK_TO_ITEM.get(identifier);
+        if (BLOCK_TO_ITEM.get(identifier) != null) {
+            return BLOCK_TO_ITEM.get(identifier);
+        }
+        return identifier;
     }
 
     public String getItem(String id) {
