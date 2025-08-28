@@ -851,7 +851,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_DOOR, BlockDoorPaleOak.class); //1245
         register(PALE_OAK_FENCE, BlockFencePaleOak.class); //1246
         register(PALE_OAK_FENCE_GATE, BlockFenceGatePaleOak.class); //1247
-
+        register(PALE_OAK_HANGING_SIGN, BlockPaleOakHangingSign.class); //1248
         register(STRIPPED_PALE_OAK_LOG, BlockLogStrippedPaleOak.class); //1249
         register(PALE_OAK_LOG, BlockLogPaleOak.class); //1250
         register(PALE_OAK_PLANKS, BlockPlanksPaleOak.class); //1251
@@ -859,12 +859,12 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_SLAB, BlockSlabPaleOak.class); //1253
         register(PALE_OAK_DOUBLE_SLAB, BlockDoubleSlabPaleOak.class); //1254
         register(PALE_OAK_STAIRS, BlockStairsPaleOak.class); //1255
-
+        register(PALE_OAK_STANDING_SIGN, BlockPaleOakSignPost.class); //1256
         register(PALE_OAK_TRAPDOOR, BlockTrapdoorPaleOak.class); //1257
-
+        register(PALE_OAK_WALL_SIGN, BlockPaleOakWallSign.class); //1258
         register(STRIPPED_PALE_OAK_WOOD, BlockWoodStrippedPaleOak.class); //1259
         register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
-
+        register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
         register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
 
         register(BUSH, BlockBush.class); //1278

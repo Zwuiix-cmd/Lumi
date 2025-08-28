@@ -32,6 +32,11 @@ public class BlockLeavesPaleOak extends BlockLeaves {
     }
 
     @Override
+    protected Item getSapling() {
+        return new ItemBlock(Block.get(PALE_OAK_SAPLING));
+    }
+
+    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
