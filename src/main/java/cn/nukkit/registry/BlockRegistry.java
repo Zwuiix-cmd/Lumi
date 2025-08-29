@@ -867,6 +867,20 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
         register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
 
+        register(PALE_MOSS_BLOCK, BlockPaleMoss.class); //1264
+        register(PALE_MOSS_CARPET, BlockPaleMossCarpet.class); //1265
+
+        register(CREAKING_HEART, BlockCreakingHeart.class); //1267
+        register(RESIN_BRICKS, BlockResinBricks.class); //1268
+        register(RESIN_BRICK_SLAB, BlockSlabResinBrick.class); //1269
+        register(RESIN_BRICK_DOUBLE_SLAB, BlockDoubleSlabResinBrick.class); //1270
+        register(RESIN_BRICK_STAIRS, BlockStairsResinBricks.class); //1271
+        register(RESIN_BRICK_WALL, BlockResinBrickWall.class); //1272
+        register(OPEN_EYEBLOSSOM, BlockOpenEyeblossom.class); //1273
+        register(CLOSED_EYEBLOSSOM, BlockClosedEyeblossom.class); //1274
+        register(CHISELED_RESIN_BRICKS, BlockChiseledResinBricks.class); //1275
+        register(RESIN_BLOCK, BlockResinBlock.class); //1276
+        register(RESIN_CLUMP, BlockResinClump.class); //1277
         register(BUSH, BlockBush.class); //1278
         register(WILDFLOWERS, BlockWildflowers.class); //1279
         register(FIREFLY_BUSH, BlockFireflyBush.class); //1280

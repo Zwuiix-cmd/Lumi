@@ -892,6 +892,7 @@ public interface BlockID {
     int CLOSED_EYEBLOSSOM = 1274;
     int CHISELED_RESIN_BRICKS = 1275;
     int RESIN_BLOCK = 1276;
+    int RESIN_CLUMP = 1277;
 
     int BUSH = 1278;
     int WILDFLOWERS = 1279;
