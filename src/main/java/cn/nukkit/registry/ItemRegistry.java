@@ -143,6 +143,8 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(WILD_ARMOR_TRIM_SMITHING_TEMPLATE, ItemWildArmorTrimSmithingTemplate::new);
         register(WIND_CHARGE, ItemWindCharge::new);
         register(YELLOW_DYE, ItemDyeYellow::new);
+        register(PALE_OAK_DOOR, ItemDoorPaleOak::new);
+        register(PALE_OAK_SIGN, ItemPaleOakSign::new);
     }
 
     @Override

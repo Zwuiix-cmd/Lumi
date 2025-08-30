@@ -847,11 +847,45 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(RED_SANDSTONE_WALL, BlockRedSandstoneBlock.class); //1237
         register(RED_NETHER_BRICK_WALL, BlockRedNetherBrickWall.class); //1238
 
+        register(PALE_OAK_BUTTON, BlockButtonPaleOak.class); //1244
+        register(PALE_OAK_DOOR, BlockDoorPaleOak.class); //1245
+        register(PALE_OAK_FENCE, BlockFencePaleOak.class); //1246
+        register(PALE_OAK_FENCE_GATE, BlockFenceGatePaleOak.class); //1247
+        register(PALE_OAK_HANGING_SIGN, BlockPaleOakHangingSign.class); //1248
+        register(STRIPPED_PALE_OAK_LOG, BlockLogStrippedPaleOak.class); //1249
+        register(PALE_OAK_LOG, BlockLogPaleOak.class); //1250
+        register(PALE_OAK_PLANKS, BlockPlanksPaleOak.class); //1251
+        register(PALE_OAK_PRESSURE_PLATE, BlockPressurePlatePaleOak.class); //1252
+        register(PALE_OAK_SLAB, BlockSlabPaleOak.class); //1253
+        register(PALE_OAK_DOUBLE_SLAB, BlockDoubleSlabPaleOak.class); //1254
+        register(PALE_OAK_STAIRS, BlockStairsPaleOak.class); //1255
+        register(PALE_OAK_STANDING_SIGN, BlockPaleOakSignPost.class); //1256
+        register(PALE_OAK_TRAPDOOR, BlockTrapdoorPaleOak.class); //1257
+        register(PALE_OAK_WALL_SIGN, BlockPaleOakWallSign.class); //1258
+        register(STRIPPED_PALE_OAK_WOOD, BlockWoodStrippedPaleOak.class); //1259
+        register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
+        register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
+        register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
+
+        register(PALE_MOSS_BLOCK, BlockPaleMoss.class); //1264
+        register(PALE_MOSS_CARPET, BlockPaleMossCarpet.class); //1265
+        register(PALE_HANGING_MOSS, BlockPaleHangingMoss.class); //1266
+        register(CREAKING_HEART, BlockCreakingHeart.class); //1267
+        register(RESIN_BRICKS, BlockResinBricks.class); //1268
+        register(RESIN_BRICK_SLAB, BlockSlabResinBrick.class); //1269
+        register(RESIN_BRICK_DOUBLE_SLAB, BlockDoubleSlabResinBrick.class); //1270
+        register(RESIN_BRICK_STAIRS, BlockStairsResinBricks.class); //1271
+        register(RESIN_BRICK_WALL, BlockResinBrickWall.class); //1272
+        register(OPEN_EYEBLOSSOM, BlockOpenEyeblossom.class); //1273
+        register(CLOSED_EYEBLOSSOM, BlockClosedEyeblossom.class); //1274
+        register(CHISELED_RESIN_BRICKS, BlockChiseledResinBricks.class); //1275
+        register(RESIN_BLOCK, BlockResinBlock.class); //1276
+        register(RESIN_CLUMP, BlockResinClump.class); //1277
         register(BUSH, BlockBush.class); //1278
         register(WILDFLOWERS, BlockWildflowers.class); //1279
         register(FIREFLY_BUSH, BlockFireflyBush.class); //1280
         register(LEAF_LITTER, BlockLeafLitter.class); //1281
-
+        register(DRIED_GHAST, BlockDriedGhast.class); //1282
         register(SHORT_DRY_GRASS, BlockShortDryGrass.class); //1283
         register(TALL_DRY_GRASS, BlockTallDryGrass.class); //1284
         register(CACTUS_FLOWER, BlockCactusFlower.class); //1285
