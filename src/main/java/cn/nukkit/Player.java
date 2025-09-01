@@ -14,6 +14,7 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.defaults.HelpCommand;
 import cn.nukkit.command.utils.RawText;
+import cn.nukkit.debugshape.DebugShape;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.EntityProperty;
@@ -5281,6 +5282,49 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.title = title;
         pk.content = content;
         this.dataPacket(pk);
+    }
+
+    public List<Long> sendDebugShape(DebugShape... shapes) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
+
+        for(DebugShape shape : shapes) {
+            scriptDebugShapes.add(shape.toNetworkData());
+            ids.add(shape.getId());
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
+
+        return ids;
+    }
+
+    public void removeDebugShape(DebugShape... shapes) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        for(DebugShape shape : shapes) {
+            scriptDebugShapes.add(shape.createRemovalNotice());
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
+    }
+
+    public void removeDebugShape(int... ids) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        for(int id : ids) {
+             scriptDebugShapes.add(new ScriptDebugShape(
+                     id, null, null,
+                     null, null, null,
+                     null, null, null,
+                     null, null, null, null
+             ));
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
     }
 
     @Override
