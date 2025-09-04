@@ -29,7 +29,7 @@ public class BlockDriedGhast extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setBlockFace(face);
+        this.setBlockFace(player.getHorizontalFacing().getOpposite());
         this.setRehydrationLevel(0);
         return this.getLevel().setBlock(this, this, true);
     }
