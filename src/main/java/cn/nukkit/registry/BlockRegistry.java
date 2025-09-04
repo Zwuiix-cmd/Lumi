@@ -33,6 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
@@ -1003,33 +1005,38 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
             final BlockPalette storagePalette = GlobalBlockPalette.getPaletteByProtocol(LevelDBConstants.PALETTE_VERSION);
             final ObjectSet<BlockPalette> set = new ObjectArraySet<>();
+            final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
             for (int protocol : ProtocolInfo.SUPPORTED_PROTOCOLS) {
                 if (protocol < Server.getInstance().getSettings().general().multiversion().minProtocol()) {
                     continue;
                 }
 
-                BlockPalette palette = GlobalBlockPalette.getPaletteByProtocol(protocol);
+                final BlockPalette palette = GlobalBlockPalette.getPaletteByProtocol(protocol);
                 if (set.contains(palette)) {
                     continue;
                 }
                 set.add(palette);
 
-                if (palette.getProtocol() == storagePalette.getProtocol()) {
-                    CustomBlockUtil.recreateBlockPalette(palette, new ObjectArrayList<>(NukkitLegacyMapper.loadBlockPalette()));
-                } else {
-                    Path path = CustomBlockUtil.getVanillaPalettePath(palette.getProtocol());
-                    if (!Files.exists(path)) {
-                        //log.warn("No vanilla palette found for {}.", Utils.getVersionByProtocol(palette.getProtocol()));
-                        continue;
+                executor.submit(() -> {
+                    if (palette.getProtocol() == storagePalette.getProtocol()) {
+                        CustomBlockUtil.recreateBlockPalette(palette, new ObjectArrayList<>(NukkitLegacyMapper.loadBlockPalette()));
+                    } else {
+                        Path path = CustomBlockUtil.getVanillaPalettePath(palette.getProtocol());
+                        if (!Files.exists(path)) {
+                            //log.warn("No vanilla palette found for {}.", Utils.getVersionByProtocol(palette.getProtocol()));
+                            return;
+                        }
+                        try {
+                            CustomBlockUtil.recreateBlockPalette(palette);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                    try {
-                        CustomBlockUtil.recreateBlockPalette(palette);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                });
             }
+
+            executor.close();
 
             ID_TO_CUSTOM_BLOCK.forEach((id, block) -> {
                 LIGHT[id] = block.getLightLevel();
