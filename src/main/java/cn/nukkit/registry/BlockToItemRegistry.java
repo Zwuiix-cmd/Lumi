@@ -113,12 +113,12 @@ public class BlockToItemRegistry implements IRegistry<String, String, String> {
     public String get(int id, int damage) {
         String identifier = LEGACY_ITEM_IDS.get(id);
         var mapping = ITEM_MAPPING.get(identifier);
-        var extra_mapping = EXTRA_BLOCK_MAPPING.get(id);
+        var extraMapping = EXTRA_BLOCK_MAPPING.get(id);
 
-        if (extra_mapping != null) {
-            var extra_id = extra_mapping.get(damage);
-            if(extra_id != null) {
-                return extra_id;
+        if (extraMapping != null) {
+            var extraId = extraMapping.get(damage);
+            if(extraId != null) {
+                return extraId;
             }
         }
         if (mapping != null) {
