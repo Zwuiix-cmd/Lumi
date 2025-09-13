@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityDropper;
+import cn.nukkit.blockentity.impl.BlockEntityDropper;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.item.Item;
@@ -11,7 +11,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.utils.Faceable;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 

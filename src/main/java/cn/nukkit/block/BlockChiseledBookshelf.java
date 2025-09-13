@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityChiseledBookshelf;
+import cn.nukkit.blockentity.impl.BlockEntityChiseledBookshelf;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.item.*;
 import cn.nukkit.math.BlockFace;
@@ -10,7 +10,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
-import cn.nukkit.utils.BlockColor;
+import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

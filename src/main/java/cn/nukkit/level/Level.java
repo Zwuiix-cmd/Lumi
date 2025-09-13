@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.api.NonComputationAtomic;
 import cn.nukkit.block.*;
 import cn.nukkit.block.customblock.CustomBlock;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -52,6 +53,7 @@ import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.persistence.PersistentDataContainer;
 import cn.nukkit.level.persistence.impl.DelegatePersistentDataContainer;
 import cn.nukkit.level.sound.Sound;
+import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.level.vibration.VibrationManager;
@@ -66,6 +68,7 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.settings.WorldSettings;
 import cn.nukkit.utils.*;
@@ -173,7 +176,11 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.AZALEA] = true;
         randomTickBlocks[Block.FLOWERING_AZALEA] = true;
 
+        randomTickBlocks[Block.MANGROVE_PROPAGULE] = true;
+        randomTickBlocks[Block.MANGROVE_LEAVES] = true;
+
         randomTickBlocks[Block.CHERRY_SAPLING] = true;
+        randomTickBlocks[Block.CHERRY_LEAVES] = true;
 
         randomTickBlocks[Block.COPPER_BLOCK] = true;
         randomTickBlocks[Block.EXPOSED_COPPER] = true;
@@ -2071,7 +2078,7 @@ public class Level implements ChunkManager, Metadatable {
             int z = Hash.hashBlockZ(node);
 
             int id = this.getBlockIdAt(x, y, z);
-            int lightFilter = id >= Block.MAX_BLOCK_ID ? 15 : Block.lightFilter[id];
+            int lightFilter = id >= Block.MAX_BLOCK_ID ? 15 : Registries.BLOCK.getLightFilter(id);
             int lightLevel = this.getBlockLightAt(x, y, z) - lightFilter;
 
             if (lightLevel >= 1) {
@@ -2134,7 +2141,7 @@ public class Level implements ChunkManager, Metadatable {
 
     @Override
     public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
-        this.setBlock(x, y, z, layer, Block.fullList[fullId], false, false);
+        this.setBlock(x, y, z, layer, Registries.BLOCK.get(fullId), false, false);
     }
 
     public boolean isAntiXrayEnabled() {

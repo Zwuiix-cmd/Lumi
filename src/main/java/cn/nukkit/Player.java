@@ -5,14 +5,21 @@ import cn.nukkit.block.*;
 import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.blockentity.*;
+import cn.nukkit.blockentity.impl.BlockEntityCampfire;
+import cn.nukkit.blockentity.impl.BlockEntityItemFrame;
+import cn.nukkit.blockentity.impl.BlockEntitySign;
+import cn.nukkit.bossbar.BossBarColor;
+import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.command.defaults.HelpCommand;
 import cn.nukkit.command.utils.RawText;
+import cn.nukkit.debugshape.DebugShape;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.data.property.EntityProperty;
+import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityWalkingMob;
@@ -21,6 +28,7 @@ import cn.nukkit.entity.passive.EntityVillager;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.entity.util.BlockIterator;
 import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -74,6 +82,7 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scoreboard.displayer.IScoreboardViewer;
@@ -82,6 +91,8 @@ import cn.nukkit.scoreboard.scoreboard.IScoreboardLine;
 import cn.nukkit.scoreboard.scorer.PlayerScorer;
 import cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 import cn.nukkit.utils.*;
+import cn.nukkit.utils.compression.SnappyCompression;
+import cn.nukkit.utils.compression.Zlib;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -102,7 +113,6 @@ import org.apache.commons.math3.util.FastMath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -1607,7 +1617,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.protocol < ProtocolInfo.v1_16_0) {
                 InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
                 inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(Item.EMPTY_ARRAY);
+                inventoryContentPacket.slots = Registries.CREATIVE_ITEM.get(this.protocol).getItems().toArray(Item.EMPTY_ARRAY);
                 this.dataPacket(inventoryContentPacket);
             }
         }
@@ -2816,7 +2826,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
                 if (this.protocol >= ProtocolInfo.v1_21_60) {
                     Collection<ItemComponentPacket.ItemDefinition> vanillaItems = RuntimeItems.getMapping(this.protocol).getVanillaItemDefinitions();
-                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Item.getCustomItemDefinition().entrySet();
+                    Set<Entry<String, CustomItemDefinition>> itemDefinitions = Registries.ITEM.getCustomItemDefinition().entrySet();
                     List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(vanillaItems.size() + itemDefinitions.size());
                     entries.addAll(vanillaItems);
                     if (this.server.getSettings().features().enableExperimentMode() && !itemDefinitions.isEmpty()) {
@@ -2837,8 +2847,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     itemComponentPacket.setEntries(entries);
                 } else {
-                    if (this.server.getSettings().features().enableExperimentMode() && !Item.getCustomItemDefinition().isEmpty()) {
-                        HashMap<String, CustomItemDefinition> itemDefinition = Item.getCustomItemDefinition();
+                    if (this.server.getSettings().features().enableExperimentMode() && !Registries.ITEM.getCustomItemDefinition().isEmpty()) {
+                        Map<String, CustomItemDefinition> itemDefinition = Registries.ITEM.getCustomItemDefinition();
                         List<ItemComponentPacket.ItemDefinition> entries = new ArrayList<>(itemDefinition.size());
                         int i = 0;
                         for (var entry : itemDefinition.entrySet()) {
@@ -5308,6 +5318,49 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.title = title;
         pk.content = content;
         this.dataPacket(pk);
+    }
+
+    public List<Long> sendDebugShape(DebugShape... shapes) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
+
+        for(DebugShape shape : shapes) {
+            scriptDebugShapes.add(shape.toNetworkData());
+            ids.add(shape.getId());
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
+
+        return ids;
+    }
+
+    public void removeDebugShape(DebugShape... shapes) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        for(DebugShape shape : shapes) {
+            scriptDebugShapes.add(shape.createRemovalNotice());
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
+    }
+
+    public void removeDebugShape(int... ids) {
+        List<ScriptDebugShape> scriptDebugShapes = new ArrayList<>();
+        for(int id : ids) {
+             scriptDebugShapes.add(new ScriptDebugShape(
+                     id, null, null,
+                     null, null, null,
+                     null, null, null,
+                     null, null, null, null
+             ));
+        }
+
+        ServerScriptDebugDrawerPacket packet = new ServerScriptDebugDrawerPacket();
+        packet.setShapes(scriptDebugShapes);
+        this.dataPacket(packet);
     }
 
     @Override

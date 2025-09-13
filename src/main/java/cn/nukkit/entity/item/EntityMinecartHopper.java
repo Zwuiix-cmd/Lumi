@@ -5,8 +5,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockHopper;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityContainer;
-import cn.nukkit.blockentity.BlockEntityFurnace;
-import cn.nukkit.blockentity.BlockEntityHopper;
+import cn.nukkit.blockentity.impl.BlockEntityFurnace;
+import cn.nukkit.blockentity.impl.BlockEntityHopper;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
@@ -21,7 +21,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.MinecartType;
+import cn.nukkit.entity.data.MinecartType;
 
 public class EntityMinecartHopper extends EntityMinecartAbstract implements InventoryHolder, BlockHopper.IHopper {
 

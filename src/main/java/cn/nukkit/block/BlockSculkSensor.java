@@ -1,15 +1,14 @@
 package cn.nukkit.block;
 
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntitySculkSensor;
+import cn.nukkit.blockentity.impl.BlockEntitySculkSensor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.RedstoneComponent;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockSculkSensor extends BlockTransparentMeta implements BlockEntityHolder<BlockEntitySculkSensor>, RedstoneComponent {
 
