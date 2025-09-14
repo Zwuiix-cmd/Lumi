@@ -4895,6 +4895,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getLevel().getAntiXraySystem().deObfuscateBlock(this, face, target);
         }
 
+        this.breakingBlockTime = System.currentTimeMillis();
         this.breakingBlock = target;
         this.breakingBlockFace = face;
         this.lastBreak = currentBreak;
