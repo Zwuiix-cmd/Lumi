@@ -4839,7 +4839,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (this.breakingBlock instanceof CustomBlock) {
                     var timeDiff = time - breakingBlockTime;
                     blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
-                    sendMessage("time: " + time + " breakingBlockTime:" + breakingBlockTime + " addedToProgress" + timeDiff / (miningTimeRequired * 1000) + " miningTimeRequired: " + miningTimeRequired + " timeDiff: " + timeDiff + " blockBreakProgress: " + blockBreakProgress);
                     if (blockBreakProgress > 0.999999999999999999999) {
                         this.onBlockBreakAbort(pos, face);
                         this.onBlockBreakComplete(pos.asBlockVector3(), face);
