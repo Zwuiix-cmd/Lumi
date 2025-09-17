@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.BlockHarvestEvent;
@@ -150,14 +151,7 @@ public class BlockSweetBerryBush extends BlockFlowable {
 
 
     public static boolean isSupportValid(Block block) {
-        switch (block.getId()) {
-            case GRASS:
-            case DIRT:
-            case PODZOL:
-                return true;
-            default:
-                return false;
-        }
+        return block.hasBlockTag(BlockTags.DIRT);
     }
 
     @Override
