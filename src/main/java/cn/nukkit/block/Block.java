@@ -491,7 +491,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
         // Throw an exception if for some reason the type cannot be determined.
         if (this.type == null) {
-            //throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
+            throw new IllegalStateException("Failed to initialize block type " + this.getName() + ": " + this.getId() + ":" + this.getDamage());
         }
 
         return this.type;
@@ -522,11 +522,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return String identifier
      */
     public String getIdentifier() {
-        if(this.getBlockType() != null) {
-            return this.getBlockType().getIdentifier();
-        } else {
-            return "";
-        }
+        return this.getBlockType().getIdentifier();
     }
 
     public int getItemId() {
