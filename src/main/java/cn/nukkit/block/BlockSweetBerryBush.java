@@ -9,6 +9,7 @@ import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemSweetBerries;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -71,7 +72,7 @@ public class BlockSweetBerryBush extends BlockFlowable {
     public boolean onActivate(@Nonnull Item item, Player player) {
         int age = MathHelper.clamp(this.getDamage(), 0, 3);
 
-        if (age < 3 && item instanceof ItemDye dye && dye.getDyeColor() == DyeColor.WHITE) {
+        if (age < 3 && item.getNamespaceId().equals(ItemNamespaceId.BONE_MEAL)) {
             BlockSweetBerryBush block = (BlockSweetBerryBush) this.clone();
             block.setDamage(block.getDamage() + 1);
             if (block.getDamage() > 3) {
@@ -125,8 +126,7 @@ public class BlockSweetBerryBush extends BlockFlowable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (this.getDamage() < 3 && ThreadLocalRandom.current().nextInt(5) == 0
-                    && this.getLevel().getFullLight(add(0, 1, 0)) >= BlockCrops.MINIMUM_LIGHT_LEVEL) {
+            if (this.getDamage() < 3 && ThreadLocalRandom.current().nextInt(5) == 0) {
                 BlockGrowEvent event = new BlockGrowEvent(this, Block.get(this.getId(), this.getDamage() + 1));
                 if (!event.isCancelled()) {
                     this.getLevel().setBlock(this, event.getNewState(), true, true);
