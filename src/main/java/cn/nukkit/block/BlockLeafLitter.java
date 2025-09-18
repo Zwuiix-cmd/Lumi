@@ -9,6 +9,7 @@ import cn.nukkit.block.properties.VanillaProperties;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.block.data.Faceable;
@@ -68,6 +69,18 @@ public class BlockLeafLitter extends BlockFlowable implements Faceable, BlockPro
             setBlockFace(player.getHorizontalFacing().getOpposite());
         }
         return this.getLevel().setBlock(this, this);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!isSupportValid(down())) {
+                this.getLevel().useBreakOn(this, null, null, true);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 
     private static boolean isSupportValid(Block block) {
