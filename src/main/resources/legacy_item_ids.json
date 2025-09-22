@@ -1,4 +1,7 @@
 {
+  "minecraft:trial_spawner": -315,
+  "minecraft:vault": -314,
+  "minecraft:crafter": -313,
   "minecraft:chipped_anvil": -959,
   "minecraft:damaged_anvil": -960,
   "minecraft:deprecated_anvil": -961,

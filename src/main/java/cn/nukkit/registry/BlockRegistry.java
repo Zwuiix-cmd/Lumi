@@ -506,6 +506,9 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
         register(COPPER_ORE, BlockOreCopper.class); //566
         register(LIGHTNING_ROD, BlockLightningRod.class); //567
+        register(CRAFTER, BlockCrafter.class); //568
+        register(VAULT, BlockVault.class); //569
+        register(TRIAL_SPAWNER, BlockTrialSpawner.class); //570
 
         register(HEAVY_CORE, BlockHeavyCore.class); //571
         register(DRIPSTONE_BLOCK, BlockDripstone.class); //572
