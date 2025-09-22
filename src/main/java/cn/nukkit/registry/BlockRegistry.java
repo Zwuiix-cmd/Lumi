@@ -509,7 +509,6 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(CRAFTER, BlockCrafter.class); //568
         register(VAULT, BlockVault.class); //569
         register(TRIAL_SPAWNER, BlockTrialSpawner.class); //570
-
         register(HEAVY_CORE, BlockHeavyCore.class); //571
         register(DRIPSTONE_BLOCK, BlockDripstone.class); //572
         register(ROOTED_DIRT, BlockDirtRooted.class); //573
@@ -873,7 +872,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(PALE_OAK_WOOD, BlockWoodPaleOak.class); //1260
         register(PALE_OAK_SAPLING, BlockPaleOakSapling.class); //1261
         register(PALE_OAK_LEAVES, BlockLeavesPaleOak.class); //1262
-
+        register(MUSHROOM_STEM, BlockMushroomStem.class); //1263
         register(PALE_MOSS_BLOCK, BlockPaleMoss.class); //1264
         register(PALE_MOSS_CARPET, BlockPaleMossCarpet.class); //1265
         register(PALE_HANGING_MOSS, BlockPaleHangingMoss.class); //1266
