@@ -6004,7 +6004,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
-        System.out.println(Math.max(newMovementSpeed, 0.00f));
         return Math.max(newMovementSpeed, 0.00f);
     }
 
