@@ -3314,7 +3314,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (playerToggleSprintEvent.isCancelled()) {
                         this.needSendData = true;
                     } else {
-                        this.setSprinting(true, false);
+                        this.setSprinting(true);
                     }
                     this.setUsingItem(false);
                 }
@@ -3328,7 +3328,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (playerToggleSneakEvent.isCancelled()) {
                         this.needSendData = true;
                     } else {
-                        this.setSprinting(false, false);
+                        this.setSprinting(false);
                     }
                 }
 
