@@ -4,11 +4,12 @@ import lombok.Getter;
 import lombok.ToString;
 
 @ToString
+@Getter
 public class EntityMovementSpeedModifier {
-    @Getter private final String identifier;
-    @Getter private final float value;
-    @Getter private final Operation operation;
-    @Getter private final boolean send;
+    private final String identifier;
+    private final float value;
+    private final Operation operation;
+    private final boolean send;
 
     public EntityMovementSpeedModifier(String identifier, float value, Operation operation) {
         this(identifier, value, operation, true);
