@@ -317,6 +317,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Setter
     private float verticalFlySpeed = DEFAULT_VERTICAL_FLY_SPEED;
 
+    private float speedToSend = DEFAULT_SPEED;
+
     private int exp = 0;
     private int expLevel = 0;
 
@@ -5970,19 +5972,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    public void setMovementSpeed(float speed) {
-        setMovementSpeed(speed, true);
+    public void addMovementSpeedModifier(EntityMovementSpeedModifier modifier) {
+        super.addMovementSpeedModifier(modifier);
+        this.speedToSend = this.recalculateMovementSpeedToSend();
+        this.sendMovementSpeed();
     }
 
-    public void setMovementSpeed(float speed, boolean send) {
-        super.setMovementSpeed(speed);
-        if (this.spawned && send) {
-            float sendMovementSpeed = recalculateSendMovementSpeed();
-            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(sendMovementSpeed).setDefaultValue(sendMovementSpeed));
+    @Override
+    public boolean removeMovementSpeedModifier(String identifier) {
+        boolean isRemoved = super.removeMovementSpeedModifier(identifier);
+
+        if(isRemoved) {
+            this.speedToSend = this.recalculateMovementSpeedToSend();
+            this.sendMovementSpeed();
         }
+
+        return isRemoved;
     }
 
-    public float recalculateSendMovementSpeed() {
+    public float recalculateMovementSpeedToSend() {
         float newMovementSpeed = DEFAULT_SPEED;
         for (EntityMovementSpeedModifier modifier : this.getMovementSpeedModifiers().values()) {
             float value = modifier.getValue();
@@ -5995,13 +6003,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     newMovementSpeed += value;
                 }
             }
-            System.out.println(modifier);
         }
+        System.out.println(Math.max(newMovementSpeed, 0.00f));
         return Math.max(newMovementSpeed, 0.00f);
     }
 
-    public void sendMovementSpeed(float speed) {
-        Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed);
+    public void sendMovementSpeed() {
+        Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.speedToSend).setDefaultValue(this.speedToSend);
         this.setAttribute(attribute);
     }
 

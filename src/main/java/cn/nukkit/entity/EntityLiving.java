@@ -528,15 +528,18 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         this.removeMovementSpeedModifier(modifier.getIdentifier());
     }
 
-    public void removeMovementSpeedModifier(String identifier) {
+    public boolean removeMovementSpeedModifier(String identifier) {
         Object result = this.movementSpeedModifiers.remove(identifier);
+
         if(result != null) {
             this.recalculateMovementSpeed();
+            return true;
         }
+
+        return false;
     }
 
-    @ApiStatus.Internal
-    public void setMovementSpeed(float speed) {
+    private void setMovementSpeed(float speed) {
         this.movementSpeed = speed;
     }
 
