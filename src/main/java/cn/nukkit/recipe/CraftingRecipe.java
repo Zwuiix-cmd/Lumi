@@ -1,4 +1,4 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe;
 
 import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
@@ -21,8 +21,6 @@ public interface CraftingRecipe extends Recipe {
 
     List<Item> getExtraResults();
 
-    List<Item> getAllResults();
-
     int getPriority();
 
     /**
@@ -34,10 +32,6 @@ public interface CraftingRecipe extends Recipe {
      * @return bool
      */
     boolean matchItems(List<Item> inputList, List<Item> extraOutputList);
-
-    boolean matchItems(List<Item> inputList, List<Item> extraOutputList, int multiplier);
-
-    List<Item> getIngredientsAggregate();
 
     RecipeUnlockingRequirement getRequirement();
 }

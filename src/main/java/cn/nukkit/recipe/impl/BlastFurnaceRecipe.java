@@ -1,7 +1,8 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.registry.Registries;
 
 public class BlastFurnaceRecipe extends FurnaceRecipe {
 
@@ -10,8 +11,8 @@ public class BlastFurnaceRecipe extends FurnaceRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerBlastFurnaceRecipe(this);
+    public void registerToCraftingManager() {
+        Registries.RECIPE_REGISTRY.addBlastFurnace(this);
     }
 
     @Override

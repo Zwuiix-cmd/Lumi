@@ -1,6 +1,8 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.registry.Registries;
 
 public class ContainerRecipe extends MixRecipe {
 
@@ -9,8 +11,8 @@ public class ContainerRecipe extends MixRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerContainerRecipe(this);
+    public void registerToCraftingManager() {
+        Registries.RECIPE_REGISTRY.registerContainerRecipe(this);
     }
 
     @Override

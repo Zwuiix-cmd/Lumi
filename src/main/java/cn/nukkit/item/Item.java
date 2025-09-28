@@ -19,13 +19,13 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.*;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.function.Supplier;
@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * Nukkit Project
  */
 @Log4j2
-public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
+public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo, ItemDescriptor {
 
     public static final Item AIR_ITEM = new ItemBlock(Block.get(BlockID.AIR), null, 0);
 
@@ -1150,6 +1150,38 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item cloned = clone();
         cloned.count += amount;
         return cloned;
+    }
+
+    @Override
+    public void putRecipe(BinaryStream stream, int protocol) {
+        if(this.getId() == 0) {
+            stream.putByte((byte) 0); //ItemDescriptorType.INVALID
+            stream.putVarInt(0); // item == null ? 0 : item.getCount()
+            return;
+        }
+
+        stream.putByte((byte) 1); //ItemDescriptorType.DEFAULT
+
+        int runtimeId = this.getId();
+        int damage = this.hasMeta() ? this.getDamage() : Short.MAX_VALUE;
+
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+        if (this instanceof StringItem) {
+            runtimeId = mapping.getNetworkId(this);
+        } else if (!this.hasMeta()) {
+            RuntimeEntry runtimeEntry = mapping.toRuntime(this.getId(), 0);
+            runtimeId = runtimeEntry.getRuntimeId();
+            damage = Short.MAX_VALUE;
+        } else {
+            RuntimeEntry runtimeEntry = mapping.toRuntime(this.getId(), this.getDamage());
+            runtimeId = runtimeEntry.getRuntimeId();
+            damage = runtimeEntry.isHasDamage() ? 0 : this.getDamage();
+        }
+
+
+        stream.putLShort(runtimeId);
+        stream.putLShort(damage);
+        stream.putVarInt(this.getCount());
     }
 
     @Override

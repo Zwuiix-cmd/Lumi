@@ -16,33 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.recipe.Recipe;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.registry.Registries;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author joserobjr
  * @since 2020-09-28
  */
+@Getter
 @ToString
 public class SmithingRecipe extends ShapelessRecipe {
 
+    @Getter
     private final Item template;
     private final Item equipment;
     private final Item ingredient;
     private final Item result;
 
-    private final List<Item> ingredientsAggregate;
+    private final Collection<ItemDescriptor> ingredients;
 
-    public SmithingRecipe(String recipeId, int priority, Collection<Item> ingredients, Item result) {
+    public SmithingRecipe(String recipeId, int priority, Collection<ItemDescriptor> ingredients, Item result) {
         super(recipeId, priority, result, ingredients);
         this.equipment = (Item) ingredients.toArray()[0];
         this.ingredient = (Item) ingredients.toArray()[1];
@@ -53,28 +59,7 @@ public class SmithingRecipe extends ShapelessRecipe {
         }
         this.result = result;
 
-        ArrayList<Item> aggregation = new ArrayList<>(3);
-
-        for (Item item : new Item[]{equipment, ingredient, template}) {
-            if (item.getId() != 0 && item.getCount() < 1) {
-                throw new IllegalArgumentException("Recipe Ingredient amount was not 1 (value: " + item.getCount() + ")");
-            }
-            boolean found = false;
-            for (Item existingIngredient : aggregation) {
-                if (existingIngredient.equals(item, item.hasMeta(), item.hasCompoundTag())) {
-                    existingIngredient.setCount(existingIngredient.getCount() + item.getCount());
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                aggregation.add(item.clone());
-            }
-        }
-
-        aggregation.trimToSize();
-        aggregation.sort(CraftingManager.recipeComparator);
-        this.ingredientsAggregate = Collections.unmodifiableList(aggregation);
+        this.ingredients = ingredients;
     }
 
     @Override
@@ -112,17 +97,13 @@ public class SmithingRecipe extends ShapelessRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerSmithingRecipe(ProtocolInfo.CURRENT_PROTOCOL, this);
+    public void registerToCraftingManager() {
+        Registries.RECIPE_REGISTRY.registerSmithingRecipe(this);
     }
 
     @Override
     public RecipeType getType() {
         return RecipeType.SMITHING_TRANSFORM;
-    }
-
-    public Item getTemplate() {
-        return template;
     }
 
     public Item getEquipment() {
@@ -133,40 +114,15 @@ public class SmithingRecipe extends ShapelessRecipe {
         return ingredient;
     }
 
-    @Override
-    public List<Item> getIngredientsAggregate() {
-        return ingredientsAggregate;
-    }
-
     public boolean matchItems(List<Item> inputList) {
-        return matchItems(inputList, 1);
-    }
-
-    public boolean matchItems(List<Item> inputList, int multiplier) {
         List<Item> haveInputs = new ArrayList<>();
         for (Item item : inputList) {
             if (item.isNull())
                 continue;
             haveInputs.add(item.clone());
         }
-        List<Item> needInputs = new ArrayList<>();
-        if(multiplier != 1){
-            for (Item item : ingredientsAggregate) {
-                if (item.isNull())
-                    continue;
-                Item itemClone = item.clone();
-                itemClone.setCount(itemClone.getCount() * multiplier);
-                needInputs.add(itemClone);
-            }
-        } else {
-            for (Item item : ingredientsAggregate) {
-                if (item.isNull())
-                    continue;
-                needInputs.add(item.clone());
-            }
-        }
 
-        return Recipe.matchItemList(haveInputs, needInputs);
+        return Recipe.matchItemList(haveInputs, ingredients);
     }
 
     @Override

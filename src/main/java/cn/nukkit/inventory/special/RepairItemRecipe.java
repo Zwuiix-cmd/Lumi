@@ -1,9 +1,11 @@
 package cn.nukkit.inventory.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.MultiRecipe;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,9 +20,10 @@ public class RepairItemRecipe extends MultiRecipe {
     }
 
     @Override
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         // Processing the checks about the inputs and outputItem
-        if (inputs.size() == 2) {
+        // TODO:RECIPES
+       /* if (inputs.size() == 2) {
             Item item1 = inputs.get(0);
             Item item2 = inputs.get(1);
             if (item1.equals(item2, false, false)) {
@@ -41,7 +44,7 @@ public class RepairItemRecipe extends MultiRecipe {
                     }
                 }
             }
-        }
+        }*/
         return false;
     }
 

@@ -1,10 +1,15 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.transaction.CraftingTransaction;
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.Recipe;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.registry.RecipeRegistry;
+import cn.nukkit.registry.Registries;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +47,7 @@ public class MultiRecipe implements Recipe {
 
     public MultiRecipe(UUID id) {
         this.id = id;
-        this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
+        this.networkId = ++RecipeRegistry.NEXT_NETWORK_ID;
     }
 
     @Override
@@ -51,8 +56,8 @@ public class MultiRecipe implements Recipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerMultiRecipe(this);
+    public void registerToCraftingManager() {
+        Registries.RECIPE_REGISTRY.registerMultiRecipe(this);
     }
 
     @Override
@@ -68,11 +73,11 @@ public class MultiRecipe implements Recipe {
         return this.networkId;
     }
 
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         return false;
     }
 
-    public Recipe toRecipe(Item outputItem, List<Item> inputs) {
+    public Recipe toRecipe(Item outputItem, Collection<ItemDescriptor> inputs) {
         return new ShapelessRecipe(outputItem, inputs);
     }
 }

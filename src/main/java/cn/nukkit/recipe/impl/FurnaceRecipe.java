@@ -1,6 +1,9 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.recipe.SmeltingRecipe;
+import cn.nukkit.registry.Registries;
 
 /**
  * @author MagicDroidX
@@ -32,8 +35,8 @@ public class FurnaceRecipe implements SmeltingRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerFurnaceRecipe(340, this);
+    public void registerToCraftingManager() {
+        Registries.RECIPE_REGISTRY.addFurnace(this);
     }
 
     @Override

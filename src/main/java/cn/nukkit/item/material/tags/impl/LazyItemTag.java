@@ -3,6 +3,7 @@ package cn.nukkit.item.material.tags.impl;
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.ItemTypes;
 import cn.nukkit.item.material.tags.ItemTag;
+import cn.nukkit.utils.BinaryStream;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -51,6 +52,13 @@ public class LazyItemTag implements ItemTag {
             this.itemTypes = this.load();
         }
         return this.itemTypes;
+    }
+
+    @Override
+    public void putRecipe(BinaryStream stream, int protocol) {
+        stream.putByte((byte) 3);
+        stream.putString(tag);
+        stream.putVarInt(1);
     }
 
     static {

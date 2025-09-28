@@ -1,11 +1,14 @@
 package cn.nukkit.inventory.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.MultiRecipe;
+import cn.nukkit.item.ItemMap;
+import cn.nukkit.item.ItemPaper;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,16 +19,16 @@ public class MapUpgradingRecipe extends MultiRecipe {
     }
 
     @Override
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         if (outputItem.getId() != ItemID.MAP && outputItem.getCount() != 1) {
             return false;
         }
         int filledMap = 0;
         int paper = 0;
-        for (Item input : inputs) {
-            if (input.getId() == ItemID.MAP) {
+        for (ItemDescriptor  input : inputs) {
+            if (input instanceof ItemMap) {
                 filledMap += 1;
-            } else if (input.getId() == ItemID.PAPER) {
+            } else if (input instanceof ItemPaper) {
                 paper += 1;
             }
         }

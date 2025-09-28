@@ -1,4 +1,4 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe;
 
 import cn.nukkit.network.protocol.ProtocolInfo;
 

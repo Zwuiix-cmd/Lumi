@@ -2,12 +2,14 @@ package cn.nukkit.item.material.tags;
 
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.tags.impl.SimpleItemTag;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.utils.BinaryStream;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Arrays;
 import java.util.Set;
 
-public interface ItemTag {
+public interface ItemTag extends ItemDescriptor {
 
     Set<ItemType> getItemTypes();
 

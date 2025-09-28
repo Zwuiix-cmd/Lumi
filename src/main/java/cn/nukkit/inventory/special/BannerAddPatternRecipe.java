@@ -1,11 +1,13 @@
 package cn.nukkit.inventory.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.MultiRecipe;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemID;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,12 +18,12 @@ public class BannerAddPatternRecipe extends MultiRecipe {
     }
 
     @Override
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         if (outputItem.getId() != ItemID.BANNER) {
             return false;
         }
         int dyeCount = 0;
-        for (Item input : inputs) {
+        for (ItemDescriptor input : inputs) {
             if (input instanceof ItemDye) {
                 dyeCount += 1;
             }

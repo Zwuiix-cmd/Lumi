@@ -1,10 +1,14 @@
 package cn.nukkit.inventory.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.MultiRecipe;
+import cn.nukkit.item.ItemGunpowder;
+import cn.nukkit.item.ItemPaper;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,14 +19,14 @@ public class FireworkRecipe extends MultiRecipe {
     }
 
     @Override
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         if (outputItem.getId() == ItemID.FIREWORKS) {
             boolean hasPaper = false;
             int powder = 0;
-            for (Item input : inputs) {
-                if (input.getId() == ItemID.GUNPOWDER) {
+            for (ItemDescriptor input : inputs) {
+                if (input instanceof ItemGunpowder) {
                     powder += 1;
-                } else if (input.getId() == ItemID.PAPER) {
+                } else if (input instanceof ItemPaper) {
                     hasPaper = true;
                 }
             }

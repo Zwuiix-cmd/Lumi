@@ -1,10 +1,11 @@
 package cn.nukkit.inventory.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.MultiRecipe;
-import cn.nukkit.inventory.Recipe;
+import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,15 +16,16 @@ public class BookCloningRecipe extends MultiRecipe {
     }
 
     @Override
-    public boolean canExecute(Player player, Item outputItem, List<Item> inputs) {
+    public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         // Processing the checks about the inputs and outputItem
-        if (inputs.size() == 2) {
-            Item item1 = inputs.get(0);
-            Item item2 = inputs.get(1);
+        // TODO:RECIPES
+        /*if (inputs.size() == 2) {
+            ItemDescriptor item1 = inputs.get(0);
+            ItemDescriptor item2 = inputs.get(1);
             if (item1.getId() == Item.WRITTEN_BOOK && item2.getId() == Item.BOOK_AND_QUILL) {
                 return true;
             } else return item1.getId() == Item.BOOK_AND_QUILL && item2.getId() == Item.WRITTEN_BOOK;
-        }
+        }*/
         return false;
     }
 }

@@ -1,6 +1,7 @@
-package cn.nukkit.inventory;
+package cn.nukkit.recipe.impl;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.Recipe;
 import lombok.ToString;
 
 @ToString
