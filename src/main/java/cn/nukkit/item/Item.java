@@ -145,7 +145,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo, ItemDescr
     }
 
     public static Item get(String id) {
-        return get(id, 0);
+        return get(id, null);
     }
 
     public static Item get(String id, Integer meta) {
@@ -160,7 +160,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo, ItemDescr
         id = id.toLowerCase();
         if (!id.contains(":")) id = "minecraft:" + id;
 
-        Item item = Registries.ITEM.get(id);
+        Item item = Registries.ITEM.get(id).clone();
         if (meta != null) {
             item.setDamage(meta);
         }
@@ -170,7 +170,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo, ItemDescr
             item.setCompoundTag(tags);
         }
 
-        return item.clone();
+        return item;
     }
 
     /**
