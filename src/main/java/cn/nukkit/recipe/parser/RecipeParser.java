@@ -29,11 +29,10 @@ public class RecipeParser {
 
         final Item result;
         if(item.has("id")) {
-            result = Item.get(item.get("id").getAsString());
+            result = Registries.ITEM.get(item.get("id").getAsString()).clone();
         } else {
-            result = Item.get(item.get("itemId").getAsString());
+            result = Registries.ITEM.get(item.get("itemId").getAsString()).clone();
         }
-
 
         if(item.has("count")) {
             result.setCount(item.get("count").getAsInt());
@@ -48,8 +47,7 @@ public class RecipeParser {
             damage = item.get("auxValue").getAsInt();
         }
 
-        if(damage == 32767) damage = 0;
-        result.setDamage(damage);
+        if(damage != 32767) result.setDamage(damage);
 
         return result;
     }
