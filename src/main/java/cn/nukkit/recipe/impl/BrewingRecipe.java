@@ -13,7 +13,7 @@ public class BrewingRecipe extends MixRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerBrewingRecipe(this);
+        Registries.RECIPE.registerBrewingRecipe(this);
     }
 
     @Override

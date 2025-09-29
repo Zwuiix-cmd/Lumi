@@ -199,7 +199,7 @@ public class ShapedRecipe implements CraftingRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerShapedRecipe(this);
+        Registries.RECIPE.registerShapedRecipe(this);
     }
 
     @Override

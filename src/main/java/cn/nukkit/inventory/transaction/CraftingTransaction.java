@@ -114,11 +114,11 @@ public class CraftingTransaction extends InventoryTransaction {
                 }
             }
         } else {
-            MultiRecipe multiRecipe = Registries.RECIPE_REGISTRY.getMultiRecipe(this.source, this.getPrimaryOutput(), this.getInputList());
+            MultiRecipe multiRecipe = Registries.RECIPE.getMultiRecipe(this.source, this.getPrimaryOutput(), this.getInputList());
             if (multiRecipe != null) {
                 setTransactionRecipe(multiRecipe.toRecipe(this.getPrimaryOutput(), this.getInputList()));
             } else {
-                setTransactionRecipe(Registries.RECIPE_REGISTRY.matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs));
+                setTransactionRecipe(Registries.RECIPE.matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs));
             }
         }
         return this.getTransactionRecipe() != null && super.canExecute();

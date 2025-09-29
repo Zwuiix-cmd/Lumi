@@ -68,7 +68,7 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
             } else if (!keepItem[slot]) {
                 CampfireRecipe recipe = recipes[slot];
                 if (recipe == null) {
-                    recipe = Registries.RECIPE_REGISTRY.matchCampfireRecipe(item);
+                    recipe = Registries.RECIPE.matchCampfireRecipe(item);
                     if (recipe == null) {
                         inventory.setItem(slot, Item.get(0));
                         ThreadLocalRandom random = ThreadLocalRandom.current();

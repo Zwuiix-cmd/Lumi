@@ -32,7 +32,7 @@ public class CampfireRecipe implements SmeltingRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerCampfireRecipe(this);
+        Registries.RECIPE.registerCampfireRecipe(this);
     }
 
     @Override

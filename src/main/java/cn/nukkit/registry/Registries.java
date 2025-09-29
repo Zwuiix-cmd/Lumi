@@ -16,5 +16,5 @@ public class Registries {
     public static final DispenseBehaviorRegistry DISPENSE_BEHAVIOR = new DispenseBehaviorRegistry();
     public static final BlockEntityRegistry BLOCK_ENTITY = new BlockEntityRegistry();
     public static final EntityRegistry ENTITY = new EntityRegistry();
-    public static final RecipeRegistry RECIPE_REGISTRY = new RecipeRegistry();
+    public static final RecipeRegistry RECIPE = new RecipeRegistry();
 }

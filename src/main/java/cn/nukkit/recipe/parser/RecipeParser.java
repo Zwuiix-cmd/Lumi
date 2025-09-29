@@ -1,8 +1,10 @@
-package cn.nukkit.recipe;
+package cn.nukkit.recipe.parser;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.material.tags.ItemTags;
+import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.impl.*;
 import cn.nukkit.registry.Registries;
 import com.google.gson.JsonArray;
@@ -12,10 +14,7 @@ import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class RecipeParser {
@@ -24,11 +23,15 @@ public class RecipeParser {
     }
 
     private static Item parseItem(JsonObject item) {
+        if(item.has("type") && item.get("type").getAsString().equals("complex_alias")) {
+            throw new ComplexAliasException();
+        }
+
         final Item result;
         if(item.has("id")) {
-            result = Registries.ITEM.get(item.get("id").getAsString());
+            result = Item.get(item.get("id").getAsString());
         } else {
-            result = Registries.ITEM.get(item.get("itemId").getAsString());
+            result = Item.get(item.get("itemId").getAsString());
         }
 
 
@@ -58,13 +61,18 @@ public class RecipeParser {
         return parseItem(input);
     }
 
-    private static Item parseOutput(JsonElement output) {
+    private static Item parseOutput(JsonElement output, List<Item> extra) {
         Item result;
         if (output.isJsonArray()) {
             JsonArray array = output.getAsJsonArray();
-            if (array.size() > 1) {
+            if (array.isEmpty()) {
                 throw new RuntimeException("Aboba?");
             }
+
+            for(int i = 1; i < array.size(); ++i) {
+                extra.add(parseItem(array.get(i).getAsJsonObject()));
+            }
+
             result = parseItem(array.get(0).getAsJsonObject());
         } else {
             result = parseItem(output.getAsJsonObject());
@@ -80,33 +88,33 @@ public class RecipeParser {
                 final int type = recipe.get("type").getAsInt();
 
                 switch (type) {
+                    case 4, 9 -> {}
+
                     case 3 -> {
                         final String block = recipe.get("block").getAsString();
                         switch (block) {
                             case "furnace", "deprecated" -> {
-                                Registries.RECIPE_REGISTRY.addFurnace(new FurnaceRecipe(
+                                Registries.RECIPE.addFurnace(new FurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
                                         parseItem(recipe.get("input").getAsJsonObject())
                                 ));
                             }
 
                             case "blast_furnace" -> {
-                                Registries.RECIPE_REGISTRY.addBlastFurnace(new BlastFurnaceRecipe(
+                                Registries.RECIPE.addBlastFurnace(new BlastFurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
                                         parseItem(recipe.get("input").getAsJsonObject())
                                 ));
                             }
 
                             case "campfire" -> {
-                                Registries.RECIPE_REGISTRY.registerCampfireRecipe(new CampfireRecipe(
+                                Registries.RECIPE.registerCampfireRecipe(new CampfireRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
                                         parseItem(recipe.get("input").getAsJsonObject())
                                 ));
                             }
 
-                            case "smoker" -> {
-                            }
-                            case "soul_campfire" -> {
+                            case "stonecutter", "smoker", "soul_campfire" -> {
                             }
 
                             default -> log.warn("Not support block type: {}", block);
@@ -132,19 +140,39 @@ public class RecipeParser {
                                    items.put(entry.getKey().charAt(0), parseInput(entry.getValue().getAsJsonObject()));
                                 });
 
-                                Registries.RECIPE_REGISTRY.registerShapedRecipe(new ShapedRecipe(
+                                final List<Item> extra = new ArrayList<>();
+                                Registries.RECIPE.registerShapedRecipe(new ShapedRecipe(
                                         recipe.get("id").getAsString(),
                                         recipe.get("priority").getAsInt(),
-                                        parseOutput(recipe.get("output")),
+                                        parseOutput(recipe.get("output"), extra),
                                         shape,
                                         items,
-                                        new ArrayList<>()
+                                        extra
                                 ));
                             }
                         }
                     }
 
-                    case 0 -> {
+                    case 8 -> {
+                        final String block = recipe.get("block").getAsString();
+                        switch (block) {
+                            case "smithing_table" -> {
+                                Registries.RECIPE.registerSmithingRecipe(new SmithingRecipe(
+                                        recipe.get("id").getAsString(),
+                                        0,
+                                        List.of(
+                                                parseItem(recipe.get("base").getAsJsonObject()),
+                                                parseItem(recipe.get("addition").getAsJsonObject()),
+                                                parseItem(recipe.get("template").getAsJsonObject())
+                                        ),
+                                        parseItem(recipe.get("result").getAsJsonObject())
+                                ));
+                            }
+                            default -> log.warn("Not support block type: {}", block);
+                        }
+                    }
+
+                    case 0, 5 -> {
                         final String block = recipe.get("block").getAsString();
 
                         switch (block) {
@@ -155,12 +183,15 @@ public class RecipeParser {
                                     inputs.add(parseInput(item.getAsJsonObject()));
                                 });
 
-                                Registries.RECIPE_REGISTRY.registerShapelessRecipe(new ShapelessRecipe(
+                                Registries.RECIPE.registerShapelessRecipe(new ShapelessRecipe(
                                         recipe.get("id").getAsString(),
                                         recipe.get("priority").getAsInt(),
-                                        parseOutput(recipe.get("output")),
+                                        parseOutput(recipe.get("output"), List.of()),
                                         inputs
                                 ));
+                            }
+
+                            case "stonecutter", "cartography_table" -> {
                             }
 
                             default -> log.warn("Not support block type: {}", block);
@@ -170,10 +201,12 @@ public class RecipeParser {
                     default -> log.warn("Unknown recipe type: {}", type);
                 }
             } catch (Exception e) {
-                log.warn("Failed to load recipe {}", recipe.get("id").toString());
+                if(!(e instanceof ComplexAliasException)) {
+                    log.error("Failed to load recipe {}", recipe.get("id").toString());
+                }
             }
         });
 
-        Registries.RECIPE_REGISTRY.rebuildPacket();
+        Registries.RECIPE.rebuildPacket();
     }
 }

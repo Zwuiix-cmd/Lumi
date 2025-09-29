@@ -57,7 +57,7 @@ public class MultiRecipe implements Recipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerMultiRecipe(this);
+        Registries.RECIPE.registerMultiRecipe(this);
     }
 
     @Override

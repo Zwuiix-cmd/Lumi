@@ -1229,7 +1229,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     private void sendRecipeList() {
-        BatchPacket cachedPacket = Registries.RECIPE_REGISTRY.getPacket();
+        BatchPacket cachedPacket = Registries.RECIPE.getPacket();
         if (cachedPacket != null) { // Don't send recipes if they wouldn't work anyways
             this.dataPacket(cachedPacket);
         }
@@ -4385,7 +4385,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     return;
                 } else if (this.craftingTransaction != null) {
-                    MultiRecipe multiRecipe = Registries.RECIPE_REGISTRY.getMultiRecipe(this, this.craftingTransaction.getPrimaryOutput(), this.craftingTransaction.getInputList());
+                    MultiRecipe multiRecipe = Registries.RECIPE.getMultiRecipe(this, this.craftingTransaction.getPrimaryOutput(), this.craftingTransaction.getInputList());
                     if (craftingTransaction.checkForCraftingPart(actions) || multiRecipe != null) {
                         for (InventoryAction action : actions) {
                             craftingTransaction.addAction(action);

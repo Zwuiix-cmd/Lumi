@@ -99,7 +99,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerShapelessRecipe(this);
+        Registries.RECIPE.registerShapelessRecipe(this);
     }
 
     @Override

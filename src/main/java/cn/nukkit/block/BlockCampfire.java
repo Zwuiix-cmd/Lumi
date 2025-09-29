@@ -196,7 +196,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable, Blo
         cloned.setCount(1);
         final CampfireInventory inventory = campfire.getInventory();
         if (inventory.canAddItem(cloned)) {
-            final CampfireRecipe recipe = Registries.RECIPE_REGISTRY.matchCampfireRecipe(cloned);
+            final CampfireRecipe recipe = Registries.RECIPE.matchCampfireRecipe(cloned);
             if (recipe != null) {
                 inventory.addItem(cloned);
                 item.setCount(item.getCount() - 1);

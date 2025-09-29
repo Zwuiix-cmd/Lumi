@@ -12,7 +12,7 @@ public class ContainerRecipe extends MixRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerContainerRecipe(this);
+        Registries.RECIPE.registerContainerRecipe(this);
     }
 
     @Override

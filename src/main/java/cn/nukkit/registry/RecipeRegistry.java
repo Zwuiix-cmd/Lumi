@@ -120,7 +120,7 @@ public class RecipeRegistry {
     public SmithingRecipe matchSmithingRecipe(List<Item> inputList) {
         UUID inputHash = RecipeUtils.getMultiItemHash(inputList);
 
-        Map<UUID, SmithingRecipe> recipeMap = Registries.RECIPE_REGISTRY.getSmithingRecipes();
+        Map<UUID, SmithingRecipe> recipeMap = Registries.RECIPE.getSmithingRecipes();
 
         if (recipeMap != null) {
             SmithingRecipe recipe = recipeMap.get(inputHash);

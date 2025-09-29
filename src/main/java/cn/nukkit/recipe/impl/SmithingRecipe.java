@@ -52,11 +52,7 @@ public class SmithingRecipe extends ShapelessRecipe {
         super(recipeId, priority, result, ingredients);
         this.equipment = (Item) ingredients.toArray()[0];
         this.ingredient = (Item) ingredients.toArray()[1];
-        if (ingredients.size() >= 3) {
-            this.template = (Item) ingredients.toArray()[2];
-        } else {
-            this.template = Item.AIR_ITEM.clone();
-        }
+        this.template = (Item) ingredients.toArray()[2];
         this.result = result;
 
         this.ingredients = ingredients;
@@ -98,7 +94,7 @@ public class SmithingRecipe extends ShapelessRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE_REGISTRY.registerSmithingRecipe(this);
+        Registries.RECIPE.registerSmithingRecipe(this);
     }
 
     @Override
@@ -122,7 +118,7 @@ public class SmithingRecipe extends ShapelessRecipe {
             haveInputs.add(item.clone());
         }
 
-        return Recipe.matchItemList(haveInputs, ingredients);
+        return Recipe.matchItemList(haveInputs, new ArrayList<>(ingredients));
     }
 
     @Override

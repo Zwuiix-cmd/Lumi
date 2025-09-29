@@ -270,7 +270,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     protected SmeltingRecipe matchRecipe(int protocol, Item raw) {
-        return Registries.RECIPE_REGISTRY.matchFurnaceRecipe(raw);
+        return Registries.RECIPE.matchFurnaceRecipe(raw);
     }
 
     protected int getSpeedMultiplier() {
@@ -313,7 +313,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
                     newProduct.setCount(product.getCount() + 1);
                     product = newProduct;
 
-                    FurnaceSmeltEvent ev = new FurnaceSmeltEvent(this, raw, product, (float) Registries.RECIPE_REGISTRY.getRecipeXp(smelt));
+                    FurnaceSmeltEvent ev = new FurnaceSmeltEvent(this, raw, product, (float) Registries.RECIPE.getRecipeXp(smelt));
                     this.server.getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.inventory.setResult(ev.getResult());
