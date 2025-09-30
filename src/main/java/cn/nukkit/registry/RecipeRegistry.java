@@ -149,6 +149,7 @@ public class RecipeRegistry {
     }
 
     public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
+        if(outputItem == null) return null;
         return this.multiRecipes.values().stream().filter(multiRecipe -> multiRecipe.canExecute(player, outputItem, inputs)).findFirst().orElse(null);
     }
 
@@ -191,6 +192,7 @@ public class RecipeRegistry {
 
     public void registerMultiRecipe(MultiRecipe recipe) {
         this.multiRecipes.put(recipe.getId(), recipe);
+        recipes.add(recipe);
     }
 
     public double getRecipeXp(Recipe recipe) {
