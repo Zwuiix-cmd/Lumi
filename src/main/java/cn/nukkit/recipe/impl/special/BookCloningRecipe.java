@@ -1,4 +1,4 @@
-package cn.nukkit.inventory.special;
+package cn.nukkit.recipe.impl.special;
 
 import cn.nukkit.Player;
 import cn.nukkit.recipe.ItemDescriptor;
@@ -18,14 +18,12 @@ public class BookCloningRecipe extends MultiRecipe {
     @Override
     public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         // Processing the checks about the inputs and outputItem
-        // TODO:RECIPES
-        /*if (inputs.size() == 2) {
-            ItemDescriptor item1 = inputs.get(0);
-            ItemDescriptor item2 = inputs.get(1);
+        ItemDescriptor[] items = inputs.toArray(new ItemDescriptor[0]);
+        if (inputs.size() == 2 &&  items[0] instanceof Item item1 && items[1] instanceof Item item2) {
             if (item1.getId() == Item.WRITTEN_BOOK && item2.getId() == Item.BOOK_AND_QUILL) {
                 return true;
             } else return item1.getId() == Item.BOOK_AND_QUILL && item2.getId() == Item.WRITTEN_BOOK;
-        }*/
+        }
         return false;
     }
 }

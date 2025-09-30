@@ -1,4 +1,4 @@
-package cn.nukkit.inventory.special;
+package cn.nukkit.recipe.impl.special;
 
 import cn.nukkit.Player;
 import cn.nukkit.recipe.ItemDescriptor;
@@ -22,10 +22,8 @@ public class RepairItemRecipe extends MultiRecipe {
     @Override
     public boolean canExecute(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
         // Processing the checks about the inputs and outputItem
-        // TODO:RECIPES
-       /* if (inputs.size() == 2) {
-            Item item1 = inputs.get(0);
-            Item item2 = inputs.get(1);
+        ItemDescriptor[] items = inputs.toArray(new ItemDescriptor[0]);
+        if (inputs.size() == 2 && items[0] instanceof Item item1 && items[1] instanceof Item item2) {
             if (item1.equals(item2, false, false)) {
                 if (item1.isTool() || item1.isArmor()) {
                     int damage = calculateDamage(item1.getDamage(), item2.getDamage(), item1.getMaxDurability());
@@ -34,8 +32,7 @@ public class RepairItemRecipe extends MultiRecipe {
                     }
                 }
             }
-        } else if (inputs.size() == 1) {
-            Item item = inputs.get(0);
+        } else if (inputs.size() == 1 && items[0] instanceof Item item) {
             if (item.getCount() == 2) {
                 if (item.isTool() || item.isArmor()) {
                     int damage = calculateDamage(item.getDamage(), item.getDamage(), item.getMaxDurability());
@@ -44,7 +41,7 @@ public class RepairItemRecipe extends MultiRecipe {
                     }
                 }
             }
-        }*/
+        }
         return false;
     }
 

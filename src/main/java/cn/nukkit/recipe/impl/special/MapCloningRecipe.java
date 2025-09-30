@@ -1,4 +1,4 @@
-package cn.nukkit.inventory.special;
+package cn.nukkit.recipe.impl.special;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.ItemEmptyMap;

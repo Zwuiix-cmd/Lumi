@@ -1,11 +1,11 @@
 package cn.nukkit.recipe.parser;
 
 import cn.nukkit.Server;
-import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.material.tags.ItemTags;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.impl.*;
+import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.registry.Registries;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -19,6 +19,16 @@ import java.util.*;
 @Slf4j
 public class RecipeParser {
     public static void init() {
+        Registries.RECIPE.registerMultiRecipe(new RepairItemRecipe());
+        Registries.RECIPE.registerMultiRecipe(new BookCloningRecipe());
+        Registries.RECIPE.registerMultiRecipe(new MapCloningRecipe());
+        Registries.RECIPE.registerMultiRecipe(new MapUpgradingRecipe());
+        Registries.RECIPE.registerMultiRecipe(new MapExtendingRecipe());
+        Registries.RECIPE.registerMultiRecipe(new BannerAddPatternRecipe());
+        Registries.RECIPE.registerMultiRecipe(new BannerDuplicateRecipe());
+        Registries.RECIPE.registerMultiRecipe(new FireworkRecipe());
+        Registries.RECIPE.registerMultiRecipe(new DecoratedPotRecipe());
+
         loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
     }
 
