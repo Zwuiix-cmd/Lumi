@@ -16,12 +16,18 @@ public interface Recipe {
 
     RecipeType getType();
 
-    static boolean matchItemList(List<Item> haveItems, Collection<ItemDescriptor> needItems) {
-        final Map<ItemDescriptor, Integer> map = new HashMap<>();
-        for(final ItemDescriptor item : needItems) {
-            map.put(item, map.getOrDefault(item, 0) + 1);
-        }
+    static boolean matchItemList(List<Item> have, Collection<ItemDescriptor> need) {
+        final List<ItemDescriptor> needItems = new ArrayList<>(need);
+        final List<Item> haveItems = new ArrayList<>(have);
 
+        final Map<ItemDescriptor, Integer> map = new HashMap<>();
+        for(ItemDescriptor item : needItems) {
+            int count = 1;
+            if(item instanceof Item item1) {
+                count = item1.getCount();
+            }
+            map.put(item, map.getOrDefault(item, 0) + count);
+        }
         for (ItemDescriptor recipeItem : new ArrayList<>(needItems)) {
             for (Item haveItem : new ArrayList<>(haveItems)) {
                 if (recipeItem.equals(haveItem)) {

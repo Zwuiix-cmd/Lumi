@@ -37,8 +37,9 @@ public class RecipeRegistry {
     private final Object2DoubleOpenHashMap<Recipe> recipeXpMap = new Object2DoubleOpenHashMap<>();
     private final Collection<Recipe> recipes = new ArrayDeque<>(); //649
 
-    public void addFurnace(FurnaceRecipe recipe) {
+    public void addFurnace(FurnaceRecipe recipe, double xp) {
         furnace.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
+        recipeXpMap.put(recipe, xp);
     }
 
     public FurnaceRecipe matchFurnaceRecipe(Item input) {
@@ -47,8 +48,9 @@ public class RecipeRegistry {
         return recipe;
     }
 
-    public void addBlastFurnace(BlastFurnaceRecipe recipe) {
+    public void addBlastFurnace(BlastFurnaceRecipe recipe, double xp) {
         blastFurnace.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
+        recipeXpMap.put(recipe, xp);
     }
 
     public FurnaceRecipe matchBlastFurnaceRecipe(Item input) {
@@ -185,9 +187,10 @@ public class RecipeRegistry {
         return this.containerRecipes.get(RecipeUtils.getContainerHash(input.getId(), potion.getId()));
     }
 
-    public void registerCampfireRecipe(CampfireRecipe recipe) {
+    public void registerCampfireRecipe(CampfireRecipe recipe, double xp) {
         Item input = recipe.getInput();
         this.campfireRecipes.put(RecipeUtils.getItemHash(input), recipe);
+        recipeXpMap.put(recipe, xp);
     }
 
     public void registerMultiRecipe(MultiRecipe recipe) {

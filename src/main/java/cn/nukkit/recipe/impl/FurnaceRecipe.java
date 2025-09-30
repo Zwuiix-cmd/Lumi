@@ -36,7 +36,7 @@ public class FurnaceRecipe implements SmeltingRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE.addFurnace(this);
+        Registries.RECIPE.addFurnace(this, 0);
     }
 
     @Override

@@ -1178,7 +1178,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo, ItemDescr
             damage = runtimeEntry.isHasDamage() ? 0 : this.getDamage();
         }
 
-
         stream.putLShort(runtimeId);
         stream.putLShort(damage);
         stream.putVarInt(this.getCount());

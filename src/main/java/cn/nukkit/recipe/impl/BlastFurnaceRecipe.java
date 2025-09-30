@@ -12,7 +12,7 @@ public class BlastFurnaceRecipe extends FurnaceRecipe {
 
     @Override
     public void registerToCraftingManager() {
-        Registries.RECIPE.addBlastFurnace(this);
+        Registries.RECIPE.addBlastFurnace(this, 0);
     }
 
     @Override

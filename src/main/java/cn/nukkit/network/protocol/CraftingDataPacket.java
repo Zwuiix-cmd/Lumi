@@ -1,12 +1,10 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.material.tags.ItemTag;
 import cn.nukkit.item.material.tags.ItemTags;
 import cn.nukkit.recipe.*;
 import cn.nukkit.recipe.impl.*;
-import cn.nukkit.utils.BinaryStream;
 import lombok.ToString;
 
 import java.util.ArrayList;

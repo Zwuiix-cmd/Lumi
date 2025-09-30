@@ -1,6 +1,6 @@
 package cn.nukkit.recipe;
 
-import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 
 import java.util.List;

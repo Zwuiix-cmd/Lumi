@@ -1,12 +1,18 @@
 package cn.nukkit.recipe.parser;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.RuntimeItemMapping;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.material.tags.ItemTags;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.impl.*;
 import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.registry.Registries;
+import cn.nukkit.utils.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,6 +35,18 @@ public class RecipeParser {
         Registries.RECIPE.registerMultiRecipe(new FireworkRecipe());
         Registries.RECIPE.registerMultiRecipe(new DecoratedPotRecipe());
 
+        Config extras407 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"));
+        List<Map> potionMixes407 = extras407.getMapList("potionMixes");
+        for (Map potionMix : potionMixes407) {
+            int fromPotionId = ((Number) potionMix.get("inputId")).intValue();
+            int fromPotionMeta = ((Number) potionMix.get("inputMeta")).intValue();
+            int ingredient = ((Number) potionMix.get("reagentId")).intValue();
+            int ingredientMeta = ((Number) potionMix.get("reagentMeta")).intValue();
+            int toPotionId = ((Number) potionMix.get("outputId")).intValue();
+            int toPotionMeta = ((Number) potionMix.get("outputMeta")).intValue();
+            Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
+        }
+
         loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
     }
 
@@ -48,7 +66,7 @@ public class RecipeParser {
             result.setCount(item.get("count").getAsInt());
         }
 
-        int damage = 0;
+        int damage = result.getDamage();
         if(item.has("damage")) {
             damage = item.get("damage").getAsInt();
         }
@@ -57,7 +75,7 @@ public class RecipeParser {
             damage = item.get("auxValue").getAsInt();
         }
 
-        if(damage != 32767) result.setDamage(damage);
+        if(damage != 32767 && result.getDamage() == 0) result.setDamage(damage);
 
         return result;
     }
@@ -89,6 +107,8 @@ public class RecipeParser {
     }
 
     private static void loadRecipes(JsonArray recipes) {
+        JsonObject furnaceXp = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/furnace_xp.json"))).getAsJsonObject();
+
         recipes.forEach(json -> {
             final JsonObject recipe = json.getAsJsonObject();
 
@@ -100,26 +120,31 @@ public class RecipeParser {
 
                     case 3 -> {
                         final String block = recipe.get("block").getAsString();
+                        final Item input = parseItem(recipe.get("input").getAsJsonObject());
+                        double xp = 0;
+                        if(furnaceXp.has(input.getNamespaceId() + ":" + input.getDamage())) {
+                            xp = furnaceXp.get(input.getNamespaceId() + ":" + input.getDamage()).getAsDouble();
+                        }
                         switch (block) {
                             case "furnace", "deprecated" -> {
                                 Registries.RECIPE.addFurnace(new FurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
-                                        parseItem(recipe.get("input").getAsJsonObject())
-                                ));
+                                        input
+                                ), xp);
                             }
 
                             case "blast_furnace" -> {
                                 Registries.RECIPE.addBlastFurnace(new BlastFurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
-                                        parseItem(recipe.get("input").getAsJsonObject())
-                                ));
+                                        input
+                                ), xp);
                             }
 
                             case "campfire" -> {
                                 Registries.RECIPE.registerCampfireRecipe(new CampfireRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()),
-                                        parseItem(recipe.get("input").getAsJsonObject())
-                                ));
+                                        input
+                                ), xp);
                             }
 
                             case "stonecutter", "smoker", "soul_campfire" -> {
@@ -148,7 +173,31 @@ public class RecipeParser {
                                    items.put(entry.getKey().charAt(0), parseInput(entry.getValue().getAsJsonObject()));
                                 });
 
+                                /*
+                                ShapedRecipe(
+                                    recipeId=minecraft:honey_block,
+                                    primaryResult=Item Honey Block (-220:0)x1,
+                                    extraResults=[Item Glass Bottle (374:0)x4],
+                                    least=0,
+                                     most=0,
+                                     shape=[AA, AA],
+                                     priority=0,
+                                     ingredients={A=Item Honey Bottle (737:0)x1},
+                                     networkId=1144,
+                                     assumeSymetry=true,
+                                     requirement=RecipeUnlockingRequirement(context=ALWAYS_UNLOCKED, ingredients=[]))
+
+                                 */
                                 final List<Item> extra = new ArrayList<>();
+                                /*
+                                ShapedRecipe(
+                                recipeId=minecraft:raw_iron_block,
+                                primaryResult=Item Block of Raw Iron (-451:0)x1,
+                                extraResults=[], least=0, most=0,
+                                shape=[AAA, AAA, AAA], priority=0,
+                                ingredients={A=Item Raw Iron (minecraft:raw_iron:0)x1}, networkId=1213, assumeSymetry=true, requirement=RecipeUnlockingRequirement(context=ALWAYS_UNLOCKED, ingredients=[]))
+                                 */
+
                                 Registries.RECIPE.registerShapedRecipe(new ShapedRecipe(
                                         recipe.get("id").getAsString(),
                                         recipe.get("priority").getAsInt(),

@@ -1,4 +1,4 @@
-package cn.nukkit.inventory.data;
+package cn.nukkit.recipe.impl.data;
 
 import cn.nukkit.item.Item;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

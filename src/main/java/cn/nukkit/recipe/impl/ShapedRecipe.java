@@ -1,6 +1,6 @@
 package cn.nukkit.recipe.impl;
 
-import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.Recipe;
@@ -10,6 +10,7 @@ import cn.nukkit.registry.RecipeRegistry;
 import cn.nukkit.registry.Registries;
 import io.netty.util.collection.CharObjectHashMap;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.*;
 
@@ -17,6 +18,7 @@ import java.util.*;
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class ShapedRecipe implements CraftingRecipe {
 
     private String recipeId;
@@ -241,7 +243,6 @@ public class ShapedRecipe implements CraftingRecipe {
                 continue;
             needOutputs.add(item.clone());
         }
-
         return Recipe.matchItemList(haveOutputs, needOutputs);
     }
 

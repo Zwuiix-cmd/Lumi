@@ -1,6 +1,6 @@
 package cn.nukkit.recipe.impl;
 
-import cn.nukkit.inventory.data.RecipeUnlockingRequirement;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.Recipe;
