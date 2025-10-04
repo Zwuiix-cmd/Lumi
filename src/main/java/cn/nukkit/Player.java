@@ -1155,10 +1155,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned) {
             return;
         }
-
-        if (this.protocol >= ProtocolInfo.v1_21_60) {
-            this.sendRecipeList();
-        }
+        
+        this.sendRecipeList();
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
