@@ -18,13 +18,13 @@
 
 package cn.nukkit.recipe.impl;
 
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
-import cn.nukkit.registry.Registries;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -50,9 +50,9 @@ public class SmithingRecipe extends ShapelessRecipe {
 
     public SmithingRecipe(String recipeId, int priority, Collection<ItemDescriptor> ingredients, Item result) {
         super(recipeId, priority, result, ingredients);
-        this.equipment = (Item) ingredients.toArray()[0];
-        this.ingredient = (Item) ingredients.toArray()[1];
-        this.template = (Item) ingredients.toArray()[2];
+        this.equipment = ((DefaultDescriptor) ingredients.toArray()[0]).getItem();
+        this.ingredient = ((DefaultDescriptor) ingredients.toArray()[1]).getItem();
+        this.template = ((DefaultDescriptor) ingredients.toArray()[2]).getItem();
         this.result = result;
 
         this.ingredients = ingredients;
@@ -90,11 +90,6 @@ public class SmithingRecipe extends ShapelessRecipe {
     @Deprecated
     public Item getFinalResult(Item equip) {
         return getFinalResult(equip, template);
-    }
-
-    @Override
-    public void registerToCraftingManager() {
-        Registries.RECIPE.registerSmithingRecipe(this);
     }
 
     @Override

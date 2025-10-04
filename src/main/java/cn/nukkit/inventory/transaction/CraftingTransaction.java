@@ -12,6 +12,7 @@ import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.network.protocol.types.inventory.ContainerType;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.recipe.*;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.recipe.impl.SmithingRecipe;
 import cn.nukkit.registry.Registries;
@@ -19,6 +20,7 @@ import cn.nukkit.registry.Registries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author CreeperFace
@@ -53,7 +55,7 @@ public class CraftingTransaction extends InventoryTransaction {
     public void setInput(Item item) {
         if (inputs.size() < gridSize * gridSize) {
             for (Item existingInput : this.inputs) {
-                if (existingInput.equalsRecipeItem(item)) {
+                if (new DefaultDescriptor(existingInput).equals(new DefaultDescriptor(item))) {
                     existingInput.setCount(existingInput.getCount() + item.getCount());
                     return;
                 }
@@ -65,7 +67,11 @@ public class CraftingTransaction extends InventoryTransaction {
     }
 
     public Collection<ItemDescriptor> getInputList() {
-        return new ArrayList<>(this.inputs);
+        Collection<ItemDescriptor> list = new ArrayList<>();
+        for(Item item : inputs) {
+            list.add(new DefaultDescriptor(item));
+        }
+        return list;
     }
 
     public void setExtraOutput(Item item) {

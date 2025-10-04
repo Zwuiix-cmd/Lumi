@@ -1,5 +1,6 @@
 package cn.nukkit.recipe.impl;
 
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
@@ -7,7 +8,6 @@ import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.registry.RecipeRegistry;
-import cn.nukkit.registry.Registries;
 import io.netty.util.collection.CharObjectHashMap;
 import lombok.Getter;
 import lombok.ToString;
@@ -196,12 +196,7 @@ public class ShapedRecipe implements CraftingRecipe {
 
     public ItemDescriptor getIngredient(int x, int y) {
         ItemDescriptor item = this.ingredients.get(this.shape[y].charAt(x));
-        return item != null ? item : Item.get(Item.AIR);
-    }
-
-    @Override
-    public void registerToCraftingManager() {
-        Registries.RECIPE.registerShapedRecipe(this);
+        return item != null ? item : new DefaultDescriptor(Item.get(Item.AIR));
     }
 
     @Override
@@ -241,7 +236,7 @@ public class ShapedRecipe implements CraftingRecipe {
         for (Item item : getExtraResults()) {
             if (item.isNull())
                 continue;
-            needOutputs.add(item.clone());
+            needOutputs.add(new DefaultDescriptor(item));
         }
         return Recipe.matchItemList(haveOutputs, needOutputs);
     }

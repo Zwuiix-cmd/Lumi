@@ -4276,6 +4276,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         try {
                             this.craftingTransaction.execute();
                         } catch (Exception e) {
+                            e.printStackTrace();
                             this.server.getLogger().debug("Executing crafting transaction failed");
                         }
                         this.craftingTransaction = null;

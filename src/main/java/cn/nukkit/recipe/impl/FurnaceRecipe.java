@@ -3,7 +3,6 @@ package cn.nukkit.recipe.impl;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.recipe.SmeltingRecipe;
-import cn.nukkit.registry.Registries;
 
 /**
  * @author MagicDroidX
@@ -32,11 +31,6 @@ public class FurnaceRecipe implements SmeltingRecipe {
     @Override
     public Item getResult() {
         return this.output.clone();
-    }
-
-    @Override
-    public void registerToCraftingManager() {
-        Registries.RECIPE.addFurnace(this, 0);
     }
 
     @Override

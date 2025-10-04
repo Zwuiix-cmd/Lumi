@@ -1,6 +1,7 @@
 package cn.nukkit.registry;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
@@ -8,18 +9,23 @@ import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.impl.*;
+import cn.nukkit.recipe.impl.special.*;
+import cn.nukkit.recipe.parser.RecipeParser;
+import cn.nukkit.utils.Config;
 import cn.nukkit.utils.RecipeUtils;
+import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.zip.Deflater;
 
 @Getter
-public class RecipeRegistry {
+public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
     public static int NEXT_NETWORK_ID = 1;
 
     private BatchPacket packet;
@@ -36,6 +42,54 @@ public class RecipeRegistry {
     private final Map<UUID, SmithingRecipe> smithingRecipes = new Object2ObjectOpenHashMap<>(); //589
     private final Object2DoubleOpenHashMap<Recipe> recipeXpMap = new Object2DoubleOpenHashMap<>();
     private final Collection<Recipe> recipes = new ArrayDeque<>(); //649
+
+    @Override
+    public void init() {
+        this.registerMultiRecipe(new RepairItemRecipe());
+        this.registerMultiRecipe(new BookCloningRecipe());
+        this.registerMultiRecipe(new MapCloningRecipe());
+        this.registerMultiRecipe(new MapUpgradingRecipe());
+        this.registerMultiRecipe(new MapExtendingRecipe());
+        this.registerMultiRecipe(new BannerAddPatternRecipe());
+        this.registerMultiRecipe(new BannerDuplicateRecipe());
+        this.registerMultiRecipe(new FireworkRecipe());
+        this.registerMultiRecipe(new DecoratedPotRecipe());
+
+        Config extras407 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"));
+        List<Map> potionMixes407 = extras407.getMapList("potionMixes");
+        for (Map potionMix : potionMixes407) {
+            int fromPotionId = ((Number) potionMix.get("inputId")).intValue();
+            int fromPotionMeta = ((Number) potionMix.get("inputMeta")).intValue();
+            int ingredient = ((Number) potionMix.get("reagentId")).intValue();
+            int ingredientMeta = ((Number) potionMix.get("reagentMeta")).intValue();
+            int toPotionId = ((Number) potionMix.get("outputId")).intValue();
+            int toPotionMeta = ((Number) potionMix.get("outputMeta")).intValue();
+            Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
+        }
+
+        RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
+        this.rebuildPacket();
+    }
+
+    @Override
+    public void register(String key, Recipe value) {
+
+    }
+
+    @Override
+    public Recipe get(String key) {
+        return null;
+    }
+
+    @Override
+    public void trim() {
+
+    }
+
+    @Override
+    public void reload() {
+
+    }
 
     public void addFurnace(FurnaceRecipe recipe, double xp) {
         furnace.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
@@ -70,7 +124,6 @@ public class RecipeRegistry {
         shapless.computeIfAbsent(resultHash, (key) -> new HashMap<>()).put(UUID.randomUUID(), recipe);
         recipes.add(recipe);
     }
-
 
     public CraftingRecipe matchRecipe(List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
         int outputHash = RecipeUtils.getItemHash(primaryOutput);

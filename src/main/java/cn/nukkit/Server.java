@@ -330,6 +330,8 @@ public class Server {
 
         this.commandMap = new SimpleCommandMap(this);
 
+        Registries.RECIPE.init();
+
         // Convert legacy data before plugins get the chance to mess with it
         try {
             nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
@@ -345,7 +347,6 @@ public class Server {
 
         this.serverID = UUID.randomUUID();
 
-        RecipeParser.init();
         this.resourcePackManager = new ResourcePackManager(
                 new ZippedResourcePackLoader(new File(Nukkit.DATA_PATH, "resource_packs")),
                 new JarPluginResourcePackLoader(new File(this.pluginPath))

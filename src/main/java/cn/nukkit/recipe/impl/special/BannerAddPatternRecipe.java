@@ -2,19 +2,18 @@ package cn.nukkit.recipe.impl.special;
 
 import cn.nukkit.Player;
 import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemID;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 public class BannerAddPatternRecipe extends MultiRecipe {
 
     public BannerAddPatternRecipe(){
-        super(UUID.fromString(TYPE_BANNER_ADD_PATTERN));
+        super(TYPE_BANNER_ADD_PATTERN);
     }
 
     @Override
@@ -24,8 +23,10 @@ public class BannerAddPatternRecipe extends MultiRecipe {
         }
         int dyeCount = 0;
         for (ItemDescriptor input : inputs) {
-            if (input instanceof ItemDye) {
-                dyeCount += 1;
+            if(input instanceof DefaultDescriptor descriptor) {
+                if (descriptor.getItem() instanceof ItemDye) {
+                    dyeCount += 1;
+                }
             }
         }
         if (dyeCount < 3) {

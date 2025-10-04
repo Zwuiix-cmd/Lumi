@@ -1,5 +1,6 @@
 package cn.nukkit.recipe.impl;
 
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
@@ -7,13 +8,13 @@ import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.registry.RecipeRegistry;
-import cn.nukkit.registry.Registries;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author MagicDroidX
@@ -98,11 +99,6 @@ public class ShapelessRecipe implements CraftingRecipe {
     }
 
     @Override
-    public void registerToCraftingManager() {
-        Registries.RECIPE.registerShapelessRecipe(this);
-    }
-
-    @Override
     public RecipeType getType() {
         return RecipeType.SHAPELESS;
     }
@@ -151,7 +147,7 @@ public class ShapelessRecipe implements CraftingRecipe {
         for (Item item : getExtraResults()) {
             if (item.isNull())
                 continue;
-            needOutputs.add(item.clone());
+            needOutputs.add(new DefaultDescriptor(item));
         }
 
         return Recipe.matchItemList(haveOutputs, needOutputs);

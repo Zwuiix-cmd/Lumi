@@ -1,6 +1,7 @@
 package cn.nukkit.recipe;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 
 import java.util.*;
 
@@ -12,8 +13,6 @@ public interface Recipe {
 
     Item getResult();
 
-    void registerToCraftingManager();
-
     RecipeType getType();
 
     static boolean matchItemList(List<Item> have, Collection<ItemDescriptor> need) {
@@ -23,8 +22,8 @@ public interface Recipe {
         final Map<ItemDescriptor, Integer> map = new HashMap<>();
         for(ItemDescriptor item : needItems) {
             int count = 1;
-            if(item instanceof Item item1) {
-                count = item1.getCount();
+            if(item instanceof DefaultDescriptor item1) {
+                count = item1.getItem().getCount();
             }
             map.put(item, map.getOrDefault(item, 0) + count);
         }

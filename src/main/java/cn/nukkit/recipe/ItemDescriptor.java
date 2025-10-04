@@ -1,19 +1,20 @@
 package cn.nukkit.recipe;
 
-import cn.nukkit.item.Item;
-import cn.nukkit.item.material.tags.ItemTag;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.utils.BinaryStream;
 
-public interface ItemDescriptor extends Cloneable {
-    void putRecipe(BinaryStream stream, int protocol);
+public abstract class ItemDescriptor implements Cloneable {
+    public abstract void putRecipe(BinaryStream stream, int protocol);
 
-    default boolean equalsRecipeItem(ItemDescriptor entry) {
-        if(this instanceof ItemTag tag && entry instanceof Item item) {
-            return tag.has(item.getItemType());
+    @Override
+    public boolean equals(Object entry) {
+        if(this instanceof ItemTagDescriptor tag && entry instanceof DefaultDescriptor item) {
+            return tag.getItemTag().has(item.getItem().getItemType());
         }
 
-        if(this instanceof Item item1 && entry instanceof Item item2) {
-            return item1.getNamespaceId().equals(item2.getNamespaceId()) && (item1.getDamage() == -1 || item2.getDamage() == -1 || item1.getDamage() == item2.getDamage());
+        if(this instanceof DefaultDescriptor item1 && entry instanceof DefaultDescriptor item2) {
+            return item1.getItem().getNamespaceId().equals(item2.getItem().getNamespaceId()) && (item1.getItem().getDamage() == -1 || item2.getItem().getDamage() == -1 || item1.getItem().getDamage() == item2.getItem().getDamage());
         }
         return false;
     }

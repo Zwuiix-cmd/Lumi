@@ -3,7 +3,6 @@ package cn.nukkit.recipe.impl;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.recipe.SmeltingRecipe;
-import cn.nukkit.registry.Registries;
 
 public class CampfireRecipe implements SmeltingRecipe {
 
@@ -28,11 +27,6 @@ public class CampfireRecipe implements SmeltingRecipe {
     @Override
     public Item getResult() {
         return this.output.clone();
-    }
-
-    @Override
-    public void registerToCraftingManager() {
-        Registries.RECIPE.registerCampfireRecipe(this, 0);
     }
 
     @Override

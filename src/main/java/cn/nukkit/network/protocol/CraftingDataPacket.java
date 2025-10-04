@@ -1,5 +1,7 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.material.tags.ItemTags;
@@ -103,9 +105,9 @@ public class CraftingDataPacket extends DataPacket {
                 case SMITHING_TRANSFORM:
                     SmithingRecipe smithing = (SmithingRecipe) recipe;
                     this.putString(smithing.getRecipeId());
-                    smithing.getTemplate().putRecipe(this, protocol);
-                    smithing.getEquipment().putRecipe(this, protocol);
-                    smithing.getIngredient().putRecipe(this, protocol);
+                    new DefaultDescriptor(smithing.getTemplate()).putRecipe(this, protocol);
+                    new DefaultDescriptor(smithing.getEquipment()).putRecipe(this, protocol);
+                    new DefaultDescriptor(smithing.getIngredient()).putRecipe(this, protocol);
                     this.putSlot(protocol, smithing.getResult(), true);
                     this.putString(CRAFTING_TAG_SMITHING_TABLE);
                     this.putUnsignedVarInt(smithing.getNetworkId());
@@ -173,9 +175,9 @@ public class CraftingDataPacket extends DataPacket {
         // approach of using many default-descriptors (which we do for smithing_transform)
         this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType(protocol));
         this.putString("minecraft:smithing_armor_trim");
-        ItemTags.TRIM_TEMPLATES.putRecipe(this, protocol);
-        ItemTags.TRIMMABLE_ARMORS.putRecipe(this, protocol);
-        ItemTags.TRIM_MATERIALS.putRecipe(this, protocol);
+        new ItemTagDescriptor(ItemTags.TRIM_TEMPLATES, "minecraft:trim_templates").putRecipe(this, protocol);
+        new ItemTagDescriptor(ItemTags.TRIMMABLE_ARMORS, "minecraft:trimmable_armors").putRecipe(this, protocol);
+        new ItemTagDescriptor(ItemTags.TRIM_MATERIALS, "minecraft:trim_materials").putRecipe(this, protocol);
         this.putString(CRAFTING_TAG_SMITHING_TABLE);
         this.putUnsignedVarInt(1);
 
@@ -217,7 +219,7 @@ public class CraftingDataPacket extends DataPacket {
     protected void writeRequirement(CraftingRecipe recipe) {
         this.putByte((byte) recipe.getRequirement().getContext().ordinal());
         if (recipe.getRequirement().getContext().equals(RecipeUnlockingRequirement.UnlockingContext.NONE)) {
-            this.putArray(recipe.getRequirement().getIngredients(), (ingredient) -> ingredient.putRecipe(this, protocol));
+            this.putArray(recipe.getRequirement().getIngredients(), (ingredient) -> new DefaultDescriptor(ingredient).putRecipe(this, protocol));
         }
     }
 }
