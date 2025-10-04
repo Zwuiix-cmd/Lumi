@@ -13,6 +13,8 @@ import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.recipe.parser.RecipeParser;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.RecipeUtils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -55,17 +57,19 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
         this.registerMultiRecipe(new FireworkRecipe());
         this.registerMultiRecipe(new DecoratedPotRecipe());
 
-        Config extras407 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"));
-        List<Map> potionMixes407 = extras407.getMapList("potionMixes");
-        for (Map potionMix : potionMixes407) {
-            int fromPotionId = ((Number) potionMix.get("inputId")).intValue();
-            int fromPotionMeta = ((Number) potionMix.get("inputMeta")).intValue();
-            int ingredient = ((Number) potionMix.get("reagentId")).intValue();
-            int ingredientMeta = ((Number) potionMix.get("reagentMeta")).intValue();
-            int toPotionId = ((Number) potionMix.get("outputId")).intValue();
-            int toPotionMeta = ((Number) potionMix.get("outputMeta")).intValue();
+        final JsonArray potionMixes = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject().get("potionMixes").getAsJsonArray();
+        potionMixes.forEach((potionMix) -> {
+            final JsonObject recipe = potionMix.getAsJsonObject();
+
+            int fromPotionId = recipe.get("inputId").getAsInt();
+            int fromPotionMeta = recipe.get("inputMeta").getAsInt();
+            int ingredient = recipe.get("reagentId").getAsInt();
+            int ingredientMeta = recipe.get("reagentMeta").getAsInt();
+            int toPotionId = recipe.get("outputId").getAsInt();
+            int toPotionMeta = recipe.get("outputMeta").getAsInt();
+
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
-        }
+        });
 
         RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
         this.rebuildPacket();

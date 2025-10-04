@@ -21,31 +21,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class RecipeParser {
-    public static void init() {
-        Registries.RECIPE.registerMultiRecipe(new RepairItemRecipe());
-        Registries.RECIPE.registerMultiRecipe(new BookCloningRecipe());
-        Registries.RECIPE.registerMultiRecipe(new MapCloningRecipe());
-        Registries.RECIPE.registerMultiRecipe(new MapUpgradingRecipe());
-        Registries.RECIPE.registerMultiRecipe(new MapExtendingRecipe());
-        Registries.RECIPE.registerMultiRecipe(new BannerAddPatternRecipe());
-        Registries.RECIPE.registerMultiRecipe(new BannerDuplicateRecipe());
-        Registries.RECIPE.registerMultiRecipe(new FireworkRecipe());
-        Registries.RECIPE.registerMultiRecipe(new DecoratedPotRecipe());
-
-        final JsonArray potionMixes = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject().get("potionMixes").getAsJsonArray();
-        potionMixes.forEach((potionMix) -> {
-            final JsonObject recipe = potionMix.getAsJsonObject();
-
-            int fromPotionId = recipe.get("inputId").getAsInt();
-            int fromPotionMeta = recipe.get("inputMeta").getAsInt();
-            int ingredient = recipe.get("reagentId").getAsInt();
-            int ingredientMeta = recipe.get("reagentMeta").getAsInt();
-            int toPotionId = recipe.get("outputId").getAsInt();
-            int toPotionMeta = recipe.get("outputMeta").getAsInt();
-
-            Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
-        });
-
     private static DefaultDescriptor parseItem(JsonObject item) {
         if(item.has("type") && item.get("type").getAsString().equals("complex_alias")) {
             throw new ComplexAliasException();
