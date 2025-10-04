@@ -11,7 +11,6 @@ import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.impl.*;
 import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.recipe.parser.RecipeParser;
-import cn.nukkit.utils.Config;
 import cn.nukkit.utils.RecipeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -27,23 +26,23 @@ import java.util.*;
 import java.util.zip.Deflater;
 
 @Getter
-public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
+public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     public static int NEXT_NETWORK_ID = 1;
 
     private BatchPacket packet;
 
-    private final Map<Integer, List<ShapedRecipe>> shaped = new HashMap<>();
-    private final Map<Integer, List<ShapelessRecipe>> shapless = new HashMap<>();
-    private final Map<Integer, FurnaceRecipe> furnace = new HashMap<>();
-    private final Map<Integer, BlastFurnaceRecipe> blastFurnace = new HashMap<>();
+    private final Map<Integer, List<ShapedRecipe>> SHAPED = new HashMap<>();
+    private final Map<Integer, List<ShapelessRecipe>> SHAPELESS = new HashMap<>();
+    private final Map<Integer, FurnaceRecipe> FURNACE = new HashMap<>();
+    private final Map<Integer, BlastFurnaceRecipe> BLAST_FURNACE = new HashMap<>();
 
-    private final Map<UUID, MultiRecipe> multiRecipes = new HashMap<>();
-    private final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
-    private final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
-    private final Map<Integer, CampfireRecipe> campfireRecipes = new Int2ObjectOpenHashMap<>();
-    private final Map<UUID, SmithingRecipe> smithingRecipes = new Object2ObjectOpenHashMap<>(); //589
-    private final Object2DoubleOpenHashMap<Recipe> recipeXpMap = new Object2DoubleOpenHashMap<>();
-    private final Collection<Recipe> recipes = new ArrayDeque<>(); //649
+    private final Map<UUID, MultiRecipe> MULTI = new HashMap<>();
+    private final Map<Integer, BrewingRecipe> BREWING = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, ContainerRecipe> CONTAINER = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, CampfireRecipe> CAMPFIRE = new Int2ObjectOpenHashMap<>();
+    private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>(); //589
+    private final Object2DoubleOpenHashMap<Recipe> FURNACE_XP = new Object2DoubleOpenHashMap<>();
+    private final Collection<Recipe> RECIPES = new ArrayDeque<>(); //649
 
     @Override
     public void init() {
@@ -76,13 +75,13 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
     }
 
     @Override
-    public void register(String key, Recipe value) {
-
+    public void register(Integer key, Recipe value) {
+        throw new UnsupportedOperationException("Not supported for RecipeRegistry");
     }
 
     @Override
-    public Recipe get(String key) {
-        return null;
+    public Recipe get(Integer key) {
+        throw new UnsupportedOperationException("Not supported for RecipeRegistry");
     }
 
     @Override
@@ -92,47 +91,86 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
 
     @Override
     public void reload() {
-
+        SHAPED.clear();
+        SHAPELESS.clear();
+        FURNACE.clear();
+        BLAST_FURNACE.clear();
+        MULTI.clear();
+        BREWING.clear();
+        CONTAINER.clear();
+        CAMPFIRE.clear();
+        SMITHING.clear();
+        FURNACE_XP.clear();
+        RECIPES.clear();
+        this.init();
     }
 
-    public void addFurnace(FurnaceRecipe recipe, double xp) {
-        furnace.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
-        recipeXpMap.put(recipe, xp);
+    public void registerFurnaceRecipe(FurnaceRecipe recipe, double xp) {
+        FURNACE.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
+        FURNACE_XP.put(recipe, xp);
     }
 
-    public FurnaceRecipe matchFurnaceRecipe(Item input) {
-        FurnaceRecipe recipe = furnace.get(RecipeUtils.getItemHash(input));
-        if (recipe == null) recipe = furnace.get(RecipeUtils.getItemHash(input, 0));
-        return recipe;
-    }
-
-    public void addBlastFurnace(BlastFurnaceRecipe recipe, double xp) {
-        blastFurnace.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
-        recipeXpMap.put(recipe, xp);
-    }
-
-    public FurnaceRecipe matchBlastFurnaceRecipe(Item input) {
-        BlastFurnaceRecipe recipe = blastFurnace.get(RecipeUtils.getItemHash(input));
-        if (recipe == null) recipe = blastFurnace.get(RecipeUtils.getItemHash(input, 0));
-        return recipe;
+    public void registerBlastFurnaceRecipe(BlastFurnaceRecipe recipe, double xp) {
+        BLAST_FURNACE.put(RecipeUtils.getItemHash(recipe.getInput()), recipe);
+        FURNACE_XP.put(recipe, xp);
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
         int resultHash = RecipeUtils.getItemHash(recipe.getResult());
-        shaped.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
-        recipes.add(recipe);
+        SHAPED.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
+        RECIPES.add(recipe);
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
         int resultHash = RecipeUtils.getItemHash(recipe.getResult());
-        shapless.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
-        recipes.add(recipe);
+        SHAPELESS.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
+        RECIPES.add(recipe);
+    }
+
+    public void registerSmithingRecipe(SmithingRecipe recipe) {
+        this.SMITHING.put(UUID.randomUUID(), recipe);
+    }
+
+    public void registerBrewingRecipe(BrewingRecipe recipe) {
+        Item input = recipe.getIngredient();
+        Item potion = recipe.getInput();
+        int potionHash = RecipeUtils.getPotionHash(input, potion);
+        this.BREWING.put(potionHash, recipe);
+    }
+
+    public void registerContainerRecipe(ContainerRecipe recipe) {
+        Item input = recipe.getIngredient();
+        Item potion = recipe.getInput();
+        this.CONTAINER.put(RecipeUtils.getContainerHash(input.getId(), potion.getId()), recipe);
+    }
+
+    public void registerCampfireRecipe(CampfireRecipe recipe, double xp) {
+        Item input = recipe.getInput();
+        this.CAMPFIRE.put(RecipeUtils.getItemHash(input), recipe);
+        FURNACE_XP.put(recipe, xp);
+    }
+
+    public void registerMultiRecipe(MultiRecipe recipe) {
+        this.MULTI.put(recipe.getId(), recipe);
+        RECIPES.add(recipe);
+    }
+
+    public FurnaceRecipe matchBlastFurnaceRecipe(Item input) {
+        BlastFurnaceRecipe recipe = BLAST_FURNACE.get(RecipeUtils.getItemHash(input));
+        if (recipe == null) recipe = BLAST_FURNACE.get(RecipeUtils.getItemHash(input, 0));
+        return recipe;
+    }
+
+    public FurnaceRecipe matchFurnaceRecipe(Item input) {
+        FurnaceRecipe recipe = FURNACE.get(RecipeUtils.getItemHash(input));
+        if (recipe == null) recipe = FURNACE.get(RecipeUtils.getItemHash(input, 0));
+        return recipe;
     }
 
     public CraftingRecipe matchRecipe(List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
         int outputHash = RecipeUtils.getItemHash(primaryOutput);
-        if (shaped.containsKey(outputHash)) {
-            List<ShapedRecipe> recipes = shaped.get(outputHash);
+        if (SHAPED.containsKey(outputHash)) {
+            List<ShapedRecipe> recipes = SHAPED.get(outputHash);
 
             if (recipes != null) {
                 for (ShapedRecipe shapedRecipe : recipes) {
@@ -143,8 +181,8 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
             }
         }
 
-        if (shapless.containsKey(outputHash)) {
-            List<ShapelessRecipe> recipes = shapless.get(outputHash);
+        if (SHAPELESS.containsKey(outputHash)) {
+            List<ShapelessRecipe> recipes = SHAPELESS.get(outputHash);
 
             if (recipes != null) {
                 for (ShapelessRecipe shapelessRecipe : recipes) {
@@ -162,7 +200,7 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
     public SmithingRecipe matchSmithingRecipe(List<Item> inputList) {
         UUID inputHash = RecipeUtils.getMultiItemHash(inputList);
 
-        Map<UUID, SmithingRecipe> recipeMap = Registries.RECIPE.getSmithingRecipes();
+        Map<UUID, SmithingRecipe> recipeMap = Registries.RECIPE.getSMITHING();
 
         if (recipeMap != null) {
             SmithingRecipe recipe = recipeMap.get(inputHash);
@@ -190,74 +228,45 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
         return null;
     }
 
-    public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
-        if(outputItem == null) return null;
-        return this.multiRecipes.values().stream().filter(multiRecipe -> multiRecipe.canExecute(player, outputItem, inputs)).findFirst().orElse(null);
-    }
-
-    public void registerSmithingRecipe(SmithingRecipe recipe) {
-        this.smithingRecipes.put(UUID.randomUUID(), recipe);
-    }
-
-    public void registerBrewingRecipe(BrewingRecipe recipe) {
-        Item input = recipe.getIngredient();
-        Item potion = recipe.getInput();
-        int potionHash = RecipeUtils.getPotionHash(input, potion);
-        this.brewingRecipes.put(potionHash, recipe);
-    }
-
-    public void registerContainerRecipe(ContainerRecipe recipe) {
-        Item input = recipe.getIngredient();
-        Item potion = recipe.getInput();
-        this.containerRecipes.put(RecipeUtils.getContainerHash(input.getId(), potion.getId()), recipe);
-    }
-
-
     public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
-        return this.brewingRecipes.get(RecipeUtils.getPotionHash(input, potion));
+        return this.BREWING.get(RecipeUtils.getPotionHash(input, potion));
     }
 
     public CampfireRecipe matchCampfireRecipe(Item input) {
-        CampfireRecipe recipe = this.campfireRecipes.get(RecipeUtils.getItemHash(input));
-        if (recipe == null) recipe = this.campfireRecipes.get(RecipeUtils.getItemHash(input, 0));
+        CampfireRecipe recipe = this.CAMPFIRE.get(RecipeUtils.getItemHash(input));
+        if (recipe == null) recipe = this.CAMPFIRE.get(RecipeUtils.getItemHash(input, 0));
         return recipe;
     }
 
     public ContainerRecipe matchContainerRecipe(Item input, Item potion) {
-        return this.containerRecipes.get(RecipeUtils.getContainerHash(input.getId(), potion.getId()));
+        return this.CONTAINER.get(RecipeUtils.getContainerHash(input.getId(), potion.getId()));
     }
 
-    public void registerCampfireRecipe(CampfireRecipe recipe, double xp) {
-        Item input = recipe.getInput();
-        this.campfireRecipes.put(RecipeUtils.getItemHash(input), recipe);
-        recipeXpMap.put(recipe, xp);
-    }
-
-    public void registerMultiRecipe(MultiRecipe recipe) {
-        this.multiRecipes.put(recipe.getId(), recipe);
-        recipes.add(recipe);
+    public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
+        if(outputItem == null) return null;
+        return this.MULTI.values().stream().filter(multiRecipe -> multiRecipe.canExecute(player, outputItem, inputs)).findFirst().orElse(null);
     }
 
     public double getRecipeXp(Recipe recipe) {
-        return recipeXpMap.getOrDefault(recipe, 0.0);
+        return FURNACE_XP.getOrDefault(recipe, 0.0);
     }
 
     public void setRecipeXp(Recipe recipe, double xp) {
-        recipeXpMap.put(recipe, xp);
+        FURNACE_XP.put(recipe, xp);
     }
 
     public void rebuildPacket() {
         final CraftingDataPacket  pk = new CraftingDataPacket();
 
-        for(FurnaceRecipe recipe : furnace.values()) {
+        for(FurnaceRecipe recipe : FURNACE.values()) {
             pk.addFurnaceRecipe(recipe);
         }
 
-        for (MultiRecipe recipe : this.getMultiRecipes().values()) {
+        for (MultiRecipe recipe : this.getMULTI().values()) {
             pk.addMultiRecipe(recipe);
         }
 
-        for (Recipe recipe : this.getRecipes()) {
+        for (Recipe recipe : this.getRECIPES()) {
             if (recipe instanceof ShapedRecipe) {
                 pk.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -265,15 +274,15 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
             }
         }
 
-        for (SmithingRecipe recipe : this.getSmithingRecipes().values()) {
+        for (SmithingRecipe recipe : this.getSMITHING().values()) {
             pk.addShapelessRecipe(recipe);
         }
 
-        for (BrewingRecipe recipe : brewingRecipes.values()) {
+        for (BrewingRecipe recipe : BREWING.values()) {
             pk.addBrewingRecipe(recipe);
         }
 
-        for (ContainerRecipe recipe : containerRecipes.values()) {
+        for (ContainerRecipe recipe : CONTAINER.values()) {
             pk.addContainerRecipe(recipe);
         }
 

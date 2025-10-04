@@ -7,7 +7,6 @@ import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.recipe.impl.*;
-import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.registry.Registries;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -99,14 +98,14 @@ public class RecipeParser {
                         }
                         switch (block) {
                             case "furnace", "deprecated" -> {
-                                Registries.RECIPE.addFurnace(new FurnaceRecipe(
+                                Registries.RECIPE.registerFurnaceRecipe(new FurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()).getItem(),
                                         input
                                 ), xp);
                             }
 
                             case "blast_furnace" -> {
-                                Registries.RECIPE.addBlastFurnace(new BlastFurnaceRecipe(
+                                Registries.RECIPE.registerBlastFurnaceRecipe(new BlastFurnaceRecipe(
                                         parseItem(recipe.get("output").getAsJsonObject()).getItem(),
                                         input
                                 ), xp);
