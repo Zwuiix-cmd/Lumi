@@ -33,6 +33,7 @@ import cn.nukkit.network.protocol.types.inventory.itemstack.request.ItemStackReq
 import cn.nukkit.network.protocol.types.inventory.itemstack.request.ItemStackRequestSlotData;
 import cn.nukkit.network.protocol.types.inventory.itemstack.request.TextProcessingEventOrigin;
 import cn.nukkit.network.protocol.types.inventory.itemstack.request.action.*;
+import cn.nukkit.recipe.ItemDescriptor;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.AbstractByteBufAllocator;
 import io.netty.buffer.ByteBuf;
@@ -1167,57 +1168,6 @@ public class BinaryStream {
 
         int count = this.getVarInt();
         return Item.get(id, damage, count);
-    }
-
-    public void putRecipeIngredient(int protocolId, Item item) {
-        if (item == null || item.getId() == 0) {
-            if (protocolId >= ProtocolInfo.v1_19_30_23) {
-                this.putByte((byte) 0); //ItemDescriptorType.INVALID
-            }
-            this.putVarInt(0); // item == null ? 0 : item.getCount()
-            return;
-        }
-
-        if (protocolId >= ProtocolInfo.v1_19_30_23) {
-            this.putByte((byte) 1); //ItemDescriptorType.DEFAULT
-        }
-
-        int runtimeId = item.getId();
-        int damage = item.hasMeta() ? item.getDamage() : Short.MAX_VALUE;
-
-        if (protocolId >= ProtocolInfo.v1_16_100) {
-            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            if (item instanceof StringItem) {
-                runtimeId = mapping.getNetworkId(item);
-            } else if (!item.hasMeta()) {
-                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), 0);
-                runtimeId = runtimeEntry.getRuntimeId();
-                damage = Short.MAX_VALUE;
-            } else {
-                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
-                runtimeId = runtimeEntry.getRuntimeId();
-                damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
-            }
-        }
-
-        if (protocolId >= ProtocolInfo.v1_19_30_23) {
-            this.putLShort(runtimeId);
-            this.putLShort(damage);
-        }else {
-            this.putVarInt(runtimeId);
-            this.putVarInt(damage);
-        }
-        this.putVarInt(item.getCount());
-    }
-
-    //TODO 改成ItemDescriptor 合并两个putRecipeIngredient方法
-    public void putRecipeIngredient(int protocolId, String itemTag, int count) {
-        if (protocolId < ProtocolInfo.v1_19_30_23) {
-            throw new UnsupportedOperationException("This method is only supported on protocol 553+");
-        }
-        this.putByte((byte) 3);
-        this.putString(itemTag);
-        this.putVarInt(count);
     }
 
     private static List<String> extractStringList(Item item, String tagName) {

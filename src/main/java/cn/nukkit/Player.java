@@ -83,6 +83,8 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.inventory.CraftingGrid;
+import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
@@ -1153,10 +1155,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned) {
             return;
         }
-
-        if (this.protocol >= ProtocolInfo.v1_21_60) {
-            this.server.sendRecipeList(this);
-        }
+        
+        this.sendRecipeList();
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
@@ -1224,6 +1224,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.sendFogStack();
         this.sendCameraPresets();
+    }
+
+    private void sendRecipeList() {
+        BatchPacket cachedPacket = Registries.RECIPE.getPacket();
+        if (cachedPacket != null) { // Don't send recipes if they wouldn't work anyways
+            this.dataPacket(cachedPacket);
+        }
     }
 
     protected boolean orderChunks() {
@@ -2919,7 +2926,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.dataPacket(trimDataPacket);
             }
             if (this.protocol < ProtocolInfo.v1_21_60) {
-                this.server.sendRecipeList(this);
+                this.sendRecipeList();
             }
 
             if (this.isEnableClientCommand()) {
@@ -4267,7 +4274,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         try {
                             this.craftingTransaction.execute();
                         } catch (Exception e) {
-                            this.server.getLogger().debug("Executing crafting transaction failed");
+                            log.warn("Executing crafting transaction failed", e);
                         }
                         this.craftingTransaction = null;
                     }
@@ -4376,7 +4383,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     return;
                 } else if (this.craftingTransaction != null) {
-                    MultiRecipe multiRecipe = Server.getInstance().getCraftingManager().getMultiRecipe(this, this.craftingTransaction.getPrimaryOutput(), this.craftingTransaction.getInputList());
+                    MultiRecipe multiRecipe = Registries.RECIPE.getMultiRecipe(this, this.craftingTransaction.getPrimaryOutput(), this.craftingTransaction.getInputList());
                     if (craftingTransaction.checkForCraftingPart(actions) || multiRecipe != null) {
                         for (InventoryAction action : actions) {
                             craftingTransaction.addAction(action);
