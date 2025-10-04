@@ -30,8 +30,8 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
 
     private BatchPacket packet;
 
-    private final Map<Integer, Map<UUID, ShapedRecipe>> shaped = new HashMap<>();
-    private final Map<Integer, Map<UUID, ShapelessRecipe>> shapless = new HashMap<>();
+    private final Map<Integer, List<ShapedRecipe>> shaped = new HashMap<>();
+    private final Map<Integer, List<ShapelessRecipe>> shapless = new HashMap<>();
     private final Map<Integer, FurnaceRecipe> furnace = new HashMap<>();
     private final Map<Integer, BlastFurnaceRecipe> blastFurnace = new HashMap<>();
 
@@ -115,31 +115,23 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
         int resultHash = RecipeUtils.getItemHash(recipe.getResult());
-        shaped.computeIfAbsent(resultHash, (key) -> new HashMap<>()).put(UUID.randomUUID(), recipe);
+        shaped.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
         recipes.add(recipe);
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
         int resultHash = RecipeUtils.getItemHash(recipe.getResult());
-        shapless.computeIfAbsent(resultHash, (key) -> new HashMap<>()).put(UUID.randomUUID(), recipe);
+        shapless.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
         recipes.add(recipe);
     }
 
     public CraftingRecipe matchRecipe(List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
         int outputHash = RecipeUtils.getItemHash(primaryOutput);
         if (shaped.containsKey(outputHash)) {
+            List<ShapedRecipe> recipes = shaped.get(outputHash);
 
-            UUID inputHash = RecipeUtils.getMultiItemHash(inputList);
-            Map<UUID, ShapedRecipe> recipeMap = shaped.get(outputHash);
-
-            if (recipeMap != null) {
-                ShapedRecipe recipe = recipeMap.get(inputHash);
-
-                if (recipe != null && recipe.matchItems(inputList, extraOutputList)) {
-                    return recipe;
-                }
-
-                for (ShapedRecipe shapedRecipe : recipeMap.values()) {
+            if (recipes != null) {
+                for (ShapedRecipe shapedRecipe : recipes) {
                     if (shapedRecipe.matchItems(inputList, extraOutputList)) {
                         return shapedRecipe;
                     }
@@ -148,22 +140,13 @@ public class RecipeRegistry implements IRegistry<String, Recipe, Recipe> {
         }
 
         if (shapless.containsKey(outputHash)) {
-            Map<UUID, ShapelessRecipe> recipes = shapless.get(outputHash);
+            List<ShapelessRecipe> recipes = shapless.get(outputHash);
 
-            if (recipes == null) {
-                return null;
-            }
-
-            UUID inputHash = RecipeUtils.getMultiItemHash(inputList);
-            ShapelessRecipe recipe = recipes.get(inputHash);
-
-            if (recipe != null && (recipe.matchItems(inputList, extraOutputList))) {
-                return recipe;
-            }
-
-            for (ShapelessRecipe shapelessRecipe : recipes.values()) {
-                if (shapelessRecipe.matchItems(inputList, extraOutputList)) {
-                    return shapelessRecipe;
+            if (recipes != null) {
+                for (ShapelessRecipe shapelessRecipe : recipes) {
+                    if (shapelessRecipe.matchItems(inputList, extraOutputList)) {
+                        return shapelessRecipe;
+                    }
                 }
             }
         }
