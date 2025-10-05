@@ -3,7 +3,7 @@ package cn.nukkit.recipe.parser;
 import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.material.tags.ItemTags;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.recipe.impl.*;

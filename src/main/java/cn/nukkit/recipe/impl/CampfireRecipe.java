@@ -35,7 +35,7 @@ public class CampfireRecipe implements SmeltingRecipe {
     }
 
     @Override
-    public boolean validRecipe(int protocol) {
+    public boolean isValidRecipe(int protocol) {
         return true;
     }
 }

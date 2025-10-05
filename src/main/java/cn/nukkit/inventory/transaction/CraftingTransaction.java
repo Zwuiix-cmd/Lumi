@@ -13,6 +13,7 @@ import cn.nukkit.network.protocol.types.inventory.ContainerType;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.recipe.*;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.recipe.impl.SmithingRecipe;
 import cn.nukkit.registry.Registries;
@@ -20,7 +21,6 @@ import cn.nukkit.registry.Registries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author CreeperFace

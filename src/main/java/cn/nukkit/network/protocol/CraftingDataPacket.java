@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
@@ -38,7 +39,7 @@ public class CraftingDataPacket extends DataPacket {
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
         for(ShapelessRecipe shapelessRecipe : recipe) {
-            if (shapelessRecipe.validRecipe(protocol)) {
+            if (shapelessRecipe.isValidRecipe(protocol)) {
                 this.entries.add(shapelessRecipe);
             }
         }
@@ -46,7 +47,7 @@ public class CraftingDataPacket extends DataPacket {
 
     public void addShapedRecipe(ShapedRecipe... recipe) {
         for(ShapedRecipe shapedRecipe : recipe) {
-            if (shapedRecipe.validRecipe(protocol)) {
+            if (shapedRecipe.isValidRecipe(protocol)) {
                 this.entries.add(shapedRecipe);
             }
         }

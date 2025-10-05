@@ -1,7 +1,6 @@
 package cn.nukkit.recipe.descriptor;
 
 import cn.nukkit.item.material.tags.ItemTag;
-import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.utils.BinaryStream;
 
 public class ItemTagDescriptor extends ItemDescriptor {

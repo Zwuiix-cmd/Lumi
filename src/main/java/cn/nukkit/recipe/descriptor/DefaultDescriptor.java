@@ -4,7 +4,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.StringItem;
-import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.utils.BinaryStream;
 
 public class DefaultDescriptor extends ItemDescriptor {

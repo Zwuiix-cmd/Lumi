@@ -3,7 +3,7 @@ package cn.nukkit.recipe.impl;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.registry.RecipeRegistry;
 
@@ -61,7 +61,7 @@ public class MultiRecipe implements Recipe {
     }
 
     @Override
-    public boolean validRecipe(int protocol) {
+    public boolean isValidRecipe(int protocol) {
         return true;
     }
 
