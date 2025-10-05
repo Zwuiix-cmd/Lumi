@@ -82,6 +82,7 @@ public class CraftingDataPacket extends DataPacket {
                     ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
                     this.putString(shapeless.getRecipeId());
                     Collection<ItemDescriptor> ingredients = shapeless.getIngredientList();
+
                     this.putUnsignedVarInt(ingredients.size());
                     for (ItemDescriptor ingredient : ingredients) {
                         ingredient.putRecipe(this, protocol);

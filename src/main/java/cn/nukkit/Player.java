@@ -1155,8 +1155,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned) {
             return;
         }
-        
-        this.sendRecipeList();
+
+        if (this.protocol >= ProtocolInfo.v1_21_60) {
+            this.sendRecipeList();
+        }
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
@@ -1227,7 +1229,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     private void sendRecipeList() {
-        BatchPacket cachedPacket = Registries.RECIPE.getPacket();
+        BatchPacket cachedPacket = Registries.RECIPE.getPacket(protocol);
         if (cachedPacket != null) { // Don't send recipes if they wouldn't work anyways
             this.dataPacket(cachedPacket);
         }
