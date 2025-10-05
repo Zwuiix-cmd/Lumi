@@ -23,7 +23,7 @@ import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
 import lombok.Getter;
 import lombok.ToString;
@@ -114,6 +114,11 @@ public class SmithingRecipe extends ShapelessRecipe {
         }
 
         return Recipe.matchItemList(haveInputs, new ArrayList<>(ingredients));
+    }
+
+    @Override
+    public boolean isValidRecipe(int protocol) {
+        return true;
     }
 
     @Override

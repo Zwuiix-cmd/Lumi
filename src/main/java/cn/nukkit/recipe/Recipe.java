@@ -2,6 +2,7 @@ package cn.nukkit.recipe;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 
 import java.util.*;
 
@@ -14,6 +15,8 @@ public interface Recipe {
     Item getResult();
 
     RecipeType getType();
+
+    boolean isValidRecipe(int protocol);
 
     static boolean matchItemList(List<Item> have, Collection<ItemDescriptor> need) {
         final List<ItemDescriptor> needItems = new ArrayList<>(need);

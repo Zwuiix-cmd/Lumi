@@ -5,8 +5,9 @@ import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.recipe.CraftingRecipe;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.impl.*;
 import cn.nukkit.recipe.impl.special.*;
@@ -29,7 +30,7 @@ import java.util.zip.Deflater;
 public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     public static int NEXT_NETWORK_ID = 1;
 
-    private BatchPacket packet;
+    private final Int2ObjectOpenHashMap<BatchPacket> PACKETS = new Int2ObjectOpenHashMap<>();
 
     private final Map<Integer, List<ShapedRecipe>> SHAPED = new HashMap<>();
     private final Map<Integer, List<ShapelessRecipe>> SHAPELESS = new HashMap<>();
@@ -255,38 +256,46 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         FURNACE_XP.put(recipe, xp);
     }
 
+    public BatchPacket getPacket(int protocol) {
+       return PACKETS.get(protocol);
+    }
+
     public void rebuildPacket() {
-        final CraftingDataPacket  pk = new CraftingDataPacket();
+        ProtocolInfo.SUPPORTED_PROTOCOLS.parallelStream().forEach(protocol -> {
+            CraftingDataPacket pk = new CraftingDataPacket();
+            pk.protocol = protocol;
 
-        for(FurnaceRecipe recipe : FURNACE.values()) {
-            pk.addFurnaceRecipe(recipe);
-        }
-
-        for (MultiRecipe recipe : this.getMULTI().values()) {
-            pk.addMultiRecipe(recipe);
-        }
-
-        for (Recipe recipe : this.getRECIPES()) {
-            if (recipe instanceof ShapedRecipe) {
-                pk.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+            for (FurnaceRecipe recipe : FURNACE.values()) {
+                pk.addFurnaceRecipe(recipe);
             }
-        }
 
-        for (SmithingRecipe recipe : this.getSMITHING().values()) {
-            pk.addShapelessRecipe(recipe);
-        }
+            for (MultiRecipe recipe : this.getMULTI().values()) {
+                pk.addMultiRecipe(recipe);
+            }
 
-        for (BrewingRecipe recipe : BREWING.values()) {
-            pk.addBrewingRecipe(recipe);
-        }
+            for (Recipe recipe : this.getRECIPES()) {
+                if (recipe instanceof ShapedRecipe) {
+                    pk.addShapedRecipe((ShapedRecipe) recipe);
+                } else if (recipe instanceof ShapelessRecipe) {
+                    pk.addShapelessRecipe((ShapelessRecipe) recipe);
+                }
+            }
 
-        for (ContainerRecipe recipe : CONTAINER.values()) {
-            pk.addContainerRecipe(recipe);
-        }
+            for (SmithingRecipe recipe : this.getSMITHING().values()) {
+                pk.addShapelessRecipe(recipe);
+            }
 
-        pk.tryEncode();
-        packet = pk.compress(Deflater.BEST_COMPRESSION);
+            for (BrewingRecipe recipe : BREWING.values()) {
+                pk.addBrewingRecipe(recipe);
+            }
+
+            for (ContainerRecipe recipe : CONTAINER.values()) {
+                pk.addContainerRecipe(recipe);
+            }
+
+            pk.tryEncode();
+
+            PACKETS.put(protocol, pk.compress(Deflater.BEST_COMPRESSION));
+        });
     }
 }

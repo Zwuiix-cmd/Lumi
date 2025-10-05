@@ -1,7 +1,7 @@
 package cn.nukkit.recipe.impl.special;
 
 import cn.nukkit.Player;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;
 import cn.nukkit.item.Item;

@@ -5,7 +5,7 @@ import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.ItemDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.registry.RecipeRegistry;
 import io.netty.util.collection.CharObjectHashMap;
@@ -244,6 +244,16 @@ public class ShapedRecipe implements CraftingRecipe {
     @Override
     public boolean requiresCraftingTable() {
         return this.getHeight() > 2 || this.getWidth() > 2;
+    }
+
+    @Override
+    public boolean isValidRecipe(int protocol) {
+        for(ItemDescriptor item : this.ingredients.values()) {
+            if(!item.putRecipe(null, protocol)) {
+                return false;
+            }
+        }
+        return new DefaultDescriptor(this.primaryResult).putRecipe(null, protocol);
     }
 
     public static class Entry {

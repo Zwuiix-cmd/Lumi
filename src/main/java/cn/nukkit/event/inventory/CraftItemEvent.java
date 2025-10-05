@@ -4,13 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.recipe.ItemDescriptor;
 import cn.nukkit.recipe.Recipe;
 import cn.nukkit.inventory.transaction.CraftingTransaction;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
-
-import java.util.stream.Collectors;
 
 /**
  * @author MagicDroidX

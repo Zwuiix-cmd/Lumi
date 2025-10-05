@@ -1,11 +1,9 @@
-package cn.nukkit.recipe;
+package cn.nukkit.recipe.descriptor;
 
-import cn.nukkit.recipe.descriptor.DefaultDescriptor;
-import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.utils.BinaryStream;
 
 public abstract class ItemDescriptor implements Cloneable {
-    public abstract void putRecipe(BinaryStream stream, int protocol);
+    public abstract boolean putRecipe(BinaryStream stream, int protocol);
 
     @Override
     public boolean equals(Object entry) {

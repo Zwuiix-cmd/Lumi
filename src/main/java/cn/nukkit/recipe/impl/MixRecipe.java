@@ -29,4 +29,9 @@ public abstract class MixRecipe implements Recipe {
     public Item getResult() {
         return output.clone();
     }
+
+    @Override
+    public boolean isValidRecipe(int protocol) {
+        return true;
+    }
 }

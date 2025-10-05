@@ -33,4 +33,9 @@ public class CampfireRecipe implements SmeltingRecipe {
     public RecipeType getType() {
         return this.ingredient.hasMeta() ? RecipeType.CAMPFIRE_DATA : RecipeType.CAMPFIRE;
     }
+
+    @Override
+    public boolean isValidRecipe(int protocol) {
+        return true;
+    }
 }

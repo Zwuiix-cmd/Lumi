@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
 import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
@@ -37,11 +38,19 @@ public class CraftingDataPacket extends DataPacket {
     public boolean cleanRecipes = true;
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
-        Collections.addAll(entries, recipe);
+        for(ShapelessRecipe shapelessRecipe : recipe) {
+            if (shapelessRecipe.isValidRecipe(protocol)) {
+                this.entries.add(shapelessRecipe);
+            }
+        }
     }
 
     public void addShapedRecipe(ShapedRecipe... recipe) {
-        Collections.addAll(entries, recipe);
+        for(ShapedRecipe shapedRecipe : recipe) {
+            if (shapedRecipe.isValidRecipe(protocol)) {
+                this.entries.add(shapedRecipe);
+            }
+        }
     }
 
     public void addFurnaceRecipe(FurnaceRecipe... recipe) {
@@ -82,6 +91,7 @@ public class CraftingDataPacket extends DataPacket {
                     ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
                     this.putString(shapeless.getRecipeId());
                     Collection<ItemDescriptor> ingredients = shapeless.getIngredientList();
+
                     this.putUnsignedVarInt(ingredients.size());
                     for (ItemDescriptor ingredient : ingredients) {
                         ingredient.putRecipe(this, protocol);
