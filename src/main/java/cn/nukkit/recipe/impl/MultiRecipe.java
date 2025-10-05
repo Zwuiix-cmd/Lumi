@@ -60,6 +60,11 @@ public class MultiRecipe implements Recipe {
         return false;
     }
 
+    @Override
+    public boolean validRecipe(int protocol) {
+        return true;
+    }
+
     public Recipe toRecipe(Item outputItem, Collection<ItemDescriptor> inputs) {
         return new ShapelessRecipe(outputItem, inputs);
     }

@@ -30,8 +30,7 @@ import java.util.zip.Deflater;
 public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     public static int NEXT_NETWORK_ID = 1;
 
-    private BatchPacket packet589;
-    private BatchPacket packet685;
+    private final Int2ObjectOpenHashMap<BatchPacket> PACKETS = new Int2ObjectOpenHashMap<>();
 
     private final Map<Integer, List<ShapedRecipe>> SHAPED = new HashMap<>();
     private final Map<Integer, List<ShapelessRecipe>> SHAPELESS = new HashMap<>();
@@ -258,16 +257,11 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public BatchPacket getPacket(int protocol) {
-        if(protocol >= ProtocolInfo.v1_21_0) {
-            return packet685;
-        } else {
-            return packet589;
-        }
+       return PACKETS.get(protocol);
     }
 
     public void rebuildPacket() {
-        List<Integer> RECIPE_PROTOCOLS = List.of(ProtocolInfo.v1_20_80, ProtocolInfo.CURRENT_PROTOCOL);
-        for (Integer protocol : RECIPE_PROTOCOLS) {
+        ProtocolInfo.SUPPORTED_PROTOCOLS.parallelStream().forEach(protocol -> {
             CraftingDataPacket pk = new CraftingDataPacket();
             pk.protocol = protocol;
 
@@ -301,11 +295,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
             pk.tryEncode();
 
-            if(protocol == ProtocolInfo.v1_20_80) {
-                packet589 = pk.compress(Deflater.BEST_COMPRESSION);
-            } else {
-                packet685 = pk.compress(Deflater.BEST_COMPRESSION);
-            }
-        }
+            PACKETS.put(protocol, pk.compress(Deflater.BEST_COMPRESSION));
+        });
     }
 }

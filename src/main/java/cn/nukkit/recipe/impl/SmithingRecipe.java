@@ -117,6 +117,11 @@ public class SmithingRecipe extends ShapelessRecipe {
     }
 
     @Override
+    public boolean validRecipe(int protocol) {
+        return true;
+    }
+
+    @Override
     public RecipeUnlockingRequirement getRequirement() {
         return RecipeUnlockingRequirement.ALWAYS_UNLOCKED;
     }

@@ -45,4 +45,6 @@ public interface Recipe {
         }
         return haveItems.isEmpty() && needItems.isEmpty();
     }
+
+    boolean validRecipe(int protocol);
 }

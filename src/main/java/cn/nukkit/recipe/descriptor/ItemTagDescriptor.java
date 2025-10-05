@@ -22,9 +22,12 @@ public class ItemTagDescriptor extends ItemDescriptor {
     }
 
     @Override
-    public void putRecipe(BinaryStream stream, int protocol) {
-        stream.putByte((byte) 3);
-        stream.putString(id);
-        stream.putVarInt(1);
+    public boolean putRecipe(BinaryStream stream, int protocol) {
+        if(stream != null) {
+            stream.putByte((byte) 3);
+            stream.putString(id);
+            stream.putVarInt(1);
+        }
+        return true;
     }
 }

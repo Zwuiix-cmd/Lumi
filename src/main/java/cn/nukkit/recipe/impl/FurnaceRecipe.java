@@ -37,4 +37,9 @@ public class FurnaceRecipe implements SmeltingRecipe {
     public RecipeType getType() {
         return this.ingredient.hasMeta() ? RecipeType.FURNACE_DATA : RecipeType.FURNACE;
     }
+
+    @Override
+    public boolean validRecipe(int protocol) {
+        return true;
+    }
 }

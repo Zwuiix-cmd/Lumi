@@ -157,4 +157,14 @@ public class ShapelessRecipe implements CraftingRecipe {
     public RecipeUnlockingRequirement getRequirement() {
         return this.requirement;
     }
+
+    @Override
+    public boolean validRecipe(int protocol) {
+        for(ItemDescriptor item : this.ingredients) {
+            if(!item.putRecipe(null, protocol)) {
+                return false;
+            }
+        }
+        return new DefaultDescriptor(this.output).putRecipe(null, protocol);
+    }
 }

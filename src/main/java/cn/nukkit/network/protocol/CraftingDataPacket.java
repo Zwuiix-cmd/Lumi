@@ -37,11 +37,19 @@ public class CraftingDataPacket extends DataPacket {
     public boolean cleanRecipes = true;
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
-        Collections.addAll(entries, recipe);
+        for(ShapelessRecipe shapelessRecipe : recipe) {
+            if (shapelessRecipe.validRecipe(protocol)) {
+                this.entries.add(shapelessRecipe);
+            }
+        }
     }
 
     public void addShapedRecipe(ShapedRecipe... recipe) {
-        Collections.addAll(entries, recipe);
+        for(ShapedRecipe shapedRecipe : recipe) {
+            if (shapedRecipe.validRecipe(protocol)) {
+                this.entries.add(shapedRecipe);
+            }
+        }
     }
 
     public void addFurnaceRecipe(FurnaceRecipe... recipe) {

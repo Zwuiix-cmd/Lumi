@@ -246,6 +246,16 @@ public class ShapedRecipe implements CraftingRecipe {
         return this.getHeight() > 2 || this.getWidth() > 2;
     }
 
+    @Override
+    public boolean validRecipe(int protocol) {
+        for(ItemDescriptor item : this.ingredients.values()) {
+            if(!item.putRecipe(null, protocol)) {
+                return false;
+            }
+        }
+        return new DefaultDescriptor(this.primaryResult).putRecipe(null, protocol);
+    }
+
     public static class Entry {
         public final int x;
         public final int y;
