@@ -232,8 +232,7 @@ public abstract class EntityWalking extends BaseEntity {
 
             Block levelBlock = getLevelBlock();
             boolean inWater = levelBlock.getId() == 8 || levelBlock.getId() == 9;
-            Block down = level.getBlock(chunk, getFloorX(), getFloorY() - 1, getFloorZ(), false);
-            int downId = down.getId();
+            int downId = level.getBlockIdAt(chunk, getFloorX(), getFloorY() - 1, getFloorZ());
             if (inWater && (downId == 0 || downId == 8 || downId == 9 || downId == BlockID.LAVA || downId == BlockID.STILL_LAVA || downId == BlockID.SIGN_POST || downId == BlockID.WALL_SIGN)) {
                 onGround = false;
             }
@@ -297,18 +296,15 @@ public abstract class EntityWalking extends BaseEntity {
                 }
             }
 
-            boolean isJump = this.checkJump(this.motionX, this.motionZ);
+            double dx = this.motionX;
+            double dz = this.motionZ;
+            boolean isJump = this.checkJump(dx, dz);
             if (this.stayTime > 0 && !inWater) {
                 this.stayTime -= tickDiff;
                 this.move(0, this.motionY, 0);
             } else {
-                if (this.onGround) {
-                    double friction = (1 - this.getDrag()) * down.getFrictionFactor();
-                    this.motionX *= friction;
-                    this.motionZ *= friction;
-                }
-                Vector2 be = new Vector2(this.x + this.motionX, this.z + this.motionZ);
-                this.move(this.motionX, this.motionY, this.motionZ);
+                Vector2 be = new Vector2(this.x + dx, this.z + dz);
+                this.move(dx, this.motionY, dz);
                 Vector2 af = new Vector2(this.x, this.z);
 
                 if ((be.x != af.x || be.y != af.y) && !isJump) {
