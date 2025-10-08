@@ -1,4 +1,13 @@
 {
+  "minecraft:copper_lantern": -1083,
+  "minecraft:exposed_copper_lantern": -1084,
+  "minecraft:weathered_copper_lantern": -1085,
+  "minecraft:oxidized_copper_lantern": -1086,
+  "minecraft:waxed_copper_lantern": -1087,
+  "minecraft:waxed_exposed_copper_lantern": -1088,
+  "minecraft:waxed_weathered_copper_lantern": -1089,
+  "minecraft:waxed_oxidized_copper_lantern": -1090,
+  "minecraft:copper_torch": -1082,
   "minecraft:mushroom_stem": -1008,
   "minecraft:trial_spawner": -315,
   "minecraft:vault": -314,
