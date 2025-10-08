@@ -894,15 +894,31 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(TALL_DRY_GRASS, BlockTallDryGrass.class); //1284
         register(CACTUS_FLOWER, BlockCactusFlower.class); //1285
 
-        register(COPPER_LANTERN, BlockCopperLantern.class); //1329
-        register(EXPOSED_COPPER_LANTERN, BlockCopperLanternExposed.class); //1330
-        register(WEATHERED_COPPER_LANTERN, BlockCopperLanternWeathered.class); //1331
-        register(OXIDIZED_COPPER_LANTERN, BlockCopperLanternOxidized.class); //1332
-        register(WAXED_COPPER_LANTERN, BlockCopperLanternWaxed.class); //1333
-        register(WAXED_EXPOSED_COPPER_LANTERN, BlockCopperLanternExposedWaxed.class); //1334
-        register(WAXED_WEATHERED_COPPER_LANTERN, BlockCopperLanternWeatheredWaxed.class); //1335
-        register(WAXED_OXIDIZED_COPPER_LANTERN, BlockCopperLanternOxidizedWaxed.class); //1336
+        register(COPPER_BARS, BlockCopperBars.class); //1321
+        register(EXPOSED_COPPER_BARS, BlockCopperBarsExposed.class); //1322
+        register(WEATHERED_COPPER_BARS, BlockCopperBarsWeathered.class); //1323
+        register(OXIDIZED_COPPER_BARS, BlockCopperBarsOxidized.class); //1324
+        register(WAXED_COPPER_BARS, BlockCopperBarsWaxed.class); //1325
+        register(WAXED_EXPOSED_COPPER_BARS,  BlockCopperBarsExposedWaxed.class); //1326
+        register(WAXED_WEATHERED_COPPER_BARS, BlockCopperBarsWeatheredWaxed.class); //1327
+        register(WAXED_OXIDIZED_COPPER_BARS, BlockCopperBarsOxidizedWaxed.class); //1328
+        register(COPPER_CHAIN, BlockCopperChain.class); //1329
+        register(EXPOSED_COPPER_CHAIN, BlockCopperChainExposed.class); //1330
+        register(WEATHERED_COPPER_CHAIN, BlockCopperChainWeathered.class); //1331
+        register(OXIDIZED_COPPER_CHAIN, BlockCopperChainOxidized.class); //1332
+        register(WAXED_COPPER_CHAIN, BlockCopperChainWaxed.class); //1333
+        register(WAXED_EXPOSED_COPPER_CHAIN, BlockCopperChainExposedWaxed.class); //1334
+        register(WAXED_WEATHERED_COPPER_CHAIN, BlockCopperChainWeatheredWaxed.class); //1335
+        register(WAXED_OXIDIZED_COPPER_CHAIN, BlockCopperChainOxidizedWaxed.class); //1336
         register(COPPER_TORCH, BlockCopperTorch.class); //1337
+        register(COPPER_LANTERN, BlockCopperLantern.class); //1338
+        register(EXPOSED_COPPER_LANTERN, BlockCopperLanternExposed.class); //1339
+        register(WEATHERED_COPPER_LANTERN, BlockCopperLanternWeathered.class); //1340
+        register(OXIDIZED_COPPER_LANTERN, BlockCopperLanternOxidized.class); //1341
+        register(WAXED_COPPER_LANTERN, BlockCopperLanternWaxed.class); //1342
+        register(WAXED_EXPOSED_COPPER_LANTERN, BlockCopperLanternExposedWaxed.class); //1343
+        register(WAXED_WEATHERED_COPPER_LANTERN, BlockCopperLanternWeatheredWaxed.class); //1344
+        register(WAXED_OXIDIZED_COPPER_LANTERN, BlockCopperLanternOxidizedWaxed.class); //1345
 
         IntStream idStream = IntStream.range(0, Block.MAX_BLOCK_ID);
         idStream.parallel().forEach(id -> {
