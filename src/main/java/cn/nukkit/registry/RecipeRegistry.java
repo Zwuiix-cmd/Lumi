@@ -24,6 +24,7 @@ import lombok.Getter;
 import javax.annotation.Nullable;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.Deflater;
 
 @Getter
@@ -41,12 +42,15 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     private final Map<Integer, BrewingRecipe> BREWING = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, ContainerRecipe> CONTAINER = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, CampfireRecipe> CAMPFIRE = new Int2ObjectOpenHashMap<>();
-    private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>(); //589
+    private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>();
     private final Object2DoubleOpenHashMap<Recipe> FURNACE_XP = new Object2DoubleOpenHashMap<>();
-    private final Collection<Recipe> RECIPES = new ArrayDeque<>(); //649
+    private final Collection<Recipe> RECIPES = new ArrayDeque<>();
+
+    private static final AtomicBoolean isLoad = new AtomicBoolean(false);
 
     @Override
     public void init() {
+        if (isLoad.getAndSet(true)) return;
         this.registerMultiRecipe(new RepairItemRecipe());
         this.registerMultiRecipe(new BookCloningRecipe());
         this.registerMultiRecipe(new MapCloningRecipe());
@@ -71,7 +75,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
         });
 
-        RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes_827.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
+        RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
         this.rebuildPacket();
     }
 
@@ -92,6 +96,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
     @Override
     public void reload() {
+        isLoad.set(false);
         SHAPED.clear();
         SHAPELESS.clear();
         FURNACE.clear();
@@ -103,7 +108,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         SMITHING.clear();
         FURNACE_XP.clear();
         RECIPES.clear();
-        this.init();
+        init();
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe, double xp) {
