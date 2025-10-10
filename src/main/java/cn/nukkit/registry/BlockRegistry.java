@@ -893,6 +893,14 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(SHORT_DRY_GRASS, BlockShortDryGrass.class); //1283
         register(TALL_DRY_GRASS, BlockTallDryGrass.class); //1284
         register(CACTUS_FLOWER, BlockCactusFlower.class); //1285
+        register(COPPER_CHEST, BlockCopperChest.class); //1286
+        register(EXPOSED_COPPER_CHEST, BlockCopperChestExposed.class); //1287
+        register(WEATHERED_COPPER_CHEST, BlockCopperChestWeathered.class); //1288
+        register(OXIDIZED_COPPER_CHEST, BlockCopperChestOxidized.class); //1289
+        register(WAXED_COPPER_CHEST, BlockCopperChestWaxed.class); //1290
+        register(WAXED_EXPOSED_COPPER_CHEST, BlockCopperChestExposedWaxed.class); //1291
+        register(WAXED_WEATHERED_COPPER_CHEST, BlockCopperChestWeatheredWaxed.class); //1292
+        register(WAXED_OXIDIZED_COPPER_CHEST, BlockCopperChestOxidizedWaxed.class); //1293
 
         register(COPPER_BARS, BlockCopperBars.class); //1321
         register(EXPOSED_COPPER_BARS, BlockCopperBarsExposed.class); //1322
