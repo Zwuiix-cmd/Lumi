@@ -56,6 +56,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         this.registerMultiRecipe(new BannerDuplicateRecipe());
         this.registerMultiRecipe(new FireworkRecipe());
         this.registerMultiRecipe(new DecoratedPotRecipe());
+        this.registerMultiRecipe(new ShulkerBoxRecipe());
 
         final JsonArray potionMixes = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject().get("potionMixes").getAsJsonArray();
         potionMixes.forEach((potionMix) -> {
@@ -270,7 +271,9 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
             }
 
             for (MultiRecipe recipe : this.getMULTI().values()) {
-                pk.addMultiRecipe(recipe);
+                if(!recipe.hideRecipe()) {
+                    pk.addMultiRecipe(recipe);
+                }
             }
 
             for (Recipe recipe : this.getRECIPES()) {
