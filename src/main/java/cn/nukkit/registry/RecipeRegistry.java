@@ -20,6 +20,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.InputStreamReader;
@@ -76,7 +77,6 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         });
 
         RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
-        this.rebuildPacket();
     }
 
     @Override
@@ -109,6 +109,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         FURNACE_XP.clear();
         RECIPES.clear();
         init();
+        buildPackets();
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe, double xp) {
@@ -265,7 +266,8 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
        return PACKETS.get(protocol);
     }
 
-    public void rebuildPacket() {
+    @ApiStatus.Internal
+    public void buildPackets() {
         ProtocolInfo.SUPPORTED_PROTOCOLS.parallelStream().forEach(protocol -> {
             CraftingDataPacket pk = new CraftingDataPacket();
             pk.protocol = protocol;
