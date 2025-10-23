@@ -1282,26 +1282,6 @@ public abstract class Entity extends Location implements Metadatable {
         return null;
     }
 
-    public static int getNetworkId(Identifier identifier) {
-        return getNetworkId(identifier.toString());
-    }
-
-    public static int getNetworkId(String identifier) {
-        var mapping = getEntityRuntimeMapping();
-        for(int networkId : mapping.keySet()) {
-            if(mapping.get(networkId).equals(identifier)) {
-                return networkId;
-            }
-        }
-
-        EntityDefinition definition = EntityManager.get().getDefinition(identifier);
-        if (definition != null) {
-            return definition.getRuntimeId();
-        }
-
-        return -1;
-    }
-
     public static CompoundTag getDefaultNBT(Vector3 pos) {
         return getDefaultNBT(pos, null);
     }

@@ -23,6 +23,7 @@ import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.Utils;
 
@@ -111,7 +112,7 @@ public class ItemSpawnEgg extends Item {
             nbt.putString("CustomName", this.getCustomName());
         }
 
-        CreatureSpawnEvent ev = new CreatureSpawnEvent(Entity.getNetworkId(this.getEntityIdentifier()), block, nbt, CreatureSpawnEvent.SpawnReason.SPAWN_EGG, player);
+        CreatureSpawnEvent ev = new CreatureSpawnEvent(Registries.ENTITY.getNetworkId(this.getEntityIdentifier()), block, nbt, CreatureSpawnEvent.SpawnReason.SPAWN_EGG, player);
         level.getServer().getPluginManager().callEvent(ev);
 
         if (ev.isCancelled()) {
