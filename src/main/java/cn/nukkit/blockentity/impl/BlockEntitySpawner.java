@@ -13,6 +13,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
+import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.Utils;
 
@@ -147,14 +148,14 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                         continue;
                     }
 
-                    CreatureSpawnEvent ev = new CreatureSpawnEvent(Entity.getNetworkId(this.entityId), pos, CreatureSpawnEvent.SpawnReason.SPAWNER, null);
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(Registries.ENTITY.getNetworkId(this.entityId), pos, CreatureSpawnEvent.SpawnReason.SPAWNER, null);
                     level.getServer().getPluginManager().callEvent(ev);
 
                     if (ev.isCancelled()) {
                         continue;
                     }
 
-                    Entity entity = Entity.createEntity(Entity.getNetworkId(this.entityId), pos);
+                    Entity entity = Entity.createEntity(Registries.ENTITY.getNetworkId(this.entityId), pos);
                     if (entity != null) {
                         if (entity instanceof EntityMob && this.level.getBlockLightAt((int) x, (int) y, (int) z) > 3) {
                             entity.close();
