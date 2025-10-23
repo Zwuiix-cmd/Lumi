@@ -373,6 +373,7 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
+        Registries.RECIPE.buildPackets();
         Registries.BLOCK.initCustomBlocks();
 
         LevelProviderManager.addProvider(this, Anvil.class);
@@ -615,6 +616,7 @@ public class Server {
         this.commandMap.clearCommands();
 
         log.info("Reloading server settings...");
+        this.settings.save();
         this.settings.load();
 
         if (this.settings.world().enableHardcore() && this.getDifficulty() != Difficulty.HARD) {
@@ -656,12 +658,14 @@ public class Server {
         }
 
         try {
-            isRunning.compareAndSet(true, false);
-
+            this.isRunning.compareAndSet(true, false);
             this.hasStopped = true;
 
             ServerStopEvent serverStopEvent = new ServerStopEvent();
-            pluginManager.callEvent(serverStopEvent);
+            this.pluginManager.callEvent(serverStopEvent);
+
+            this.getLogger().debug("Saving server settings...");
+            this.settings.save();
 
             if (this.rcon != null) {
                 this.getLogger().debug("Closing RCON...");
