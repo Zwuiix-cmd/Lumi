@@ -373,8 +373,8 @@ public class Server {
             this.enablePlugins(PluginLoadOrder.STARTUP);
         }
 
-        Registries.RECIPE.buildPackets();
         Registries.BLOCK.initCustomBlocks();
+        Registries.RECIPE.buildPackets();
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);
