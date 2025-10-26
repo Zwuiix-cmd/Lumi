@@ -267,7 +267,7 @@ public class Network {
                             DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
                             ev.call();
 
-                            if(ev.isCancelled()) {
+                            if (ev.isCancelled()) {
                                 return;
                             }
 
@@ -278,20 +278,18 @@ public class Network {
                             DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
                             ev.call();
 
-                            if(ev.isCancelled()) {
+                            if (ev.isCancelled()) {
                                 return;
                             }
 
                             pk.decode();
                         }
-                    } catch (Exception e) {
-                        if(e instanceof DataPacketDecodeException) {
-                            if(player != null) {
-                                player.kick(TextFormat.RED + "Unable to decode " + pk.getClass().getSimpleName());
-                            }
-                            return;
+                    } catch (DataPacketDecodeException e) {
+                        if(player != null) {
+                            player.close("", "Unable to decode " + pk.getClass().getSimpleName());
                         }
-
+                        return;
+                    } catch (Exception e) {
                         if (log.isTraceEnabled()) {
                             log.trace("Dumping Packet\n{}", ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(buf)));
                         }

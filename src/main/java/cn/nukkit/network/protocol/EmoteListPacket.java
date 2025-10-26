@@ -28,12 +28,15 @@ public class EmoteListPacket extends DataPacket {
             throw new DataPacketDecodeException("Too big EmoteListPacket: " + size);
         }
         for (int i = 0; i < size; i++) {
-            String id = this.getString();
-
             try {
-                pieceIds.add(UUID.fromString(id));
+                UUID id = this.getUUID();
+                if(id.version() != 4) {
+                    throw new DataPacketDecodeException("Invalid UUID version : " + id);
+                }
+
+                pieceIds.add(id);
             } catch (IllegalArgumentException e) {
-                throw new DataPacketDecodeException("Invalid UUID: " + id);
+                throw new DataPacketDecodeException("Invalid UUID");
             }
         }
     }
