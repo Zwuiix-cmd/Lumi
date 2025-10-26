@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Player;
+import cn.nukkit.math.MathHelper;
+import cn.nukkit.resourcepacks.ResourcePack;
 import lombok.ToString;
 
 import java.util.UUID;
@@ -27,6 +30,28 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public byte[] sha256;
     public boolean premium;
     public int type = TYPE_RESOURCE;
+
+    public static ResourcePackDataInfoPacket create(UUID packId, int maxChunkSize, int chunkCount, long compressedPackSize, byte[] sha256, boolean premium) {
+        ResourcePackDataInfoPacket packet = new ResourcePackDataInfoPacket();
+        packet.packId = packId;
+        packet.maxChunkSize = maxChunkSize;
+        packet.chunkCount = chunkCount;
+        packet.compressedPackSize = compressedPackSize;
+        packet.sha256 = sha256;
+        packet.premium = premium;
+        return packet;
+    }
+
+    public static ResourcePackDataInfoPacket from(ResourcePack resourcePack) {
+        return create(
+                resourcePack.getPackId(),
+                Player.RESOURCE_PACK_CHUNK_SIZE,
+                MathHelper.ceil(resourcePack.getPackSize() / (float) Player.RESOURCE_PACK_CHUNK_SIZE),
+                resourcePack.getPackSize(),
+                resourcePack.getSha256(),
+                false
+        );
+    }
 
     @Override
     public void decode() {

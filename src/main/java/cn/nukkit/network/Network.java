@@ -3,9 +3,12 @@ package cn.nukkit.network;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.event.server.DataPacketDecodeEvent;
 import cn.nukkit.network.process.DataPacketManager;
 import cn.nukkit.network.protocol.*;
+import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.VarInt;
 import io.netty.buffer.ByteBuf;
@@ -258,17 +261,41 @@ public class Network {
                 if (pk != null) {
                     pk.protocol = player == null ? Integer.MAX_VALUE : player.protocol;
                     pk.setBuffer(buf, buf.length - bais.available());
+
                     try {
                         if (raknetProtocol > 8) {
+                            DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
+                            ev.call();
+
+                            if(ev.isCancelled()) {
+                                return;
+                            }
+
                             pk.decode();
                         } else { // version < 1.6
                             pk.setBuffer(buf, 3);
+
+                            DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
+                            ev.call();
+
+                            if(ev.isCancelled()) {
+                                return;
+                            }
+
                             pk.decode();
                         }
                     } catch (Exception e) {
+                        if(e instanceof DataPacketDecodeException) {
+                            if(player != null) {
+                                player.kick(TextFormat.RED + "Unable to decode " + pk.getClass().getSimpleName());
+                            }
+                            return;
+                        }
+
                         if (log.isTraceEnabled()) {
                             log.trace("Dumping Packet\n{}", ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(buf)));
                         }
+
                         log.error("Unable to decode packet", e);
                         throw new IllegalStateException("Unable to decode " + pk.getClass().getSimpleName());
                     }
