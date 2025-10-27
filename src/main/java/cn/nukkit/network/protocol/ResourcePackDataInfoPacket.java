@@ -31,26 +31,15 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public boolean premium;
     public int type = TYPE_RESOURCE;
 
-    public static ResourcePackDataInfoPacket create(UUID packId, int maxChunkSize, int chunkCount, long compressedPackSize, byte[] sha256, boolean premium) {
-        ResourcePackDataInfoPacket packet = new ResourcePackDataInfoPacket();
-        packet.packId = packId;
-        packet.maxChunkSize = maxChunkSize;
-        packet.chunkCount = chunkCount;
-        packet.compressedPackSize = compressedPackSize;
-        packet.sha256 = sha256;
-        packet.premium = premium;
-        return packet;
-    }
-
     public static ResourcePackDataInfoPacket from(ResourcePack resourcePack) {
-        return create(
-                resourcePack.getPackId(),
-                Player.RESOURCE_PACK_CHUNK_SIZE,
-                MathHelper.ceil(resourcePack.getPackSize() / (float) Player.RESOURCE_PACK_CHUNK_SIZE),
-                resourcePack.getPackSize(),
-                resourcePack.getSha256(),
-                false
-        );
+        ResourcePackDataInfoPacket packet = new ResourcePackDataInfoPacket();
+        packet.packId = resourcePack.getPackId();
+        packet.maxChunkSize = Player.RESOURCE_PACK_CHUNK_SIZE;
+        packet.chunkCount = MathHelper.ceil(resourcePack.getPackSize() / (float) Player.RESOURCE_PACK_CHUNK_SIZE);
+        packet.compressedPackSize = resourcePack.getPackSize();
+        packet.sha256 = resourcePack.getSha256();
+        packet.premium = false;
+        return packet;
     }
 
     @Override

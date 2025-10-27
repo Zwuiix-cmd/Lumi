@@ -15,15 +15,6 @@ public class UpdateEquipmentPacket extends DataPacket {
     public long eid;
     public CompoundTag namedtag;
 
-    public static UpdateEquipmentPacket create(int windowId, int windowType, long eid, CompoundTag namedtag) {
-        UpdateEquipmentPacket packet = new UpdateEquipmentPacket();
-        packet.windowId = windowId;
-        packet.windowType = windowType;
-        packet.eid = eid;
-        packet.namedtag = namedtag;
-        return packet;
-    }
-
     @Override
     public byte pid() {
         return NETWORK_ID;
