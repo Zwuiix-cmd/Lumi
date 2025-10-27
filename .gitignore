@@ -35,4 +35,3 @@ vanilla_palettes/*
 *.log
 /logs
 scoreboard.json
-build.bat
