@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
 
-public abstract class BlockWoodStripped extends BlockWood {
+public abstract class BlockWoodStripped extends BlockLog {
 
     public BlockWoodStripped() {
         this(0);
@@ -22,31 +22,15 @@ public abstract class BlockWoodStripped extends BlockWood {
     public abstract String getName();
     
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        short[] faces = new short[]{
-                0,
-                0,
-                0b10,
-                0b10,
-                0b01,
-                0b01
-        };
-    
-        this.setDamage(((this.getDamage() & 0x03) | faces[face.getIndex()]));
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
-    }
-    
-    @Override
-    public Item toItem() {
-        return new ItemBlock(this, 0);
-    }
-    
-    @Override
     public boolean canBeActivated() {
         return false;
     }
-    
+
+    @Override
+    public int getStrippedId() {
+        throw new UnsupportedOperationException("getStrippedId can't be used with BlockWoodStripped");
+    }
+
     @Override
     public boolean onActivate(Item item, Player player) {
         return false;

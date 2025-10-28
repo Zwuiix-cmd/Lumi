@@ -29,15 +29,9 @@ public class BlockWoodPaleOak extends BlockWoodBark {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_PALE_OAK_WOOD;
     }
-
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x7;
-    }
-
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(PALE_OAK_WOOD));

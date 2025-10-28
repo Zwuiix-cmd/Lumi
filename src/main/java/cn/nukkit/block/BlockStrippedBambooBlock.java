@@ -41,7 +41,7 @@ public class BlockStrippedBambooBlock extends BlockWoodStripped {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_BAMBOO_BLOCK;
     }
 

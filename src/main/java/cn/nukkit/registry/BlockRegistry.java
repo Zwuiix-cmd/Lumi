@@ -76,7 +76,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(GOLD_ORE, BlockOreGold.class); //14
         register(IRON_ORE, BlockOreIron.class); //15
         register(COAL_ORE, BlockOreCoal.class); //16
-        register(WOOD, BlockWood.class); //17
+        register(OAK_LOG, BlockOakLog.class); //17
         register(LEAVES, BlockLeaves.class); //18
         register(SPONGE, BlockSponge.class); //19
         register(GLASS, BlockGlass.class); //20
@@ -220,7 +220,7 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
         register(STAINED_TERRACOTTA, BlockTerracottaStained.class); //159
         register(STAINED_GLASS_PANE, BlockGlassPaneStained.class); //160
         register(LEAVES2, BlockLeaves2.class); //161
-        register(WOOD2, BlockWood2.class); //162
+        register(ACACIA_LOG, BlockAcaciaLog.class); //162
         register(ACACIA_WOOD_STAIRS, BlockStairsAcacia.class); //163
         register(DARK_OAK_WOOD_STAIRS, BlockStairsDarkOak.class); //164
         register(SLIME_BLOCK, BlockSlime.class); //165
@@ -743,7 +743,10 @@ public class BlockRegistry implements IRegistry<Integer, Block, Class<? extends 
 
         register(TORCHFLOWER_CROP, BlockTorchflowerCrop.class); //822
         register(TORCHFLOWER, BlockTorchflower.class); //823
-
+        register(SPRUCE_LOG, BlockSpruceLog.class); //824
+        register(BIRCH_LOG, BlockBirchLog.class); //825
+        register(JUNGLE_LOG, BlockJungleLog.class); //826
+        register(DARK_OAK_LOG, BlockDarkOakLog.class); //827
         register(SUSPICIOUS_GRAVEL, BlockSuspiciousGravel.class); //828
         register(PITCHER_CROP, BlockPitcherCrop.class); //829
 

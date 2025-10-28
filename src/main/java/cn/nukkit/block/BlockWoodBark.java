@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
 
-public class BlockWoodBark extends BlockWood {
+public class BlockWoodBark extends BlockLog {
 
     private static final String[] NAMES = {
             "Oak Wood",
@@ -45,17 +45,12 @@ public class BlockWoodBark extends BlockWood {
         }
         return name;
     }
-    
+
     @Override
-    protected int getStrippedId() {
-        return getId();
+    public int getStrippedId() {
+        return 0;
     }
-    
-    @Override
-    protected int getStrippedDamage() {
-        return getDamage() | STRIPPED_BIT;
-    }
-    
+
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (face.getAxis().isHorizontal()) {

@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 
-public class BlockLogPaleOak extends BlockWood {
+public class BlockLogPaleOak extends BlockLog {
 
     public BlockLogPaleOak() {
         this(0);
@@ -24,13 +24,8 @@ public class BlockLogPaleOak extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_PALE_OAK_LOG;
-    }
-
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x3;
     }
 
     @Override

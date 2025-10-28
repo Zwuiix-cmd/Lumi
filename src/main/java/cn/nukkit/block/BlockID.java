@@ -29,8 +29,7 @@ public interface BlockID {
     int GOLD_ORE = 14;
     int IRON_ORE = 15;
     int COAL_ORE = 16;
-    int LOG = 17;
-    int WOOD = 17;
+    int OAK_LOG = 17;
     int LEAVES = 18;
     int SPONGE = 19;
     int GLASS = 20;
@@ -222,9 +221,7 @@ public interface BlockID {
     int STAINED_GLASS_PANE = 160;
     int LEAVES2 = 161;
     int LEAVE2 = 161;
-    int WOOD2 = 162;
-    int TRUNK2 = 162;
-    int LOG2 = 162;
+    int ACACIA_LOG = 162;
     int ACACIA_WOOD_STAIRS = 163;
     int ACACIA_WOODEN_STAIRS = 163;
     int DARK_OAK_WOOD_STAIRS = 164;
@@ -757,7 +754,10 @@ public interface BlockID {
 
     int TORCHFLOWER_CROP = 822;
     int TORCHFLOWER = 823;
-
+    int SPRUCE_LOG = 824;
+    int BIRCH_LOG = 825;
+    int JUNGLE_LOG = 826;
+    int DARK_OAK_LOG = 827;
     int SUSPICIOUS_GRAVEL = 828;
     int PITCHER_CROP = 829;
     int CALIBRATED_SCULK_SENSOR = 835;

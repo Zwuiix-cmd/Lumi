@@ -30,13 +30,8 @@ public class BlockWoodMangrove extends BlockWoodBark {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_MANGROVE_WOOD;
-    }
-
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x7;
     }
 
     @Override

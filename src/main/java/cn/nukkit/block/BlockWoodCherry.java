@@ -29,13 +29,8 @@ public class BlockWoodCherry extends BlockWoodBark {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_CHERRY_WOOD;
-    }
-
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x7;
     }
 
     @Override
