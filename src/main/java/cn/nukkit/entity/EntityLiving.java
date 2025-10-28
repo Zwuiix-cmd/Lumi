@@ -149,7 +149,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
                 // Critical hit
                 if ((damager instanceof Player p) && !damager.onGround && !damager.isSprinting() && damager.fallDistance > 0 && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
-                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getEntity(), p);
+                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getEntity(), p, (EntityDamageByEntityEvent) source);
                     event.call();
 
                     if(!event.isCancelled()) {

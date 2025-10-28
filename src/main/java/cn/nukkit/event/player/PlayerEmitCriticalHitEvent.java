@@ -5,6 +5,8 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.HandlerList;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.math.BlockFace;
 
 public class PlayerEmitCriticalHitEvent extends Event implements Cancellable {
@@ -15,10 +17,12 @@ public class PlayerEmitCriticalHitEvent extends Event implements Cancellable {
 
     private Entity entity;
     private Player damager;
+    private EntityDamageByEntityEvent damageEvent;
 
-    public PlayerEmitCriticalHitEvent(Entity entity, Player damager) {
+    public PlayerEmitCriticalHitEvent(Entity entity, Player damager, EntityDamageByEntityEvent damageEvent) {
         this.entity = entity;
         this.damager = damager;
+        this.damageEvent = damageEvent;
     }
 
     public Entity getEntity() {
@@ -27,5 +31,9 @@ public class PlayerEmitCriticalHitEvent extends Event implements Cancellable {
 
     public Player getDamager() {
         return damager;
+    }
+
+    public EntityDamageByEntityEvent getDamageEvent() {
+        return damageEvent;
     }
 }
