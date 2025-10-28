@@ -264,10 +264,9 @@ public class Network {
 
                     try {
                         if (raknetProtocol > 8) {
-                            DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
-                            ev.call();
+                            DataPacketDecodeEvent event = new DataPacketDecodeEvent(player, pk);
 
-                            if (ev.isCancelled()) {
+                            if (!event.call()) {
                                 return;
                             }
 
@@ -275,10 +274,9 @@ public class Network {
                         } else { // version < 1.6
                             pk.setBuffer(buf, 3);
 
-                            DataPacketDecodeEvent ev = new DataPacketDecodeEvent(player, pk);
-                            ev.call();
+                            DataPacketDecodeEvent event = new DataPacketDecodeEvent(player, pk);
 
-                            if (ev.isCancelled()) {
+                            if (!event.call()) {
                                 return;
                             }
 
