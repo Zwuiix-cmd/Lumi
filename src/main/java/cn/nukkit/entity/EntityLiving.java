@@ -13,6 +13,7 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
+import cn.nukkit.event.player.PlayerEmitCriticalHitEvent;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTurtleShell;
@@ -147,15 +148,20 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 // Critical hit
-                if (damager instanceof Player && !damager.onGround) {
-                    AnimatePacket animate = new AnimatePacket();
-                    animate.action = AnimatePacket.Action.CRITICAL_HIT;
-                    animate.eid = getId();
+                if ((damager instanceof Player p) && !damager.onGround && !damager.isSprinting() && damager.fallDistance > 0 && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
+                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getEntity(), p);
+                    event.call();
 
-                    this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
-                    this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
+                    if(!event.isCancelled()) {
+                        AnimatePacket animate = new AnimatePacket();
+                        animate.action = AnimatePacket.Action.CRITICAL_HIT;
+                        animate.eid = getId();
 
-                    source.setDamage(source.getDamage() * 1.5f);
+                        this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
+                        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
+
+                        source.setDamage(source.getDamage() * 1.5f);
+                    }
                 }
 
                 if (damager.isOnFire() && !(damager instanceof Player)) {
