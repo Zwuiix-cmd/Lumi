@@ -4879,15 +4879,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.data = 65535 / breakTick;
                 this.getLevel().addChunkPacket(this.breakingBlock.getFloorX() >> 4, this.breakingBlock.getFloorZ() >> 4, pk);
                 this.level.addParticle(new PunchBlockParticle(pos, block, face));
-                if (this.breakingBlock instanceof CustomBlock) {
-                    var timeDiff = time - breakingBlockTime;
-                    blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
-                    if (blockBreakProgress > 0.999999999999999999999) {
-                        this.onBlockBreakAbort(pos, face);
-                        this.onBlockBreakComplete(pos.asBlockVector3(), face);
-                    }
-                    breakingBlockTime = time;
+
+                var timeDiff = time - breakingBlockTime;
+                blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
+                if (blockBreakProgress > 0.999999999999999999999) {
+                    this.onBlockBreakAbort(pos, face);
+                    this.onBlockBreakComplete(pos.asBlockVector3(), face);
                 }
+                breakingBlockTime = time;
             }
         }
     }
