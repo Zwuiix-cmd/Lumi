@@ -62,6 +62,10 @@ public class PlayerSettings extends OkaeriConfig {
     @Comment("Forcing server to set enchantment levels to value calculated by server")
     private boolean forcedSafetyEnchant = true;
 
+    @CustomKey("fastest-packet-handling")
+    @Comment("Forcing server to fast handle packet")
+    private boolean fastestPacketHandling = true;
+
     @CustomKey("space-name-mode")
     @Comment("Handling player names with space. It can be DISABLED, IGNORE and REPLACING")
     private SpaceNameMode spaceNameMode = SpaceNameMode.IGNORE;
