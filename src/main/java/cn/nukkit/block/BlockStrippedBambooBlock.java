@@ -2,7 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.block.data.BlockColor;
 
-public class BlockStrippedBambooBlock extends BlockWoodStripped {
+public class BlockStrippedBambooBlock extends BlockLogStripped {
     public BlockStrippedBambooBlock() {
         super(0);
     }

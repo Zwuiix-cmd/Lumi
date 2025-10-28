@@ -4,13 +4,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.block.data.BlockColor;
 
-public class BlockLogMangrove extends BlockLog {
+public class BlockMangroveLog extends BlockLog {
 
-    public BlockLogMangrove() {
+    public BlockMangroveLog() {
         this(0);
     }
 
-    public BlockLogMangrove(int meta) {
+    public BlockMangroveLog(int meta) {
         super(meta);
     }
 

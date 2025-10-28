@@ -3,19 +3,14 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 
-public class BlockWoodPaleOak extends BlockWoodBark {
+public class BlockPaleOakWood extends BlockLog {
 
-    public BlockWoodPaleOak() {
+    public BlockPaleOakWood() {
         super(0);
     }
 
-    public BlockWoodPaleOak(int meta) {
+    public BlockPaleOakWood(int meta) {
         super(meta);
-    }
-
-    @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta & ~0x7); // Clear the wood type bits
     }
 
     @Override
@@ -31,9 +26,5 @@ public class BlockWoodPaleOak extends BlockWoodBark {
     @Override
     public int getStrippedId() {
         return STRIPPED_PALE_OAK_WOOD;
-    }
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(PALE_OAK_WOOD));
     }
 }

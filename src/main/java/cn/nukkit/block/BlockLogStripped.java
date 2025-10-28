@@ -2,16 +2,14 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.math.BlockFace;
 
-public abstract class BlockWoodStripped extends BlockLog {
+public abstract class BlockLogStripped extends BlockLog {
 
-    public BlockWoodStripped() {
+    public BlockLogStripped() {
         this(0);
     }
     
-    public BlockWoodStripped(int meta) {
+    public BlockLogStripped(int meta) {
         super(meta);
     }
     

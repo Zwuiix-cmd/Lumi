@@ -3,13 +3,13 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 
-public class BlockLogPaleOak extends BlockLog {
+public class BlockPaleOakLog extends BlockLog {
 
-    public BlockLogPaleOak() {
+    public BlockPaleOakLog() {
         this(0);
     }
 
-    public BlockLogPaleOak(int meta) {
+    public BlockPaleOakLog(int meta) {
         super(meta);
     }
 

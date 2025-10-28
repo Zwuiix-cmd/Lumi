@@ -1,22 +1,15 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
 import cn.nukkit.block.data.BlockColor;
 
-public class BlockWoodMangrove extends BlockWoodBark {
+public class BlockMangroveWood extends BlockLog {
 
-    public BlockWoodMangrove() {
+    public BlockMangroveWood() {
         super(0);
     }
 
-    public BlockWoodMangrove(int meta) {
+    public BlockMangroveWood(int meta) {
         super(meta);
-    }
-
-    @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta & ~0x7); // Clear the wood type bits
     }
 
     @Override
@@ -32,11 +25,6 @@ public class BlockWoodMangrove extends BlockWoodBark {
     @Override
     public int getStrippedId() {
         return STRIPPED_MANGROVE_WOOD;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(MANGROVE_WOOD));
     }
 
     @Override

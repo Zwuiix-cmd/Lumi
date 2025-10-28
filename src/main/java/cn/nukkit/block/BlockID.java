@@ -416,7 +416,7 @@ public interface BlockID {
     int LANTERN = 463;
     int CAMPFIRE_BLOCK = 464;
     int LAVA_CAULDRON = 465;
-    int WOOD_BARK = 467;
+    int OAK_WOOD = 467;
     int COMPOSTER = 468;
     int LIT_BLAST_FURNACE = 469;
     int LIGHT_BLOCK = 470;
@@ -826,6 +826,18 @@ public interface BlockID {
     int WAXED_EXPOSED_COPPER_TRAPDOOR = 1052;
     int WAXED_WEATHERED_COPPER_TRAPDOOR = 1053;
     int WAXED_OXIDIZED_COPPER_TRAPDOOR = 1054;
+
+    int SPRUCE_WOOD = 1069;
+    int BIRCH_WOOD = 1070;
+    int JUNGLE_WOOD = 1071;
+    int ACACIA_WOOD = 1072;
+    int DARK_OAK_WOOD = 1073;
+    int STRIPPED_OAK_WOOD = 1074;
+    int STRIPPED_SPRUCE_WOOD = 1075;
+    int STRIPPED_BIRCH_WOOD = 1076;
+    int STRIPPED_JUNGLE_WOOD = 1077;
+    int STRIPPED_ACACIA_WOOD = 1078;
+    int STRIPPED_DARK_OAK_WOOD = 1079;
 
     int BLUE_ORCHID = 1085;
     int ALLIUM = 1086;
