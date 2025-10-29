@@ -4,13 +4,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.block.data.BlockColor;
 
-public class BlockLogMangrove extends BlockWood {
+public class BlockMangroveLog extends BlockLog {
 
-    public BlockLogMangrove() {
+    public BlockMangroveLog() {
         this(0);
     }
 
-    public BlockLogMangrove(int meta) {
+    public BlockMangroveLog(int meta) {
         super(meta);
     }
 
@@ -25,13 +25,8 @@ public class BlockLogMangrove extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
+    public int getStrippedId() {
         return STRIPPED_MANGROVE_LOG;
-    }
-
-    @Override
-    protected int getStrippedDamage() {
-        return this.getDamage() & ~0x3;
     }
 
     @Override

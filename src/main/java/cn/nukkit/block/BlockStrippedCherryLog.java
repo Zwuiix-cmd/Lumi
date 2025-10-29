@@ -2,13 +2,13 @@ package cn.nukkit.block;
 
 import cn.nukkit.block.data.BlockColor;
 
-public class BlockLogStrippedCherry extends BlockWoodStripped {
+public class BlockStrippedCherryLog extends BlockLogStripped {
 
-    public BlockLogStrippedCherry() {
+    public BlockStrippedCherryLog() {
         super(0);
     }
 
-    public BlockLogStrippedCherry(int meta) {
+    public BlockStrippedCherryLog(int meta) {
         super(meta);
     }
 

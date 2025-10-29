@@ -374,7 +374,6 @@ public class Server {
         }
 
         Registries.BLOCK.initCustomBlocks();
-        Registries.RECIPE.buildPackets();
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);
@@ -440,6 +439,8 @@ public class Server {
         if (loadPlugins) {
             this.enablePlugins(PluginLoadOrder.POSTWORLD);
         }
+
+        Registries.RECIPE.buildPackets();
 
         EntityProperty.init();
         EntityProperty.buildPacket();
