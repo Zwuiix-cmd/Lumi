@@ -51,7 +51,6 @@ import cn.nukkit.permission.Permissible;
 import cn.nukkit.plugin.*;
 import cn.nukkit.plugin.service.NKServiceManager;
 import cn.nukkit.plugin.service.ServiceManager;
-import cn.nukkit.recipe.parser.RecipeParser;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
@@ -192,6 +191,7 @@ public class Server {
     private final ServiceManager serviceManager = new NKServiceManager();
     private Level defaultLevel;
     private final Thread currentThread;
+    private Thread networkThread;
     /**
      * This is needed for structure generation
      */
@@ -586,7 +586,7 @@ public class Server {
 
     public boolean dispatchCommand(CommandSender sender, String commandLine) throws ServerException {
         // First we need to check if this command is on the main thread or not, if not, warn the user
-        if (!this.isPrimaryThread()) {
+        if (!this.isPrimaryThread() && !this.isNetworkThread()) {
             this.getLogger().warning("Command Dispatched Async: " + commandLine);
         }
         if (sender == null) {
@@ -739,6 +739,7 @@ public class Server {
 
         log.info(this.baseLang.translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
 
+        this.startNetworkTick();
         this.tickProcessor();
         this.forceShutdown();
     }
@@ -777,6 +778,7 @@ public class Server {
         this.nextTick = System.currentTimeMillis();
         try {
             while (this.isRunning.get()) {
+
                 try {
                     this.tick();
 
@@ -816,6 +818,17 @@ public class Server {
         } catch (Throwable e) {
             log.fatal("Exception happened while ticking server\n{}", Utils.getAllThreadDumps(), e);
         }
+    }
+
+    synchronized public void startNetworkTick() {
+         networkThread = new Thread(() -> {
+            while (this.isRunning.get()) {
+                this.network.processInterfaces();
+            }
+         });
+
+         networkThread.setName("network");
+         networkThread.start();
     }
 
     public void onPlayerCompleteLoginSequence(Player player) {
@@ -1006,8 +1019,6 @@ public class Server {
         }
 
         ++this.tickCounter;
-
-        this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
@@ -2105,6 +2116,10 @@ public class Server {
         return (Thread.currentThread() == currentThread);
     }
 
+    public boolean isNetworkThread() {
+        return (Thread.currentThread() == networkThread);
+    }
+
     /**
      * Get server's primary thread
      *
@@ -2112,6 +2127,10 @@ public class Server {
      */
     public Thread getPrimaryThread() {
         return currentThread;
+    }
+
+    public Thread getNetworkThread() {
+        return networkThread;
     }
 
     private void registerProfessions() {
