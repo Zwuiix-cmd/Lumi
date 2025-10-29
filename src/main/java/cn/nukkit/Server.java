@@ -2113,11 +2113,11 @@ public class Server {
      * @return true if the current thread matches the expected primary thread, false otherwise
      */
     public boolean isPrimaryThread() {
-        return (Thread.currentThread() == currentThread);
+        return Thread.currentThread() == currentThread;
     }
 
     public boolean isNetworkThread() {
-        return (Thread.currentThread() == networkThread);
+        return Thread.currentThread() == networkThread;
     }
 
     /**
