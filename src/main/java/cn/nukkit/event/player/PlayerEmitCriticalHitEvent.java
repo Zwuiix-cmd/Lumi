@@ -18,11 +18,21 @@ public class PlayerEmitCriticalHitEvent extends Event implements Cancellable {
     private Entity entity;
     private Player damager;
     private EntityDamageByEntityEvent damageEvent;
+    private float damage;
 
-    public PlayerEmitCriticalHitEvent(Entity entity, Player damager, EntityDamageByEntityEvent damageEvent) {
+    public PlayerEmitCriticalHitEvent(float damage, Entity entity, Player damager, EntityDamageByEntityEvent damageEvent) {
+        this.damage = damage;
         this.entity = entity;
         this.damager = damager;
         this.damageEvent = damageEvent;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
     }
 
     public Entity getEntity() {

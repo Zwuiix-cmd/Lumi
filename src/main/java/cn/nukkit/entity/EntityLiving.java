@@ -149,7 +149,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
                 // Critical hit
                 if ((damager instanceof Player p) && !damager.onGround && !damager.isSprinting() && damager.fallDistance > 0 && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
-                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getEntity(), p, (EntityDamageByEntityEvent) source);
+                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getDamage() * 1.5f, source.getEntity(), p, (EntityDamageByEntityEvent) source);
                     event.call();
 
                     if(!event.isCancelled()) {
@@ -160,7 +160,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                         this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
                         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
 
-                        source.setDamage(source.getDamage() * 1.5f);
+                        source.setDamage(event.getDamage());
                     }
                 }
 
