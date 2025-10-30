@@ -68,6 +68,10 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         return 0;
     }
 
+    public Map<DamageModifier, Float> getModifiers() {
+        return modifiers;
+    }
+
     public float getDamage() {
         return this.getDamage(DamageModifier.BASE);
     }
