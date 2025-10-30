@@ -2695,6 +2695,7 @@ public class Level implements ChunkManager, Metadatable {
 
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
+                player.setNeedSendInventory(true);
                 return null;
             }
 
