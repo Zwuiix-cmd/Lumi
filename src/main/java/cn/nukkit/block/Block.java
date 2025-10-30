@@ -513,7 +513,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return true if there is, otherwise false
      */
     public boolean hasBlockTag(BlockTag blockTag) {
-        return this.getBlockTags().contains(blockTag);
+        try {
+            return this.getBlockTags().contains(blockTag);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
