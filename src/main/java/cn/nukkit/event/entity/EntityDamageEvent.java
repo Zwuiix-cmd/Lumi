@@ -178,7 +178,11 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         /**
          * Damage reduction caused by armor's enchantments
          */
-        ARMOR_ENCHANTMENTS
+        ARMOR_ENCHANTMENTS,
+        /**
+         * Critical hit
+         */
+        CRITICAL,
     }
 
     public enum DamageCause {
