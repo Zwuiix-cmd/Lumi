@@ -3181,7 +3181,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
 
                             uniqueIds.add(entry.uuid.toString());
-                            this.dataPacket(ResourcePackDataInfoPacket.from(resourcePack));
+                            this.dataPacket(resourcePack.toNetwork());
                         }
                         break;
                     case ResourcePackClientResponsePacket.STATUS_HAVE_ALL_PACKS:

@@ -1,12 +1,12 @@
 package cn.nukkit.block;
 
-public class BlockWoodStrippedJungle extends BlockWoodStripped {
+public class BlockStrippedJungleLog extends BlockLogStripped {
 
-    public BlockWoodStrippedJungle() {
+    public BlockStrippedJungleLog() {
         this(0);
     }
     
-    public BlockWoodStrippedJungle(int meta) {
+    public BlockStrippedJungleLog(int meta) {
         super(meta);
     }
     
