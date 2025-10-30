@@ -130,9 +130,13 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        if (source instanceof EntityDamageByEntityEvent event) {
-            if (event.getDamager() instanceof Player damager && damager.attackCooldown > 0) {
+        if (source instanceof EntityDamageByEntityEvent event && event.getDamager() instanceof Player damager) {
+            if(damager.attackCooldown > 0) {
                 return false;
+            }
+
+            if (damager.fallDistance > 0 && !damager.onGround && !damager.isSprinting() && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
+                source.setDamage(source.getDamage() * 1.5f, EntityDamageEvent.DamageModifier.CRITICAL);
             }
         }
 
@@ -148,20 +152,13 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 // Critical hit
-                if ((damager instanceof Player p) && !damager.onGround && !damager.isSprinting() && damager.fallDistance > 0 && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
-                    PlayerEmitCriticalHitEvent event = new PlayerEmitCriticalHitEvent(source.getDamage() * 1.5f, source.getEntity(), p, (EntityDamageByEntityEvent) source);
-                    event.call();
+                if(source.isApplicable(EntityDamageEvent.DamageModifier.CRITICAL)) {
+                    AnimatePacket animate = new AnimatePacket();
+                    animate.action = AnimatePacket.Action.CRITICAL_HIT;
+                    animate.eid = getId();
 
-                    if(!event.isCancelled()) {
-                        AnimatePacket animate = new AnimatePacket();
-                        animate.action = AnimatePacket.Action.CRITICAL_HIT;
-                        animate.eid = getId();
-
-                        this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
-                        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
-
-                        source.setDamage(event.getDamage());
-                    }
+                    this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
+                    this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
                 }
 
                 if (damager.isOnFire() && !(damager instanceof Player)) {
