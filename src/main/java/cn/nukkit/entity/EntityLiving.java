@@ -135,8 +135,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 return false;
             }
 
-            if (damager.fallDistance > 0 && !damager.onGround && !damager.isSprinting() && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
-                source.setDamage(source.getDamage() * 1.5f, EntityDamageEvent.DamageModifier.CRITICAL);
+            if (damager.fallDistance < 0 && !damager.onGround && !damager.isInsideOfWater() && !damager.hasEffect(EffectType.BLINDNESS)) {
+                source.setDamage(source.getFinalDamage() / 2, EntityDamageEvent.DamageModifier.CRITICAL);
             }
         }
 
@@ -156,6 +156,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     AnimatePacket animate = new AnimatePacket();
                     animate.action = AnimatePacket.Action.CRITICAL_HIT;
                     animate.eid = getId();
+                    animate.data = 55;
 
                     this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
                     this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ATTACK_STRONG);
