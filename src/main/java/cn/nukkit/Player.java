@@ -4039,7 +4039,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.lastEating = 0;
                         entityEventPacket.isEncoded = false;
                         entityEventPacket.originProtocol = this.protocol;
-                        entityEventPacket.data = (hand.getNetworkId() << 16) | hand.getDamage();
+                        entityEventPacket.data = (hand.getNetworkId(this.protocol) << 16) | hand.getDamage();
                         this.dataPacket(entityEventPacket);
                         Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
                         break;
