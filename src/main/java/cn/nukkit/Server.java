@@ -783,7 +783,7 @@ public class Server {
                     long next = this.nextTick;
                     long current = System.currentTimeMillis();
 
-                    if (next - 0.1 > current) {
+                    /*if (next - 0.1 > current) {
                         long allocated = next - current - 1;
 
                         if (settings.world().doWorldGc()) { // Instead of wasting time, do something potentially useful
@@ -808,7 +808,7 @@ public class Server {
                                 this.getLogger().logException(e);
                             }
                         }
-                    }
+                    }*/
                 } catch (RuntimeException e) {
                     log.error("A RuntimeException happened while ticking the server", e);
                 }
@@ -990,14 +990,11 @@ public class Server {
 
     private void tick() {
         long tickTime = System.currentTimeMillis();
+        this.network.processInterfaces();
 
         long time = tickTime - this.nextTick;
         if (time < -25) {
-            try {
-                Thread.sleep(Math.max(5, -time - 25));
-            } catch (InterruptedException e) {
-                Server.getInstance().getLogger().logException(e);
-            }
+            return;
         }
 
         long tickTimeNano = System.nanoTime();
@@ -1006,8 +1003,6 @@ public class Server {
         }
 
         ++this.tickCounter;
-
-        this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
