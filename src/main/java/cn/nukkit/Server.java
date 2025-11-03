@@ -779,36 +779,6 @@ public class Server {
 
                 try {
                     this.tick();
-
-                    long next = this.nextTick;
-                    long current = System.currentTimeMillis();
-
-                    /*if (next - 0.1 > current) {
-                        long allocated = next - current - 1;
-
-                        if (settings.world().doWorldGc()) { // Instead of wasting time, do something potentially useful
-                            int offset = 0;
-                            for (int i = 0; i < levelArray.length; i++) {
-                                offset = (i + lastLevelGC) % levelArray.length;
-                                Level level = levelArray[offset];
-                                if (!level.isBeingConverted) {
-                                    level.doGarbageCollection(allocated - 1);
-                                }
-                                allocated = next - System.currentTimeMillis();
-                                if (allocated <= 0) break;
-                            }
-                            lastLevelGC = offset + 1;
-                        }
-
-                        if (allocated > 0 || !settings.world().doWorldGc()) {
-                            try {
-                                //noinspection BusyWait
-                                Thread.sleep(allocated, 900000);
-                            } catch (Exception e) {
-                                this.getLogger().logException(e);
-                            }
-                        }
-                    }*/
                 } catch (RuntimeException e) {
                     log.error("A RuntimeException happened while ticking the server", e);
                 }
