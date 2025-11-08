@@ -159,7 +159,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         id = id.toLowerCase();
         if (!id.contains(":")) id = "minecraft:" + id;
 
-        Item item = Registries.ITEM.get(id).clone();
+        Item item = Registries.ITEM.get(id);
         if (meta != null) {
             item.setDamage(meta);
         }
