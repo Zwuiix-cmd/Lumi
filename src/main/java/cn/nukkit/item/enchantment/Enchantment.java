@@ -172,7 +172,7 @@ public abstract class Enchantment implements Cloneable, EnchantmentID {
     }
 
     @Override
-    protected Enchantment clone() {
+    public Enchantment clone() {
         try {
             return (Enchantment) super.clone();
         } catch (CloneNotSupportedException e) {
