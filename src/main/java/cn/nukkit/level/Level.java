@@ -2491,6 +2491,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
+            //TODO: rework the way how the experience is dropped
             if (!isSilkTouch && player != null && (drops.length != 0 || target.getId() == BlockID.SCULK)) { // For example no xp from redstone if it's mined with stone pickaxe + trick for xp with sculk block
                 if (player.isSurvival() || player.isAdventure()) {
                     this.dropExpOrb(vector.add(0.5, 0.5, 0.5), dropExp);
