@@ -7,9 +7,9 @@ public class GUIDataPickItemPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.GUI_DATA_PICK_ITEM_PACKET;
 
-    private String description;
-    private String itemEffects;
-    private int hotbarSlot;
+    public String description;
+    public String itemEffects;
+    public int hotbarSlot;
 
     @Override
     public byte pid() {
