@@ -35,6 +35,11 @@ public class ObjectSpruceTree extends ObjectTree {
     }
 
     @Override
+    protected int getLeafType() {
+        return 1;
+    }
+
+    @Override
     public void placeObject(ChunkManager level, int x, int y, int z, NukkitRandom random) {
         this.treeHeight = random.nextBoundedInt(4) + 6;
 
@@ -65,7 +70,7 @@ public class ObjectSpruceTree extends ObjectTree {
                     }
 
                     if (!Block.isBlockSolidById(level.getBlockIdAt(xx, yyy, zz))) {
-                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getType());
+                        level.setBlockAt(xx, yyy, zz, this.getLeafBlock(), this.getLeafType());
                         if (createSnow) {
                             if (level.getBlockIdAt(xx, yyy + 1, zz) == Block.AIR && level.getBlockIdAt(xx, yyy + 2, zz) == Block.AIR) {
                                 level.setBlockAt(xx, yyy + 1, zz, Block.SNOW_LAYER, 0);
