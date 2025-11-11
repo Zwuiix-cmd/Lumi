@@ -25,11 +25,6 @@ public class ObjectSpruceTree extends ObjectTree {
     }
 
     @Override
-    public int getType() {
-        return 1;
-    }
-
-    @Override
     public int getTrunkBlock() {
         return BlockID.SPRUCE_LOG;
     }

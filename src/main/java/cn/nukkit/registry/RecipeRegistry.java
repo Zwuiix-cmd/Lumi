@@ -62,8 +62,9 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         this.registerMultiRecipe(new FireworkRecipe());
         this.registerMultiRecipe(new DecoratedPotRecipe());
 
-        final JsonArray potionMixes = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject().get("potionMixes").getAsJsonArray();
-        potionMixes.forEach((potionMix) -> {
+        final JsonObject brewing = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject();
+
+        brewing.get("potionMixes").getAsJsonArray().forEach((potionMix) -> {
             final JsonObject recipe = potionMix.getAsJsonObject();
 
             int fromPotionId = recipe.get("inputId").getAsInt();
@@ -74,6 +75,23 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
             int toPotionMeta = recipe.get("outputMeta").getAsInt();
 
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
+        });
+
+        brewing.get("containerMixes").getAsJsonArray().forEach((containerMix) -> {
+            final JsonObject recipe = containerMix.getAsJsonObject();
+
+            final Item ingredient = Item.get(recipe.get("reagentId").getAsInt());
+
+            final int fromPotionId = recipe.get("inputId").getAsInt();
+            final int toPotionId = recipe.get("outputId").getAsInt();
+
+            for (int meta : Registries.POTION.getPotionId2TypeMap().keySet()) {
+                Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(
+                        Item.get(fromPotionId, meta),
+                        ingredient,
+                        Item.get(toPotionId, meta)
+                ));
+            }
         });
 
         RecipeParser.loadRecipes(JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/recipes.json"))).getAsJsonObject().get("recipes").getAsJsonArray());
@@ -250,7 +268,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
-        if(outputItem == null) return null;
+        if (outputItem == null) return null;
         return this.MULTI.values().stream().filter(multiRecipe -> multiRecipe.canExecute(player, outputItem, inputs)).findFirst().orElse(null);
     }
 
@@ -263,7 +281,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public BatchPacket getPacket(int protocol) {
-       return PACKETS.get(protocol);
+        return PACKETS.get(protocol);
     }
 
     @ApiStatus.Internal
