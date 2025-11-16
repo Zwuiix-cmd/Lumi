@@ -111,6 +111,10 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             return false;
         }
 
+        if(entityId.isEmpty()) {
+            return true;
+        }
+
         if (this.delay++ >= Utils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
             this.delay = 0;
 
