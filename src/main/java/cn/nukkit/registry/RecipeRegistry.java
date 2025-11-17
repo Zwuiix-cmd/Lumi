@@ -230,10 +230,6 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         if (recipeMap != null) {
             SmithingRecipe recipe = recipeMap.get(inputHash);
 
-            if (recipe != null && recipe.matchItems(inputList)) {
-                return recipe;
-            }
-
             ArrayList<Item> list = new ArrayList<>();
             for (Item item : inputList) {
                 Item clone = item.clone();
@@ -242,6 +238,10 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
                     clone.setDamage(0);
                 }
                 list.add(clone);
+            }
+
+            if (recipe != null && recipe.matchItems(list)) {
+                return recipe;
             }
 
             for (SmithingRecipe smithingRecipe : recipeMap.values()) {
