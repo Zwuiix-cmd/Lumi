@@ -44,12 +44,12 @@ public class BlockSuspiciousGravel extends BlockSuspicious {
     }
 
     @Override
-    public Sound getBrushSound() {
-        return Sound.BRUSH_SUSPICIOUS_GRAVEL;
+    public void playBrushSound() {
+        getLevel().addSound(this, Sound.BRUSH_SUSPICIOUS_GRAVEL);
     }
 
     @Override
-    public Sound getCompletedSound() {
-        return Sound.BRUSH_COMPLETED_SUSPICIOUS_GRAVEL;
+    public void playCompletedSound() {
+        getLevel().addSound(this, Sound.BRUSH_COMPLETED_SUSPICIOUS_GRAVEL);
     }
 }

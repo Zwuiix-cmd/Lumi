@@ -46,9 +46,9 @@ public abstract class BlockSuspicious extends BlockFallableMeta implements Block
 
     public abstract Block getDefaultBlock();
 
-    public abstract Sound getBrushSound();
+    public abstract void playBrushSound();
 
-    public abstract Sound getCompletedSound();
+    public abstract void playCompletedSound();
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
@@ -78,13 +78,13 @@ public abstract class BlockSuspicious extends BlockFallableMeta implements Block
                 if (blockEntity.getBrushCount() >= BlockEntityBrushableBlock.REQUIRED_BRUSHES_TO_BREAK) {
                     getLevel().dropItem(this.getSide(face).add(0.5, 0, 0.5), blockEntity.getItem(), Vector3.ZERO, true, 10);
                     getLevel().setBlock(this, getDefaultBlock());
-                    getLevel().addSound(this, getCompletedSound());
+                    playBrushSound();
                     return 1;
                 }
 
                 if (getDamage() != state) {
                     this.setDamage(state);
-                    getLevel().addSound(this, getBrushSound());
+                    playBrushSound();
                     getLevel().setBlock(this, this);
                 }
             }
