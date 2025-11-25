@@ -21,7 +21,7 @@ public class BlockBricks extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 2;
+        return 0.8;
     }
 
     @Override

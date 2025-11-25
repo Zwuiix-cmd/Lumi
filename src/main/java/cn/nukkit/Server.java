@@ -833,7 +833,10 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        this.batchPackets(players, new DataPacket[]{pk}); // This is sent "directly" so it always gets thru before possible TYPE_REMOVE packet for NPCs etc.
+
+        for (Player player : players) {
+            player.dataPacket(pk);
+        }
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
@@ -889,10 +892,6 @@ public class Server {
             for (Player p : new ArrayList<>(this.players.values())) {
                 p.onUpdate(currentTick);
             }
-        }
-
-        for (Player p : this.getOnlinePlayers().values()) {
-            p.resetPacketCounters();
         }
 
         int baseTickRate = this.settings.performance().baseTickRate();
@@ -962,6 +961,13 @@ public class Server {
         long tickTime = System.currentTimeMillis();
         this.network.processInterfaces();
 
+        if(this.settings.player().fastestPacketHandling()) {
+            this.network.processInterfaces();
+            for (Player p : this.getOnlinePlayers().values()) {
+                p.resetPacketCounters();
+            }
+        }
+
         long time = tickTime - this.nextTick;
         if (time < -25) {
             return;
@@ -973,6 +979,13 @@ public class Server {
         }
 
         ++this.tickCounter;
+
+        if(!this.settings.player().fastestPacketHandling()) {
+            this.network.processInterfaces();
+            for (Player p : this.getOnlinePlayers().values()) {
+                p.resetPacketCounters();
+            }
+        }
 
         if (this.rcon != null) {
             this.rcon.check();
@@ -989,7 +1002,6 @@ public class Server {
         if ((this.tickCounter & 0b1111) == 0) {
 
             this.network.resetStatistics();
-            this.maxTick = 20;
             this.maxUse = 0;
 
             if ((this.tickCounter & 0b111111111) == 0) {
@@ -1021,12 +1033,8 @@ public class Server {
 
         long nowNano = System.nanoTime();
 
-        float tick = (float) Math.min(20, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
+        float tick = (float) Math.min(maxTick, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
         float use = (float) Math.min(1, ((double) (nowNano - tickTimeNano)) / 50000000);
-
-        if (this.maxTick > tick) {
-            this.maxTick = tick;
-        }
 
         if (this.maxUse < use) {
             this.maxUse = use;
@@ -1041,7 +1049,7 @@ public class Server {
         if ((this.nextTick - tickTime) < -1000) {
             this.nextTick = tickTime;
         } else {
-            this.nextTick += 50;
+            this.nextTick += Math.max(1L, Math.round(1000.0 / maxTick));
         }
     }
 
@@ -1240,6 +1248,14 @@ public class Server {
             sum += aUseAverage;
         }
         return ((float) Math.round(sum / this.useAverage.length * 100)) / 100;
+    }
+
+    public float getMaxTick() {
+        return maxTick;
+    }
+
+    public void setMaxTick(float maxTick) {
+        this.maxTick = maxTick;
     }
 
     public SimpleCommandMap getCommandMap() {
