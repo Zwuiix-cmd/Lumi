@@ -3,10 +3,10 @@ package cn.nukkit.blockentity.impl;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.inventory.InventoryType;
-import cn.nukkit.recipe.SmeltingRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.recipe.SmeltingRecipe;
 import cn.nukkit.registry.Registries;
 
 public class BlockEntityBlastFurnace extends BlockEntityFurnace {

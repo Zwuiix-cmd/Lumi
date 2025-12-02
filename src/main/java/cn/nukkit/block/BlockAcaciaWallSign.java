@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockAcaciaWallSign extends BlockWallSign {

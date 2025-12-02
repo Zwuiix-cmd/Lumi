@@ -1,10 +1,10 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.level.ChunkException;
 
 import java.util.Arrays;
 

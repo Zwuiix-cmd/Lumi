@@ -1,12 +1,12 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.utils.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;

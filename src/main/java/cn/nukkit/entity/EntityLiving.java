@@ -10,6 +10,7 @@ import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.util.BlockIterator;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -30,8 +31,6 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
-import cn.nukkit.entity.util.BlockIterator;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 

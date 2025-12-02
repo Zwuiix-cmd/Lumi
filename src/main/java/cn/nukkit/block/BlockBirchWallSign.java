@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBirchSign;
 import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockBirchWallSign extends BlockWallSign {

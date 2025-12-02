@@ -4,7 +4,6 @@ import cn.nukkit.command.data.*;
 import cn.nukkit.network.protocol.types.CommandParam;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.SequencedHashSet;
-import com.google.gson.Gson;
 import lombok.ToString;
 import org.cloudburstmc.protocol.common.util.TypeMap;
 

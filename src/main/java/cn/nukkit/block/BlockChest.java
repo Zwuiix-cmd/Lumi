@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityChest;
 import cn.nukkit.inventory.ContainerInventory;
@@ -14,8 +16,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

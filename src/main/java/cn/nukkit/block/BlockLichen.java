@@ -8,7 +8,6 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitRandom;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class BlockLichen extends BlockTransparentMeta {

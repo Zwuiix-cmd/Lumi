@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.Item;
 
 /**
  * Created by Pub4Game on 03.01.2016.

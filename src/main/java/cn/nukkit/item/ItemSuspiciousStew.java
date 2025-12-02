@@ -3,7 +3,6 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;
-import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemSuspiciousStew extends ItemFood {
     

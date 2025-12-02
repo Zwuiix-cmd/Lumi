@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static cn.nukkit.math.BlockFace.*;
 import static cn.nukkit.block.data.Rail.Orientation.State.*;
+import static cn.nukkit.math.BlockFace.*;
 
 /**
  * INTERNAL helper class of railway

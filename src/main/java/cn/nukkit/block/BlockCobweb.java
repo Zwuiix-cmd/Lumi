@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemString;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.block.data.BlockColor;
 
 /**
  * Created on 2015/12/2 by xtypr.

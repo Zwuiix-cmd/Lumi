@@ -2,12 +2,10 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemInkSac;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.Utils;
 
 public class EntitySquid extends EntityWaterAnimal {

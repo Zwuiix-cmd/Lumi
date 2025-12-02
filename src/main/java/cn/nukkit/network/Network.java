@@ -8,7 +8,6 @@ import cn.nukkit.network.process.DataPacketManager;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.exception.DataPacketDecodeException;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.VarInt;
 import io.netty.buffer.ByteBuf;

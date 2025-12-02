@@ -1,7 +1,6 @@
 package cn.nukkit.level.biome.impl.taiga;
 
 import cn.nukkit.block.BlockDoublePlant;
-import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.biome.type.GrassyBiome;
 import cn.nukkit.level.generator.object.tree.ObjectTree;

@@ -6,9 +6,9 @@ import cn.nukkit.entity.passive.EntityCod;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.spawner.AbstractEntitySpawner;
 import cn.nukkit.utils.spawner.EntitySpawnerTask;
-import cn.nukkit.utils.Utils;
 
 public class CodSpawner extends AbstractEntitySpawner {
 

@@ -1,13 +1,13 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.BoneMealParticle;
-import cn.nukkit.block.data.BlockColor;
 
 import java.util.Random;
 

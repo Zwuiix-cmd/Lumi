@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.leveldb.serializer;
 
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
@@ -7,7 +8,6 @@ import cn.nukkit.level.format.leveldb.LevelDBKey;
 import cn.nukkit.level.format.leveldb.structure.ChunkBuilder;
 import cn.nukkit.level.format.leveldb.structure.LevelDBChunkSection;
 import cn.nukkit.level.format.leveldb.structure.StateBlockStorage;
-import cn.nukkit.level.ChunkException;
 import cn.nukkit.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

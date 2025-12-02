@@ -1,7 +1,6 @@
 package cn.nukkit.level.generator.populator.overworld;
 
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.mob.EntitySkeleton;

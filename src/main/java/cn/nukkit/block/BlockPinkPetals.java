@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.customblock.properties.IntBlockProperty;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.VanillaProperties;
@@ -11,7 +12,6 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

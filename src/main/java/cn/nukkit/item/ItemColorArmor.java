@@ -1,8 +1,8 @@
 package cn.nukkit.item;
 
-import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.data.DyeColor;
+import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
  * Created by fromgate on 27.03.2016.

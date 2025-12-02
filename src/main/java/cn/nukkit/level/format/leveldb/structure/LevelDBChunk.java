@@ -11,13 +11,13 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.util.BitArrayVersion;
+import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.utils.compression.Zlib;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.NukkitMath;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockAmethystCluster extends BlockAmethystBud {

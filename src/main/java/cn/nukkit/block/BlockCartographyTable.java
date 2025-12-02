@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.ItemTool;
 
 public class BlockCartographyTable extends BlockSolid {
 

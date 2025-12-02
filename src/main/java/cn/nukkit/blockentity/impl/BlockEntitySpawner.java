@@ -14,7 +14,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
 import cn.nukkit.registry.Registries;
-import cn.nukkit.utils.Identifier;
 import cn.nukkit.utils.Utils;
 
 public class BlockEntitySpawner extends BlockEntitySpawnable {

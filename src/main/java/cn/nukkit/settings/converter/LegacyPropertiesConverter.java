@@ -1,7 +1,6 @@
 package cn.nukkit.settings.converter;
 
 import cn.nukkit.Difficulty;
-import cn.nukkit.settings.GeneralSettings;
 import cn.nukkit.settings.PlayerSettings;
 import cn.nukkit.settings.ServerSettings;
 import cn.nukkit.settings.WorldSettings;
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static cn.nukkit.settings.GeneralSettings.*;
+import static cn.nukkit.settings.GeneralSettings.ServerAuthoritativeMovement;
 
 @Slf4j
 public class LegacyPropertiesConverter {

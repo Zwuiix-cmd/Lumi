@@ -13,11 +13,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -25,11 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static cn.nukkit.command.selector.SelectorType.NEAREST_PLAYER;
-import static cn.nukkit.command.selector.SelectorType.NPC_INITIATOR;
-import static cn.nukkit.command.selector.SelectorType.RANDOM_PLAYER;
-import static cn.nukkit.command.selector.SelectorType.SELF;
-import static cn.nukkit.command.selector.SelectorType.parseSelectorType;
+import static cn.nukkit.command.selector.SelectorType.*;
 
 /**
  * 目标选择器API<p/>

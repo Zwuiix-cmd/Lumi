@@ -2,10 +2,8 @@ package cn.nukkit.utils;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.recipe.CraftingRecipe;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public class RecipeUtils {

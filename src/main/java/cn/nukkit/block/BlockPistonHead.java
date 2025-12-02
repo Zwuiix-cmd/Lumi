@@ -1,11 +1,11 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.blockentity.impl.BlockEntityPistonArm;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.Faceable;
 
 /**
  * @author CreeperFace

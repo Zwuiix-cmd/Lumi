@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.level.Sound;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.level.Sound;
 
 public class BlockTrapdoorCherry extends BlockTrapdoor {
     public BlockTrapdoorCherry() {

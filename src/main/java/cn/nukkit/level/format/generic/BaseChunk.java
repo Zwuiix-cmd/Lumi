@@ -3,10 +3,10 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
-import cn.nukkit.level.ChunkException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

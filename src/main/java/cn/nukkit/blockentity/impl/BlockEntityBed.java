@@ -2,9 +2,9 @@ package cn.nukkit.blockentity.impl;
 
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by CreeperFace on 2.6.2017.

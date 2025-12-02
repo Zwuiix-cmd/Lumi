@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.Item;
 
 public class BlockWallMudBrick extends BlockWall {
 

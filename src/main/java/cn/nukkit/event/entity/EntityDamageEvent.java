@@ -3,8 +3,8 @@ package cn.nukkit.event.entity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.EffectType;
 import cn.nukkit.event.Cancellable;
-import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.EventException;
+import cn.nukkit.event.HandlerList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.EnumMap;

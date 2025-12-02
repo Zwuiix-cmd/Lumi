@@ -1,5 +1,6 @@
 package cn.nukkit;
 
+import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowDialog;
 import cn.nukkit.inventory.Inventory;
@@ -11,7 +12,6 @@ import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.PlayerFogPacket;
 import cn.nukkit.network.session.NetworkPlayerSession;
 import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.bossbar.DummyBossBar;
 import cn.nukkit.utils.LoginChainData;
 import com.google.common.cache.Cache;
 import com.google.common.collect.BiMap;

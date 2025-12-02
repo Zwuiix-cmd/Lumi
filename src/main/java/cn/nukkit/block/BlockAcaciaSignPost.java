@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemAcaciaSign;
 import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockAcaciaSignPost extends BlockSignPost {

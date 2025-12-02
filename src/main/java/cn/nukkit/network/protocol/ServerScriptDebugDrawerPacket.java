@@ -1,8 +1,6 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.debugshape.DebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
-import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
 import cn.nukkit.utils.BinaryStream;
 import lombok.*;
 
