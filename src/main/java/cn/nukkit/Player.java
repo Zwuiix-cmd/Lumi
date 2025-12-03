@@ -288,7 +288,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected AdventureSettings adventureSettings;
 
-    protected boolean checkMovement = true;
+    protected boolean checkMovement = false;
 
     private PermissibleBase perm;
     /**
