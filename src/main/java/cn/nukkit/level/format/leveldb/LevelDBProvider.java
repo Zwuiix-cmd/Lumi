@@ -707,7 +707,7 @@ public class LevelDBProvider implements LevelProvider {
         try {
             chunk = this.readChunk(chunkX, chunkZ);
         } catch (Exception ex) {
-            Server.getInstance().getLogger().error("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
+            Server.getInstance().getLogger().debug("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
         }
 
         if (chunk == null && create) {
