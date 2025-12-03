@@ -1053,7 +1053,7 @@ public class LevelDBProvider implements LevelProvider {
                         if (!skipCorrupted) {
                             throw e;
                         }
-                        log.error("Skipped corrupted chunk {} {}", chunkX, chunkZ, e);
+                        log.debug("Skipped corrupted chunk {} {}", chunkX, chunkZ, e);
                         continue;
                     }
                 }
