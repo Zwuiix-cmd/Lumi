@@ -3328,15 +3328,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                 } else if(this.riding instanceof EntityControllable entityControllable) {
-                    if (this.riding.getId() == authPacket.getPredictedVehicle() && this.riding.isControlling(this)) {
-                        double moveVecX = authPacket.getMotion().getX();
-                        double moveVecY = authPacket.getMotion().getY();
+                    double moveVecX = authPacket.getMotion().getX();
+                    double moveVecY = authPacket.getMotion().getY();
 
-                        if (this.temporalVector.setComponents(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ()).distanceSquared(this.riding) < 100) {
-                            entityControllable.onPlayerInput(this, moveVecX, moveVecY);
-                            ignoreCoordinateMove = true;
-                        }
-                    }
+                    this.temporalVector.setComponents(authPacket.getPosition().getX(), authPacket.getPosition().getY(), authPacket.getPosition().getZ());
+                    entityControllable.onPlayerInput(this, moveVecX, moveVecY);
+                    ignoreCoordinateMove = true;
                 }
 
                 if (authPacket.getInputData().contains(AuthInputAction.START_SPRINTING)) {
