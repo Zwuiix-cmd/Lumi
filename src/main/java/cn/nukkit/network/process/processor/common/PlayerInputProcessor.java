@@ -23,7 +23,7 @@ public class PlayerInputProcessor extends DataPacketProcessor<PlayerInputPacket>
     @Override
     public void handle(@NotNull PlayerHandle playerHandle, @NotNull PlayerInputPacket pk) {
         Player player = playerHandle.player;
-        if (!player.isAlive() || !player.spawned || !player.isMovementServerAuthoritative() || player.isLockMovementInput()) {
+        if (!player.isAlive() || !player.spawned || player.isMovementServerAuthoritative() || player.isLockMovementInput()) {
             return;
         }
 
@@ -55,6 +55,6 @@ public class PlayerInputProcessor extends DataPacketProcessor<PlayerInputPacket>
 
     @Override
     public boolean isSupported(int protocol) {
-        return protocol > ProtocolInfo.v1_20_0;
+        return protocol < ProtocolInfo.v1_21_80;
     }
 }
