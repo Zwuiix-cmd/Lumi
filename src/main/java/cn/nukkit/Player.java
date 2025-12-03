@@ -4531,6 +4531,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
 
                                 this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
+                                this.needSendInventory = true;
 
                                 if (!(this.distance(blockVector.asVector3()) > (this.isCreative() ? 13 : 7))) {
                                     if (this.isCreative()) {
@@ -4563,8 +4564,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 Block target = this.level.getBlock(blockVector.asVector3());
                                 block = target.getSide(face);
 
-                                this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NOGRAPHIC);
-                                this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
+                                this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NETWORK);
+                                this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NETWORK, 1);
 
                                 if (target instanceof BlockDoor) {
                                     BlockDoor door = (BlockDoor) target;
@@ -4576,8 +4577,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                         if (part.getId() == target.getId()) {
                                             target = part;
-                                            this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_NOGRAPHIC);
-                                            this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
+                                            this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_NETWORK);
+                                            this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NETWORK, 1);
                                         }
                                     }
                                 }
@@ -4614,6 +4615,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 if (blockVector.distanceSquared(this) < 10000) {
                                     target = this.level.getBlock(blockVector.asVector3());
                                     this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_ALL_PRIORITY, 1);
+                                    this.sendAllInventories();
 
                                     BlockEntity blockEntity = this.level.getBlockEntity(blockVector.asVector3());
                                     if (blockEntity instanceof BlockEntitySpawnable) {
@@ -4975,6 +4978,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             handItem = this.level.useBreakOn(blockPos.asVector3(), face, handItem, this, true);
             if (handItem == null) {
                 this.level.sendBlocks(new Player[]{this}, new Vector3[]{blockPos.asVector3()}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                this.sendAllInventories();
 
                 BlockEntity blockEntity = this.level.getBlockEntity(blockPos.asVector3());
                 if (blockEntity instanceof BlockEntitySpawnable) {
