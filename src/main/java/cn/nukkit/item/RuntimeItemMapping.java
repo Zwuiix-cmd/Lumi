@@ -320,8 +320,9 @@ public class RuntimeItemMapping {
         }
 
         if (runtimeEntry == null) {
-            throw new IllegalArgumentException("Unknown legacy2Runtime mapping: id=" + id + " meta=" + meta + " protocol=" + this.protocolId);
+            return this.legacy2Runtime.get(this.getFullId(0, 0)); // fallback air
         }
+        
         return runtimeEntry;
     }
 
