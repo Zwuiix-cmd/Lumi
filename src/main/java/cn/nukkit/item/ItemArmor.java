@@ -1,7 +1,6 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.trim.ItemTrimMaterialType;
 import cn.nukkit.item.trim.ItemTrimPatternType;
 import cn.nukkit.math.Vector3;

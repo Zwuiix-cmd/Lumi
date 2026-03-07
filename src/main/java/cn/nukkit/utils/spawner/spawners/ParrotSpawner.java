@@ -5,9 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.passive.EntityParrot;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.spawner.AbstractEntitySpawner;
 import cn.nukkit.utils.spawner.EntitySpawnerTask;
-import cn.nukkit.utils.Utils;
 
 public class ParrotSpawner extends AbstractEntitySpawner {
 

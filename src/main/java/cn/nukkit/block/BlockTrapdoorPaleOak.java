@@ -1,8 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.level.Sound;
-
 public class BlockTrapdoorPaleOak extends BlockTrapdoor {
     public BlockTrapdoorPaleOak() {
         this(0);

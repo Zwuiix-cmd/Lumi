@@ -1,16 +1,16 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.generator.object.mushroom.BigMushroom;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitRandom;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.item.data.DyeColor;
 
 import java.util.concurrent.ThreadLocalRandom;
 

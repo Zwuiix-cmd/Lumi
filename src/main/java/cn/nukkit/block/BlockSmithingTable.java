@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.inventory.SmithingInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.block.data.BlockColor;
 
 import javax.annotation.Nullable;
 

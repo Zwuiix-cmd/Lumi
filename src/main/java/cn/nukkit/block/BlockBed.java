@@ -22,7 +22,8 @@ import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.InternalPlugin;
-import cn.nukkit.utils.*;
+import cn.nukkit.utils.TextFormat;
+import cn.nukkit.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 /**

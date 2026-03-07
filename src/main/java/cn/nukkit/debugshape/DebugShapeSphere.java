@@ -4,7 +4,7 @@ import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
 import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class DebugShapeSphere extends DebugShape {
 

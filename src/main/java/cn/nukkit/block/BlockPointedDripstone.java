@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.customblock.properties.BooleanBlockProperty;
 import cn.nukkit.block.customblock.properties.EnumBlockProperty;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.enums.DripstoneThickness;
 import cn.nukkit.event.block.BlockFallEvent;
@@ -12,8 +14,6 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
 
 import java.util.Objects;
 import java.util.Random;

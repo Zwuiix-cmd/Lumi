@@ -5,7 +5,6 @@ import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBoneMeal;
-import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.BoneMealParticle;
 

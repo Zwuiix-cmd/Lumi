@@ -1,13 +1,15 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.item.Item;
+import cn.nukkit.item.material.tags.ItemTags;
+import cn.nukkit.recipe.CraftingRecipe;
+import cn.nukkit.recipe.Recipe;
+import cn.nukkit.recipe.RecipeType;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.ItemTagDescriptor;
-import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.material.tags.ItemTags;
-import cn.nukkit.recipe.*;
 import cn.nukkit.recipe.impl.*;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import lombok.ToString;
 
 import java.util.ArrayList;

@@ -1,12 +1,12 @@
 package cn.nukkit.recipe.impl;
 
-import cn.nukkit.recipe.descriptor.DefaultDescriptor;
-import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.registry.RecipeRegistry;
 import io.netty.util.collection.CharObjectHashMap;
 import lombok.Getter;

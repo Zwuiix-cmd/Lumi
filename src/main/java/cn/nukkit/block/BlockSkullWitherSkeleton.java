@@ -1,11 +1,14 @@
 package cn.nukkit.block;
 
+<<<<<<< HEAD
+=======
 import cn.nukkit.Player;
 import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 import org.jetbrains.annotations.NotNull;
 
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 public class BlockSkullWitherSkeleton extends BlockSkull {
 
     public BlockSkullWitherSkeleton() {

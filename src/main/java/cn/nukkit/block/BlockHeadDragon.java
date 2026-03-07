@@ -1,7 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
-
 public class BlockHeadDragon extends BlockSkull {
 
     public BlockHeadDragon() {

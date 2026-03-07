@@ -1,7 +1,6 @@
 package cn.nukkit.level.generator.structure;
 
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.ChunkManager;

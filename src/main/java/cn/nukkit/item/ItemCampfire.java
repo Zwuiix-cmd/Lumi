@@ -1,7 +1,6 @@
 package cn.nukkit.item;
 
 import cn.nukkit.block.BlockCampfire;
-import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemCampfire extends Item {
     public ItemCampfire() {

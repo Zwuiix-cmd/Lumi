@@ -5,8 +5,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemGunpowder;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemPaper;
-import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;
 
 import java.util.Collection;

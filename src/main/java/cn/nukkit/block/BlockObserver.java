@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.event.block.BlockRedstoneEvent;
 import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.item.Item;
@@ -9,7 +10,6 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.plugin.PluginManager;
-import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockObserver extends BlockSolidMeta implements Faceable {

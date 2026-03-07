@@ -2,13 +2,13 @@ package cn.nukkit.block;
 
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.LevelException;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.level.LevelException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

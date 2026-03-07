@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityTarget;
 import cn.nukkit.entity.Entity;
@@ -18,7 +19,6 @@ import cn.nukkit.math.BlockFace.Axis;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

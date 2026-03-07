@@ -1,8 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDoorAcacia;
-import cn.nukkit.block.data.BlockColor;
 
 public class BlockDoorAcacia extends BlockDoorWood {
 

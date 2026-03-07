@@ -3,8 +3,8 @@ package cn.nukkit.recipe.impl;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.RecipeType;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.registry.RecipeRegistry;
 
 import java.util.Collection;

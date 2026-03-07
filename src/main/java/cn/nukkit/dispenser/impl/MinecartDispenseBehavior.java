@@ -3,6 +3,7 @@ package cn.nukkit.dispenser.impl;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDispenser;
 import cn.nukkit.block.BlockRail;
+import cn.nukkit.block.data.Rail;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
@@ -11,7 +12,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.block.data.Rail;
 
 public class MinecartDispenseBehavior extends DefaultDispenseBehavior {
 

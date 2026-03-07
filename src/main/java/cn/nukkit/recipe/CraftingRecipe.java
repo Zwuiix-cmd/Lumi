@@ -1,7 +1,7 @@
 package cn.nukkit.recipe;
 
-import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 import cn.nukkit.item.Item;
+import cn.nukkit.recipe.impl.data.RecipeUnlockingRequirement;
 
 import java.util.List;
 import java.util.UUID;

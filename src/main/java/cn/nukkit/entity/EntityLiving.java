@@ -33,7 +33,10 @@ import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.TextPacket;
+<<<<<<< HEAD
+=======
 import cn.nukkit.network.protocol.types.SwingSource;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 
 import java.util.*;
 
@@ -117,7 +120,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     @Override
     public boolean canBeAffected(EffectType type) {
-        return true;
+        return !(this instanceof EntitySmite) || type != EffectType.REGENERATION && type != EffectType.POISON;
     }
 
     @Override

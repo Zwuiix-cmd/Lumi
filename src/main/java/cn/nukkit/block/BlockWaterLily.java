@@ -1,12 +1,12 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.block.data.BlockColor;
 
 /**
  * Created on 2015/12/1 by xtypr.

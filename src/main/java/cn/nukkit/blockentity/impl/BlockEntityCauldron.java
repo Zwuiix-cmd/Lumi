@@ -3,8 +3,12 @@ package cn.nukkit.blockentity.impl;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.data.BlockColor;
+<<<<<<< HEAD
+import cn.nukkit.blockentity.BlockEntity;
+=======
 import cn.nukkit.block.properties.enums.PotionType;
 import cn.nukkit.blockentity.BlockEntityID;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.FullChunk;

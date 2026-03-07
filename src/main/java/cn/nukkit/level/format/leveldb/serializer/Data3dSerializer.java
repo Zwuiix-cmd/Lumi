@@ -56,7 +56,7 @@ public class Data3dSerializer {
             for (int i = 0; i < biomes.length; i++) {
                 PalettedBlockStorage storage = readPalettedBiomes(buffer);
                 if (storage == null && i == 0) {
-                    throw new IllegalStateException("First biome palette can not point to previous!");
+                    continue;
                 }
 
                 if (storage == null) {

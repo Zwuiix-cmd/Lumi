@@ -5,7 +5,6 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.level.Position;
 
-import java.util.List;
 import java.util.Set;
 
 public class BlockExplodeEvent extends BlockEvent implements Cancellable {

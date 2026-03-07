@@ -23,7 +23,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * @author MagicDroidX

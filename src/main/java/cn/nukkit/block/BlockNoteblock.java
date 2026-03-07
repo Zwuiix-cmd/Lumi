@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityMusic;
 import cn.nukkit.event.player.PlayerInteractEvent;
@@ -14,7 +15,6 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.BlockEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.block.data.BlockColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

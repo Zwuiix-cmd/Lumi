@@ -3,8 +3,15 @@ package cn.nukkit.inventory.transaction;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.inventory.CraftItemEvent;
+<<<<<<< HEAD
+import cn.nukkit.inventory.BigCraftingGrid;
+import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.InventoryType;
+import cn.nukkit.inventory.SmithingInventory;
+=======
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.CraftingTakeResultAction;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
@@ -12,7 +19,8 @@ import cn.nukkit.network.protocol.ContainerClosePacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.network.protocol.types.inventory.ContainerType;
 import cn.nukkit.plugin.InternalPlugin;
-import cn.nukkit.recipe.*;
+import cn.nukkit.recipe.CraftingRecipe;
+import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.impl.MultiRecipe;

@@ -1,6 +1,5 @@
 package cn.nukkit.entity.projectile;
 
-import cn.nukkit.Difficulty;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.effect.Effect;
 import cn.nukkit.entity.effect.EffectType;

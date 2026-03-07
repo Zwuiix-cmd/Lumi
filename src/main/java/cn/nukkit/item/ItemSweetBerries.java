@@ -1,7 +1,6 @@
 package cn.nukkit.item;
 
 import cn.nukkit.block.BlockSweetBerryBush;
-import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemSweetBerries extends ItemFood {
 

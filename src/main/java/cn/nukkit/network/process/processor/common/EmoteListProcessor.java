@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.PlayerHandle;
 import cn.nukkit.network.process.DataPacketProcessor;
 import cn.nukkit.network.protocol.EmoteListPacket;
-import cn.nukkit.network.protocol.EmotePacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

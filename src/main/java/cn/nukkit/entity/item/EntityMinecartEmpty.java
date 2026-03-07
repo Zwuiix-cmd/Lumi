@@ -3,12 +3,12 @@ package cn.nukkit.entity.item;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.entity.data.MinecartType;
 import cn.nukkit.entity.passive.EntityWaterAnimal;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.entity.data.MinecartType;
 
 /**
  * Created by Snake1999 on 2016/1/30.

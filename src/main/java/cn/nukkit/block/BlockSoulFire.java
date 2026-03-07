@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.level.Level;
 import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.level.Level;
 
 public class BlockSoulFire extends BlockFire {
 

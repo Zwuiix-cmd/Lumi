@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 import cn.nukkit.event.block.DoorToggleEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
@@ -11,8 +13,6 @@ import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
 
 /**
  * Created on 2015/11/23 by xtypr.

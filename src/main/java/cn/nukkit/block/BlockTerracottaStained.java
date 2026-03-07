@@ -1,9 +1,9 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.block.data.TerracottaColor;
+import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created on 2015/12/2 by xtypr.

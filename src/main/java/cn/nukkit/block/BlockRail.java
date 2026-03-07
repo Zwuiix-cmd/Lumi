@@ -1,6 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
+import cn.nukkit.block.data.Rail;
+import cn.nukkit.block.data.Rail.Orientation;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemRail;
@@ -9,17 +13,13 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
-import cn.nukkit.block.data.Rail;
-import cn.nukkit.block.data.Rail.Orientation;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static cn.nukkit.math.BlockFace.*;
 import static cn.nukkit.block.data.Rail.Orientation.*;
+import static cn.nukkit.math.BlockFace.*;
 
 /**
  * Created by Snake1999 on 2016/1/11.

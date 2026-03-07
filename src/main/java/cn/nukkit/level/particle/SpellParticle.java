@@ -1,9 +1,9 @@
 package cn.nukkit.level.particle;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.block.data.BlockColor;
 
 /**
  * Created on 2015/12/27 by xtypr.

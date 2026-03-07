@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRail;
+import cn.nukkit.block.data.Rail;
 import cn.nukkit.entity.item.EntityMinecartTNT;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -10,7 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.block.data.Rail;
 
 public class ItemMinecartTNT extends Item {
 

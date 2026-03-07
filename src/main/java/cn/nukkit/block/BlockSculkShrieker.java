@@ -1,9 +1,9 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.block.data.BlockColor;
 
 public class BlockSculkShrieker extends BlockTransparent {
 

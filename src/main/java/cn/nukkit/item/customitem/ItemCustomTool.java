@@ -1,6 +1,9 @@
 package cn.nukkit.item.customitem;
 
-import cn.nukkit.item.*;
+import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.StringItem;
+import cn.nukkit.item.StringItemToolBase;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.registry.Registries;

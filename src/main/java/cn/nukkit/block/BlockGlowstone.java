@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemGlowstoneDust;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.MathHelper;
-import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.utils.Utils;
 
 /**

@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
@@ -13,7 +14,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;

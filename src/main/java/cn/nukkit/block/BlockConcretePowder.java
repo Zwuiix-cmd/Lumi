@@ -1,12 +1,12 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.data.DyeColor;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.item.data.DyeColor;
 
 /**
  * Created by CreeperFace on 2.6.2017.

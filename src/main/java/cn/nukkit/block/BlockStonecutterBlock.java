@@ -1,12 +1,15 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+<<<<<<< HEAD
+import cn.nukkit.block.data.Faceable;
+=======
 import cn.nukkit.inventory.StonecutterInventory;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.block.data.Faceable;
 
 public class BlockStonecutterBlock extends BlockSolidMeta implements Faceable {
 

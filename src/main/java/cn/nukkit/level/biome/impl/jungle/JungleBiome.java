@@ -1,6 +1,5 @@
 package cn.nukkit.level.biome.impl.jungle;
 
-import cn.nukkit.block.BlockFlower;
 import cn.nukkit.level.biome.type.GrassyBiome;
 import cn.nukkit.level.generator.populator.impl.PopulatorBambooForest;
 import cn.nukkit.level.generator.populator.impl.PopulatorFlower;
