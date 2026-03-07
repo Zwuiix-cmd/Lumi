@@ -1,6 +1,7 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockLog;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitRandom;
 

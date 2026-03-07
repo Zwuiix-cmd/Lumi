@@ -12,8 +12,8 @@ import java.util.UUID;
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
- * @see cn.nukkit.Player
- * @see cn.nukkit.OfflinePlayer
+ * @see Player
+ * @see OfflinePlayer
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 public interface IPlayer extends ServerOperator, Metadatable {
@@ -29,9 +29,9 @@ public interface IPlayer extends ServerOperator, Metadatable {
     /**
      * Returns the name of this player.
      *
-     * 如果是在线的玩家，这个函数只会返回登录名字。如果要返回显示的名字，参见{@link cn.nukkit.Player#getDisplayName}<br>
+     * 如果是在线的玩家，这个函数只会返回登录名字。如果要返回显示的名字，参见{@link Player#getDisplayName}<br>
      * Notice that this will only return its login name. If you need its display name, turn to
-     * {@link cn.nukkit.Player#getDisplayName}
+     * {@link Player#getDisplayName}
      *
      * @return 这个玩家的名称。<br>The name of this player.
      * @since Nukkit 1.0 | Nukkit API 1.0.0
@@ -63,7 +63,7 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * Returns if this player is pardoned by whitelist.
      *
      * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
-     * @see cn.nukkit.Server#isWhitelisted
+     * @see Server#isWhitelisted
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     boolean isWhitelisted();
@@ -74,8 +74,8 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @param value 如果为{@code true}，把玩家加入白名单。如果为{@code false}，取消这个玩家的白名单。<br>
      *              {@code true} for add and {@code false} for remove.
      * @see #isWhitelisted
-     * @see cn.nukkit.Server#addWhitelist
-     * @see cn.nukkit.Server#removeWhitelist
+     * @see Server#addWhitelist
+     * @see Server#removeWhitelist
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     void setWhitelisted(boolean value);
@@ -84,7 +84,7 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * Returns a {@code Player} object for this interface.
      *
      * @return 这个接口的 {@code Player}对象。<br>a {@code Player} object for this interface.
-     * @see cn.nukkit.Server#getPlayerExact
+     * @see Server#getPlayerExact
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     Player getPlayer();

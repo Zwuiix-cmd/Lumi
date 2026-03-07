@@ -5,17 +5,12 @@ import cn.nukkit.entity.data.skin.PersonaPiece;
 import cn.nukkit.entity.data.skin.PersonaPieceTint;
 import cn.nukkit.entity.data.skin.Skin;
 import cn.nukkit.entity.data.skin.SkinAnimation;
-<<<<<<< HEAD
-import cn.nukkit.utils.ClientChainData;
-import cn.nukkit.utils.SerializedImage;
-=======
 import cn.nukkit.network.encryption.EncryptionUtils;
 import cn.nukkit.network.protocol.types.auth.AuthPayload;
 import cn.nukkit.network.protocol.types.auth.AuthType;
 import cn.nukkit.network.protocol.types.auth.CertificateChainPayload;
 import cn.nukkit.network.protocol.types.auth.TokenPayload;
 import cn.nukkit.utils.*;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

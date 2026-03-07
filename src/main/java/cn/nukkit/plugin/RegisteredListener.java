@@ -1,6 +1,10 @@
 package cn.nukkit.plugin;
 
-import cn.nukkit.event.*;
+import cn.nukkit.event.Cancellable;
+import cn.nukkit.event.Event;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.Listener;
+import cn.nukkit.event.EventException;
 
 /**
  * @author MagicDroidX

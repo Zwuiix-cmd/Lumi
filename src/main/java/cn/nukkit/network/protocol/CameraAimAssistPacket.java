@@ -43,8 +43,8 @@ public class CameraAimAssistPacket extends DataPacket {
         }
         this.setViewAngle(this.getVector2f());
         this.setDistance(this.getFloat());
-        this.setTargetMode(CameraAimAssistPacket.TargetMode.values()[this.getByte()]);
-        this.setAction(CameraAimAssistPacket.Action.values()[this.getByte()]);
+        this.setTargetMode(TargetMode.values()[this.getByte()]);
+        this.setAction(Action.values()[this.getByte()]);
         if (protocol >= ProtocolInfo.v1_21_100) {
             this.setShowDebugRender(this.getBoolean());
         }

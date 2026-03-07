@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemNamespaceId;
+import cn.nukkit.item.ItemSpruceSign;
 
 public class BlockSpruceSignPost extends BlockSignPost {
 

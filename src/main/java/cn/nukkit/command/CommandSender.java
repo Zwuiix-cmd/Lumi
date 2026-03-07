@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
- * @see cn.nukkit.command.CommandExecutor#onCommand
+ * @see CommandExecutor#onCommand
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 public interface CommandSender extends Permissible {
@@ -73,8 +73,8 @@ public interface CommandSender extends Permissible {
      * {@code if (sender instanceof ConsoleCommandSender) .....;}
      *
      * @return 命令发送者的名称。<br>the name of the command sender.
-     * @see cn.nukkit.Player#getName()
-     * @see cn.nukkit.command.ConsoleCommandSender#getName()
+     * @see Player#getName()
+     * @see ConsoleCommandSender#getName()
      * @see cn.nukkit.plugin.PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */

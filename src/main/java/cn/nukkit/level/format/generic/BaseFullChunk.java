@@ -1,11 +1,8 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
-<<<<<<< HEAD
-=======
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.PersistentDataContainerBlockEntity;
 import cn.nukkit.entity.Entity;

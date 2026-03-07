@@ -1,5 +1,6 @@
 package cn.nukkit.block.customblock;
 
+import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFallableMeta;
 import cn.nukkit.block.BlockMeta;
@@ -7,6 +8,8 @@ import cn.nukkit.block.customblock.properties.BlockProperties;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.item.Item;
 import cn.nukkit.registry.Registries;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 

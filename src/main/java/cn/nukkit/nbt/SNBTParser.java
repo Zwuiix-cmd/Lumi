@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class SNBTParser {
-    private final cn.nukkit.nbt.snbt.Node root;
+    private final Node root;
 
     private SNBTParser(@NotNull String SNBT) {
         SNBTParserImplement parser = new SNBTParserImplement(new StringReader(SNBT));

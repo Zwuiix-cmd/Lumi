@@ -4,7 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.registry.Registries;
 
-import java.awt.*;
+import java.awt.Color;
 
 public abstract class Effect implements Cloneable {
 

@@ -61,7 +61,7 @@ public class EncryptionUtils {
     private static final KeyPairGenerator KEY_PAIR_GEN;
 
     public static final String ALGORITHM_TYPE = AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384;
-    private static final org.jose4j.jwa.AlgorithmConstraints ALGORITHM_CONSTRAINTS =
+    private static final AlgorithmConstraints ALGORITHM_CONSTRAINTS =
             new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.PERMIT, ALGORITHM_TYPE);
 
     private static final String DISCOVERY_ENDPOINT =

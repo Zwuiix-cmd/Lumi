@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.data.Faceable;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.impl.BlockEntityDispenser;
 import cn.nukkit.dispenser.DispenseBehavior;
@@ -15,6 +14,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.registry.Registries;
+import cn.nukkit.block.data.Faceable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map.Entry;

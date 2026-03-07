@@ -22,7 +22,7 @@ import java.util.Locale;
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
- * @see cn.nukkit.plugin.PluginDescription
+ * @see PluginDescription
  */
 abstract public class PluginBase implements Plugin {
 
@@ -281,7 +281,7 @@ abstract public class PluginBase implements Plugin {
      * {@code HelloWorld v1.0.0}
      *
      * @return 这个插件完整的名字。<br>The full name of this plugin.
-     * @see cn.nukkit.plugin.PluginDescription#getFullName
+     * @see PluginDescription#getFullName
      */
     public final String getFullName() {
         return this.description.getFullName();

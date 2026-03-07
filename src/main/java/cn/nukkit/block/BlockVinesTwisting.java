@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockVinesTwisting extends BlockVinesNether {
 

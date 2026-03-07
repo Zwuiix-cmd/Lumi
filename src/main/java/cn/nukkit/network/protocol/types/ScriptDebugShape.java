@@ -4,7 +4,7 @@ import cn.nukkit.math.Vector3f;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Color;
 
 @Value
 public class ScriptDebugShape {

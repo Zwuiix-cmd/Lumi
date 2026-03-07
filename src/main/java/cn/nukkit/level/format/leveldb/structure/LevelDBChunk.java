@@ -11,13 +11,13 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.util.BitArrayVersion;
-import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.utils.compression.Zlib;
 import org.jetbrains.annotations.NotNull;
 
@@ -270,12 +270,12 @@ public class LevelDBChunk extends BaseChunk {
     }
 
     @Override
-    public void setBiome(int x, int y, int z, cn.nukkit.level.biome.Biome biome) {
+    public void setBiome(int x, int y, int z, Biome biome) {
         this.setBiomeId(x, y, z, biome.getId());
     }
 
     @Override
-    public void setBiome(int x, int z, cn.nukkit.level.biome.Biome biome) {
+    public void setBiome(int x, int z, Biome biome) {
         setBiomeId(x, z, biome.getId());
     }
 

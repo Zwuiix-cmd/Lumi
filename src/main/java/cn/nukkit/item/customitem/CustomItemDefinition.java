@@ -27,9 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * CustomBlockDefinition用于获得发送给客户端的物品行为包数据。{@link CustomItemDefinition.SimpleBuilder}中提供的方法都是控制发送给客户端数据，如果需要控制服务端部分行为，请覆写{@link cn.nukkit.item.Item Item}中的方法。
+ * CustomBlockDefinition用于获得发送给客户端的物品行为包数据。{@link SimpleBuilder}中提供的方法都是控制发送给客户端数据，如果需要控制服务端部分行为，请覆写{@link Item Item}中的方法。
  * <p>
- * CustomBlockDefinition is used to get the data of the item behavior_pack sent to the client. The methods provided in {@link CustomItemDefinition.SimpleBuilder} control the data sent to the client, if you need to control some of the server-side behavior, please override the methods in {@link cn.nukkit.item.Item Item}.
+ * CustomBlockDefinition is used to get the data of the item behavior_pack sent to the client. The methods provided in {@link SimpleBuilder} control the data sent to the client, if you need to control some of the server-side behavior, please override the methods in {@link Item Item}.
  */
 @Log4j2
 public class CustomItemDefinition {
@@ -100,8 +100,8 @@ public class CustomItemDefinition {
     }
 
     @Deprecated
-    public static CustomItemDefinition.SimpleBuilder customBuilder(CustomItem item, ItemCreativeCategory creativeCategory) {
-        return new CustomItemDefinition.SimpleBuilder(item, creativeCategory);
+    public static SimpleBuilder customBuilder(CustomItem item, ItemCreativeCategory creativeCategory) {
+        return new SimpleBuilder(item, creativeCategory);
     }
 
     /**
@@ -113,13 +113,13 @@ public class CustomItemDefinition {
      * @param creativeCategory the creative category
      * @return the custom item definition . simple builder
      */
-    public static CustomItemDefinition.SimpleBuilder customBuilder(CustomItem item, CreativeItemCategory creativeCategory) {
-        return new CustomItemDefinition.SimpleBuilder(item, creativeCategory);
+    public static SimpleBuilder customBuilder(CustomItem item, CreativeItemCategory creativeCategory) {
+        return new SimpleBuilder(item, creativeCategory);
     }
 
     @Deprecated
-    public static CustomItemDefinition.SimpleBuilder simpleBuilder(ItemCustom item, ItemCreativeCategory creativeCategory) {
-        return new CustomItemDefinition.SimpleBuilder(item, creativeCategory);
+    public static SimpleBuilder simpleBuilder(ItemCustom item, ItemCreativeCategory creativeCategory) {
+        return new SimpleBuilder(item, creativeCategory);
     }
 
     /**
@@ -130,13 +130,13 @@ public class CustomItemDefinition {
      * @param item             the item
      * @param creativeCategory the creative category
      */
-    public static CustomItemDefinition.SimpleBuilder simpleBuilder(ItemCustom item, CreativeItemCategory creativeCategory) {
-        return new CustomItemDefinition.SimpleBuilder(item, creativeCategory);
+    public static SimpleBuilder simpleBuilder(ItemCustom item, CreativeItemCategory creativeCategory) {
+        return new SimpleBuilder(item, creativeCategory);
     }
 
     @Deprecated
-    public static CustomItemDefinition.ToolBuilder toolBuilder(ItemCustomTool item, ItemCreativeCategory creativeCategory) {
-        return new CustomItemDefinition.ToolBuilder(item, creativeCategory);
+    public static ToolBuilder toolBuilder(ItemCustomTool item, ItemCreativeCategory creativeCategory) {
+        return new ToolBuilder(item, creativeCategory);
     }
 
     /**
@@ -147,13 +147,13 @@ public class CustomItemDefinition {
      * @param item             the item
      * @param creativeCategory the creative category
      */
-    public static CustomItemDefinition.ToolBuilder toolBuilder(ItemCustomTool item, CreativeItemCategory creativeCategory) {
-        return new CustomItemDefinition.ToolBuilder(item, creativeCategory);
+    public static ToolBuilder toolBuilder(ItemCustomTool item, CreativeItemCategory creativeCategory) {
+        return new ToolBuilder(item, creativeCategory);
     }
 
     @Deprecated
-    public static CustomItemDefinition.ArmorBuilder armorBuilder(ItemCustomArmor item, ItemCreativeCategory creativeCategory) {
-        return new CustomItemDefinition.ArmorBuilder(item, creativeCategory);
+    public static ArmorBuilder armorBuilder(ItemCustomArmor item, ItemCreativeCategory creativeCategory) {
+        return new ArmorBuilder(item, creativeCategory);
     }
 
     /**
@@ -164,13 +164,13 @@ public class CustomItemDefinition {
      * @param item             the item
      * @param creativeCategory the creative category
      */
-    public static CustomItemDefinition.ArmorBuilder armorBuilder(ItemCustomArmor item, CreativeItemCategory creativeCategory) {
-        return new CustomItemDefinition.ArmorBuilder(item, creativeCategory);
+    public static ArmorBuilder armorBuilder(ItemCustomArmor item, CreativeItemCategory creativeCategory) {
+        return new ArmorBuilder(item, creativeCategory);
     }
 
     @Deprecated
-    public static CustomItemDefinition.EdibleBuilder edibleBuilder(ItemCustomFood item, ItemCreativeCategory creativeCategory) {
-        return new CustomItemDefinition.EdibleBuilder(item, creativeCategory);
+    public static EdibleBuilder edibleBuilder(ItemCustomFood item, ItemCreativeCategory creativeCategory) {
+        return new EdibleBuilder(item, creativeCategory);
     }
 
     /**
@@ -181,8 +181,8 @@ public class CustomItemDefinition {
      * @param item             the item
      * @param creativeCategory the creative category
      */
-    public static CustomItemDefinition.EdibleBuilder edibleBuilder(ItemCustomFood item, CreativeItemCategory creativeCategory) {
-        return new CustomItemDefinition.EdibleBuilder(item, creativeCategory);
+    public static EdibleBuilder edibleBuilder(ItemCustomFood item, CreativeItemCategory creativeCategory) {
+        return new EdibleBuilder(item, creativeCategory);
     }
 
     @Nullable

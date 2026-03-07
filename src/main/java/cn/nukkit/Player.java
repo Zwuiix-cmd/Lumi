@@ -2,6 +2,7 @@ package cn.nukkit;
 
 import cn.nukkit.AdventureSettings.Type;
 import cn.nukkit.block.*;
+import cn.nukkit.block.customblock.CustomBlock;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
@@ -289,7 +290,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected AdventureSettings adventureSettings;
 
-    protected boolean checkMovement = false;
+    protected boolean checkMovement = true;
 
     private PermissibleBase perm;
     /**
@@ -3014,14 +3015,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.data = 65535 / breakTick;
                 this.getLevel().addChunkPacket(this.breakingBlock.getFloorX() >> 4, this.breakingBlock.getFloorZ() >> 4, pk);
                 this.level.addParticle(new PunchBlockParticle(pos, block, face));
-
-                var timeDiff = time - breakingBlockTime;
-                blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
-                if (blockBreakProgress > 0.999999999999999999999) {
-                    this.onBlockBreakAbort(pos, face);
-                    this.onBlockBreakComplete(pos.asBlockVector3(), face);
+                if (this.breakingBlock instanceof CustomBlock) {
+                    var timeDiff = time - breakingBlockTime;
+                    blockBreakProgress += timeDiff / (miningTimeRequired * 1000);
+                    if (blockBreakProgress > 0.999999999999999999999) {
+                        this.onBlockBreakAbort(pos, face);
+                        this.onBlockBreakComplete(pos.asBlockVector3(), face);
+                    }
+                    breakingBlockTime = time;
                 }
-                breakingBlockTime = time;
             }
         }
     }
@@ -3109,7 +3111,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             handItem = this.level.useBreakOn(blockPos.asVector3(), face, handItem, this, true);
             if (handItem == null) {
                 this.level.sendBlocks(new Player[]{this}, new Vector3[]{blockPos.asVector3()}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
-                this.sendAllInventories();
 
                 BlockEntity blockEntity = this.level.getBlockEntity(blockPos.asVector3());
                 if (blockEntity instanceof BlockEntitySpawnable) {

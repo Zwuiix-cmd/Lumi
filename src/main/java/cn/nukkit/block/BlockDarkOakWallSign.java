@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDarkOakSign;
 import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockDarkOakWallSign extends BlockWallSign {

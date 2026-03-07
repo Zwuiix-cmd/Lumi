@@ -71,10 +71,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.settings.WorldSettings;
-import cn.nukkit.utils.Hash;
-import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.TextFormat;
-import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.*;
 import cn.nukkit.utils.collection.nb.Long2ObjectNonBlockingMap;
 import cn.nukkit.utils.collection.nb.LongObjectEntry;
 import com.google.common.base.Preconditions;
@@ -2727,7 +2724,6 @@ public class Level implements ChunkManager, Metadatable {
 
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
-                player.setNeedSendInventory(true);
                 return null;
             }
 

@@ -27,24 +27,24 @@ import java.util.function.Consumer;
 @Log4j2
 public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
 
-    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, String texture) {
+    public static Builder builder(CustomBlock customBlock, String texture) {
         return builder(customBlock, Materials.builder().any(Materials.RenderMethod.OPAQUE, texture), CreativeItemCategory.CONSTRUCTION);
     }
 
-    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, String texture, CreativeItemCategory blockCreativeCategory) {
+    public static Builder builder(CustomBlock customBlock, String texture, CreativeItemCategory blockCreativeCategory) {
         return builder(customBlock, Materials.builder().any(Materials.RenderMethod.OPAQUE, texture), blockCreativeCategory);
     }
 
-    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, Materials materials) {
+    public static Builder builder(CustomBlock customBlock, Materials materials) {
         return builder(customBlock, materials, CreativeItemCategory.CONSTRUCTION);
     }
 
-    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock) {
-        return new CustomBlockDefinition.Builder(customBlock, null, CreativeItemCategory.CONSTRUCTION);
+    public static Builder builder(CustomBlock customBlock) {
+        return new Builder(customBlock, null, CreativeItemCategory.CONSTRUCTION);
     }
 
-    public static CustomBlockDefinition.Builder builder(CustomBlock customBlock, CreativeItemCategory blockCreativeCategory) {
-        return new CustomBlockDefinition.Builder(customBlock, null, blockCreativeCategory);
+    public static Builder builder(CustomBlock customBlock, CreativeItemCategory blockCreativeCategory) {
+        return new Builder(customBlock, null, blockCreativeCategory);
     }
 
     /**
@@ -55,8 +55,8 @@ public record CustomBlockDefinition(String identifier, CompoundTag nbt) {
      * @param blockCreativeCategory 自定义方块在创造栏的大分类<br>the block creative category
      * @return the custom block definition builder.
      */
-    public static CustomBlockDefinition.Builder builder(@NotNull CustomBlock customBlock, @NotNull Materials materials, CreativeItemCategory blockCreativeCategory) {
-        return new CustomBlockDefinition.Builder(customBlock, materials, blockCreativeCategory);
+    public static Builder builder(@NotNull CustomBlock customBlock, @NotNull Materials materials, CreativeItemCategory blockCreativeCategory) {
+        return new Builder(customBlock, materials, blockCreativeCategory);
     }
 
     public static class Builder {

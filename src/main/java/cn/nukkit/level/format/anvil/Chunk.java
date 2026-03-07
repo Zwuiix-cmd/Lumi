@@ -5,16 +5,16 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.anvil.palette.BiomePalette;
 import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
-import cn.nukkit.level.util.BlockUpdateEntry;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
 import cn.nukkit.registry.Registries;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.level.util.BlockUpdateEntry;
+import cn.nukkit.level.ChunkException;
 import cn.nukkit.utils.compression.Zlib;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -473,8 +473,8 @@ public class Chunk extends BaseChunk {
     @Override
     public int getBlockSkyLight(int x, int y, int z) {
         cn.nukkit.level.format.ChunkSection section = this.sections[y >> 4];
-        if (section instanceof cn.nukkit.level.format.anvil.ChunkSection) {
-            cn.nukkit.level.format.anvil.ChunkSection anvilSection = (cn.nukkit.level.format.anvil.ChunkSection) section;
+        if (section instanceof ChunkSection) {
+            ChunkSection anvilSection = (ChunkSection) section;
             if (anvilSection.skyLight != null) {
                 return section.getBlockSkyLight(x, y & 0x0f, z);
             } else if (!anvilSection.hasSkyLight) {
@@ -497,8 +497,8 @@ public class Chunk extends BaseChunk {
     @Override
     public int getBlockLight(int x, int y, int z) {
         cn.nukkit.level.format.ChunkSection section = this.sections[y >> 4];
-        if (section instanceof cn.nukkit.level.format.anvil.ChunkSection) {
-            cn.nukkit.level.format.anvil.ChunkSection anvilSection = (cn.nukkit.level.format.anvil.ChunkSection) section;
+        if (section instanceof ChunkSection) {
+            ChunkSection anvilSection = (ChunkSection) section;
             if (anvilSection.blockLight != null) {
                 return section.getBlockLight(x, y & 0x0f, z);
             } else if (!anvilSection.hasBlockLight) {

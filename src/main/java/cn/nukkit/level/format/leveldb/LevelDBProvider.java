@@ -22,9 +22,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.plugin.InternalPlugin;
 import cn.nukkit.scheduler.Task;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.BinaryStream;
-import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.*;
@@ -711,7 +709,7 @@ public class LevelDBProvider implements LevelProvider {
         try {
             chunk = this.readChunk(chunkX, chunkZ);
         } catch (Exception ex) {
-            Server.getInstance().getLogger().debug("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
+            Server.getInstance().getLogger().error("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
         }
 
         if (chunk == null && create) {
@@ -746,7 +744,7 @@ public class LevelDBProvider implements LevelProvider {
             try {
                 if (!this.executor.awaitTermination(10, TimeUnit.MINUTES)) {
                     log.warn("LevelDB executor did not terminate in time, forcing shutdown for: {}", this.getName());
-                    java.util.List<Runnable> droppedTasks = this.executor.shutdownNow();
+                    List<Runnable> droppedTasks = this.executor.shutdownNow();
                     if (!droppedTasks.isEmpty()) {
                         log.warn("Dropped {} pending tasks during forced shutdown", droppedTasks.size());
                     }
@@ -1105,7 +1103,7 @@ public class LevelDBProvider implements LevelProvider {
                         if (!skipCorrupted) {
                             throw e;
                         }
-                        log.debug("Skipped corrupted chunk {} {}", chunkX, chunkZ, e);
+                        log.error("Skipped corrupted chunk {} {}", chunkX, chunkZ, e);
                         continue;
                     }
                 }

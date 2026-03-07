@@ -5,12 +5,7 @@ import cn.nukkit.block.BlockSkull;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
-<<<<<<< HEAD
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemLapisLazuli;
-=======
 import cn.nukkit.item.*;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;

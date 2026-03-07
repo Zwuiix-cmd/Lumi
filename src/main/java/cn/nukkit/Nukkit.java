@@ -88,7 +88,7 @@ public class Nukkit {
 
         log.debug("Stopping other threads...");
 
-        for (Thread thread : java.lang.Thread.getAllStackTraces().keySet()) {
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
             if (!(thread instanceof InterruptibleThread)) {
                 continue;
             }
@@ -133,13 +133,13 @@ public class Nukkit {
     public static void setLogLevel(Level level) {
         Preconditions.checkNotNull(level, "level");
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME);
+        LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
         loggerConfig.setLevel(level);
         ctx.updateLoggers();
     }
 
     public static Level getLogLevel() {
-        return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME).getLevel();
+        return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME).getLevel();
     }
 
     public static String getBranch() {

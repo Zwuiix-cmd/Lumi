@@ -1,10 +1,8 @@
 package cn.nukkit.network.protocol;
 
-<<<<<<< HEAD
-=======
 import cn.nukkit.math.Vector3f;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.network.protocol.types.ScriptDebugShape;
+import cn.nukkit.network.protocol.types.ScriptDebugShapeType;
 import cn.nukkit.utils.BinaryStream;
 import lombok.*;
 import java.awt.Color;

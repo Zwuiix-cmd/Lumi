@@ -6,7 +6,7 @@ package cn.nukkit.permission;
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project
- * @see cn.nukkit.permission.Permissible
+ * @see Permissible
  */
 public interface ServerOperator {
 

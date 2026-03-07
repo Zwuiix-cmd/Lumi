@@ -2,7 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.customblock.properties.BlockProperties;
-import cn.nukkit.block.data.Faceable;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
 import cn.nukkit.block.properties.VanillaProperties;
 import cn.nukkit.event.block.BlockGrowEvent;
@@ -14,6 +13,7 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.block.data.Faceable;
 
 public class BlockDripleafSmall extends BlockFlowable implements BlockPropertiesHelper, Faceable {
 

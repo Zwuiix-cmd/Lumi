@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author null(javadoc) @ Nukkit Project
- * @see cn.nukkit.event.Listener
- * @see cn.nukkit.event.Event
+ * @see Listener
+ * @see Event
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 

@@ -3,15 +3,11 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.level.ChunkException;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
-<<<<<<< HEAD
-=======
 import cn.nukkit.level.ChunkException;
 import cn.nukkit.registry.Registries;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

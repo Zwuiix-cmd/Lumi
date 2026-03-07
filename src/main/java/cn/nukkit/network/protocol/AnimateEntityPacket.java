@@ -75,7 +75,7 @@ public class AnimateEntityPacket extends DataPacket {
 
     /**
      * 包含一个实体动画的信息的记录类<br/>
-     * 用于{@link cn.nukkit.network.protocol.AnimateEntityPacket}网络包
+     * 用于{@link AnimateEntityPacket}网络包
      */
     @Builder
     public static class Animation {

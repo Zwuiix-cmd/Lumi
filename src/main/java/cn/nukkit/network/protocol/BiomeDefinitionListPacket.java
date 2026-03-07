@@ -19,8 +19,8 @@ import lombok.Value;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.zip.Deflater;
 
 @ToString()
@@ -237,7 +237,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
     }
 
     @SuppressWarnings({"NullableProblems", "SuspiciousMethodCalls"})
-    private static class SequencedHashSet<E> implements java.util.List<E> {
+    private static class SequencedHashSet<E> implements List<E> {
 
         private final Object2IntMap<E> map = new Object2IntLinkedOpenHashMap<>();
         private final Int2ObjectMap<E> inverse = new Int2ObjectLinkedOpenHashMap<>();

@@ -1,8 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
 import cn.nukkit.event.block.BlockRedstoneEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -11,6 +9,8 @@ import cn.nukkit.level.sound.LeverSound;
 import cn.nukkit.level.vibration.VanillaVibrationTypes;
 import cn.nukkit.level.vibration.VibrationEvent;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 
 /**
  * @author Nukkit Project Team
