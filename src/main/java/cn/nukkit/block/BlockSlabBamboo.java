@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
-import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.block.data.BlockColor;
 
 public class BlockSlabBamboo extends BlockSlab {
     public BlockSlabBamboo() {

@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.block.material.tags.BlockTags;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
@@ -9,6 +8,7 @@ import cn.nukkit.event.block.BlockHarvestEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemNamespaceId;
 import cn.nukkit.item.ItemSweetBerries;
 import cn.nukkit.level.Level;
@@ -17,6 +17,8 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.MathHelper;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.item.data.DyeColor;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ThreadLocalRandom;

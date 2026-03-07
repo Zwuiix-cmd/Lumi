@@ -2,8 +2,7 @@ package cn.nukkit.entity.data.skin;
 
 import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
-import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.SerializedImage;
+import cn.nukkit.utils.*;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import lombok.ToString;
@@ -12,8 +11,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author MagicDroidX

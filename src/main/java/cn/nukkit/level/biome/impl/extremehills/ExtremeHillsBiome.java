@@ -1,6 +1,7 @@
 package cn.nukkit.level.biome.impl.extremehills;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.biome.type.GrassyBiome;

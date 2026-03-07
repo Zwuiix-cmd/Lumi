@@ -1,5 +1,6 @@
 package cn.nukkit.level.vibration;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.material.tags.BlockInternalTags;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.level.VibrationArriveEvent;

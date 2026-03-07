@@ -2,8 +2,11 @@ package cn.nukkit.item.material.tags;
 
 import cn.nukkit.item.material.ItemType;
 import cn.nukkit.item.material.tags.impl.LazyItemTag;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is generated automatically, do not change it manually.

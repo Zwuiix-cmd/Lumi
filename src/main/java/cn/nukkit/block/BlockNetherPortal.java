@@ -1,7 +1,5 @@
 package cn.nukkit.block;
 
-import cn.nukkit.block.data.BlockColor;
-import cn.nukkit.block.data.Faceable;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
@@ -11,6 +9,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Axis;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.block.data.BlockColor;
+import cn.nukkit.block.data.Faceable;
 
 /**
  * Created on 2016/1/5 by xtypr.

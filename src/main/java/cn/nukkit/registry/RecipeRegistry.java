@@ -10,7 +10,6 @@ import cn.nukkit.recipe.CraftingRecipe;
 import cn.nukkit.recipe.descriptor.DefaultDescriptor;
 import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.Recipe;
-import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.impl.*;
 import cn.nukkit.recipe.impl.special.*;
 import cn.nukkit.recipe.parser.RecipeParser;

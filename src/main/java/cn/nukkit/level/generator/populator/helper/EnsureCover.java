@@ -2,7 +2,9 @@ package cn.nukkit.level.generator.populator.helper;
 
 import cn.nukkit.level.format.FullChunk;
 
-import static cn.nukkit.block.BlockID.*;
+import static cn.nukkit.block.BlockID.AIR;
+import static cn.nukkit.block.BlockID.SNOW_LAYER;
+import static cn.nukkit.block.BlockID.STILL_WATER;
 
 /**
  * @author DaPorkchop_

@@ -1,11 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-<<<<<<< HEAD
-import cn.nukkit.block.data.BlockColor;
-=======
 import cn.nukkit.block.material.tags.BlockTags;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -19,11 +15,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.network.protocol.AnimatePacket;
-<<<<<<< HEAD
-=======
 import cn.nukkit.block.data.BlockColor;
 import cn.nukkit.network.protocol.types.SwingSource;
->>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;

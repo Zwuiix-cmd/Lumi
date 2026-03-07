@@ -2,8 +2,11 @@ package cn.nukkit.block.material.tags;
 
 import cn.nukkit.block.material.BlockType;
 import cn.nukkit.block.material.tags.impl.LazyBlockTag;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is generated automatically, do not change it manually.

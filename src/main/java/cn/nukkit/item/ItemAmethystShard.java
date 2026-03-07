@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.item.trim.ItemTrimMaterialType;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * @author MagicDroidX

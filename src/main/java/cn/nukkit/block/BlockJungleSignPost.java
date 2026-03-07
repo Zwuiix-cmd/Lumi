@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemJungleSign;
 import cn.nukkit.item.ItemNamespaceId;
 
 public class BlockJungleSignPost extends BlockSignPost {

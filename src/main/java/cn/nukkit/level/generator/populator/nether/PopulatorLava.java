@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator.populator.nether;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
