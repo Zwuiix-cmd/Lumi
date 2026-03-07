@@ -41,15 +41,19 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(BLUE_DYE, ItemDyeBlue::new);
         register(BLUE_EGG, ItemBlueEgg::new);
         register(BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSmithingTemplateArmorTrimBolt::new);
+        register(BONE, ItemBone::new);
         register(BONE_MEAL, ItemBoneMeal::new);
+        register(BOWL, ItemBowl::new);
         register(BREEZE_ROD, ItemBreezeRod::new);
         register(BREWER_POTTERY_SHERD, ItemBrewerPotterySherd::new);
         register(BROWN_DYE, ItemDyeBrown::new);
         register(BROWN_EGG, ItemBrownEgg::new);
         register(BRUSH, ItemBrush::new);
         register(BURN_POTTERY_SHERD, ItemBurnPotterySherd::new);
+        register(CHARCOAL, ItemCharcoal::new);
         register(CHERRY_DOOR, ItemDoorCherry::new);
         register(CHERRY_SIGN, ItemCherrySign::new);
+        register(COAL, ItemCoal::new);
         register(COAST_ARMOR_TRIM_SMITHING_TEMPLATE, ItemCoastArmorTrimSmithingTemplate::new);
         register(COCOA_BEANS, ItemCocoaBeans::new);
         register(COPPER_AXE, ItemAxeCopper::new);
@@ -72,6 +76,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(ECHO_SHARD, ItemEchoShard::new);
         register(EXPLORER_POTTERY_SHERD, ItemExplorerPotterySherd::new);
         register(EYE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemEyeArmorTrimSmithingTemplate::new);
+        register(FEATHER, ItemFeather::new);
         register(FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSmithingTemplateArmorTrimFlow::new);
         register(FLOW_BANNER_PATTERN, ItemBannerPatternFlow::new);
         register(FLOW_POTTERY_SHERD, ItemFlowPotterySherd::new);
@@ -80,6 +85,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(GOAT_HORN, ItemGoatHorn::new);
         register(GRAY_DYE, ItemDyeGray::new);
         register(GREEN_DYE, ItemDyeGreen::new);
+        register(GUNPOWDER, ItemGunpowder::new);
         register(GUSTER_BANNER_PATTERN, ItemBannerPatternGuster::new);
         register(GUSTER_POTTERY_SHERD, ItemGusterPotterySherd::new);
         register(HEARTBREAK_POTTERY_SHERD, ItemHeartbreakPotterySherd::new);
@@ -132,6 +138,8 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSnoutArmorTrimSmithingTemplate::new);
         register(SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemSpireArmorTrimSmithingTemplate::new);
         register(SPRUCE_SIGN, ItemSpruceSign::new);
+        register(STRING, ItemString::new);
+        register(SUGAR, ItemSugar::new);
         register(TIDE_ARMOR_TRIM_SMITHING_TEMPLATE, ItemTideArmorTrimSmithingTemplate::new);
         register(TORCHFLOWER_SEEDS, ItemTorchflowerSeeds::new);
         register(TRIAL_KEY, ItemTrialKey::new);
@@ -145,6 +153,53 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         register(YELLOW_DYE, ItemDyeYellow::new);
         register(PALE_OAK_DOOR, ItemDoorPaleOak::new);
         register(PALE_OAK_SIGN, ItemPaleOakSign::new);
+        register(WOODEN_SPEAR, ItemWoodenSpear::new);
+        register(STONE_SPEAR, ItemStoneSpear::new);
+        register(COPPER_SPEAR, ItemCopperSpear::new);
+        register(IRON_SPEAR, ItemIronSpear::new);
+        register(GOLDEN_SPEAR, ItemGoldenSpear::new);
+        register(DIAMOND_SPEAR, ItemDiamondSpear::new);
+        register(NETHERITE_SPEAR, ItemNetheriteSpear::new);
+        register(IRON_NAUTILUS_ARMOR, ItemIronNautilusArmor::new);
+        register(COPPER_NAUTILUS_ARMOR, ItemCopperNautilusArmor::new);
+        register(GOLDEN_NAUTILUS_ARMOR, ItemGoldenNautilusArmor::new);
+        register(DIAMOND_NAUTILUS_ARMOR, ItemDiamondNautilusArmor::new);
+        register(NETHERITE_NAUTILUS_ARMOR, ItemNetheriteNautilusArmor::new);
+        register(BUNDLE, ItemBundle::new);
+        register(BLACK_BUNDLE, ItemBlackBundle::new);
+        register(BLUE_BUNDLE, ItemBlueBundle::new);
+        register(BROWN_BUNDLE, ItemBrownBundle::new);
+        register(CYAN_BUNDLE, ItemCyanBundle::new);
+        register(GRAY_BUNDLE, ItemGrayBundle::new);
+        register(GREEN_BUNDLE, ItemGreenBundle::new);
+        register(LIGHT_BLUE_BUNDLE, ItemLightBlueBundle::new);
+        register(LIGHT_GRAY_BUNDLE, ItemLightGrayBundle::new);
+        register(LIME_BUNDLE, ItemLimeBundle::new);
+        register(MAGENTA_BUNDLE, ItemMagentaBundle::new);
+        register(ORANGE_BUNDLE, ItemOrangeBundle::new);
+        register(PINK_BUNDLE, ItemPinkBundle::new);
+        register(PURPLE_BUNDLE, ItemPurpleBundle::new);
+        register(RED_BUNDLE, ItemRedBundle::new);
+        register(WHITE_BUNDLE, ItemWhiteBundle::new);
+        register(YELLOW_BUNDLE, ItemYellowBundle::new);
+        register(NETHERITE_HORSE_ARMOR, ItemHorseArmorNetherite::new);
+        register(WOLF_ARMOR, ItemWolfArmor::new);
+        register(WHITE_HARNESS, ItemWhiteHarness::new);
+        register(ORANGE_HARNESS, ItemOrangeHarness::new);
+        register(MAGENTA_HARNESS, ItemMagentaHarness::new);
+        register(LIGHT_BLUE_HARNESS, ItemLightBlueHarness::new);
+        register(YELLOW_HARNESS, ItemYellowHarness::new);
+        register(LIME_HARNESS, ItemLimeHarness::new);
+        register(PINK_HARNESS, ItemPinkHarness::new);
+        register(GRAY_HARNESS, ItemGrayHarness::new);
+        register(LIGHT_GRAY_HARNESS, ItemLightGrayHarness::new);
+        register(CYAN_HARNESS, ItemCyanHarness::new);
+        register(PURPLE_HARNESS, ItemPurpleHarness::new);
+        register(BLUE_HARNESS, ItemBlueHarness::new);
+        register(BROWN_HARNESS, ItemBrownHarness::new);
+        register(GREEN_HARNESS, ItemGreenHarness::new);
+        register(RED_HARNESS, ItemRedHarness::new);
+        register(BLACK_HARNESS, ItemBlackHarness::new);
     }
 
     @Override
@@ -181,7 +236,8 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
                     throw new UnsupportedOperationException(e);
                 }
             };
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RegisterException(e);
         }
 
@@ -209,8 +265,8 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
     }
 
     public void addToCustom(String namespace, Item item) {
-        CUSTOM_ITEMS.put(namespace, () -> item);
-        register(namespace, () -> item);
+        CUSTOM_ITEMS.put(namespace, item::clone);
+        register(namespace, item::clone);
     }
 
     public void deleteCustom(String namespaceId) {
@@ -236,7 +292,7 @@ public class ItemRegistry implements ItemNamespaceId, IRegistry<String, Item, Su
         if (supplier == null) {
             return Item.AIR_ITEM.clone();
         }
-        return supplier.get().clone();
+        return supplier.get();
     }
 
     public Supplier<Item> getSupplier(String id) {

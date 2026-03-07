@@ -7,6 +7,8 @@ import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.recipe.CraftingRecipe;
+import cn.nukkit.recipe.descriptor.DefaultDescriptor;
+import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.Recipe;
 import cn.nukkit.recipe.descriptor.ItemDescriptor;
 import cn.nukkit.recipe.impl.*;
@@ -33,16 +35,17 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
     private final Int2ObjectOpenHashMap<BatchPacket> PACKETS = new Int2ObjectOpenHashMap<>();
 
-    private final Map<Integer, List<ShapedRecipe>> SHAPED = new HashMap<>();
-    private final Map<Integer, List<ShapelessRecipe>> SHAPELESS = new HashMap<>();
-    private final Map<Integer, FurnaceRecipe> FURNACE = new HashMap<>();
-    private final Map<Integer, BlastFurnaceRecipe> BLAST_FURNACE = new HashMap<>();
+    private final Map<String, List<ShapedRecipe>> SHAPED = new HashMap<>();
+    private final Map<String, List<ShapelessRecipe>> SHAPELESS = new HashMap<>();
+    private final Map<String, FurnaceRecipe> FURNACE = new HashMap<>();
+    private final Map<String, BlastFurnaceRecipe> BLAST_FURNACE = new HashMap<>();
 
     private final Map<UUID, MultiRecipe> MULTI = new HashMap<>();
-    private final Map<Integer, BrewingRecipe> BREWING = new Int2ObjectOpenHashMap<>();
-    private final Map<Integer, ContainerRecipe> CONTAINER = new Int2ObjectOpenHashMap<>();
-    private final Map<Integer, CampfireRecipe> CAMPFIRE = new Int2ObjectOpenHashMap<>();
+    private final Map<String, BrewingRecipe> BREWING = new HashMap<>();
+    private final Map<String, ContainerRecipe> CONTAINER = new HashMap<>();
+    private final Map<String, CampfireRecipe> CAMPFIRE = new HashMap<>();
     private final Map<UUID, SmithingRecipe> SMITHING = new Object2ObjectOpenHashMap<>();
+    private final Map<String, StonecutterRecipe> STONECUTTER = new HashMap<>();
     private final Object2DoubleOpenHashMap<Recipe> FURNACE_XP = new Object2DoubleOpenHashMap<>();
     private final Collection<Recipe> RECIPES = new ArrayDeque<>();
 
@@ -60,17 +63,18 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         this.registerMultiRecipe(new BannerDuplicateRecipe());
         this.registerMultiRecipe(new FireworkRecipe());
         this.registerMultiRecipe(new DecoratedPotRecipe());
+        this.registerMultiRecipe(new ShulkerBoxRecipe());
 
         final JsonObject brewing = JsonParser.parseReader(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("recipes/brewing_recipes.json"))).getAsJsonObject();
 
         brewing.get("potionMixes").getAsJsonArray().forEach((potionMix) -> {
             final JsonObject recipe = potionMix.getAsJsonObject();
 
-            int fromPotionId = recipe.get("inputId").getAsInt();
+            String fromPotionId = recipe.get("inputId").getAsString();
             int fromPotionMeta = recipe.get("inputMeta").getAsInt();
-            int ingredient = recipe.get("reagentId").getAsInt();
+            String ingredient = recipe.get("reagentId").getAsString();
             int ingredientMeta = recipe.get("reagentMeta").getAsInt();
-            int toPotionId = recipe.get("outputId").getAsInt();
+            String toPotionId = recipe.get("outputId").getAsString();
             int toPotionMeta = recipe.get("outputMeta").getAsInt();
 
             Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
@@ -79,10 +83,10 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         brewing.get("containerMixes").getAsJsonArray().forEach((containerMix) -> {
             final JsonObject recipe = containerMix.getAsJsonObject();
 
-            final Item ingredient = Item.get(recipe.get("reagentId").getAsInt());
+            final Item ingredient = Item.get(recipe.get("reagentId").getAsString());
 
-            final int fromPotionId = recipe.get("inputId").getAsInt();
-            final int toPotionId = recipe.get("outputId").getAsInt();
+            final String fromPotionId = recipe.get("inputId").getAsString();
+            final String toPotionId = recipe.get("outputId").getAsString();
 
             for (int meta : Registries.POTION.getPotionId2TypeMap().keySet()) {
                 Registries.RECIPE.registerBrewingRecipe(new BrewingRecipe(
@@ -140,15 +144,25 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
-        int resultHash = RecipeUtils.getItemHash(recipe.getResult());
+        String resultHash = RecipeUtils.getItemHash(recipe.getResult());
         SHAPED.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
         RECIPES.add(recipe);
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
-        int resultHash = RecipeUtils.getItemHash(recipe.getResult());
+        String resultHash = RecipeUtils.getItemHash(recipe.getResult());
         SHAPELESS.computeIfAbsent(resultHash, (key) -> new ArrayList<>()).add(recipe);
         RECIPES.add(recipe);
+    }
+
+    public void addStonecutterRecipe(StonecutterRecipe recipe) {
+        registerShapelessRecipe(recipe);
+
+        for(ItemDescriptor descriptor : recipe.getIngredientList()) {
+            if(descriptor instanceof DefaultDescriptor defaultDescriptor) {
+                STONECUTTER.computeIfAbsent(RecipeUtils.getItemHash(defaultDescriptor.getItem()), (key) -> new StonecutterRecipe(recipe.getResult(), new ArrayList<>(recipe.getIngredientList()))).addResult(new DefaultDescriptor(recipe.getResult()));
+            }
+        }
     }
 
     public void registerSmithingRecipe(SmithingRecipe recipe) {
@@ -156,16 +170,21 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public void registerBrewingRecipe(BrewingRecipe recipe) {
-        Item input = recipe.getIngredient();
-        Item potion = recipe.getInput();
-        int potionHash = RecipeUtils.getPotionHash(input, potion);
-        this.BREWING.put(potionHash, recipe);
+        Item input = recipe.getInput();
+        Item ingredient = recipe.getIngredient();
+        Item output = recipe.getResult();
+
+        String recipeId = RecipeUtils.computeBrewingRecipeId(input, ingredient, output);
+        this.BREWING.put(recipeId, recipe);
     }
 
     public void registerContainerRecipe(ContainerRecipe recipe) {
-        Item input = recipe.getIngredient();
-        Item potion = recipe.getInput();
-        this.CONTAINER.put(RecipeUtils.getContainerHash(input.getId(), potion.getId()), recipe);
+        Item input = recipe.getInput();
+        Item ingredient = recipe.getIngredient();
+        Item output = recipe.getResult();
+
+        String recipeId = RecipeUtils.computeContainerRecipeId(input, ingredient, output);
+        this.CONTAINER.put(recipeId, recipe);
     }
 
     public void registerCampfireRecipe(CampfireRecipe recipe, double xp) {
@@ -192,7 +211,7 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
     }
 
     public CraftingRecipe matchRecipe(List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
-        int outputHash = RecipeUtils.getItemHash(primaryOutput);
+        String outputHash = RecipeUtils.getItemHash(primaryOutput);
         if (SHAPED.containsKey(outputHash)) {
             List<ShapedRecipe> recipes = SHAPED.get(outputHash);
 
@@ -222,38 +241,37 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
     @Nullable
     public SmithingRecipe matchSmithingRecipe(List<Item> inputList) {
-        UUID inputHash = RecipeUtils.getMultiItemHash(inputList);
-
-        Map<UUID, SmithingRecipe> recipeMap = Registries.RECIPE.getSMITHING();
-
-        if (recipeMap != null) {
-            SmithingRecipe recipe = recipeMap.get(inputHash);
-
-            ArrayList<Item> list = new ArrayList<>();
-            for (Item item : inputList) {
-                Item clone = item.clone();
-                clone.setCount(1);
-                if ((item.isTool() || item.isArmor()) && item.getDamage() > 0) {
-                    clone.setDamage(0);
-                }
-                list.add(clone);
+        ArrayList<Item> list = new ArrayList<>();
+        for (Item item : inputList) {
+            Item clone = item.clone();
+            clone.setCount(1);
+            if ((item.isTool() || item.isArmor()) && item.getDamage() > 0) {
+                clone.setDamage(0);
             }
+            list.add(clone);
+        }
 
-            if (recipe != null && recipe.matchItems(list)) {
-                return recipe;
+        for (SmithingRecipe smithingRecipe : SMITHING.values()) {
+            if (smithingRecipe.matchItems(list)) {
+                return smithingRecipe;
             }
+        }
 
-            for (SmithingRecipe smithingRecipe : recipeMap.values()) {
-                if (smithingRecipe.matchItems(list)) {
-                    return smithingRecipe;
-                }
-            }
+        return null;
+    }
+
+    public BrewingRecipe findBrewingRecipe(Item input, Item potion) {
+        for(BrewingRecipe recipe : BREWING.values()) {
+            if (recipe.fastCheck(input, potion)) return recipe;
         }
         return null;
     }
 
-    public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
-        return this.BREWING.get(RecipeUtils.getPotionHash(input, potion));
+    public ContainerRecipe findContainerRecipe(Item input, Item potion) {
+        for(ContainerRecipe recipe : CONTAINER.values()) {
+            if (recipe.fastCheck(input, potion)) return recipe;
+        }
+        return null;
     }
 
     public CampfireRecipe matchCampfireRecipe(Item input) {
@@ -262,8 +280,27 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
         return recipe;
     }
 
-    public ContainerRecipe matchContainerRecipe(Item input, Item potion) {
-        return this.CONTAINER.get(RecipeUtils.getContainerHash(input.getId(), potion.getId()));
+    public StonecutterRecipe matchStonecutterRecipe(Item input, List<Item> outputs) {
+        StonecutterRecipe recipe = this.STONECUTTER.get(RecipeUtils.getItemHash(input));
+
+        if(recipe != null) {
+            boolean found = false;
+
+            for(Item item : outputs) {
+                for(ItemDescriptor descriptor : recipe.getIngredientList()) {
+                    if(descriptor instanceof DefaultDescriptor defaultDescriptor && defaultDescriptor.getItem().getNamespaceId().equals(item.getNamespaceId())) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!found) {
+                return null;
+            }
+        }
+
+        return recipe;
     }
 
     public MultiRecipe getMultiRecipe(Player player, Item outputItem, Collection<ItemDescriptor> inputs) {
@@ -294,7 +331,9 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
             }
 
             for (MultiRecipe recipe : this.getMULTI().values()) {
-                pk.addMultiRecipe(recipe);
+                if(!recipe.hideRecipe()) {
+                    pk.addMultiRecipe(recipe);
+                }
             }
 
             for (Recipe recipe : this.getRECIPES()) {
@@ -319,7 +358,9 @@ public class RecipeRegistry implements IRegistry<Integer, Recipe, Recipe> {
 
             pk.tryEncode();
 
-            PACKETS.put(protocol, pk.compress(Deflater.BEST_COMPRESSION));
+            synchronized (PACKETS) {
+                PACKETS.put(protocol, pk.compress(Deflater.BEST_COMPRESSION));
+            }
         });
     }
 }

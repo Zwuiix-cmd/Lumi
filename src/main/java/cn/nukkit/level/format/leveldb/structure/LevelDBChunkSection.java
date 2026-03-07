@@ -3,6 +3,7 @@ package cn.nukkit.level.format.leveldb.structure;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.properties.BlockPropertiesHelper;
+import cn.nukkit.level.BlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
@@ -56,18 +57,18 @@ public class LevelDBChunkSection implements ChunkSection {
     }
 
     public LevelDBChunkSection(Level level, LevelDBChunk parent, int y) {
-        this.parent = new WeakReference<>(parent);
+        this.setParent(parent);
         this.y = y;
         this.storages = new StateBlockStorage[]{ new StateBlockStorage(), new StateBlockStorage() };
         this.level = level;
     }
 
-    public LevelDBChunkSection(Level level, int y, @Nullable StateBlockStorage[] storages) {
-        this(level, null, y, storages, null, null, null, false, false);
+    public LevelDBChunkSection(Level level, int y, @Nullable StateBlockStorage[] storages, byte[] blockLight, boolean hasSkyLight) {
+        this(level, null, y, storages, blockLight, null, null, false, hasSkyLight);
     }
 
     public LevelDBChunkSection(Level level, LevelDBChunk parent, int y, @Nullable StateBlockStorage[] storages, byte[] blockLight, byte[] skyLight, byte[] compressedLight, boolean hasBlockLight, boolean hasSkyLight) {
-        this.parent = new WeakReference<>(parent);
+        this.setParent(parent);
         this.y = y;
         this.level = level;
 
@@ -118,6 +119,11 @@ public class LevelDBChunkSection implements ChunkSection {
 
     public void setParent(LevelDBChunk parent) {
         this.parent = new WeakReference<>(parent);
+
+        // Set hasSkyLight based on dimension (Overworld = 0 has sky light)
+        if (parent != null && parent.getProvider() != null) {
+            this.hasSkyLight = parent.getProvider().getLevel().getDimensionData().getDimensionId() == 0;
+        }
     }
 
     @Override
@@ -614,23 +620,6 @@ public class LevelDBChunkSection implements ChunkSection {
     }
 
     @Override
-    public byte[] getBytes(int protocolId) {
-        try {
-            this.readLock.lock();
-
-            //TODO: properly mv support
-            byte[] ids = this.storages[0].getBlockIds();
-            byte[] data = this.storages[0].getBlockData();
-            byte[] merged = new byte[ids.length + data.length];
-            System.arraycopy(ids, 0, merged, 0, ids.length);
-            System.arraycopy(data, 0, merged, ids.length, data.length);
-            return merged;
-        } finally {
-            this.readLock.unlock();
-        }
-    }
-
-    @Override
     public int getMaximumLayer() {
         return 1;
     }
@@ -677,7 +666,7 @@ public class LevelDBChunkSection implements ChunkSection {
     }
 
     @Override
-    public void writeTo(int protocol, BinaryStream stream, boolean antiXray) {
+    public void writeTo(int protocol, BinaryStream stream, boolean antiXray, BlockPalette blockPalette) {
         try {
             this.readLock.lock();
 
@@ -687,7 +676,7 @@ public class LevelDBChunkSection implements ChunkSection {
             stream.putByte((byte) layers);
 
             for (int i = 0; i < layers; i++) {
-                this.storages[i].writeTo(level, protocol, stream, antiXray);
+                this.storages[i].writeTo(level, protocol, stream, antiXray, blockPalette);
             }
         } finally {
             this.readLock.unlock();
@@ -796,5 +785,21 @@ public class LevelDBChunkSection implements ChunkSection {
     @Override
     public void setDirty() {
         this.dirty = true;
+    }
+
+    @Override
+    public boolean maybeHasLightSource() {
+        try {
+            this.readLock.lock();
+
+            for (StateBlockStorage storage : this.storages) {
+                if (storage != null && storage.maybeHasLightSource()) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            this.readLock.unlock();
+        }
     }
 }

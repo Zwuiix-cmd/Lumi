@@ -3,7 +3,7 @@ package cn.nukkit.level.format.leveldb.structure;
 import cn.nukkit.Nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.BlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.anvil.util.BlockStorage;
 import cn.nukkit.level.format.anvil.util.NibbleArray;
@@ -35,6 +35,7 @@ import static cn.nukkit.level.format.leveldb.LevelDBConstants.SUB_CHUNK_SIZE;
 public class StateBlockStorage {
 
     private static final int SECTION_SIZE = 16 * 16 * 16;
+    private static final BlockStateSnapshot AIR = BlockStateMapping.get().getState(0, 0);
 
     private List<BlockStateSnapshot> palette;
     private BitArray bitArray;
@@ -50,7 +51,7 @@ public class StateBlockStorage {
     public StateBlockStorage(BitArrayVersion version) {
         this.bitArray = version.createPalette();
         this.palette = new ObjectArrayList<>(16);
-        this.palette.add(BlockStateMapping.get().getState(0, 0));
+        this.palette.add(AIR);
 
         this.blockIds = null;
         this.blockData = null;
@@ -220,8 +221,8 @@ public class StateBlockStorage {
         this.set(elementIndex(pos.x, pos.y, pos.z), BlockStateMapping.get().getBlockStateFromFullId(value));
     }
 
-    public void writeTo(Level level, int protocol, BinaryStream stream, boolean antiXray) {
-        PalettedBlockStorage palettedBlockStorage = PalettedBlockStorage.createFromBlockPalette(protocol);
+    public void writeTo(Level level, int protocol, BinaryStream stream, boolean antiXray, BlockPalette blockPalette) {
+        PalettedBlockStorage palettedBlockStorage = PalettedBlockStorage.createFromBlockPalette(this.bitArray.getVersion(), protocol);
 
         if(antiXray) {
             final NukkitRandom nukkitRandom = new NukkitRandom();
@@ -250,12 +251,12 @@ public class StateBlockStorage {
                         }
                     }
                 }
-                palettedBlockStorage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, meta));
+                palettedBlockStorage.setBlock(i, blockPalette.getRuntimeId(id, meta));
             }
         } else {
             for (int i = 0; i < SECTION_SIZE; i++) {
                 final int fullId = get(i);
-                palettedBlockStorage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK));
+                palettedBlockStorage.setBlock(i, blockPalette.getRuntimeId(fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK));
             }
         }
 
@@ -415,6 +416,23 @@ public class StateBlockStorage {
                 this.blockIds != null ? this.blockIds.clone() : null,
                 this.blockData != null ? this.blockData.copy(): null
         );
+    }
+
+    /**
+     * Check if this storage may contain light-emitting blocks.
+     * This is a fast check that only looks at the palette, not every block position.
+     * If this returns false, the storage definitely has no light sources.
+     * If this returns true, the storage may have light sources (needs full scan).
+     *
+     * @return true if light sources may exist, false if definitely none
+     */
+    public boolean maybeHasLightSource() {
+        for (BlockStateSnapshot state : this.palette) {
+            if (Registries.BLOCK.getLight(state.getLegacyId()) > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static int elementIndex(int x, int y, int z) {

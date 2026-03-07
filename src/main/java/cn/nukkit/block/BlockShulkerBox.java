@@ -106,7 +106,7 @@ public class BlockShulkerBox extends BlockTransparentMeta implements BlockEntity
 
                 for (int it = 0; it < i.getSize(); it++) {
                     if (i.getItem(it).getId() != Item.AIR) {
-                        CompoundTag d = NBTIO.putItemHelper(i.getItem(it), it);
+                        CompoundTag d = NBTIO.putItemHelper(i.getItem(it), it, true);
                         items.add(d);
                     }
                 }
@@ -202,5 +202,10 @@ public class BlockShulkerBox extends BlockTransparentMeta implements BlockEntity
             return new Item[]{this.toItem()};
         }
         return super.getDrops(player, item);
+    }
+
+    @Override
+    public boolean diffusesSkyLight() {
+        return true;
     }
 }

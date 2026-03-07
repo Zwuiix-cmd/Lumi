@@ -22,6 +22,9 @@ public class ScriptDebugShape {
     @Nullable
     Color color;
     @Nullable
+    private final Long attachedToEntityId;
+    int dimensionId;
+    @Nullable
     String text;
     @Nullable
     Vector3f boxBounds;
@@ -33,5 +36,4 @@ public class ScriptDebugShape {
     Float arrowHeadRadius;
     @Nullable
     Integer segments;
-
 }

@@ -349,6 +349,7 @@ public class EntityHuman extends EntityHumanType {
             pk.speedY = (float) this.motionY;
             pk.speedZ = (float) this.motionZ;
             pk.yaw = (float) this.yaw;
+            pk.headYaw = (float) this.headYaw;
             pk.pitch = (float) this.pitch;
             pk.item = playerInventory.getItemInHand();
             pk.metadata = this.dataProperties.clone();

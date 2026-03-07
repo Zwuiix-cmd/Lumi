@@ -77,7 +77,7 @@ public class EntityFirework extends Entity {
     public void saveNBT() {
         super.saveNBT();
         if (this.firework != null) {
-            this.namedTag.putCompound("FireworkItem", NBTIO.putItemHelper(this.firework));
+            this.namedTag.putCompound("FireworkItem", NBTIO.putItemHelper(this.firework, true));
             this.namedTag.putInt("FireworkLifeTime", this.lifetime);
         }
     }
@@ -124,21 +124,24 @@ public class EntityFirework extends Entity {
             }
 
             if (this.age >= this.lifetime) {
-                EntityEventPacket pk = new EntityEventPacket();
-                pk.event = EntityEventPacket.FIREWORK_EXPLOSION;
-                pk.eid = this.getId();
-
-                this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
-
-                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LARGE_BLAST, -1, NETWORK_ID);
-
-                this.kill(); // Using close() here would remove the firework before the explosion is displayed
-
+                this.explode();
                 hasUpdate = true;
             }
         }
 
         return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+    }
+
+    protected void explode() {
+        EntityEventPacket pk = new EntityEventPacket();
+        pk.event = EntityEventPacket.FIREWORK_EXPLOSION;
+        pk.eid = this.getId();
+
+        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
+
+        level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LARGE_BLAST, -1, NETWORK_ID);
+
+        this.kill(); // Using close() here would remove the firework before the explosion is displayed
     }
 
     @Override

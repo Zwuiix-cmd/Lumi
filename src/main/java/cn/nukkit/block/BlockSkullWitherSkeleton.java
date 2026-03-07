@@ -1,5 +1,14 @@
 package cn.nukkit.block;
 
+<<<<<<< HEAD
+=======
+import cn.nukkit.Player;
+import cn.nukkit.entity.mob.EntityWither;
+import cn.nukkit.item.Item;
+import cn.nukkit.math.BlockFace;
+import org.jetbrains.annotations.NotNull;
+
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 public class BlockSkullWitherSkeleton extends BlockSkull {
 
     public BlockSkullWitherSkeleton() {
@@ -23,5 +32,14 @@ public class BlockSkullWitherSkeleton extends BlockSkull {
     @Override
     public SkullType getSkullType() {
         return SkullType.WITHER_SKELETON;
+    }
+
+    @Override
+    public boolean place(@NotNull Item item, @NotNull Block block, @NotNull Block target, @NotNull BlockFace face, double fx, double fy, double fz, @NotNull Player player) {
+        if (super.place(item, block, target, face, fx, fy, fz, player)) {
+            EntityWither.trySpawnWither(this);
+            return true;
+        }
+        return false;
     }
 }

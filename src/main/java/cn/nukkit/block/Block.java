@@ -120,13 +120,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-        }
-
         Block block;
         int fullId = id << DATA_BITS;
-        if (meta != null && meta > DATA_SIZE) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
+        } else if (meta != null && meta > DATA_SIZE) {
             if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
                 log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
                 return new BlockUnknown(id, meta);
@@ -188,21 +186,23 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         int id = fullId << DATA_BITS;
 
+        Block block;
         if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
+            block = Registries.BLOCK.getCustom(id).toCustomBlock(fullId & DATA_BITS);
+        } else {
+            if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
+                int meta = fullId & DATA_BITS;
+                log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
+                return new BlockUnknown(id, meta);
+            }
+            block = Registries.BLOCK.get(fullId).clone();
         }
 
-        if (fullId >= Registries.BLOCK.getFullListSize() || Registries.BLOCK.get(fullId) == null) {
-            int meta = fullId & DATA_BITS;
-            log.warn("Found an unknown BlockId:Meta combination: {}:{}", id, meta);
-            return new BlockUnknown(id, meta);
-        }
-        Block block = Registries.BLOCK.get(fullId).clone();
         block.x = x;
         block.y = y;
         block.z = z;
         block.level = level;
-        //block.layer = layer;
+        block.layer = layer;
         return block;
     }
 
@@ -211,17 +211,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
-        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
-            return Registries.BLOCK.getCustom(id).toCustomBlock(meta);
-        }
-
         Block block;
-        if (meta <= DATA_SIZE) {
+        if (id >= LOWEST_CUSTOM_BLOCK_ID) {
+            block = Registries.BLOCK.getCustom(id).toCustomBlock(meta);
+        } else if (meta <= DATA_SIZE) {
             block = Registries.BLOCK.get(id << DATA_BITS | meta).clone();
         } else {
             block = Registries.BLOCK.get(id << DATA_BITS).clone();
             block.setDamage(meta);
         }
+
         block.x = x;
         block.y = y;
         block.z = z;
@@ -577,18 +576,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         this.boundingBox = null;
     }
 
-    /**
-     * 是否直接掉落方块物品
-     * Whether to drop block items directly
-     *
-     * @param player 玩家
-     * @return true - 直接掉落方块物品, false - 通过getDrops方法获取掉落物品
-     *         true - Drop block items directly, false - Get dropped items through the getDrops method
-     */
-    public boolean isDropOriginal(Player player) {
-        return false;
-    }
-
     public Item[] getDrops(Item item) {
         if (this instanceof CustomBlock) {
             return new Item[]{
@@ -652,22 +639,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             return 1.0;
         }
         if (toolType == ItemTool.TYPE_NONE) return 1.0;
-        switch (toolTier) {
-            case ItemTool.TIER_WOODEN:
-                return 2.0;
-            case ItemTool.TIER_STONE:
-                return 4.0;
-            case ItemTool.TIER_IRON:
-                return 6.0;
-            case ItemTool.TIER_DIAMOND:
-                return 8.0;
-            case ItemTool.TIER_NETHERITE:
-                return 9.0;
-            case ItemTool.TIER_GOLD:
-                return 12.0;
-            default:
-                return 1.0;
-        }
+        return switch (toolTier) {
+            case ItemTool.TIER_WOODEN -> 2.0;
+            case ItemTool.TIER_STONE -> 4.0;
+            case ItemTool.TIER_COPPER -> 5.0;
+            case ItemTool.TIER_IRON -> 6.0;
+            case ItemTool.TIER_DIAMOND -> 8.0;
+            case ItemTool.TIER_NETHERITE -> 9.0;
+            case ItemTool.TIER_GOLD -> 12.0;
+            default -> 1.0;
+        };
     }
 
     private static double speedBonusByEfficiencyLore0(int efficiencyLoreLevel) {
@@ -777,9 +758,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             hasAquaAffinity = Optional.ofNullable(player.getInventory().getHelmet().getEnchantment(Enchantment.ID_WATER_WORKER))
                     .map(Enchantment::getLevel).map(l -> l >= 1).orElse(false);
             hasteEffectLevel = Optional.ofNullable(player.getEffect(EffectType.HASTE))
-                    .map(Effect::getAmplifier).orElse(0);
+                    .map(Effect::getLevel).orElse(0);
             miningFatigueLevel = Optional.ofNullable(player.getEffect(EffectType.MINING_FATIGUE))
-                    .map(Effect::getAmplifier).orElse(0);
+                    .map(Effect::getLevel).orElse(0);
         }
 
 
@@ -796,7 +777,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                     .map(Enchantment::getLevel).orElse(0);
 
             if (canHarvest && efficiencyLevel > 0) {
-                speedMultiplier += efficiencyLevel ^ 2 + 1;
+                speedMultiplier += efficiencyLevel * efficiencyLevel + 1;
             }
 
             if (hasConduitPower) hasteEffectLevel = Integer.max(hasteEffectLevel, 2);
@@ -807,7 +788,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         if (miningFatigueLevel > 0) {
-            speedMultiplier /= 3 ^ miningFatigueLevel;
+            speedMultiplier *= Math.pow(0.3, miningFatigueLevel);
         }
 
         seconds /= speedMultiplier;

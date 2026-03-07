@@ -59,7 +59,9 @@ public class Utils {
     public static final IntSet monstersList = new IntOpenHashSet(Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGhast.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHoglin.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityRavager.NETWORK_ID, EntityShulker.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntitySlime.NETWORK_ID, EntitySpider.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombiePigman.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID));
     /**
      * List of biomes where water can freeze
+     * @deprecated Use {@link cn.nukkit.level.biome.Biome#getBiome(int)} and {@link cn.nukkit.level.biome.Biome#isFreezing()} instead
      */
+    @Deprecated
     public static final IntSet freezingBiomes = new IntOpenHashSet(Arrays.asList(10, 11, 12, 26, 30, 31, 140, 158));
 
     /**
@@ -447,33 +449,6 @@ public class Utils {
      */
     public static String getVersionByProtocol(int protocol) {
         return switch (protocol) {
-            case ProtocolInfo.v1_16_0 -> "1.16.0";
-            case ProtocolInfo.v1_16_20 -> "1.16.20";
-            case ProtocolInfo.v1_16_100_0, ProtocolInfo.v1_16_100_51, ProtocolInfo.v1_16_100_52, ProtocolInfo.v1_16_100 ->
-                    "1.16.100";
-            case ProtocolInfo.v1_16_200_51, ProtocolInfo.v1_16_200 -> "1.16.200";
-            case ProtocolInfo.v1_16_210_50, ProtocolInfo.v1_16_210_53, ProtocolInfo.v1_16_210 -> "1.16.210";
-            case ProtocolInfo.v1_16_220 -> "1.16.220";
-            case ProtocolInfo.v1_16_230_50, ProtocolInfo.v1_16_230, ProtocolInfo.v1_16_230_54 -> "1.16.230";
-            case ProtocolInfo.v1_17_0 -> "1.17.0";
-            case ProtocolInfo.v1_17_10 -> "1.17.10";
-            case ProtocolInfo.v1_17_20_20 -> "1.17.20";
-            case ProtocolInfo.v1_17_30 -> "1.17.30";
-            case ProtocolInfo.v1_17_40 -> "1.17.40";
-            case ProtocolInfo.v1_18_0 -> "1.18.0";
-            case ProtocolInfo.v1_18_10_26, ProtocolInfo.v1_18_10 -> "1.18.10";
-            case ProtocolInfo.v1_18_30 -> "1.18.30";
-            case ProtocolInfo.v1_19_0_29, ProtocolInfo.v1_19_0_31, ProtocolInfo.v1_19_0 -> "1.19.0";
-            case ProtocolInfo.v1_19_10 -> "1.19.10";
-            case ProtocolInfo.v1_19_20 -> "1.19.20";
-            case ProtocolInfo.v1_19_21 -> "1.19.21";
-            case ProtocolInfo.v1_19_30_23, ProtocolInfo.v1_19_30 -> "1.19.30";
-            case ProtocolInfo.v1_19_40 -> "1.19.40";
-            case ProtocolInfo.v1_19_50_20, ProtocolInfo.v1_19_50 -> "1.19.50";
-            case ProtocolInfo.v1_19_60 -> "1.19.60";
-            case ProtocolInfo.v1_19_63 -> "1.19.63";
-            case ProtocolInfo.v1_19_70_24, ProtocolInfo.v1_19_70 -> "1.19.70";
-            case ProtocolInfo.v1_19_80 -> "1.19.80";
             case ProtocolInfo.v1_20_0_23, ProtocolInfo.v1_20_0 -> "1.20.0";
             case ProtocolInfo.v1_20_10_21, ProtocolInfo.v1_20_10 -> "1.20.10";
             case ProtocolInfo.v1_20_30_24, ProtocolInfo.v1_20_30 -> "1.20.30";
@@ -498,6 +473,8 @@ public class Utils {
             case ProtocolInfo.v1_21_111 -> "1.21.111";
             case ProtocolInfo.v1_21_120 -> "1.21.120";
             case ProtocolInfo.v1_21_124 -> "1.21.124";
+            case ProtocolInfo.v1_21_130 -> "1.21.130";
+            case ProtocolInfo.v1_26_0 -> "1.26.0";
             //TODO Multiversion 添加新版本支持时修改这里
             default -> throw new IllegalStateException("Invalid protocol: " + protocol);
         };

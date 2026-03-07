@@ -51,7 +51,9 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
             ProtocolInfo.v1_21_100,
             ProtocolInfo.v1_21_111,
             ProtocolInfo.v1_21_120,
-            ProtocolInfo.v1_21_124
+            ProtocolInfo.v1_21_124,
+            ProtocolInfo.v1_21_130,
+            ProtocolInfo.v1_26_0
     );
 
     @Override
@@ -63,7 +65,7 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
                 return;
             }
             try (InputStream stream = CreativeItemRegistry.class.getClassLoader()
-                    .getResourceAsStream("gamedata/creative_items/creative_items_" + protocol + ".json")) {
+                    .getResourceAsStream("gamedata/item/creative/creative_items_" + protocol + ".json")) {
                 if (stream == null) {
                     return;
                 }
@@ -75,7 +77,7 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
                 this.initOldItems(root, protocol);
 
             } catch (Exception e) {
-                throw new RuntimeException("Failed to load gamedata/creative_items/creative_items_" + protocol + ".json", e);
+                throw new RuntimeException("Failed to load gamedata/item/creative/creative_items_" + protocol + ".json", e);
             }
         });
     }
@@ -204,7 +206,14 @@ public class CreativeItemRegistry implements IRegistry<Integer, CreativeItemRegi
 
     @Override
     public CreativeItems get(Integer protocol) {
-        return CREATIVE_ITEMS.get(protocol);
+        CreativeItems items = CREATIVE_ITEMS.get(protocol);
+        if (items != null) return items;
+
+        return CREATIVE_ITEMS.keySet().stream()
+                .filter(p -> p < protocol)
+                .max(Comparator.naturalOrder())
+                .map(CREATIVE_ITEMS::get)
+                .orElse(null);
     }
 
     public Map<Integer,CreativeItems> getCreativeItems() {

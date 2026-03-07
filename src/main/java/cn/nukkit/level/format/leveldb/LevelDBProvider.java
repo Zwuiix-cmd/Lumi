@@ -33,9 +33,9 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import lombok.extern.log4j.Log4j2;
 import net.daporkchop.ldbjni.DBProvider;
-import net.daporkchop.ldbjni.LevelDB;
 import net.daporkchop.lib.natives.FeatureBuilder;
 import org.cloudburstmc.nbt.*;
 import org.iq80.leveldb.*;
@@ -74,10 +74,13 @@ public class LevelDBProvider implements LevelProvider {
     protected CompoundTag levelData;
     private Vector3 spawn;
     private Long cachedSeed;
+    private int lastGcPosition = 0;
 
     protected volatile boolean closed;
     protected final Lock gcLock;
     private final ExecutorService executor;
+
+    private Task autoCompactionTask;
 
     public LevelDBProvider(Level level, String path) {
         this.level = level;
@@ -153,7 +156,7 @@ public class LevelDBProvider implements LevelProvider {
 
         if (level.isAutoCompaction()) {
             int delay = level.getServer().getSettings().world().worldAutoCompactionTicks();
-            level.getServer().getScheduler().scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, new Task() {
+            this.autoCompactionTask = new Task() {
                 @Override
                 public void onRun(int currentTick) {
                     if (closed || !level.isAutoCompaction()) {
@@ -162,7 +165,8 @@ public class LevelDBProvider implements LevelProvider {
                     }
                     CompletableFuture.runAsync(new AutoCompaction(), LevelDBProvider.this.executor);
                 }
-            }, delay + ThreadLocalRandom.current().nextInt(delay), delay);
+            };
+            level.getServer().getScheduler().scheduleDelayedRepeatingTask(InternalPlugin.INSTANCE, autoCompactionTask, delay + ThreadLocalRandom.current().nextInt(delay), delay);
         }
     }
 
@@ -229,7 +233,7 @@ public class LevelDBProvider implements LevelProvider {
                 .compressionType(CompressionType.ZLIB_RAW)
                 .cacheSize(1024L * 1024L * Server.getInstance().getSettings().world().leveldbCacheMb())
                 .blockSize(64 * 1024);
-        return Server.getInstance().getSettings().world().useNativeLeveldb() ? LevelDB.PROVIDER.open(dir, options) : JAVA_LDB_PROVIDER.open(dir, options);
+        return JAVA_LDB_PROVIDER.open(dir, options);
     }
 
     public static void updateLevelData(CompoundTag levelData) {
@@ -446,7 +450,7 @@ public class LevelDBProvider implements LevelProvider {
             loadBlockTickingQueue(tickingData, false);
         }
 
-        byte[] randomTickingData = this.db.get(PENDING_RANDOM_TICKS.getKey(chunkX, chunkZ, this.level.getDimension()));
+        byte[] randomTickingData = this.db.get(RANDOM_TICKS.getKey(chunkX, chunkZ, this.level.getDimension()));
         if (randomTickingData != null && randomTickingData.length != 0) {
             loadBlockTickingQueue(randomTickingData, true);
         }
@@ -580,7 +584,7 @@ public class LevelDBProvider implements LevelProvider {
             writeBatch.delete(pendingScheduledTicksKey);
         }
 
-       /* byte[] pendingRandomTicksKey = PENDING_RANDOM_TICKS.getKey(chunkX, chunkZ);
+       /* byte[] pendingRandomTicksKey = RANDOM_TICKS.getKey(chunkX, chunkZ);
         if (randomBlockUpdateEntries != null && !randomBlockUpdateEntries.isEmpty()) {
             CompoundTag ticks = saveBlockTickingQueue(randomBlockUpdateEntries, currentTick);
             if (ticks != null) {
@@ -727,6 +731,11 @@ public class LevelDBProvider implements LevelProvider {
         }
 
         try {
+            if (this.autoCompactionTask != null) {
+                this.autoCompactionTask.cancel();
+                this.autoCompactionTask = null;
+            }
+
             gcLock.lock();
 
             this.unloadChunksUnsafe(true);
@@ -735,9 +744,18 @@ public class LevelDBProvider implements LevelProvider {
             this.executor.shutdown();
 
             try {
-                this.executor.awaitTermination(1, TimeUnit.DAYS);
+                if (!this.executor.awaitTermination(10, TimeUnit.MINUTES)) {
+                    log.warn("LevelDB executor did not terminate in time, forcing shutdown for: {}", this.getName());
+                    java.util.List<Runnable> droppedTasks = this.executor.shutdownNow();
+                    if (!droppedTasks.isEmpty()) {
+                        log.warn("Dropped {} pending tasks during forced shutdown", droppedTasks.size());
+                    }
+                    if (!this.executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                        log.error("LevelDB executor did not terminate even after forced shutdown for: {}", this.getName());
+                    }
+                }
             } catch (InterruptedException e) {
-                Server.getInstance().getLogger().error("Stopping LevelDB Executor interrupted", e);
+                this.executor.shutdownNow();
             }
 
             try {
@@ -886,7 +904,41 @@ public class LevelDBProvider implements LevelProvider {
 
     @Override
     public void doGarbageCollection() {
-        //leveldb不需要回收regions
+        //Do nothing. LevelDB don't need third-party garbage collection
+    }
+
+    @Override
+    public void doGarbageCollection(long time) {
+        long start = System.currentTimeMillis();
+        int maxIterations = this.chunks.size();
+        if (this.lastGcPosition > maxIterations) {
+            this.lastGcPosition = 0;
+        }
+
+        ObjectIterator<BaseFullChunk> iterator = chunks.values().iterator();
+        if (this.lastGcPosition != 0) {
+            iterator.skip(lastGcPosition);
+        }
+
+        int iterations;
+        for (iterations = 0; iterations < maxIterations; iterations++) {
+            if (!iterator.hasNext()) {
+                iterator = this.chunks.values().iterator();
+            }
+
+            if (!iterator.hasNext()) {
+                break;
+            }
+
+            BaseFullChunk chunk = iterator.next();
+            if (chunk instanceof LevelDBChunk && chunk.isGenerated() && chunk.isPopulated()) {
+                chunk.compress();
+                if (System.currentTimeMillis() - start >= time) {
+                    break;
+                }
+            }
+        }
+        this.lastGcPosition += iterations;
     }
 
     public CompoundTag getLevelData() {
@@ -1080,7 +1132,9 @@ public class LevelDBProvider implements LevelProvider {
 
             log.debug("Running AutoCompaction... ({})", path);
             try {
-                gcLock.lock();
+                if (!gcLock.tryLock(500, TimeUnit.MILLISECONDS)) {
+                    return;
+                }
 
                 if (!canRun()) {
                     return;
@@ -1105,6 +1159,8 @@ public class LevelDBProvider implements LevelProvider {
                     return next;
                 }, true);
                 log.debug("{} chunks have been compressed ({})", count, path);
+            } catch (InterruptedException e) {
+                log.debug("AutoCompaction interrupted", e);
             } finally {
                 gcLock.unlock();
             }
@@ -1113,9 +1169,5 @@ public class LevelDBProvider implements LevelProvider {
         private boolean canRun() {
             return !closed && level != null && level.getPlayers().isEmpty();
         }
-    }
-
-    static {
-        log.info("native LevelDB provider: {}", Server.getInstance().getSettings().world().useNativeLeveldb() && LevelDB.PROVIDER.isNative());
     }
 }

@@ -15,7 +15,11 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemID;
+<<<<<<< HEAD
 import cn.nukkit.item.data.DyeColor;
+=======
+import cn.nukkit.item.ItemNamespaceId;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -165,7 +169,7 @@ public class EntityWolf extends EntityTameableMob {
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         int healable = this.getHealableItem(item);
 
-        if (item.getId() == ItemID.BONE) {
+        if (item.getNamespaceId().equals(ItemNamespaceId.BONE)) {
             if (!this.hasOwner() && !this.isAngry()) {
                 if (Utils.rand(1, 3) == 3) {
                     EntityEventPacket packet = new EntityEventPacket();
@@ -324,7 +328,7 @@ public class EntityWolf extends EntityTameableMob {
     }
 
     public boolean isBeggingItem(Item item) {
-        return item.getId() == ItemID.BONE ||
+        return item.getNamespaceId().equals(ItemNamespaceId.BONE) ||
             item.getId() == ItemID.RAW_CHICKEN ||
             item.getId() == ItemID.COOKED_CHICKEN ||
             item.getId() == ItemID.RAW_BEEF ||

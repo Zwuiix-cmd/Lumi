@@ -82,16 +82,13 @@ public class WorldSettings extends OkaeriConfig {
     private int worldAutoCompactionTicks = 36000;
 
     @CustomKey("light-updates")
-    private boolean lightUpdates = false;
+    private boolean lightUpdates = true;
 
     @CustomKey("clear-chunk-tick-list")
     private boolean clearChunkTickList = true;
 
     @CustomKey("leveldb-cache-mb")
     private int leveldbCacheMb = 80;
-
-    @CustomKey("use-native-leveldb")
-    private boolean useNativeLeveldb = false;
 
     @Setter(value = AccessLevel.NONE)
     @CustomKey("entity")

@@ -1,7 +1,5 @@
 package cn.nukkit.recipe;
 
-import cn.nukkit.network.protocol.ProtocolInfo;
-
 public enum RecipeType {
 
     SHAPELESS(0),
@@ -19,9 +17,12 @@ public enum RecipeType {
      * @since v582
      */
     SMITHING_TRIM(9),
+    STONECUTTER(0),
     REPAIR(-1),
     CAMPFIRE(2),
-    CAMPFIRE_DATA(3);
+    CAMPFIRE_DATA(3),
+    BREWING(0), //custom
+    CONTAINER(0); //custom
 
     private final int networkType;
 
@@ -29,11 +30,7 @@ public enum RecipeType {
         this.networkType = networkType;
     }
 
-    public int getNetworkType(int protocol) {
-        return switch (this) {
-            case SMITHING_TRANSFORM -> protocol >= ProtocolInfo.v1_19_60 ? networkType : 0;
-            case SMITHING_TRIM -> protocol >= ProtocolInfo.v1_19_80 ? networkType : 0;
-            default -> networkType;
-        };
+    public int getNetworkType() {
+        return networkType;
     }
 }

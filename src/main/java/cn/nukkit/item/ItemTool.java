@@ -27,6 +27,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
     public static final int TYPE_SHEARS = 5;
     public static final int TYPE_HOE = 6;
     public static final int TYPE_BRUSH = 7;
+    public static final int TYPE_SPEAR = 8;
 
     public static final int DURABILITY_WOODEN = 60;
     public static final int DURABILITY_GOLD = 33;
@@ -81,7 +82,8 @@ public abstract class ItemTool extends Item implements ItemDurable {
                 block.getToolType() == ItemTool.TYPE_AXE && this.isAxe() ||
                 block.getToolType() == ItemTool.TYPE_HOE && this.isHoe() ||
                 block.getToolType() == ItemTool.TYPE_SWORD && this.isSword() ||
-                block.getToolType() == ItemTool.TYPE_SHEARS && this.isShears()
+                block.getToolType() == ItemTool.TYPE_SHEARS && this.isShears() ||
+                block.getToolType() == ItemTool.TYPE_SPEAR && this.isSpear()
         ) {
             this.meta++;
         } else if (!this.isShears() && block.calculateBreakTime(this) > 0) {
@@ -129,23 +131,15 @@ public abstract class ItemTool extends Item implements ItemDurable {
 
     @Override
     public int getEnchantAbility() {
-        switch (this.getTier()) {
-            case TIER_STONE:
-                return 5;
-            case TIER_WOODEN:
-                return 15;
-            case TIER_DIAMOND:
-                return 10;
-            case TIER_GOLD:
-                return 22;
-            case TIER_IRON:
-                return 14;
-            //TODO
-            case TIER_NETHERITE:
-                return 10;
-            default:
-                return 0;
-        }
+        return switch (this.getTier()) {
+            case TIER_STONE -> 5;
+            case TIER_COPPER -> 13;
+            case TIER_WOODEN, TIER_NETHERITE -> 15;
+            case TIER_DIAMOND -> 10;
+            case TIER_GOLD -> 22;
+            case TIER_IRON -> 14;
+            default -> 0;
+        };
     }
 
     /**

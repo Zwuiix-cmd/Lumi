@@ -1,9 +1,14 @@
-package cn.nukkit.blockentity.impl;
 
+package cn.nukkit.blockentity.impl;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.data.BlockColor;
+<<<<<<< HEAD
 import cn.nukkit.blockentity.BlockEntity;
+=======
+import cn.nukkit.block.properties.enums.PotionType;
+import cn.nukkit.blockentity.BlockEntityID;
+>>>>>>> b404d29b4eafa3f021215ba2b1c248f33f0c56c4
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.FullChunk;
@@ -34,7 +39,7 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
         }
         potionId = namedTag.getShort("PotionId");
 
-        int potionType = (potionId & 0xFFFF) == 0xFFFF ? POTION_TYPE_EMPTY : POTION_TYPE_NORMAL;
+        int potionType = (potionId & 0xFFFF) == 0xFFFF? POTION_TYPE_EMPTY : POTION_TYPE_NORMAL;
         if (namedTag.getBoolean("SplashPotion")) {
             potionType = POTION_TYPE_SPLASH;
             namedTag.remove("SplashPotion");
@@ -57,15 +62,23 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
     }
 
     public boolean hasPotion() {
-        return getPotionId() != 0xffff;
+        return (getPotionId() & 0xFFFF) != POTION_TYPE_EMPTY;
+    }
+
+    public void setPotionType(int potionType) {
+        this.namedTag.putShort("PotionType", potionType & 0xFFFF);
     }
 
     public int getPotionType() {
         return this.namedTag.getShort("PotionType") & 0xFFFF;
     }
 
-    public void setPotionType(int potionType) {
-        this.namedTag.putShort("PotionType", potionType & 0xFFFF);
+    public PotionType getType() {
+        return PotionType.getByTypeData(getPotionType());
+    }
+
+    public void setType(PotionType type) {
+        setPotionType(type.potionTypeData);
     }
 
     public boolean isSplashPotion() {
@@ -128,14 +141,19 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
     }
 
     @Override
+    public boolean isBlockEntityValid() {
+        return getBlock().getId() == Block.CAULDRON_BLOCK;
+    }
+
+    @Override
     public CompoundTag getSpawnCompound() {
         CompoundTag compoundTag = new CompoundTag()
-                .putString("id", BlockEntity.CAULDRON)
+                .putString("id", BlockEntityID.CAULDRON)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
                 .putShort("PotionId", namedTag.getShort("PotionId"))
-                .putByte("PotionType", namedTag.getShort("PotionType"));
+                .putShort("PotionType", (short) namedTag.getShort("PotionType"));
         if (namedTag.contains("CustomColor")) {
             compoundTag.putInt("CustomColor", namedTag.getInt("CustomColor"));
         }

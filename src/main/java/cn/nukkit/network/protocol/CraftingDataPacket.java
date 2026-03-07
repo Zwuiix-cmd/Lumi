@@ -84,11 +84,33 @@ public class CraftingDataPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(protocol >= ProtocolInfo.v1_20_0_23 ? entries.size() + 1 : entries.size());//1.20.0+ 有额外的smithing_trim
+        this.putUnsignedVarInt(entries.size() + 1);
 
         for (Recipe recipe : entries) {
-            this.putVarInt(recipe.getType().getNetworkType(protocol));
+            this.putVarInt(recipe.getType().getNetworkType());
             switch (recipe.getType()) {
+                case STONECUTTER:
+                    StonecutterRecipe stonecutterRecipe = (StonecutterRecipe) recipe;
+                    this.putString(stonecutterRecipe.getRecipeId());
+                    Collection<ItemDescriptor> ingredientsStonecutter = stonecutterRecipe.getIngredientList();
+
+                    this.putUnsignedVarInt(ingredientsStonecutter.size());
+                    for (ItemDescriptor ingredient : ingredientsStonecutter) {
+                        ingredient.putRecipe(this, protocol);
+                    }
+                    this.putUnsignedVarInt(1); // Results length
+                    this.putSlot(protocol, stonecutterRecipe.getResult(), true);
+                    this.putUUID(stonecutterRecipe.getId());
+
+                    this.putString(CRAFTING_TAG_STONECUTTER);
+                    this.putVarInt(stonecutterRecipe.getPriority());
+
+                    if (protocol >= ProtocolInfo.v1_21_0) {
+                        this.writeRequirement(stonecutterRecipe);
+                    }
+
+                    this.putUnsignedVarInt(stonecutterRecipe.getNetworkId());
+                    break;
                 case SHAPELESS:
                     ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
                     this.putString(shapeless.getRecipeId());
@@ -99,20 +121,17 @@ public class CraftingDataPacket extends DataPacket {
                         ingredient.putRecipe(this, protocol);
                     }
                     this.putUnsignedVarInt(1); // Results length
-                    this.putSlot(protocol, shapeless.getResult(), protocol >= ProtocolInfo.v1_16_100);
+                    this.putSlot(protocol, shapeless.getResult(), true);
                     this.putUUID(shapeless.getId());
-                    if (protocol >= 354) {
-                        this.putString(CRAFTING_TAG_CRAFTING_TABLE);
-                        if (protocol >= 361) {
-                            this.putVarInt(shapeless.getPriority());
-                            if (protocol >= 407) {
-                                if (protocol >= ProtocolInfo.v1_21_0) {
-                                    this.writeRequirement(shapeless);
-                                }
-                                this.putUnsignedVarInt(shapeless.getNetworkId());
-                            }
-                        }
+
+                    this.putString(CRAFTING_TAG_CRAFTING_TABLE);
+                    this.putVarInt(shapeless.getPriority());
+
+                    if (protocol >= ProtocolInfo.v1_21_0) {
+                        this.writeRequirement(shapeless);
                     }
+
+                    this.putUnsignedVarInt(shapeless.getNetworkId());
                     break;
                 case SMITHING_TRANSFORM:
                     SmithingRecipe smithing = (SmithingRecipe) recipe;
@@ -126,9 +145,7 @@ public class CraftingDataPacket extends DataPacket {
                     break;
                 case SHAPED:
                     ShapedRecipe shaped = (ShapedRecipe) recipe;
-                    if (protocol >= 361) {
-                        this.putString(shaped.getRecipeId());
-                    }
+                    this.putString(shaped.getRecipeId());
                     this.putVarInt(shaped.getWidth());
                     this.putVarInt(shaped.getHeight());
 
@@ -142,24 +159,22 @@ public class CraftingDataPacket extends DataPacket {
                     outputs.addAll(shaped.getExtraResults());
                     this.putUnsignedVarInt(outputs.size());
                     for (Item output : outputs) {
-                        this.putSlot(protocol, output, protocol >= ProtocolInfo.v1_16_100);
+                        this.putSlot(protocol, output, true);
                     }
                     this.putUUID(shaped.getId());
-                    if (protocol >= 354) {
-                        this.putString(CRAFTING_TAG_CRAFTING_TABLE);
-                        if (protocol >= 361) {
-                            this.putVarInt(shaped.getPriority());
-                            if (this.protocol >= ProtocolInfo.v1_20_80) {
-                                this.putBoolean(shaped.isAssumeSymetry());
-                            }
-                            if (protocol >= 407) {
-                                if (protocol >= ProtocolInfo.v1_21_0) {
-                                    this.writeRequirement(shaped);
-                                }
-                                this.putUnsignedVarInt(shaped.getNetworkId());
-                            }
-                        }
+
+                    this.putString(CRAFTING_TAG_CRAFTING_TABLE);
+                    this.putVarInt(shaped.getPriority());
+
+                    if (this.protocol >= ProtocolInfo.v1_20_80) {
+                        this.putBoolean(shaped.isAssumeSymetry());
                     }
+
+                    if (protocol >= ProtocolInfo.v1_21_0) {
+                        this.writeRequirement(shaped);
+                    }
+
+                    this.putUnsignedVarInt(shaped.getNetworkId());
                     break;
                 case FURNACE:
                 case FURNACE_DATA:
@@ -169,23 +184,19 @@ public class CraftingDataPacket extends DataPacket {
                     if (recipe.getType() == RecipeType.FURNACE_DATA) {
                         this.putVarInt(input.getDamage());
                     }
-                    this.putSlot(protocol, furnace.getResult(), protocol >= ProtocolInfo.v1_16_100);
-                    if (protocol >= 354) {
-                        this.putString(CRAFTING_TAG_FURNACE);
-                    }
+                    this.putSlot(protocol, furnace.getResult(), true);
+                    this.putString(CRAFTING_TAG_FURNACE);
                     break;
                 case MULTI:
-                    if (protocol >= ProtocolInfo.v1_16_0) { // ??
-                        this.putUUID(((MultiRecipe) recipe).getId());
-                        this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
-                        break;
-                    }
+                    this.putUUID(((MultiRecipe) recipe).getId());
+                    this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
+                    break;
             }
         }
 
         // Identical smithing_trim recipe sent by BDS that uses tag-descriptors, as the client seems to ignore the
         // approach of using many default-descriptors (which we do for smithing_transform)
-        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType(protocol));
+        this.putVarInt(RecipeType.SMITHING_TRIM.getNetworkType());
         this.putString("minecraft:smithing_armor_trim");
         new ItemTagDescriptor(ItemTags.TRIM_TEMPLATES, "minecraft:trim_templates").putRecipe(this, protocol);
         new ItemTagDescriptor(ItemTags.TRIMMABLE_ARMORS, "minecraft:trimmable_armors").putRecipe(this, protocol);
@@ -193,32 +204,26 @@ public class CraftingDataPacket extends DataPacket {
         this.putString(CRAFTING_TAG_SMITHING_TABLE);
         this.putUnsignedVarInt(1);
 
-        if (protocol >= 388) {
-            this.putUnsignedVarInt(this.brewingEntries.size());
-            for (BrewingRecipe recipe : brewingEntries) {
-                if (protocol >= 407) {
-                    this.putVarInt(recipe.getInput().getNetworkId(protocol));
-                }
-                this.putVarInt(recipe.getInput().getDamage());
-                this.putVarInt(recipe.getIngredient().getNetworkId(protocol));
-                if (protocol >= 407) {
-                    this.putVarInt(recipe.getIngredient().getDamage());
-                    this.putVarInt(recipe.getResult().getNetworkId(protocol));
-                }
-                this.putVarInt(recipe.getResult().getDamage());
-            }
 
-            this.putUnsignedVarInt(this.containerEntries.size());
-            for (ContainerRecipe recipe : containerEntries) {
-                this.putVarInt(recipe.getInput().getNetworkId(protocol));
-                this.putVarInt(recipe.getIngredient().getNetworkId(protocol));
-                this.putVarInt(recipe.getResult().getNetworkId(protocol));
-            }
-
-            if (protocol >= ProtocolInfo.v1_17_30) {
-                this.putUnsignedVarInt(0); // Material reducers size
-            }
+        this.putUnsignedVarInt(this.brewingEntries.size());
+        for (BrewingRecipe recipe : brewingEntries) {
+            this.putVarInt(recipe.getInput().getNetworkId(protocol));
+            this.putVarInt(recipe.getInput().getDamage());
+            this.putVarInt(recipe.getIngredient().getNetworkId(protocol));
+            this.putVarInt(recipe.getIngredient().getDamage());
+            this.putVarInt(recipe.getResult().getNetworkId(protocol));
+            this.putVarInt(recipe.getResult().getDamage());
         }
+
+        this.putUnsignedVarInt(this.containerEntries.size());
+        for (ContainerRecipe recipe : containerEntries) {
+            this.putVarInt(recipe.getInput().getNetworkId(protocol));
+            this.putVarInt(recipe.getIngredient().getNetworkId(protocol));
+            this.putVarInt(recipe.getResult().getNetworkId(protocol));
+        }
+
+        this.putUnsignedVarInt(0); // Material reducers size
+
 
         this.putBoolean(cleanRecipes);
     }

@@ -1,6 +1,5 @@
 package cn.nukkit.item;
 
-import cn.nukkit.network.protocol.ProtocolInfo;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,10 +37,5 @@ public class StringItemToolBase extends ItemTool implements ItemDurable, StringI
     @Override
     public StringItemToolBase clone() {
         return (StringItemToolBase) super.clone();
-    }
-
-    @Override
-    public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_16_100;
     }
 }

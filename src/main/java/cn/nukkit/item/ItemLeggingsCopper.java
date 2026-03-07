@@ -5,7 +5,7 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 /**
  * @author Glorydark
  */
-public class ItemLeggingsCopper extends StringItemBase {
+public class ItemLeggingsCopper extends StringItemArmorBase {
 
     public ItemLeggingsCopper() {
         super(COPPER_LEGGINGS, "Copper Leggings");
@@ -13,7 +13,7 @@ public class ItemLeggingsCopper extends StringItemBase {
 
     @Override
     public boolean isSupportedOn(int protocolId) {
-        return protocolId >= ProtocolInfo.v1_21_100;
+        return protocolId >= ProtocolInfo.v1_21_111;
     }
 
     @Override
