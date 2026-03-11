@@ -455,8 +455,8 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
                         Block target = level.getBlock(blockVector.asVector3());
                         Block block = target.getSide(face);
 
-                        level.sendBlocks(new Player[]{player}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NOGRAPHIC);
-                        level.sendBlocks(new Player[]{player}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
+                        level.sendBlocks(new Player[]{player}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NETWORK);
+                        level.sendBlocks(new Player[]{player}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NETWORK, 1);
 
                         if (target instanceof BlockDoor) {
                             BlockDoor door = (BlockDoor) target;
@@ -468,8 +468,8 @@ public class InventoryTransactionProcessor extends DataPacketProcessor<Inventory
 
                                 if (part.getId() == target.getId()) {
                                     target = part;
-                                    level.sendBlocks(new Player[]{player}, new Block[]{target}, UpdateBlockPacket.FLAG_NOGRAPHIC);
-                                    level.sendBlocks(new Player[]{player}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
+                                    level.sendBlocks(new Player[]{player}, new Block[]{target}, UpdateBlockPacket.FLAG_NETWORK);
+                                    level.sendBlocks(new Player[]{player}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NETWORK, 1);
                                 }
                             }
                         }
